@@ -83,12 +83,23 @@
     .chart-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; }
     .chart-card h3 { font-size: 12px; font-weight: 700; margin-bottom: 12px; color: #424242; }
 
+    /* Pie Chart */
+    .pie-chart-wrap { display: flex; align-items: center; gap: 16px; }
+    .pie-chart { width: 110px; height: 110px; border-radius: 50%; flex-shrink: 0; }
+    .pie-legend { display: flex; flex-direction: column; gap: 4px; }
+    .pie-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #424242; }
+    .pie-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
     /* Vertical Bar Chart */
-    .vbar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
+    .vbar-wrap { position: relative; height: 130px; padding: 0 4px; }
+    .vbar-grid { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .vbar-grid-line { border-top: 1px solid #e8e8e8; width: 100%; }
+    .vbar-grid-line:last-child { border-top: 1px solid #d0d0d0; }
+    .vbar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100%; position: relative; z-index: 1; }
     .vbar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
-    .vbar-bar { width: 100%; max-width: 28px; border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.2s; }
-    .vbar-val { font-size: 10px; font-weight: 600; color: #424242; margin-bottom: 2px; }
-    .vbar-lbl { font-size: 9px; color: #616161; margin-top: 4px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
+    .vbar-bar { width: 100%; max-width: 32px; border-radius: 3px 3px 0 0; min-height: 4px; }
+    .vbar-val { font-size: 10px; font-weight: 600; color: #424242; margin-bottom: 3px; }
+    .vbar-lbl { font-size: 9px; color: #616161; margin-top: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56px; }
 
     /* Table Toolbar */
     .table-toolbar {
@@ -974,20 +985,24 @@
       campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
       const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
-      var statusChart = buildVBarChart(statusCounts, statusColors, 'By Status');
+      // Pie: Status distribution
+      var statusChart = buildPieChart(statusCounts, statusColors, 'By Status');
 
+      // Bar: Workloads
       var wlCounts = {};
       campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
       var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload');
 
+      // Pie: Region distribution
       var areaCounts = {};
       campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
       var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-      var areaChart = buildVBarChart(areaCounts, areaColors, 'By Region');
+      var areaChart = buildPieChart(areaCounts, areaColors, 'By Region');
 
       if (currentView === 'partner') {
         chartsRow.innerHTML = statusChart + workloadChart + areaChart;
       } else {
+        // Bar: Partners
         var partnerCounts = {};
         campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
         var pColors = ['#0078d4','#107c10','#d83b01','#8a6d00','#7719aa','#005a9e','#c19c00'];
@@ -1002,11 +1017,31 @@
       var entries = Object.entries(data);
       var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
       var bars = entries.map(function(e) {
-        var pct = Math.round((e[1] / maxVal) * 100);
+        var pct = Math.max(5, Math.round((e[1] / maxVal) * 100));
         var color = (typeof colors === 'string') ? colors : (colors[e[0]] || '#0078d4');
         return '<div class="vbar-col"><span class="vbar-val">'+e[1]+'</span><div class="vbar-bar" style="height:'+pct+'%;background:'+color+'" title="'+e[0]+': '+e[1]+'"></div><span class="vbar-lbl" title="'+e[0]+'">'+e[0]+'</span></div>';
       }).join('');
-      return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-chart">'+bars+'</div></div>';
+      var gridLines = '<div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div>';
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-wrap"><div class="vbar-grid">'+gridLines+'</div><div class="vbar-chart">'+bars+'</div></div></div>';
+    }
+
+    function buildPieChart(data, colors, title) {
+      var entries = Object.entries(data).filter(function(e) { return e[1] > 0; });
+      var total = entries.reduce(function(sum, e) { return sum + e[1]; }, 0);
+      var gradientParts = [];
+      var angle = 0;
+      entries.forEach(function(e) {
+        var pct = (e[1] / total) * 360;
+        var color = colors[e[0]] || '#999';
+        gradientParts.push(color + ' ' + angle + 'deg ' + (angle + pct) + 'deg');
+        angle += pct;
+      });
+      var gradient = 'conic-gradient(' + gradientParts.join(', ') + ')';
+      var legend = entries.map(function(e) {
+        var color = colors[e[0]] || '#999';
+        return '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
+      }).join('');
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
