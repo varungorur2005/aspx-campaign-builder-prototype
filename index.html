@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASPX - Campaign Builder</title>
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       RESET & BASE
+       ══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5; color: #242424; min-height: 100vh;
+      font-size: 13px;
+    }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ══════════════════════════════════════════════════════════════
+       TOP NAV
+       ══════════════════════════════════════════════════════════════ */
+    .top-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 48px; padding: 0 20px;
+      background: #1b3a5c; position: sticky; top: 0; z-index: 500;
+    }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-title { font-size: 14px; color: #fff; font-weight: 400; }
+    .nav-platform-name { font-weight: 700; }
+    .nav-separator { color: rgba(255,255,255,0.4); font-weight: 300; }
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #4a8bc2; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       APP LAYOUT
+       ══════════════════════════════════════════════════════════════ */
+    .app-layout { display: flex; min-height: calc(100vh - 48px); }
+
+    /* Sidebar */
+    .sidebar {
+      width: 200px; background: #fafafa; border-right: 1px solid #e0e0e0;
+      padding: 12px 0; flex-shrink: 0;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; }
+    .sidebar-link {
+      display: flex; align-items: center; padding: 9px 14px;
+      font-size: 13px; color: #424242; text-decoration: none;
+      border-left: 3px solid transparent; transition: all 0.12s;
+    }
+    .sidebar-link:hover { background: #f0f0f0; }
+    .sidebar-link.active { background: #e8f0fe; color: #0078d4; border-left-color: #0078d4; font-weight: 600; }
+
+    /* Main */
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+
+    /* ══════════════════════════════════════════════════════════════
+       DASHBOARD VIEW
+       ══════════════════════════════════════════════════════════════ */
+    .dashboard-view { padding: 20px 24px 40px; }
+    .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+    /* KPI Row */
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-tile {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 16px; text-align: left;
+    }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; }
+    .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
+
+    /* Charts Row */
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .charts-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
+    .chart-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; }
+    .chart-card h3 { font-size: 12px; font-weight: 700; margin-bottom: 12px; color: #424242; }
+    .chart-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .chart-bar-label { width: 80px; font-size: 11px; color: #616161; text-align: right; }
+    .chart-bar-track { flex: 1; height: 20px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+    .chart-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; font-size: 10px; color: #fff; font-weight: 600; min-width: 20px; }
+    .chart-bar-count { font-size: 11px; color: #424242; width: 24px; }
+
+    /* Pie Chart (CSS conic-gradient) */
+    .pie-chart-wrap { display: flex; align-items: center; gap: 16px; }
+    .pie-chart {
+      width: 120px; height: 120px; border-radius: 50%; flex-shrink: 0;
+    }
+    .pie-legend { display: flex; flex-direction: column; gap: 4px; }
+    .pie-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #424242; }
+    .pie-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    /* Table Toolbar */
+    .table-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 8px; }
+    .toolbar-right { display: flex; align-items: center; gap: 8px; }
+    .toolbar-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; font-size: 12px; font-weight: 500;
+      color: #424242; background: transparent; border: none; border-radius: 4px;
+      transition: all 0.12s;
+    }
+    .toolbar-btn:hover { background: #f0f0f0; color: #0078d4; }
+    .toolbar-search {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border: 1px solid #d1d1d1; border-radius: 4px; background: #fff;
+    }
+    .toolbar-search:focus-within { border-color: #0078d4; }
+    .toolbar-search input { border: none; outline: none; font-size: 12px; width: 180px; }
+    .toolbar-sort select {
+      font-size: 12px; padding: 5px 8px; border: 1px solid #d1d1d1;
+      border-radius: 4px; background: #fff;
+    }
+
+    /* Campaign Table */
+    .campaign-table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .campaign-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .campaign-table thead { position: sticky; top: 0; z-index: 10; }
+    .campaign-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: #616161;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      padding: 10px 12px; border-bottom: 2px solid #e0e0e0; background: #fafafa;
+      white-space: nowrap;
+    }
+    .campaign-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    .campaign-table tr:hover td { background: #f8f9fa; }
+    .campaign-id-link { color: #0078d4; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .campaign-id-link:hover { text-decoration: underline; }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .status-badge.new { background: #e8f0fe; color: #0078d4; }
+    .status-badge.outreach { background: #e6f2ff; color: #005a9e; }
+    .status-badge.funding { background: #fff4ce; color: #8a6d00; }
+    .status-badge.committed { background: #dff6dd; color: #107c10; }
+    .status-badge.blocked { background: #fed9cc; color: #d83b01; }
+    .status-badge.closed { background: #f0f0f0; color: #605e5c; }
+
+    /* Workload pills */
+    .workload-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+    .workload-pill {
+      font-size: 10px; padding: 2px 6px; border-radius: 3px;
+      background: #e8f0fe; color: #0078d4; font-weight: 500;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       FILTER FLYOUT
+       ══════════════════════════════════════════════════════════════ */
+    .filter-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 400;
+    }
+    .filter-overlay.show { display: block; }
+    .filter-panel {
+      position: fixed; top: 48px; right: 0; bottom: 0; width: 320px;
+      background: #fff; box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+      padding: 20px; overflow-y: auto; z-index: 401;
+      transform: translateX(100%); transition: transform 0.2s ease;
+    }
+    .filter-overlay.show .filter-panel { transform: translateX(0); }
+    .filter-panel h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .filter-section { margin-bottom: 16px; }
+    .filter-section label { display: block; font-size: 11px; font-weight: 600; color: #616161; margin-bottom: 4px; text-transform: uppercase; }
+    .filter-section select, .filter-section input {
+      width: 100%; padding: 7px 10px; font-size: 12px;
+      border: 1px solid #d1d1d1; border-radius: 4px;
+    }
+    .filter-actions { display: flex; gap: 8px; margin-top: 16px; }
+
+    /* ══════════════════════════════════════════════════════════════
+       DETAIL FLYOUT
+       ══════════════════════════════════════════════════════════════ */
+    .detail-view {
+      position: fixed; top: 48px; right: 0; bottom: 0;
+      width: 620px; max-width: 50vw; background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      border-left: 1px solid #e0e0e0;
+      transform: translateX(100%); transition: transform 0.25s ease;
+      overflow-y: auto; padding: 20px 24px 80px; z-index: 301;
+    }
+    .detail-view.show { transform: translateX(0); }
+    .flyout-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .flyout-close {
+      width: 32px; height: 32px; border-radius: 4px; border: none;
+      background: transparent; font-size: 18px; color: #616161;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.12s;
+    }
+    .flyout-close:hover { background: #f0f0f0; color: #242424; }
+
+    /* Detail Header */
+    .detail-header { margin-bottom: 20px; }
+    .detail-header h1 { font-size: 20px; font-weight: 700; }
+    .detail-meta { display: flex; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+    .detail-meta-item { font-size: 12px; color: #616161; }
+    .detail-meta-item strong { color: #424242; }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      display: flex; align-items: flex-start; gap: 0;
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 20px 24px; margin-bottom: 20px; position: relative;
+    }
+    .step-item {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1; position: relative;
+    }
+    .step-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #e0e0e0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #616161;
+      transition: all 0.2s; border: 2px solid transparent; position: relative; z-index: 2;
+    }
+    .step-item.completed .step-dot { background: #107c10; color: #fff; }
+    .step-item.active .step-dot { background: #0078d4; color: #fff; border-color: #005a9e; box-shadow: 0 0 0 3px rgba(0,120,212,0.2); }
+    .step-item.blocked .step-dot { background: #d83b01; color: #fff; }
+    .step-item.closed-state .step-dot { background: #605e5c; color: #fff; }
+    .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
+    .step-item.active .step-label { color: #0078d4; }
+    .step-item.blocked .step-label { color: #d83b01; }
+    .step-date { font-size: 9px; color: #999; margin-top: 2px; }
+    .step-connector {
+      flex: 1; height: 2px; background: #e0e0e0;
+      align-self: flex-start; margin-top: 16px; z-index: 1;
+    }
+    .step-connector.filled { background: #107c10; }
+
+    /* Panel Cards */
+    .panel-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    .panel-card h2 {
+      font-size: 14px; font-weight: 700; color: #242424;
+      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* State Description Banner */
+    .state-banner {
+      padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;
+      font-size: 12px; border-left: 3px solid;
+    }
+    .state-banner.info { background: #e8f0fe; border-color: #0078d4; color: #1a3a5c; }
+    .state-banner.warning { background: #fff4ce; border-color: #8a6d00; color: #5c4600; }
+    .state-banner.danger { background: #fed9cc; border-color: #d83b01; color: #5c1a00; }
+    .state-banner.neutral { background: #f0f0f0; border-color: #605e5c; color: #3b3a39; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group label { font-size: 11px; font-weight: 600; color: #424242; text-transform: uppercase; letter-spacing: 0.2px; }
+    .form-group label .required { color: #d83b01; }
+    .form-group input, .form-group select, .form-group textarea {
+      font-size: 13px; padding: 8px 12px;
+      border: 1px solid #d1d1d1; border-radius: 4px; background: #fff; color: #242424;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0078d4; }
+    .form-group textarea { resize: vertical; min-height: 56px; }
+    .form-group input:disabled, .form-group select:disabled { background: #f5f5f5; color: #a0a0a0; }
+
+    .radio-group { display: flex; gap: 16px; padding-top: 4px; }
+    .radio-group label { font-weight: 400; font-size: 13px; display: flex; align-items: center; gap: 4px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+    /* Outcome Cards */
+    .outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .outcome-card {
+      border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px 14px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .outcome-card:hover { border-color: #0078d4; background: #f8fbff; }
+    .outcome-card.selected { border-color: #0078d4; background: #e8f0fe; box-shadow: 0 0 0 1px #0078d4; }
+    .outcome-card .oc-title { font-size: 12px; font-weight: 600; color: #242424; }
+    .outcome-card .oc-effect { font-size: 11px; color: #616161; margin-top: 3px; }
+    .outcome-card .oc-badge { font-size: 10px; font-weight: 600; margin-top: 4px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+    .oc-badge.success { background: #dff6dd; color: #107c10; }
+    .oc-badge.danger { background: #fed9cc; color: #d83b01; }
+
+    /* Workloads Table */
+    .workloads-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .workloads-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: #616161;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      padding: 8px 12px; border-bottom: 2px solid #e0e0e0; background: #fafafa;
+    }
+    .workloads-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+    .workloads-table tr:hover td { background: #f8f9fa; }
+    .workloads-table select, .workloads-table input[type="number"], .workloads-table input[type="text"] {
+      font-size: 12px; padding: 5px 8px; border: 1px solid #d1d1d1; border-radius: 4px; width: 100%;
+    }
+
+    /* Notes / Audit Timeline */
+    .audit-timeline { margin-top: 12px; }
+    .audit-entry { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f8f8; }
+    .audit-dot { width: 8px; height: 8px; border-radius: 50%; background: #0078d4; margin-top: 5px; flex-shrink: 0; }
+    .audit-dot.blocked { background: #d83b01; }
+    .audit-dot.closed { background: #605e5c; }
+    .audit-dot.success { background: #107c10; }
+    .audit-text { font-size: 12px; color: #424242; }
+    .audit-date { font-size: 10px; color: #999; margin-top: 2px; }
+
+    /* Buttons */
+    .btn {
+      font-size: 13px; font-weight: 600; padding: 8px 20px;
+      border-radius: 4px; border: none; transition: all 0.15s;
+    }
+    .btn-primary { background: #0078d4; color: #fff; }
+    .btn-primary:hover { background: #005a9e; }
+    .btn-secondary { background: #fff; color: #424242; border: 1px solid #d1d1d1; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    .btn-danger { background: #d83b01; color: #fff; }
+    .btn-danger:hover { background: #b83200; }
+    .btn-success { background: #107c10; color: #fff; }
+    .btn-success:hover { background: #0b5e0b; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-group { display: flex; gap: 8px; margin-top: 16px; }
+
+    /* Action Bar (inside flyout) */
+    #detailActionBar .action-bar-left { display: flex; gap: 8px; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 600;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 8px; padding: 24px; width: 440px; max-width: 90vw; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: #616161; margin-bottom: 16px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 80px; right: 24px;
+      background: #107c10; color: #fff; padding: 12px 20px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(20px); opacity: 0; transition: all 0.3s ease; z-index: 700;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: #d83b01; }
+  </style>
+</head>
+<body>
+  <!-- ═══════ TOP NAV ═══════ -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <svg width="20" height="20" viewBox="0 0 21 21">
+        <rect x="0" y="0" width="10" height="10" fill="#f25022"/>
+        <rect x="11" y="0" width="10" height="10" fill="#7fba00"/>
+        <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
+        <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
+      </svg>
+      <span class="nav-title nav-platform-name">AI Business Solutions &amp; Security</span>
+      <span class="nav-separator">|</span>
+      <span class="nav-title" id="pageTitle">Campaign Builder (Partner View)</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-avatar" title="Varun Gorur">VG</div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- ═══════ SIDEBAR ═══════ -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link" onclick="return false"><span>Growth Opportunities</span></a>
+        <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
+        <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
+        <a href="#" class="sidebar-link" onclick="return false"><span>MCI Performance</span></a>
+      </nav>
+    </aside>
+
+    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ═══════════════════════════════════════════════════════
+           DASHBOARD VIEW
+           ═══════════════════════════════════════════════════════ -->
+      <div class="dashboard-view" id="dashboardView">
+        <h1 class="page-title" id="dashboardTitle">Campaigns — Partner View</h1>
+
+        <!-- KPIs -->
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- Charts -->
+        <div class="charts-row" id="chartsRow"></div>
+
+        <!-- Table Toolbar -->
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <div class="toolbar-search">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
+            </div>
+            <div class="toolbar-sort">
+              <select id="sortSelect" onchange="renderDashboard()">
+                <option value="updated">Latest Update</option>
+                <option value="created">Created Date</option>
+                <option value="blocked">Blocked First</option>
+                <option value="status">By Status</option>
+              </select>
+            </div>
+          </div>
+          <div class="toolbar-right">
+            <button class="toolbar-btn" onclick="toggleFilter()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
+              Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="campaign-table-wrap">
+          <table class="campaign-table">
+            <thead id="campaignTableHead"></thead>
+            <tbody id="campaignTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       DETAIL FLYOUT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="detail-view" id="detailView">
+    <div class="flyout-header">
+      <span style="font-size:11px;color:#616161;">Campaign Detail</span>
+      <button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button>
+    </div>
+
+    <!-- Header -->
+    <div class="detail-header" id="detailHeader"></div>
+
+        <!-- Lifecycle Stepper -->
+        <div class="lifecycle-stepper" id="lifecycleStepper"></div>
+
+        <!-- State Banner -->
+        <div class="state-banner info" id="stateBanner"></div>
+
+        <!-- Contextual Action Panel -->
+        <div id="actionPanel"></div>
+
+        <!-- Workloads (only in Committed) -->
+        <div class="panel-card" id="workloadsPanel" style="display:none;">
+          <h2>Workloads</h2>
+          <table class="workloads-table">
+            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change</th><th>Notes</th></tr></thead>
+            <tbody id="workloadsBody"></tbody>
+          </table>
+          <div class="form-group full-width" style="margin-top:14px;">
+            <label>Notes</label>
+            <textarea placeholder="General notes for this campaign..."></textarea>
+          </div>
+        </div>
+
+        <!-- Notes / Audit History -->
+        <div class="panel-card">
+          <h2>Activity &amp; Audit History</h2>
+          <div class="audit-timeline" id="auditTimeline"></div>
+        </div>
+
+      <!-- Action Bar -->
+      <div id="detailActionBar" style="padding:12px 0; border-top:1px solid #e0e0e0; margin-top:16px; display:flex; align-items:center; justify-content:space-between;"></div>
+  </div>
+
+  <!-- ═══════ FILTER FLYOUT ═══════ -->
+  <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()">
+    <div class="filter-panel" onclick="event.stopPropagation()">
+      <h3>Filters <button class="btn btn-sm btn-secondary" onclick="resetFilters()">Reset</button></h3>
+      <div class="filter-section">
+        <label>Status</label>
+        <select id="filterStatus" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="New">New</option>
+          <option value="Outreach">Outreach</option>
+          <option value="Funding">Funding</option>
+          <option value="Committed">Committed</option>
+          <option value="Blocked">Blocked</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div class="filter-section">
+        <label>Source</label>
+        <select id="filterSource" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="Summit">Summit</option>
+          <option value="CSU">CSU</option>
+          <option value="Field Referral">Field Referral</option>
+        </select>
+      </div>
+      <div class="filter-section">
+        <label>Sub-Region</label>
+        <select id="filterRegion" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="US West">US West</option>
+          <option value="US East">US East</option>
+          <option value="EMEA North">EMEA North</option>
+          <option value="APAC">APAC</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary btn-sm" onclick="toggleFilter()">Apply</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ CLOSE MODAL ═══════ -->
+  <div class="modal-overlay" id="closeModal">
+    <div class="modal">
+      <h3>Close Campaign</h3>
+      <p>Are you sure you want to close this campaign? You can reactivate it later if needed.</p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Please provide reason for closing <span style="color:#d83b01;">*</span></label>
+        <textarea id="closeReasonText" placeholder="Enter reason for closing..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-danger" onclick="confirmCloseCampaign()">Yes, Close Campaign</button>
+        <button class="btn btn-secondary" onclick="hideModal('closeModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ TOAST ═══════ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+    // ═══════ MOCK DATA ═══════
+    const campaigns = [
+      {
+        id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
+        tpid: 'TP-44201', segment: 'Enterprise', region: 'ANZ', industry: 'Government',
+        source: 'Security CSU Partner Summit | ANZ',
+        workloads: ['IRM','MIP P2','MDE','MDA','Sentinel'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'John.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
+        unified: 'Unified', opportunityId: '7-123456789',
+        dates: { created: '2026-05-28', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MIP P2', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Summit | ANZ', type: 'info', actor: 'scottweeden@microsoft.com' }
+        ]
+      },
+      {
+        id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro India Private Ltd',
+        tpid: 'TP-55102', segment: 'Enterprise', region: 'India', industry: 'Financial Services',
+        source: 'Security CSU Partner Summit | FSI',
+        workloads: ['MDE','MDA','MDO','MDI','IRM'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'Jane.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-123456787',
+        dates: { created: '2026-05-28', updated: '2026-06-02' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Summit | FSI', type: 'info', actor: 'scottweeden@microsoft.com' }
+        ]
+      },
+      {
+        id: '334455', customer: 'Contoso Ltd', partner: 'Acme Consulting',
+        tpid: 'TP-33098', segment: 'Enterprise', region: 'US West', industry: 'Technology',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDO','MDI','MDE'],
+        status: 'Committed', previousState: null, blockReason: '',
+        partnerDRI: 'partner@acme.com', microsoftDRI: 'field@microsoft.com',
+        unified: 'Unified', opportunityId: '7-334455001',
+        dates: { created: '2026-05-10', outreach: '2026-05-12', engagement: '2026-05-18', fundingSubmission: '2026-05-22', fundingApproval: '2026-05-28', updated: '2026-06-04' },
+        funding: { submitted: true, secured: 'yes' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDO', status: 'Committed', seats: 120000, notes: 'Full tenant rollout' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Closed', seats: 50000, notes: 'Phase 1 complete' }
+        ],
+        history: [
+          { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
+          { date: '2026-05-12', text: 'Outreach completed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-18', text: 'Customer engaged — agreed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-22', text: 'ECIF funding submitted', type: 'info', actor: 'partner@acme.com' },
+          { date: '2026-05-28', text: 'Funding approved', type: 'success', actor: 'field@microsoft.com' },
+          { date: '2026-06-04', text: 'MDE workload marked as Closed', type: 'success', actor: 'partner@acme.com' }
+        ]
+      },
+      {
+        id: '556677', customer: 'Northwind Traders', partner: 'TechData Corp',
+        tpid: 'TP-77451', segment: 'Mid-Market', region: 'EMEA North', industry: 'Retail',
+        source: 'Security CSU Partner Summit | EMEA',
+        workloads: ['MDE','MDA','Sentinel'],
+        status: 'Blocked', previousState: 'Outreach', blockReason: 'Customer prefers to work with another partner',
+        partnerDRI: 'rep@techdata.com', microsoftDRI: 'msftfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-556677001',
+        dates: { created: '2026-05-15', outreach: '2026-05-18', engagement: '2026-05-25', updated: '2026-06-01' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: 'preference' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-15', text: 'Campaign created', type: 'info', actor: 'msftfield@microsoft.com' },
+          { date: '2026-05-18', text: 'Outreach completed', type: 'success', actor: 'rep@techdata.com' },
+          { date: '2026-05-25', text: 'Customer prefers another partner — blocked', type: 'blocked', actor: 'rep@techdata.com' }
+        ]
+      },
+      {
+        id: '889900', customer: 'Tailspin Toys', partner: 'Insight Direct',
+        tpid: 'TP-12399', segment: 'SMB', region: 'APAC', industry: 'Consumer Goods',
+        source: 'Security CSU Partner Summit | APAC',
+        workloads: ['MDO','MDE'],
+        status: 'Funding', previousState: null, blockReason: '',
+        partnerDRI: 'sales@insight.com', microsoftDRI: 'apacfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-889900001',
+        dates: { created: '2026-05-20', outreach: '2026-05-22', engagement: '2026-05-28', fundingSubmission: '', updated: '2026-06-02' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-20', text: 'Campaign created', type: 'info', actor: 'apacfield@microsoft.com' },
+          { date: '2026-05-22', text: 'Outreach completed', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-05-28', text: 'Customer agreed', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-06-02', text: 'Awaiting funding submission', type: 'info', actor: 'apacfield@microsoft.com' }
+        ]
+      },
+      {
+        id: '101010', customer: 'Woodgrove Bank', partner: 'Avanade',
+        tpid: 'TP-88210', segment: 'Enterprise', region: 'US East', industry: 'Financial Services',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDO','MDI','MDE','Sentinel'],
+        status: 'Outreach', previousState: null, blockReason: '',
+        partnerDRI: 'exec@avanade.com', microsoftDRI: 'usfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-101010001',
+        dates: { created: '2026-06-01', outreach: '', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-06-01', text: 'Campaign created', type: 'info', actor: 'usfield@microsoft.com' },
+          { date: '2026-06-03', text: 'Partner initiated outreach', type: 'info', actor: 'exec@avanade.com' }
+        ]
+      },
+      {
+        id: '777888', customer: 'Litware Inc', partner: 'Softchoice',
+        tpid: 'TP-65477', segment: 'Mid-Market', region: 'US East', industry: 'Technology',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDE','MDA'],
+        status: 'Closed', previousState: null, blockReason: '',
+        partnerDRI: 'dri@softchoice.com', microsoftDRI: 'usfield2@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-777888001',
+        dates: { created: '2026-04-15', outreach: '2026-04-17', engagement: '2026-04-22', fundingSubmission: '2026-04-25', fundingApproval: '2026-04-30', updated: '2026-05-25' },
+        funding: { submitted: true, secured: 'yes' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Closed', seats: 15000, notes: 'Complete' },
+          { name: 'MDA', status: 'Closed', seats: 8000, notes: 'Complete' }
+        ],
+        history: [
+          { date: '2026-04-15', text: 'Campaign created', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-04-17', text: 'Outreach completed', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-04-22', text: 'Customer engaged', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-04-30', text: 'Funding approved', type: 'success', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-20', text: 'All workloads closed', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-05-25', text: 'Campaign auto-closed', type: 'closed', actor: 'System' }
+        ]
+      }
+    ];
+
+    let currentCampaign = null;
+    let currentView = 'partner'; // 'partner' or 'field'
+    const STATE_ORDER = ['New', 'Outreach', 'Funding', 'Committed', 'Closed'];
+
+    // ═══════ VIEW SWITCH ═══════
+    function switchView(view) {
+      currentView = view;
+      document.getElementById('navPartner').classList.toggle('active', view === 'partner');
+      document.getElementById('navField').classList.toggle('active', view === 'field');
+      document.getElementById('pageTitle').textContent = view === 'partner' ? 'Campaign Builder (Partner View)' : 'Campaign Builder (MSFT Field View)';
+      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns — Partner View' : 'Campaigns — Field | Corp View';
+      renderDashboard();
+    }
+
+    // ═══════ DASHBOARD ═══════
+    function renderDashboard() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const filterStatus = document.getElementById('filterStatus').value;
+      const filterSource = document.getElementById('filterSource').value;
+      const filterRegion = document.getElementById('filterRegion').value;
+      const sortBy = document.getElementById('sortSelect').value;
+
+      let filtered = campaigns.filter(c => {
+        if (search && !c.customer.toLowerCase().includes(search) && !c.id.toLowerCase().includes(search)) return false;
+        if (filterStatus && c.status !== filterStatus) return false;
+        if (filterSource && c.source !== filterSource) return false;
+        if (filterRegion && c.region !== filterRegion) return false;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (sortBy === 'updated') return (b.dates.updated || '').localeCompare(a.dates.updated || '');
+        if (sortBy === 'created') return (b.dates.created || '').localeCompare(a.dates.created || '');
+        if (sortBy === 'blocked') return (b.status === 'Blocked' ? 1 : 0) - (a.status === 'Blocked' ? 1 : 0);
+        if (sortBy === 'status') return STATE_ORDER.indexOf(a.status === 'Blocked' ? 'Committed' : a.status) - STATE_ORDER.indexOf(b.status === 'Blocked' ? 'Committed' : b.status);
+        return 0;
+      });
+
+      // KPIs — differ by view
+      const total = campaigns.length;
+      const blocked = campaigns.filter(c => c.status === 'Blocked').length;
+      const partnersEngaged = new Set(campaigns.filter(c => c.status !== 'New').map(c => c.partner)).size;
+      const usageWhitespace = '1.2M'; // mock
+      const unifiedPct = Math.round(campaigns.filter(c => c.unified === 'Unified').length / total * 100);
+
+      if (currentView === 'partner') {
+        document.getElementById('kpiRow').innerHTML =
+          '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Campaigns Blocked (!)</span></div>';
+      } else {
+        document.getElementById('kpiRow').innerHTML =
+          '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+usageWhitespace+'</span><span class="kpi-label">Usage Whitespace</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified Percentage</span></div>';
+      }
+
+      renderCharts();
+
+      // Table headers based on view
+      const thead = document.getElementById('campaignTableHead');
+      if (currentView === 'partner') {
+        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Source</th></tr>';
+      } else {
+        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Unified</th><th>Opportunity ID</th><th>Source</th></tr>';
+      }
+
+      const tbody = document.getElementById('campaignTableBody');
+      tbody.innerHTML = filtered.map(c => {
+        var wl = c.workloads.map(w => '<span class="workload-pill">'+w+'</span>').join('');
+        if (currentView === 'partner') {
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td><span class="status-badge '+c.status.toLowerCase()+'">'+c.status+'</span></td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
+        } else {
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td><span class="status-badge '+c.status.toLowerCase()+'">'+c.status+'</span></td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
+        }
+      }).join('');
+    }
+
+    function renderCharts() {
+      const chartsRow = document.getElementById('chartsRow');
+      const statusCounts = {};
+      campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
+      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
+
+      // Pie: Campaigns by Status (all views)
+      var statusPie = buildPieChart(statusCounts, statusColors, 'Campaigns by Status');
+
+      if (currentView === 'partner') {
+        // Pie: Campaigns by Area
+        var areaCounts = {};
+        campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
+        var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
+        var areaPie = buildPieChart(areaCounts, areaColors, 'Campaigns by Area');
+        chartsRow.className = 'charts-row';
+        chartsRow.innerHTML = statusPie + areaPie;
+      } else {
+        // Field view: Status + Partners + Area
+        var partnerCounts = {};
+        campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
+        var partnerColors = {};
+        var pColors = ['#0078d4','#107c10','#d83b01','#8a6d00','#7719aa','#005a9e','#c19c00'];
+        Object.keys(partnerCounts).forEach((p, i) => { partnerColors[p] = pColors[i % pColors.length]; });
+        var partnerPie = buildPieChart(partnerCounts, partnerColors, 'Campaigns by Partners');
+
+        var areaCounts2 = {};
+        campaigns.forEach(c => { areaCounts2[c.region] = (areaCounts2[c.region] || 0) + 1; });
+        var areaColors2 = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
+        var areaPie2 = buildPieChart(areaCounts2, areaColors2, 'Campaigns by Area');
+
+        chartsRow.className = 'charts-row three-col';
+        chartsRow.innerHTML = statusPie + areaPie2 + partnerPie;
+      }
+    }
+
+    function buildPieChart(data, colors, title) {
+      var entries = Object.entries(data).filter(function(e) { return e[1] > 0; });
+      var total = entries.reduce(function(sum, e) { return sum + e[1]; }, 0);
+      // Build conic-gradient
+      var gradientParts = [];
+      var angle = 0;
+      entries.forEach(function(e) {
+        var pct = (e[1] / total) * 360;
+        var color = colors[e[0]] || '#999';
+        gradientParts.push(color + ' ' + angle + 'deg ' + (angle + pct) + 'deg');
+        angle += pct;
+      });
+      var gradient = 'conic-gradient(' + gradientParts.join(', ') + ')';
+      // Legend
+      var legend = entries.map(function(e) {
+        var color = colors[e[0]] || '#999';
+        return '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
+      }).join('');
+
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
+    }
+
+    // ═══════ DETAIL VIEW ═══════
+    function openCampaign(id) {
+      currentCampaign = campaigns.find(c => c.id === id);
+      if (!currentCampaign) return;
+      document.getElementById('detailView').classList.add('show');
+      renderDetail();
+    }
+
+    function showDashboard() {
+      document.getElementById('detailView').classList.remove('show');
+      currentCampaign = null;
+    }
+
+    function renderDetail() {
+      const c = currentCampaign;
+      if (!c) return;
+
+      document.getElementById('detailHeader').innerHTML = '<h1>'+c.id+' &mdash; '+c.customer+'</h1><div class="detail-meta"><div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div><div class="detail-meta-item"><strong>Source:</strong> '+c.source+'</div><div class="detail-meta-item"><strong>TPID:</strong> '+c.tpid+'</div><div class="detail-meta-item"><strong>Segment:</strong> '+c.segment+'</div><div class="detail-meta-item"><strong>Region:</strong> '+c.region+'</div><div class="detail-meta-item"><strong>Partner DRI:</strong> '+c.partnerDRI+'</div><div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+c.microsoftDRI+'</div><div class="detail-meta-item"><strong>Workloads:</strong> '+c.workloads.join(', ')+'</div></div>';
+
+      renderStepper(c);
+      renderBanner(c);
+      renderActionPanel(c);
+      renderWorkloads(c);
+      renderAudit(c);
+      renderActionBar(c);
+    }
+
+    function renderStepper(c) {
+      const stateIdx = STATE_ORDER.indexOf(c.status === 'Blocked' ? (c.previousState || 'Outreach') : c.status);
+      const isBlocked = c.status === 'Blocked';
+      const isClosed = c.status === 'Closed';
+
+      let html = '';
+      STATE_ORDER.forEach((state, i) => {
+        let cls = '';
+        if (isBlocked && i === stateIdx) cls = 'blocked';
+        else if (isClosed && i === STATE_ORDER.length - 1) cls = 'closed-state';
+        else if (i < stateIdx) cls = 'completed';
+        else if (i === stateIdx) cls = 'active';
+
+        const dotContent = (cls === 'completed') ? '&#10003;' : (cls === 'blocked' ? '!' : (i + 1));
+
+        let dateStr = '';
+        if (state === 'New' && c.dates.created) dateStr = c.dates.created;
+        else if (state === 'Outreach' && c.dates.outreach) dateStr = c.dates.outreach;
+        else if (state === 'Funding' && c.dates.fundingSubmission) dateStr = c.dates.fundingSubmission;
+        else if (state === 'Committed' && c.dates.fundingApproval) dateStr = c.dates.fundingApproval;
+        else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
+
+        var closeLink = '';
+        if (state === 'Closed' && c.status !== 'Closed') {
+          closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
+        }
+        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+state+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
+        if (i < STATE_ORDER.length - 1) {
+          html += '<div class="step-connector '+(i < stateIdx ? 'filled' : '')+'"></div>';
+        }
+      });
+      document.getElementById('lifecycleStepper').innerHTML = html;
+    }
+
+    function renderBanner(c) {
+      const banner = document.getElementById('stateBanner');
+      const msgs = {
+        'New': { cls: 'info', text: '<strong>New:</strong> Partner and field have engaged with the customer. Confirm outreach to advance.' },
+        'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Confirm engagement outcome to advance.' },
+        'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
+        'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
+        'Blocked': { cls: 'danger', text: '<strong>Blocked:</strong> '+( c.blockReason || 'Campaign is blocked.') },
+        'Closed': { cls: 'neutral', text: '<strong>Closed:</strong> Campaign is closed. Reactivate if additional work is needed.' }
+      };
+      const m = msgs[c.status] || msgs['New'];
+      banner.className = 'state-banner ' + m.cls;
+      banner.innerHTML = m.text;
+    }
+
+    function renderActionPanel(c) {
+      const panel = document.getElementById('actionPanel');
+      let html = '';
+
+      if (c.status === 'New') {
+        html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Outreach') {
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">— Select —</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner → Blocked</option><option value="declined">Customer no longer requires assistance → Blocked</option><option value="external">Customer cannot engage at this time → Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Funding') {
+        const step1Done = c.funding.submitted;
+        html = '<div class="panel-card"><h2>Funding &mdash; '+(step1Done ? 'Step 2: Funding Secured' : 'Step 1: Submit Funding')+'</h2><div class="form-grid">';
+        if (!step1Done) {
+          html += '<div class="form-group"><label>Funding Submitted? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSubmitted"> Yes, submitted</label></div></div><div class="form-group"><label>Submission Date <span class="required">*</span></label><input type="date" id="gateFundingSubDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment" placeholder="Notes on funding submission..."></textarea></div>';
+        } else {
+          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">— Select —</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">— Select —</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
+        }
+        html += '</div></div>';
+      }
+      else if (c.status === 'Blocked') {
+        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Closed') {
+        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">— Select —</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+      }
+
+      panel.innerHTML = html;
+    }
+
+    function renderWorkloads(c) {
+      const panel = document.getElementById('workloadsPanel');
+      if (c.status !== 'Committed') { panel.style.display = 'none'; return; }
+      panel.style.display = '';
+
+      const tbody = document.getElementById('workloadsBody');
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
+    }
+
+    function renderAudit(c) {
+      document.getElementById('auditTimeline').innerHTML = c.history.slice().reverse().map(h => '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+h.text+'</div><div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>').join('');
+    }
+
+    function renderActionBar(c) {
+      const bar = document.getElementById('detailActionBar');
+      let left = '';
+      if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
+      else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
+      else if (c.status === 'Funding') {
+        if (!c.funding.submitted) left = '<button class="btn btn-primary" onclick="advanceFundingStep1()">Submit Funding &rarr;</button>';
+        else left = '<button class="btn btn-primary" onclick="advanceFundingStep2()">Confirm Funding &rarr;</button>';
+      }
+      else if (c.status === 'Committed') left = '<button class="btn btn-secondary" onclick="saveDraft()">Save Changes</button>';
+      else if (c.status === 'Blocked') left = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
+      else if (c.status === 'Closed') left = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
+
+      const closeBtn = '';
+      bar.innerHTML = '<div class="action-bar-left">'+left+' <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div>'+closeBtn+'</div>';
+    }
+
+    // ═══════ STATE TRANSITIONS ═══════
+    function advanceFromNew() {
+      const checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
+      const date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
+      if (!checked || !date) { showToast('Please confirm outreach and provide a date', true); return; }
+      const c = currentCampaign;
+      c.status = 'Outreach';
+      c.dates.outreach = date;
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Outreach confirmed', type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Advanced to Outreach');
+    }
+
+    let selectedOutcome = '';
+    function onOutcomeChange() {
+      var sel = document.getElementById('gateEngagementOutcome');
+      selectedOutcome = sel ? sel.value : '';
+      var grp = document.getElementById('engageCommentGroup');
+      if (grp) grp.style.display = (selectedOutcome && selectedOutcome !== 'agreed') ? '' : 'none';
+    }
+
+    function advanceFromOutreach() {
+      var checked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
+      var date = document.getElementById('gateEngagementDate') && document.getElementById('gateEngagementDate').value;
+      if (!checked || !date || !selectedOutcome) { showToast('Please complete all required fields', true); return; }
+      if (selectedOutcome !== 'agreed') {
+        var comment = document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value;
+        if (!comment) { showToast('Notes required for non-success outcomes', true); return; }
+      }
+      var c = currentCampaign;
+      c.dates.engagement = date;
+      c.dates.updated = today();
+      c.engagement.outcome = selectedOutcome;
+
+      if (selectedOutcome === 'agreed') {
+        c.status = 'Funding';
+        c.history.push({ date: today(), text: 'Customer engaged — agreed to campaign', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Funding');
+      } else {
+        var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
+        c.previousState = 'Outreach';
+        c.blockReason = reasons[selectedOutcome];
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked');
+      }
+      selectedOutcome = '';
+      renderDetail();
+    }
+
+    function advanceFundingStep1() {
+      var checked = document.getElementById('gateFundingSubmitted') && document.getElementById('gateFundingSubmitted').checked;
+      var date = document.getElementById('gateFundingSubDate') && document.getElementById('gateFundingSubDate').value;
+      if (!checked || !date) { showToast('Please confirm submission and date', true); return; }
+      var c = currentCampaign;
+      c.funding.submitted = true;
+      c.dates.fundingSubmission = date;
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'ECIF funding submitted', type: 'info', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Funding submission recorded');
+    }
+
+    function toggleFundingDecline() {
+      var val = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').value;
+      var grp = document.getElementById('fundingDeclineReasonGroup');
+      if (grp) grp.style.display = val === 'no' ? '' : 'none';
+    }
+
+    function advanceFundingStep2() {
+      var secured = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').value;
+      var date = document.getElementById('gateFundingDate') && document.getElementById('gateFundingDate').value;
+      if (!secured) { showToast('Please select whether funding was secured', true); return; }
+      var c = currentCampaign;
+      c.funding.secured = secured;
+      c.dates.updated = today();
+
+      if (secured === 'yes') {
+        c.dates.fundingApproval = date || today();
+        c.status = 'Committed';
+        c.history.push({ date: today(), text: 'Funding approved — campaign committed', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed');
+      } else {
+        var reason = document.getElementById('gateFundingDeclineReason') && document.getElementById('gateFundingDeclineReason').value;
+        if (!reason) { showToast('Please select a decline reason', true); return; }
+        c.funding.declineReason = reason;
+        c.previousState = 'Funding';
+        c.blockReason = reason;
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Funding declined — ' + reason, type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked — funding declined');
+      }
+      renderDetail();
+    }
+
+    function unblockCampaign() {
+      var reason = document.getElementById('gateUnblockReason') && document.getElementById('gateUnblockReason').value;
+      if (!reason) { showToast('Please provide an unblock explanation', true); return; }
+      var c = currentCampaign;
+      c.status = c.previousState || 'Outreach';
+      c.previousState = null;
+      c.blockReason = '';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Unblocked — returned to ' + c.status, type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Campaign unblocked — returned to ' + c.status);
+    }
+
+    function reactivateCampaign() {
+      var reason = document.getElementById('gateReactivateReason') && document.getElementById('gateReactivateReason').value;
+      if (!reason) { showToast('Please select a reactivation reason', true); return; }
+      var c = currentCampaign;
+      c.status = 'Committed';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Campaign reactivated to Committed');
+    }
+
+    function confirmCloseCampaign() {
+      var reason = document.getElementById('closeReasonText') && document.getElementById('closeReasonText').value.trim();
+      if (!reason) { showToast('Please provide a reason for closing', true); return; }
+      var c = currentCampaign;
+      c.previousState = c.status;
+      c.status = 'Closed';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Campaign manually closed — ' + reason, type: 'closed', actor: c.partnerDRI });
+      hideModal('closeModal');
+      document.getElementById('closeReasonText').value = '';
+      renderDetail();
+      showToast('Campaign closed');
+    }
+
+    function updateWorkload(idx, field, value) {
+      var c = currentCampaign;
+      if (field === 'seats') c.workloadData[idx].seats = parseInt(value) || 0;
+      else c.workloadData[idx][field] = value;
+
+      // Auto-close if all workloads closed
+      if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
+        c.status = 'Closed';
+        c.dates.updated = today();
+        c.history.push({ date: today(), text: 'All workloads closed — campaign auto-closed', type: 'closed', actor: c.partnerDRI });
+        renderDetail();
+        showToast('All workloads closed — campaign auto-closed');
+      }
+    }
+
+    function saveDraft() {
+      if (currentCampaign) currentCampaign.dates.updated = today();
+      showToast('Changes saved');
+    }
+
+    // ═══════ UTILITIES ═══════
+    function today() { return new Date().toISOString().split('T')[0]; }
+
+    function showToast(msg, isError) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    function showModal(id) { document.getElementById(id).classList.add('show'); }
+    function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function toggleFilter() { document.getElementById('filterOverlay').classList.toggle('show'); }
+    function resetFilters() {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterRegion').value = '';
+      renderDashboard();
+    }
+
+    // ═══════ INIT ═══════
+    switchView('partner');
+  </script>
+</body>
+</html>
