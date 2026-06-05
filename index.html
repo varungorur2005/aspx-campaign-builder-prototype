@@ -75,28 +75,20 @@
     .kpi-clickable:hover { border-color: #0078d4; box-shadow: 0 2px 8px rgba(0,120,212,0.12); }
     .kpi-clickable .kpi-value { text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color 0.15s; }
     .kpi-clickable:hover .kpi-value { text-decoration-color: currentColor; }
-    .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; }
-    .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; display: block; }
+    .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 8px; display: block; }
 
     /* Charts Row */
-    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .charts-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
+    .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .chart-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; }
     .chart-card h3 { font-size: 12px; font-weight: 700; margin-bottom: 12px; color: #424242; }
-    .chart-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .chart-bar-label { width: 80px; font-size: 11px; color: #616161; text-align: right; }
-    .chart-bar-track { flex: 1; height: 20px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
-    .chart-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; font-size: 10px; color: #fff; font-weight: 600; min-width: 20px; }
-    .chart-bar-count { font-size: 11px; color: #424242; width: 24px; }
 
-    /* Pie Chart (CSS conic-gradient) */
-    .pie-chart-wrap { display: flex; align-items: center; gap: 16px; }
-    .pie-chart {
-      width: 120px; height: 120px; border-radius: 50%; flex-shrink: 0;
-    }
-    .pie-legend { display: flex; flex-direction: column; gap: 4px; }
-    .pie-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #424242; }
-    .pie-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    /* Vertical Bar Chart */
+    .vbar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
+    .vbar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
+    .vbar-bar { width: 100%; max-width: 28px; border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.2s; }
+    .vbar-val { font-size: 10px; font-weight: 600; color: #424242; margin-bottom: 2px; }
+    .vbar-lbl { font-size: 9px; color: #616161; margin-top: 4px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
 
     /* Table Toolbar */
     .table-toolbar {
@@ -408,10 +400,10 @@
         <!-- Table Toolbar -->
         <div class="table-toolbar">
           <div class="toolbar-left">
-            <div class="toolbar-search">
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
-            </div>
+            <button class="toolbar-btn" onclick="showToast('Campaign data export prepared')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Download
+            </button>
             <div class="toolbar-sort">
               <select id="sortSelect" onchange="renderDashboard()">
                 <option value="updated">Latest Update</option>
@@ -422,6 +414,14 @@
             </div>
           </div>
           <div class="toolbar-right">
+            <div class="toolbar-search">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
+            </div>
+            <button class="toolbar-btn" onclick="showToast('Column customization is not available in this prototype')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 2v12M6 2v12M10 2v12M14 2v12"/><path d="M2 5h2M6 5h2M10 5h2" stroke-width="2"/></svg>
+              Change columns
+            </button>
             <button class="toolbar-btn" onclick="toggleFilter()">
               <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
               Filters
@@ -934,14 +934,14 @@
         document.getElementById('kpiRow').innerHTML =
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Blocked (!)</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span><span class="kpi-label">Blocked (!)</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'pending\')"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
       } else {
         document.getElementById('kpiRow').innerHTML =
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blockedLong+'</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blockedLong+' &#9888;</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'committed\')"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
           '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
@@ -974,83 +974,39 @@
       campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
       const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
-      // Pie: Campaigns by Status (all views)
-      var statusPie = buildPieChart(statusCounts, statusColors, 'Campaigns by Status');
+      var statusChart = buildVBarChart(statusCounts, statusColors, 'By Status');
 
-      // Bar: Campaigns by Workload (all views)
       var wlCounts = {};
       campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
-      var workloadBar = buildBarChart(wlCounts, '#0078d4', 'Campaigns by Workload');
+      var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload');
 
-      // Funnel: Pipeline (all views)
-      var funnelData = {};
-      ['New','Outreach','Funding','Committed','Closed'].forEach(function(s) { funnelData[s] = campaigns.filter(function(c) { return c.status === s || (s === 'Committed' && c.status === 'Blocked' && c.previousState === 'Committed'); }).length; });
-      var funnelColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Closed: '#605e5c' };
-      var funnelBar = buildBarChart(funnelData, funnelColors, 'Pipeline Funnel');
+      var areaCounts = {};
+      campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
+      var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
+      var areaChart = buildVBarChart(areaCounts, areaColors, 'By Region');
 
       if (currentView === 'partner') {
-        // Partner: Status pie + Area pie + Workload bar + Funnel
-        var areaCounts = {};
-        campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
-        var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-        var areaPie = buildPieChart(areaCounts, areaColors, 'Campaigns by Area');
-        chartsRow.className = 'charts-row';
-        chartsRow.innerHTML = statusPie + areaPie + workloadBar + funnelBar;
+        chartsRow.innerHTML = statusChart + workloadChart + areaChart;
       } else {
-        // Field view: Status + Partners + Workload + Blocked Reasons + Area
         var partnerCounts = {};
         campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
-        var partnerColors = {};
         var pColors = ['#0078d4','#107c10','#d83b01','#8a6d00','#7719aa','#005a9e','#c19c00'];
+        var partnerColors = {};
         Object.keys(partnerCounts).forEach((p, i) => { partnerColors[p] = pColors[i % pColors.length]; });
-        var partnerPie = buildPieChart(partnerCounts, partnerColors, 'Campaigns by Partners');
-
-        // Blocked reasons
-        var blockedReasons = {};
-        campaigns.filter(c => c.status === 'Blocked').forEach(function(c) {
-          var r = c.blockReason || 'Unknown';
-          blockedReasons[r] = (blockedReasons[r] || 0) + 1;
-        });
-        var brColors = {};
-        Object.keys(blockedReasons).forEach((r, i) => { brColors[r] = ['#d83b01','#8a6d00','#7719aa','#005a9e'][i % 4]; });
-        var blockedPie = Object.keys(blockedReasons).length > 0 ? buildPieChart(blockedReasons, brColors, 'Blocked Reasons') : '';
-
-        chartsRow.className = 'charts-row';
-        chartsRow.innerHTML = statusPie + partnerPie + workloadBar + (blockedPie || funnelBar);
+        var partnerChart = buildVBarChart(partnerCounts, partnerColors, 'By Partner');
+        chartsRow.innerHTML = statusChart + workloadChart + areaChart + partnerChart;
       }
     }
 
-    function buildBarChart(data, colors, title) {
+    function buildVBarChart(data, colors, title) {
       var entries = Object.entries(data);
       var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
       var bars = entries.map(function(e) {
-        var pct = (e[1] / maxVal) * 100;
+        var pct = Math.round((e[1] / maxVal) * 100);
         var color = (typeof colors === 'string') ? colors : (colors[e[0]] || '#0078d4');
-        return '<div class="chart-bar-row"><div class="chart-bar-label">'+e[0]+'</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:'+pct+'%;background:'+color+'">'+e[1]+'</div></div></div>';
+        return '<div class="vbar-col"><span class="vbar-val">'+e[1]+'</span><div class="vbar-bar" style="height:'+pct+'%;background:'+color+'" title="'+e[0]+': '+e[1]+'"></div><span class="vbar-lbl" title="'+e[0]+'">'+e[0]+'</span></div>';
       }).join('');
-      return '<div class="chart-card"><h3>'+title+'</h3>'+bars+'</div>';
-    }
-
-    function buildPieChart(data, colors, title) {
-      var entries = Object.entries(data).filter(function(e) { return e[1] > 0; });
-      var total = entries.reduce(function(sum, e) { return sum + e[1]; }, 0);
-      // Build conic-gradient
-      var gradientParts = [];
-      var angle = 0;
-      entries.forEach(function(e) {
-        var pct = (e[1] / total) * 360;
-        var color = colors[e[0]] || '#999';
-        gradientParts.push(color + ' ' + angle + 'deg ' + (angle + pct) + 'deg');
-        angle += pct;
-      });
-      var gradient = 'conic-gradient(' + gradientParts.join(', ') + ')';
-      // Legend
-      var legend = entries.map(function(e) {
-        var color = colors[e[0]] || '#999';
-        return '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
-      }).join('');
-
-      return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-chart">'+bars+'</div></div>';
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
