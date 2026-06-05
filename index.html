@@ -393,7 +393,7 @@
            DASHBOARD VIEW
            Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
       <div class="dashboard-view content-view active" id="dashboardView">
-        <h1 class="page-title" id="dashboardTitle">Campaigns Ã¢â‚¬â€ Partner View</h1>
+        <h1 class="page-title" id="dashboardTitle">Campaigns - Partner View</h1>
 
         <!-- KPIs -->
         <div class="kpi-row" id="kpiRow"></div>
@@ -721,7 +721,7 @@
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.getElementById('pageTitle').textContent =
         view === 'partner' ? 'Campaign Builder (Partner View)' : 'Campaign Builder (MSFT Field View)';
-      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns â€” Partner View' : 'Campaigns â€” Field | Corp View';
+      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns - Partner View' : 'Campaigns - Field | Corp View';
       showDashboard();
       toggleFilter(false);
       renderDashboard();
