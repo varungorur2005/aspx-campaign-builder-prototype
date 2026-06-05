@@ -748,20 +748,30 @@
       // KPIs — differ by view
       const total = campaigns.length;
       const blocked = campaigns.filter(c => c.status === 'Blocked').length;
+      const inProgress = campaigns.filter(c => c.status !== 'Closed').length;
       const partnersEngaged = new Set(campaigns.filter(c => c.status !== 'New').map(c => c.partner)).size;
       const usageWhitespace = '1.2M'; // mock
       const unifiedPct = Math.round(campaigns.filter(c => c.unified === 'Unified').length / total * 100);
+      const totalSeats = campaigns.reduce(function(sum, c) { return sum + c.workloadData.reduce(function(s, w) { return s + w.seats; }, 0); }, 0);
+      const workloadsCommitted = campaigns.reduce(function(sum, c) { return sum + c.workloadData.filter(function(w) { return w.status === 'Committed'; }).length; }, 0);
+      const pendingActions = campaigns.filter(c => c.status !== 'Closed' && c.status !== 'Blocked').length;
+      const blockedLong = campaigns.filter(c => c.status === 'Blocked').length; // mock: all blocked > 14 days
 
       if (currentView === 'partner') {
         document.getElementById('kpiRow').innerHTML =
           '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Campaigns Blocked (!)</span></div>';
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Blocked (!)</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
       } else {
         document.getElementById('kpiRow').innerHTML =
           '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
           '<div class="kpi-tile"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+usageWhitespace+'</span><span class="kpi-label">Usage Whitespace</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified Percentage</span></div>';
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blockedLong+'</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
       }
 
       renderCharts();
@@ -794,16 +804,27 @@
       // Pie: Campaigns by Status (all views)
       var statusPie = buildPieChart(statusCounts, statusColors, 'Campaigns by Status');
 
+      // Bar: Campaigns by Workload (all views)
+      var wlCounts = {};
+      campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
+      var workloadBar = buildBarChart(wlCounts, '#0078d4', 'Campaigns by Workload');
+
+      // Funnel: Pipeline (all views)
+      var funnelData = {};
+      ['New','Outreach','Funding','Committed','Closed'].forEach(function(s) { funnelData[s] = campaigns.filter(function(c) { return c.status === s || (s === 'Committed' && c.status === 'Blocked' && c.previousState === 'Committed'); }).length; });
+      var funnelColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Closed: '#605e5c' };
+      var funnelBar = buildBarChart(funnelData, funnelColors, 'Pipeline Funnel');
+
       if (currentView === 'partner') {
-        // Pie: Campaigns by Area
+        // Partner: Status pie + Area pie + Workload bar + Funnel
         var areaCounts = {};
         campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
         var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
         var areaPie = buildPieChart(areaCounts, areaColors, 'Campaigns by Area');
         chartsRow.className = 'charts-row';
-        chartsRow.innerHTML = statusPie + areaPie;
+        chartsRow.innerHTML = statusPie + areaPie + workloadBar + funnelBar;
       } else {
-        // Field view: Status + Partners + Area
+        // Field view: Status + Partners + Workload + Blocked Reasons + Area
         var partnerCounts = {};
         campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
         var partnerColors = {};
@@ -811,14 +832,30 @@
         Object.keys(partnerCounts).forEach((p, i) => { partnerColors[p] = pColors[i % pColors.length]; });
         var partnerPie = buildPieChart(partnerCounts, partnerColors, 'Campaigns by Partners');
 
-        var areaCounts2 = {};
-        campaigns.forEach(c => { areaCounts2[c.region] = (areaCounts2[c.region] || 0) + 1; });
-        var areaColors2 = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-        var areaPie2 = buildPieChart(areaCounts2, areaColors2, 'Campaigns by Area');
+        // Blocked reasons
+        var blockedReasons = {};
+        campaigns.filter(c => c.status === 'Blocked').forEach(function(c) {
+          var r = c.blockReason || 'Unknown';
+          blockedReasons[r] = (blockedReasons[r] || 0) + 1;
+        });
+        var brColors = {};
+        Object.keys(blockedReasons).forEach((r, i) => { brColors[r] = ['#d83b01','#8a6d00','#7719aa','#005a9e'][i % 4]; });
+        var blockedPie = Object.keys(blockedReasons).length > 0 ? buildPieChart(blockedReasons, brColors, 'Blocked Reasons') : '';
 
-        chartsRow.className = 'charts-row three-col';
-        chartsRow.innerHTML = statusPie + areaPie2 + partnerPie;
+        chartsRow.className = 'charts-row';
+        chartsRow.innerHTML = statusPie + partnerPie + workloadBar + (blockedPie || funnelBar);
       }
+    }
+
+    function buildBarChart(data, colors, title) {
+      var entries = Object.entries(data);
+      var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
+      var bars = entries.map(function(e) {
+        var pct = (e[1] / maxVal) * 100;
+        var color = (typeof colors === 'string') ? colors : (colors[e[0]] || '#0078d4');
+        return '<div class="chart-bar-row"><div class="chart-bar-label">'+e[0]+'</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:'+pct+'%;background:'+color+'">'+e[1]+'</div></div></div>';
+      }).join('');
+      return '<div class="chart-card"><h3>'+title+'</h3>'+bars+'</div>';
     }
 
     function buildPieChart(data, colors, title) {
