@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -71,6 +71,10 @@
       background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
       padding: 16px; text-align: left;
     }
+    .kpi-clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .kpi-clickable:hover { border-color: #0078d4; box-shadow: 0 2px 8px rgba(0,120,212,0.12); }
+    .kpi-clickable .kpi-value { text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color 0.15s; }
+    .kpi-clickable:hover .kpi-value { text-decoration-color: currentColor; }
     .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; }
     .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
 
@@ -707,6 +711,143 @@
           { date: '2026-05-20', text: 'All workloads closed', type: 'success', actor: 'dri@softchoice.com' },
           { date: '2026-05-25', text: 'Campaign auto-closed', type: 'closed', actor: 'System' }
         ]
+      },
+      {
+        id: '445566', customer: 'Adventure Works', partner: 'Computacenter',
+        tpid: 'TP-77190', segment: 'Enterprise', region: 'EMEA North', industry: 'Manufacturing',
+        source: 'Security CSU Partner Summit | EMEA',
+        workloads: ['Sentinel','MDE','MDI'],
+        status: 'Committed', previousState: null, blockReason: '',
+        partnerDRI: 'lead@computacenter.com', microsoftDRI: 'emeafield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-445566001',
+        dates: { created: '2026-04-20', outreach: '2026-04-24', engagement: '2026-05-01', fundingSubmission: '2026-05-05', fundingApproval: '2026-05-10', updated: '2026-06-01' },
+        funding: { submitted: true, secured: 'yes' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'Sentinel', status: 'Committed', seats: 22000, notes: 'SOC expansion' },
+          { name: 'MDE', status: 'Committed', seats: 18000, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: 'Pending approval' }
+        ],
+        history: [
+          { date: '2026-04-20', text: 'Campaign created', type: 'info', actor: 'emeafield@microsoft.com' },
+          { date: '2026-04-24', text: 'Outreach completed', type: 'success', actor: 'lead@computacenter.com' },
+          { date: '2026-05-01', text: 'Customer engaged - agreed', type: 'success', actor: 'lead@computacenter.com' },
+          { date: '2026-05-10', text: 'Funding secured', type: 'success', actor: 'emeafield@microsoft.com' },
+          { date: '2026-06-01', text: 'Workloads committed', type: 'success', actor: 'lead@computacenter.com' }
+        ]
+      },
+      {
+        id: '998877', customer: 'Fabrikam Industries', partner: 'SoftwareOne',
+        tpid: 'TP-44210', segment: 'Enterprise', region: 'EMEA North', industry: 'Energy',
+        source: 'Security CSU Partner Summit | EMEA',
+        workloads: ['MIP P2','IRM','MDA'],
+        status: 'Funding', previousState: null, blockReason: '',
+        partnerDRI: 'pm@softwareone.com', microsoftDRI: 'emeafield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-998877001',
+        dates: { created: '2026-05-10', outreach: '2026-05-14', engagement: '2026-05-20', updated: '2026-06-03' },
+        funding: { submitted: true, secured: '' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MIP P2', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'emeafield@microsoft.com' },
+          { date: '2026-05-14', text: 'Outreach completed', type: 'success', actor: 'pm@softwareone.com' },
+          { date: '2026-05-20', text: 'Customer agreed', type: 'success', actor: 'pm@softwareone.com' },
+          { date: '2026-06-03', text: 'Funding submitted, awaiting approval', type: 'info', actor: 'emeafield@microsoft.com' }
+        ]
+      },
+      {
+        id: '112233', customer: 'Relecloud', partner: 'Pax8',
+        tpid: 'TP-90881', segment: 'Mid-Market', region: 'US West', industry: 'Media',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDO','Sentinel'],
+        status: 'Outreach', previousState: null, blockReason: '',
+        partnerDRI: 'sales@pax8.com', microsoftDRI: 'uswestfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-112233001',
+        dates: { created: '2026-05-30', updated: '2026-06-04' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-30', text: 'Campaign created', type: 'info', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-06-04', text: 'Partner initiating outreach', type: 'info', actor: 'sales@pax8.com' }
+        ]
+      },
+      {
+        id: '667788', customer: 'Wide World Importers', partner: 'CDW',
+        tpid: 'TP-90234', segment: 'Enterprise', region: 'US East', industry: 'Logistics',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDE','MDI','Sentinel','MDA'],
+        status: 'Blocked', previousState: 'Funding', blockReason: 'Customer budget freeze until Q2',
+        partnerDRI: 'rep@cdw.com', microsoftDRI: 'usfield2@microsoft.com',
+        unified: 'Unified', opportunityId: '7-667788001',
+        dates: { created: '2026-04-28', outreach: '2026-05-01', engagement: '2026-05-06', updated: '2026-05-22' },
+        funding: { submitted: true, secured: '' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-04-28', text: 'Campaign created', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-01', text: 'Outreach completed', type: 'success', actor: 'rep@cdw.com' },
+          { date: '2026-05-06', text: 'Customer engaged', type: 'success', actor: 'rep@cdw.com' },
+          { date: '2026-05-15', text: 'Funding submitted', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-22', text: 'Blocked: Customer budget freeze until Q2', type: 'blocked', actor: 'rep@cdw.com' }
+        ]
+      },
+      {
+        id: '334400', customer: 'Coho Vineyard', partner: 'TD Synnex',
+        tpid: 'TP-11762', segment: 'Mid-Market', region: 'US West', industry: 'Food & Beverage',
+        source: 'Security CSU Partner Summit | US',
+        workloads: ['MDE','MDA','MDO'],
+        status: 'Closed', previousState: null, blockReason: '',
+        partnerDRI: 'partner@tdsynnex.com', microsoftDRI: 'uswestfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-334400001',
+        dates: { created: '2026-03-20', outreach: '2026-03-22', engagement: '2026-03-28', fundingSubmission: '2026-04-02', fundingApproval: '2026-04-08', updated: '2026-05-15' },
+        funding: { submitted: true, secured: 'yes' },
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Closed', seats: 5200, notes: 'Complete' },
+          { name: 'MDA', status: 'Closed', seats: 3800, notes: 'Complete' },
+          { name: 'MDO', status: 'Closed', seats: 4100, notes: 'Complete' }
+        ],
+        history: [
+          { date: '2026-03-20', text: 'Campaign created', type: 'info', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-03-22', text: 'Outreach completed', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-03-28', text: 'Customer engaged', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-04-08', text: 'Funding approved', type: 'success', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-05-10', text: 'All workloads closed', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-05-15', text: 'Campaign auto-closed', type: 'closed', actor: 'System' }
+        ]
+      },
+      {
+        id: '556600', customer: 'Humongous Insurance', partner: 'Wipro',
+        tpid: 'TP-88412', segment: 'Enterprise', region: 'APAC', industry: 'Insurance',
+        source: 'Security CSU Partner Summit | APAC',
+        workloads: ['Sentinel','MDI','IRM'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'lead@wipro.com', microsoftDRI: 'apacfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-556600001',
+        dates: { created: '2026-06-03', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-06-03', text: 'Campaign created from Security CSU Partner Summit | APAC', type: 'info', actor: 'apacfield@microsoft.com' }
+        ]
       }
     ];
 
@@ -728,7 +869,26 @@
     }
 
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DASHBOARD Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    // KPI FILTER
+    let activeKpiFilter = null;
+    function filterByKpi(filter) {
+      const statusEl = document.getElementById('filterStatus');
+      statusEl.value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterRegion').value = '';
+      document.getElementById('searchInput').value = '';
+
+      if (filter === activeKpiFilter || filter === 'all') {
+        activeKpiFilter = null;
+      } else {
+        activeKpiFilter = filter;
+        if (filter === 'blocked') statusEl.value = 'Blocked';
+        else if (filter === 'committed') statusEl.value = 'Committed';
+      }
+      renderDashboard();
+    }
+
+    // DASHBOARD
     function renderDashboard() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const filterStatus = document.getElementById('filterStatus').value;
@@ -741,6 +901,12 @@
         if (filterStatus && c.status !== filterStatus) return false;
         if (filterSource && c.source !== filterSource) return false;
         if (filterRegion && c.region !== filterRegion) return false;
+        // KPI-based filters
+        if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
+        if (activeKpiFilter === 'pending' && (c.status === 'Closed' || c.status === 'Blocked')) return false;
+        if (activeKpiFilter === 'engaged' && c.status === 'New') return false;
+        if (activeKpiFilter === 'unified' && c.unified !== 'Unified') return false;
+        if (activeKpiFilter === 'seats' && c.workloadData.reduce((s,w) => s + w.seats, 0) === 0) return false;
         return true;
       });
 
@@ -766,19 +932,19 @@
 
       if (currentView === 'partner') {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Blocked (!)</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blocked+'</span><span class="kpi-label">Blocked (!)</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'pending\')"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
       } else {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#d83b01">'+blockedLong+'</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
-          '<div class="kpi-tile"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blockedLong+'</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'committed\')"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
       }
 
       renderCharts();
