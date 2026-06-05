@@ -73,8 +73,7 @@
     }
     .kpi-clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
     .kpi-clickable:hover { border-color: #0078d4; box-shadow: 0 2px 8px rgba(0,120,212,0.12); }
-    .kpi-clickable .kpi-value { text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color 0.15s; }
-    .kpi-clickable:hover .kpi-value { text-decoration-color: currentColor; }
+    .kpi-clickable .kpi-value { text-decoration: underline; cursor: pointer; }
     .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; display: block; }
     .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 8px; display: block; }
 
@@ -87,7 +86,8 @@
     .pie-chart-wrap { display: flex; align-items: center; gap: 12px; }
     .pie-chart { width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; }
     .pie-legend { display: flex; flex-direction: column; gap: 3px; }
-    .pie-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #424242; }
+    .pie-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #424242; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
+    .pie-legend-item:hover { background: #f0f0f0; color: #0078d4; }
     .pie-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
     /* Vertical Bar Chart */
@@ -96,8 +96,9 @@
     .vbar-grid-line { border-top: 1px solid #e8e8e8; width: 100%; }
     .vbar-grid-line:last-child { border-top: 1px solid #d0d0d0; }
     .vbar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100%; position: relative; z-index: 1; }
-    .vbar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
-    .vbar-bar { width: 100%; max-width: 32px; border-radius: 3px 3px 0 0; min-height: 4px; }
+    .vbar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; cursor: pointer; }
+    .vbar-bar { width: 100%; max-width: 32px; border-radius: 3px 3px 0 0; min-height: 4px; cursor: pointer; opacity: 0.9; }
+    .vbar-bar:hover { opacity: 1; box-shadow: 0 0 0 2px rgba(0,120,212,0.3); }
     .vbar-val { font-size: 10px; font-weight: 600; color: #424242; margin-bottom: 3px; }
     .vbar-lbl { font-size: 9px; color: #616161; margin-top: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56px; }
 
@@ -882,12 +883,14 @@
 
     // KPI FILTER
     let activeKpiFilter = null;
+    let activeChartFilter = null;
     function filterByKpi(filter) {
       const statusEl = document.getElementById('filterStatus');
       statusEl.value = '';
       document.getElementById('filterSource').value = '';
       document.getElementById('filterRegion').value = '';
       document.getElementById('searchInput').value = '';
+      activeChartFilter = null;
 
       if (filter === activeKpiFilter || filter === 'all') {
         activeKpiFilter = null;
@@ -895,6 +898,23 @@
         activeKpiFilter = filter;
         if (filter === 'blocked') statusEl.value = 'Blocked';
         else if (filter === 'committed') statusEl.value = 'Committed';
+      }
+      renderDashboard();
+    }
+
+    function filterByChart(type, value) {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterRegion').value = '';
+      document.getElementById('searchInput').value = '';
+      activeKpiFilter = null;
+
+      if (activeChartFilter && activeChartFilter.type === type && activeChartFilter.value === value) {
+        activeChartFilter = null;
+      } else {
+        activeChartFilter = { type: type, value: value };
+        if (type === 'status') document.getElementById('filterStatus').value = value;
+        else if (type === 'region') document.getElementById('filterRegion').value = value;
       }
       renderDashboard();
     }
@@ -918,6 +938,8 @@
         if (activeKpiFilter === 'engaged' && c.status === 'New') return false;
         if (activeKpiFilter === 'unified' && c.unified !== 'Unified') return false;
         if (activeKpiFilter === 'seats' && c.workloadData.reduce((s,w) => s + w.seats, 0) === 0) return false;
+        // Chart-based filters
+        if (activeChartFilter && activeChartFilter.type === 'workload' && !c.workloads.includes(activeChartFilter.value)) return false;
         return true;
       });
 
@@ -986,18 +1008,18 @@
       const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
       // Pie: Status distribution
-      var statusChart = buildPieChart(statusCounts, statusColors, 'By Status');
+      var statusChart = buildPieChart(statusCounts, statusColors, 'By Status', 'status');
 
       // Bar: Workloads
       var wlCounts = {};
       campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
-      var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload');
+      var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload', 'workload');
 
       // Pie: Region distribution
       var areaCounts = {};
       campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
       var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-      var areaChart = buildPieChart(areaCounts, areaColors, 'By Region');
+      var areaChart = buildPieChart(areaCounts, areaColors, 'By Region', 'region');
 
       if (currentView === 'partner') {
         chartsRow.innerHTML = statusChart + workloadChart + areaChart;
@@ -1006,19 +1028,20 @@
       }
     }
 
-    function buildVBarChart(data, colors, title) {
+    function buildVBarChart(data, colors, title, filterType) {
       var entries = Object.entries(data);
       var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
       var bars = entries.map(function(e) {
         var pct = Math.max(5, Math.round((e[1] / maxVal) * 100));
         var color = (typeof colors === 'string') ? colors : (colors[e[0]] || '#0078d4');
-        return '<div class="vbar-col"><span class="vbar-val">'+e[1]+'</span><div class="vbar-bar" style="height:'+pct+'%;background:'+color+'" title="'+e[0]+': '+e[1]+'"></div><span class="vbar-lbl" title="'+e[0]+'">'+e[0]+'</span></div>';
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<div class="vbar-col" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')"><span class="vbar-val">'+e[1]+'</span><div class="vbar-bar" style="height:'+pct+'%;background:'+color+'" title="'+e[0]+': '+e[1]+'"></div><span class="vbar-lbl" title="'+e[0]+'">'+e[0]+'</span></div>';
       }).join('');
       var gridLines = '<div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div>';
       return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-wrap"><div class="vbar-grid">'+gridLines+'</div><div class="vbar-chart">'+bars+'</div></div></div>';
     }
 
-    function buildPieChart(data, colors, title) {
+    function buildPieChart(data, colors, title, filterType) {
       var entries = Object.entries(data).filter(function(e) { return e[1] > 0; });
       var total = entries.reduce(function(sum, e) { return sum + e[1]; }, 0);
       var gradientParts = [];
@@ -1032,7 +1055,8 @@
       var gradient = 'conic-gradient(' + gradientParts.join(', ') + ')';
       var legend = entries.map(function(e) {
         var color = colors[e[0]] || '#999';
-        return '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<div class="pie-legend-item" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
       }).join('');
       return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
     }
