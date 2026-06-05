@@ -1002,14 +1002,7 @@
       if (currentView === 'partner') {
         chartsRow.innerHTML = statusChart + workloadChart + areaChart;
       } else {
-        // Bar: Partners
-        var partnerCounts = {};
-        campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
-        var pColors = ['#0078d4','#107c10','#d83b01','#8a6d00','#7719aa','#005a9e','#c19c00'];
-        var partnerColors = {};
-        Object.keys(partnerCounts).forEach((p, i) => { partnerColors[p] = pColors[i % pColors.length]; });
-        var partnerChart = buildVBarChart(partnerCounts, partnerColors, 'By Partner');
-        chartsRow.innerHTML = statusChart + workloadChart + areaChart + partnerChart;
+        chartsRow.innerHTML = statusChart + workloadChart + areaChart;
       }
     }
 
