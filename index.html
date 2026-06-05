@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ASPX - Campaign Builder</title>
   <style>
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        RESET & BASE
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -17,9 +17,9 @@
     button { font-family: inherit; cursor: pointer; }
     input, select, textarea { font-family: inherit; }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        TOP NAV
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .top-nav {
       display: flex; align-items: center; justify-content: space-between;
       height: 48px; padding: 0 20px;
@@ -37,9 +37,9 @@
       font-size: 12px; font-weight: 600; cursor: pointer;
     }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        APP LAYOUT
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .app-layout { display: flex; min-height: calc(100vh - 48px); }
 
     /* Sidebar */
@@ -59,9 +59,9 @@
     /* Main */
     .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        DASHBOARD VIEW
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .dashboard-view { padding: 20px 24px 40px; }
     .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
@@ -138,33 +138,6 @@
     .content-view { display: none; }
     .content-view.active { display: block; }
 
-    /* ASPX companion views */
-    .view-header { margin-bottom: 18px; }
-    .view-eyebrow {
-      font-size: 11px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.6px; color: #616161; margin-bottom: 6px;
-    }
-    .view-subtitle { font-size: 13px; color: #616161; margin-top: 6px; }
-    .sub-tabs-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; padding: 10px 12px; margin-bottom: 16px;
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-      overflow-x: auto;
-    }
-    .sub-tabs-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .sub-tab {
-      padding: 7px 12px; border: none; border-bottom: 2px solid transparent;
-      background: transparent; color: #424242; font-size: 12px; font-weight: 600;
-      white-space: nowrap;
-    }
-    .sub-tab:hover { background: #f5f5f5; }
-    .sub-tab.active { color: #0078d4; border-bottom-color: #0078d4; background: #eef6fc; border-radius: 4px 4px 0 0; }
-    .panel-card.compact { padding: 16px; }
-    .table-note { font-size: 11px; color: #616161; }
-    .metric-positive { color: #107c10; font-weight: 600; }
-    .metric-neutral { color: #005a9e; font-weight: 600; }
-    .metric-warning { color: #8a6d00; font-weight: 600; }
-
     /* Status Badges */
     .status-badge {
       display: inline-block; padding: 3px 10px; border-radius: 12px;
@@ -184,9 +157,9 @@
       background: #e8f0fe; color: #0078d4; font-weight: 500;
     }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        FILTER FLYOUT
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .filter-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 400;
     }
@@ -207,9 +180,9 @@
     }
     .filter-actions { display: flex; gap: 8px; margin-top: 16px; }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        DETAIL FLYOUT
-       ══════════════════════════════════════════════════════════════ */
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .detail-view {
       position: fixed; top: 48px; right: 0; bottom: 0;
       width: 620px; max-width: 50vw; background: #fff;
@@ -386,7 +359,7 @@
   </style>
 </head>
 <body>
-  <!-- ═══════ TOP NAV ═══════ -->
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP NAV Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <nav class="top-nav">
     <div class="nav-left">
       <svg width="20" height="20" viewBox="0 0 21 21">
@@ -405,24 +378,22 @@
   </nav>
 
   <div class="app-layout">
-    <!-- ═══════ SIDEBAR ═══════ -->
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SIDEBAR Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
     <aside class="sidebar">
       <nav class="sidebar-nav">
-        <a href="#" class="sidebar-link" onclick="switchView('growth'); return false" id="navGrowth"><span>Growth Opportunities</span></a>
         <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
         <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
-        <a href="#" class="sidebar-link" onclick="switchView('mci'); return false" id="navMci"><span>MCI Performance</span></a>
       </nav>
     </aside>
 
-    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MAIN CONTENT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
     <main class="main-content" id="mainContent">
 
-      <!-- ═══════════════════════════════════════════════════════
+      <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
            DASHBOARD VIEW
-           ═══════════════════════════════════════════════════════ -->
+           Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
       <div class="dashboard-view content-view active" id="dashboardView">
-        <h1 class="page-title" id="dashboardTitle">Campaigns — Partner View</h1>
+        <h1 class="page-title" id="dashboardTitle">Campaigns Ã¢â‚¬â€ Partner View</h1>
 
         <!-- KPIs -->
         <div class="kpi-row" id="kpiRow"></div>
@@ -463,115 +434,13 @@
         </div>
       </div>
 
-      <div class="dashboard-view content-view" id="growthView">
-        <div class="view-header">
-          <div class="view-eyebrow">Insights</div>
-          <h1 class="page-title">Growth Opportunities</h1>
-          <p class="view-subtitle">Opportunity whitespace and earnings signals across priority motion areas.</p>
-        </div>
-
-        <div class="sub-tabs-bar">
-          <div class="sub-tabs-left">
-            <button class="sub-tab active" onclick="setGrowthTab('copilot')" id="growthTabCopilot">Copilot Opportunities</button>
-            <button class="sub-tab" onclick="setGrowthTab('e3')" id="growthTabE3">E3 Opportunities</button>
-            <button class="sub-tab" onclick="setGrowthTab('e5')" id="growthTabE5">E5 Opportunities</button>
-            <button class="sub-tab" onclick="setGrowthTab('e5exp')" id="growthTabE5exp">E5 Expansion</button>
-            <button class="sub-tab" onclick="setGrowthTab('cloud')" id="growthTabCloud">Cloud Endpoints</button>
-            <button class="sub-tab" onclick="setGrowthTab('tenants')" id="growthTabTenants">Tenants</button>
-          </div>
-        </div>
-
-        <div class="kpi-row" id="growthKpiRow"></div>
-
-        <div class="panel-card compact">
-          <div class="table-toolbar">
-            <div class="toolbar-left">
-              <button class="toolbar-btn" onclick="showToast('Growth opportunities export prepared')">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Download
-              </button>
-              <button class="toolbar-btn" onclick="showToast('Data dictionary opened for Growth Opportunities')">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/><path d="M6 4h4M6 7h4M6 10h2"/></svg>
-                Data Dictionary
-              </button>
-              <button class="toolbar-btn" onclick="showToast('Filter panel is not enabled in this prototype')">
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
-                Filter
-              </button>
-            </div>
-            <div class="toolbar-right">
-              <div class="toolbar-search">
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-                <input type="text" placeholder="Search tenants..." id="growthSearchInput" oninput="renderGrowthView()">
-              </div>
-            </div>
-          </div>
-
-          <div class="campaign-table-wrap">
-            <table class="campaign-table">
-              <thead id="growthTableHead"></thead>
-              <tbody id="growthTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div class="dashboard-view content-view" id="mciView">
-        <div class="view-header">
-          <div class="view-eyebrow">Insights</div>
-          <h1 class="page-title">MCI MW Performance Measurement</h1>
-          <p class="view-subtitle">AI Business Solutions &amp; Security</p>
-        </div>
-
-        <div class="sub-tabs-bar">
-          <div class="sub-tabs-left">
-            <button class="sub-tab active" onclick="setMciTab('copilotPower')" id="mciTabCopilotPower">Copilot + Power</button>
-            <button class="sub-tab" onclick="setMciTab('secureProductivity')" id="mciTabSecureProductivity">Secure Productivity</button>
-            <button class="sub-tab" onclick="setMciTab('cloudEndpoints')" id="mciTabCloudEndpoints">Cloud Endpoints</button>
-          </div>
-        </div>
-
-        <div class="kpi-row" id="mciKpiRow"></div>
-
-        <div class="panel-card compact">
-          <div class="table-toolbar">
-            <div class="toolbar-left">
-              <button class="toolbar-btn" onclick="showToast('MCI performance export prepared')">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Download
-              </button>
-              <button class="toolbar-btn" onclick="showToast('Data dictionary opened for MCI Performance')">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/><path d="M6 4h4M6 7h4M6 10h2"/></svg>
-                Data Dictionary
-              </button>
-              <button class="toolbar-btn" onclick="showToast('Filter panel is not enabled in this prototype')">
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
-                Filter
-              </button>
-            </div>
-            <div class="toolbar-right">
-              <div class="toolbar-search">
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-                <input type="text" placeholder="Search performance rows..." id="mciSearchInput" oninput="renderMciView()">
-              </div>
-            </div>
-          </div>
-
-          <div class="campaign-table-wrap">
-            <table class="campaign-table">
-              <thead id="mciTableHead"></thead>
-              <tbody id="mciTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
     </main>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
+
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        DETAIL FLYOUT
-       ═══════════════════════════════════════════════════════ -->
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="detail-view" id="detailView">
     <div class="flyout-header">
       <span style="font-size:11px;color:#616161;">Campaign Detail</span>
@@ -613,7 +482,7 @@
       <div id="detailActionBar" style="padding:12px 0; border-top:1px solid #e0e0e0; margin-top:16px; display:flex; align-items:center; justify-content:space-between;"></div>
   </div>
 
-  <!-- ═══════ FILTER FLYOUT ═══════ -->
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â FILTER FLYOUT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()">
     <div class="filter-panel" onclick="event.stopPropagation()">
       <h3>Filters <button class="btn btn-sm btn-secondary" onclick="resetFilters()">Reset</button></h3>
@@ -655,7 +524,7 @@
     </div>
   </div>
 
-  <!-- ═══════ CLOSE MODAL ═══════ -->
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â CLOSE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="modal-overlay" id="closeModal">
     <div class="modal">
       <h3>Close Campaign</h3>
@@ -671,14 +540,14 @@
     </div>
   </div>
 
-  <!-- ═══════ TOAST ═══════ -->
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOAST Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="toast" id="toast"></div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        JAVASCRIPT
-       ═══════════════════════════════════════════════════════════════ -->
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <script>
-    // ═══════ MOCK DATA ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MOCK DATA Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     const campaigns = [
       {
         id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
@@ -743,7 +612,7 @@
         history: [
           { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
           { date: '2026-05-12', text: 'Outreach completed', type: 'success', actor: 'partner@acme.com' },
-          { date: '2026-05-18', text: 'Customer engaged — agreed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-18', text: 'Customer engaged Ã¢â‚¬â€ agreed', type: 'success', actor: 'partner@acme.com' },
           { date: '2026-05-22', text: 'ECIF funding submitted', type: 'info', actor: 'partner@acme.com' },
           { date: '2026-05-28', text: 'Funding approved', type: 'success', actor: 'field@microsoft.com' },
           { date: '2026-06-04', text: 'MDE workload marked as Closed', type: 'success', actor: 'partner@acme.com' }
@@ -768,7 +637,7 @@
         history: [
           { date: '2026-05-15', text: 'Campaign created', type: 'info', actor: 'msftfield@microsoft.com' },
           { date: '2026-05-18', text: 'Outreach completed', type: 'success', actor: 'rep@techdata.com' },
-          { date: '2026-05-25', text: 'Customer prefers another partner — blocked', type: 'blocked', actor: 'rep@techdata.com' }
+          { date: '2026-05-25', text: 'Customer prefers another partner Ã¢â‚¬â€ blocked', type: 'blocked', actor: 'rep@techdata.com' }
         ]
       },
       {
@@ -843,250 +712,23 @@
 
     let currentCampaign = null;
     let currentView = 'partner';
-    let currentGrowthTab = 'copilot';
-    let currentMciTab = 'copilotPower';
     const STATE_ORDER = ['New', 'Outreach', 'Funding', 'Committed', 'Closed'];
-    const growthViews = {
-      copilot: {
-        label: 'Copilot Opportunities',
-        kpis: [
-          { value: '482K', label: 'Copilot Eligible M365 Seats' },
-          { value: '311K', label: 'Copilot Seats Whitespace' },
-          { value: '126', label: 'Copilot Opportunity Accounts' },
-          { value: '$8.6M', label: 'Potential Earnings' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Tenant Country/Region', 'Tenant Segment', 'Customer TPID', 'Customer Name', 'Copilot Eligible M365 Seats', 'Copilot Seats Whitespace', 'Copilot Opportunity', 'Potential Earnings'],
-        rows: [
-          ['Fabrikam Holdings', 'TEN-10452', 'United States', 'Enterprise', '1082457', 'Fabrikam', '85,000', '62,400', 'High', '$1,248,000'],
-          ['Contoso Retail', 'TEN-11803', 'Canada', 'Enterprise', '2083175', 'Contoso Ltd', '64,200', '41,000', 'High', '$820,000'],
-          ['Northwind Health', 'TEN-13991', 'United Kingdom', 'SMC-Corporate', '3054411', 'Northwind Health', '39,600', '28,300', 'Medium', '$566,000'],
-          ['Woodgrove Bank', 'TEN-15420', 'United States', 'Enterprise', '8821004', 'Woodgrove Bank', '93,000', '51,250', 'High', '$1,025,000'],
-          ['Litware Group', 'TEN-16488', 'Germany', 'Corporate', '6547712', 'Litware Inc', '27,500', '16,800', 'Medium', '$336,000'],
-          ['Adventure Works', 'TEN-17102', 'Australia', 'Corporate', '7719088', 'Adventure Works', '18,400', '12,100', 'Low', '$242,000']
-        ]
-      },
-      e3: {
-        label: 'E3 Opportunities',
-        kpis: [
-          { value: '212K', label: 'M365 Business Premium Seats' },
-          { value: '74K', label: 'E3 Upgrade Whitespace' },
-          { value: '61', label: 'Ready to Engage Accounts' },
-          { value: '$2.1M', label: 'Potential Earnings' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Country/Region', 'Segment', 'Customer TPID', 'Customer Name', 'Current Productivity Seats', 'E3 Upgrade Whitespace', 'Priority', 'Potential Earnings'],
-        rows: [
-          ['Alpine Energy', 'TEN-18330', 'United States', 'Corporate', '4422011', 'Alpine Energy', '21,500', '8,400', 'High', '$252,000'],
-          ['Proseware', 'TEN-18542', 'France', 'SMC-Corporate', '5510234', 'Proseware', '18,200', '6,900', 'Medium', '$207,000'],
-          ['Blue Yonder Air', 'TEN-18801', 'India', 'Enterprise', '1098451', 'Blue Yonder Air', '42,100', '16,500', 'High', '$495,000'],
-          ['A. Datum', 'TEN-19117', 'Spain', 'Corporate', '6642014', 'A. Datum', '11,900', '4,600', 'Medium', '$138,000'],
-          ['Southridge Video', 'TEN-19754', 'Japan', 'Corporate', '7712550', 'Southridge Video', '14,700', '5,200', 'Low', '$156,000']
-        ]
-      },
-      e5: {
-        label: 'E5 Opportunities',
-        kpis: [
-          { value: '148K', label: 'M365 E3 Installed Base' },
-          { value: '53K', label: 'E5 Upgrade Whitespace' },
-          { value: '47', label: 'Top Priority Accounts' },
-          { value: '$3.4M', label: 'Potential Earnings' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Country/Region', 'Segment', 'Customer TPID', 'Customer Name', 'M365 E3 Seats', 'E5 Whitespace', 'Security Propensity', 'Potential Earnings'],
-        rows: [
-          ['Wide World Importers', 'TEN-20418', 'United States', 'Enterprise', '9023412', 'Wide World Importers', '38,000', '14,500', 'High', '$928,000'],
-          ['Humongous Insurance', 'TEN-20901', 'United Kingdom', 'Enterprise', '8841230', 'Humongous Insurance', '29,300', '10,400', 'High', '$665,000'],
-          ['Trey Research', 'TEN-21442', 'Singapore', 'Corporate', '1184022', 'Trey Research', '17,500', '7,100', 'Medium', '$454,000'],
-          ['Fourth Coffee', 'TEN-21960', 'Canada', 'Corporate', '4478200', 'Fourth Coffee', '9,800', '3,900', 'Medium', '$250,000'],
-          ['Graphic Design Institute', 'TEN-22351', 'Netherlands', 'SMC-Corporate', '5124601', 'Graphic Design Institute', '7,200', '2,600', 'Low', '$166,000']
-        ]
-      },
-      e5exp: {
-        label: 'E5 Expansion',
-        kpis: [
-          { value: '96K', label: 'Eligible Expansion Seats' },
-          { value: '32K', label: 'Incremental E5 Upside' },
-          { value: '29', label: 'Expansion Accounts' },
-          { value: '$1.7M', label: 'Potential Earnings' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Country/Region', 'Segment', 'Customer TPID', 'Customer Name', 'Existing E5 Seats', 'Expansion Whitespace', 'Expansion Priority', 'Potential Earnings'],
-        rows: [
-          ['Consolidated Messenger', 'TEN-23010', 'United States', 'Enterprise', '7130920', 'Consolidated Messenger', '24,000', '8,100', 'High', '$429,000'],
-          ['Nod Publishers', 'TEN-23318', 'Australia', 'Corporate', '8841010', 'Nod Publishers', '13,500', '4,300', 'Medium', '$228,000'],
-          ['Bellows College', 'TEN-23641', 'Ireland', 'Corporate', '3991055', 'Bellows College', '10,800', '3,900', 'Medium', '$207,000'],
-          ['Lucerne Bank', 'TEN-24107', 'Switzerland', 'Enterprise', '6100248', 'Lucerne Bank', '19,400', '6,600', 'High', '$350,000'],
-          ['Margies Travel', 'TEN-24566', 'Brazil', 'Corporate', '7103402', 'Margies Travel', '7,600', '2,500', 'Low', '$132,000']
-        ]
-      },
-      cloud: {
-        label: 'Cloud Endpoints',
-        kpis: [
-          { value: '188K', label: 'Managed Endpoints' },
-          { value: '72K', label: 'Endpoints Whitespace' },
-          { value: '38', label: 'Endpoint Motions' },
-          { value: '$1.4M', label: 'Potential Earnings' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Country/Region', 'Segment', 'Customer TPID', 'Customer Name', 'Managed Endpoints', 'Cloud Endpoints Whitespace', 'Endpoint Readiness', 'Potential Earnings'],
-        rows: [
-          ['Relecloud', 'TEN-25112', 'United States', 'Enterprise', '9088124', 'Relecloud', '56,000', '21,800', 'High', '$436,000'],
-          ['City Power & Light', 'TEN-25743', 'United Kingdom', 'Enterprise', '6627100', 'City Power & Light', '31,500', '10,200', 'Medium', '$204,000'],
-          ['Coho Winery', 'TEN-25998', 'France', 'Corporate', '1176208', 'Coho Winery', '12,400', '4,100', 'Medium', '$82,000'],
-          ['VanArsdel', 'TEN-26431', 'Japan', 'Corporate', '4487604', 'VanArsdel', '18,900', '7,500', 'High', '$150,000'],
-          ['The Phone Company', 'TEN-26845', 'Mexico', 'SMC-Corporate', '7712940', 'The Phone Company', '9,700', '3,300', 'Low', '$66,000']
-        ]
-      },
-      tenants: {
-        label: 'Tenants',
-        kpis: [
-          { value: '146', label: 'Tracked Tenants' },
-          { value: '84', label: 'Active Opportunity Tenants' },
-          { value: '22', label: 'Needs Association Cleanup' },
-          { value: '91%', label: 'Tenant Data Coverage' }
-        ],
-        columns: ['Tenant Name', 'Tenant ID', 'Country/Region', 'Segment', 'Customer TPID', 'Customer Name', 'Associated Reseller', 'Opportunity Motions', 'Last Refresh', 'Data Health'],
-        rows: [
-          ['Fabrikam Holdings', 'TEN-10452', 'United States', 'Enterprise', '1082457', 'Fabrikam', 'Ingram Micro', 'Copilot, E5', '2026-06-04', 'Healthy'],
-          ['Contoso Retail', 'TEN-11803', 'Canada', 'Enterprise', '2083175', 'Contoso Ltd', 'TD Synnex', 'Copilot, Cloud Endpoints', '2026-06-05', 'Healthy'],
-          ['Northwind Health', 'TEN-13991', 'United Kingdom', 'SMC-Corporate', '3054411', 'Northwind Health', 'Softcat', 'Copilot', '2026-06-03', 'Review'],
-          ['Lucerne Bank', 'TEN-24107', 'Switzerland', 'Enterprise', '6100248', 'Lucerne Bank', 'SoftwareOne', 'E5 Expansion', '2026-06-02', 'Healthy'],
-          ['Margies Travel', 'TEN-24566', 'Brazil', 'Corporate', '7103402', 'Margies Travel', 'Lumen', 'E5 Expansion', '2026-05-30', 'Review']
-        ]
-      }
-    };
-    const mciViews = {
-      copilotPower: {
-        kpis: [
-          { value: '82%', label: 'Attainment to Target' },
-          { value: '$4.2M', label: 'Revenue Influenced' },
-          { value: '128', label: 'Activated Partners' },
-          { value: '94', label: 'Qualified Opportunities' }
-        ],
-        columns: ['Partner', 'Area', 'Sub-Solution', 'QTD Target', 'QTD Actual', 'Attainment', 'Pipeline Coverage', 'Top Motion'],
-        rows: [
-          ['Ingram Micro', 'US West', 'Copilot + Power', '$820K', '$706K', '86%', '3.2x', 'Copilot Attach'],
-          ['TD Synnex', 'US East', 'Copilot + Power', '$690K', '$581K', '84%', '2.8x', 'Power Platform'],
-          ['Crayon', 'EMEA', 'Copilot + Power', '$510K', '$438K', '86%', '2.6x', 'Copilot Renewals'],
-          ['Softchoice', 'Canada', 'Copilot + Power', '$360K', '$298K', '83%', '2.4x', 'Power Apps'],
-          ['Insight', 'APAC', 'Copilot + Power', '$290K', '$226K', '78%', '2.1x', 'Copilot New Logo'],
-          ['Bytes', 'UK', 'Copilot + Power', '$250K', '$213K', '85%', '2.5x', 'Power BI']
-        ]
-      },
-      secureProductivity: {
-        kpis: [
-          { value: '76%', label: 'Attainment to Target' },
-          { value: '$3.1M', label: 'Revenue Influenced' },
-          { value: '103', label: 'Activated Partners' },
-          { value: '71', label: 'Qualified Opportunities' }
-        ],
-        columns: ['Partner', 'Area', 'Solution Play', 'QTD Target', 'QTD Actual', 'Attainment', 'Win Rate', 'Top Motion'],
-        rows: [
-          ['Avanade', 'US', 'Secure Productivity', '$740K', '$548K', '74%', '31%', 'M365 E5 Security'],
-          ['SoftwareOne', 'EMEA', 'Secure Productivity', '$620K', '$486K', '78%', '35%', 'Defender Upsell'],
-          ['Wipro', 'India', 'Secure Productivity', '$430K', '$327K', '76%', '28%', 'Purview'],
-          ['Cancom', 'Germany', 'Secure Productivity', '$315K', '$253K', '80%', '34%', 'M365 Compliance'],
-          ['NTT', 'Japan', 'Secure Productivity', '$280K', '$198K', '71%', '26%', 'Insider Risk'],
-          ['SADA', 'Canada', 'Secure Productivity', '$210K', '$159K', '76%', '29%', 'E5 Security']
-        ]
-      },
-      cloudEndpoints: {
-        kpis: [
-          { value: '88%', label: 'Attainment to Target' },
-          { value: '$2.6M', label: 'Revenue Influenced' },
-          { value: '91', label: 'Activated Partners' },
-          { value: '54', label: 'Qualified Opportunities' }
-        ],
-        columns: ['Partner', 'Area', 'Endpoint Motion', 'QTD Target', 'QTD Actual', 'Attainment', 'Managed Devices', 'Top Motion'],
-        rows: [
-          ['CDW', 'US', 'Cloud Endpoints', '$510K', '$458K', '90%', '124K', 'Intune Attach'],
-          ['Computacenter', 'UK', 'Cloud Endpoints', '$430K', '$368K', '86%', '98K', 'Windows 11 Refresh'],
-          ['Fujitsu', 'Japan', 'Cloud Endpoints', '$340K', '$293K', '86%', '83K', 'Autopilot'],
-          ['Datacom', 'ANZ', 'Cloud Endpoints', '$255K', '$231K', '91%', '61K', 'Endpoint Security'],
-          ['Orange Business', 'France', 'Cloud Endpoints', '$230K', '$193K', '84%', '57K', 'Intune Premium'],
-          ['NTT Data', 'Spain', 'Cloud Endpoints', '$200K', '$172K', '86%', '49K', 'Autopatch']
-        ]
-      }
-    };
-
-    // ═══════ VIEW SWITCH ═══════
+    // â•â•â•â•â•â•â• VIEW SWITCH â•â•â•â•â•â•â•
     function switchView(view) {
       currentView = view;
-      document.getElementById('navGrowth').classList.toggle('active', view === 'growth');
       document.getElementById('navPartner').classList.toggle('active', view === 'partner');
       document.getElementById('navField').classList.toggle('active', view === 'field');
-      document.getElementById('navMci').classList.toggle('active', view === 'mci');
-      document.getElementById('dashboardView').classList.toggle('active', view === 'partner' || view === 'field');
-      document.getElementById('growthView').classList.toggle('active', view === 'growth');
-      document.getElementById('mciView').classList.toggle('active', view === 'mci');
+      document.getElementById('dashboardView').classList.toggle('active', true);
       document.getElementById('pageTitle').textContent =
-        view === 'growth' ? 'Growth Opportunities' :
-        view === 'mci' ? 'MCI Performance' :
         view === 'partner' ? 'Campaign Builder (Partner View)' : 'Campaign Builder (MSFT Field View)';
-      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns — Partner View' : 'Campaigns — Field | Corp View';
+      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns â€” Partner View' : 'Campaigns â€” Field | Corp View';
       showDashboard();
       toggleFilter(false);
-      if (view === 'growth') renderGrowthView();
-      else if (view === 'mci') renderMciView();
-      else renderDashboard();
+      renderDashboard();
     }
 
-    function setGrowthTab(tab) {
-      currentGrowthTab = tab;
-      ['copilot', 'e3', 'e5', 'e5exp', 'cloud', 'tenants'].forEach(function(key) {
-        var el = document.getElementById('growthTab' + (key === 'e3' ? 'E3' : key === 'e5' ? 'E5' : key === 'e5exp' ? 'E5exp' : key === 'cloud' ? 'Cloud' : key === 'tenants' ? 'Tenants' : 'Copilot'));
-        if (el) el.classList.toggle('active', key === tab);
-      });
-      renderGrowthView();
-    }
 
-    function setMciTab(tab) {
-      currentMciTab = tab;
-      ['copilotPower', 'secureProductivity', 'cloudEndpoints'].forEach(function(key) {
-        var label = key === 'copilotPower' ? 'CopilotPower' : key === 'secureProductivity' ? 'SecureProductivity' : 'CloudEndpoints';
-        var el = document.getElementById('mciTab' + label);
-        if (el) el.classList.toggle('active', key === tab);
-      });
-      renderMciView();
-    }
-
-    function renderGrowthView() {
-      var config = growthViews[currentGrowthTab];
-      var search = document.getElementById('growthSearchInput').value.toLowerCase();
-      document.getElementById('growthKpiRow').innerHTML = config.kpis.map(function(kpi) {
-        return '<div class="kpi-tile"><span class="kpi-value">' + kpi.value + '</span><span class="kpi-label">' + kpi.label + '</span></div>';
-      }).join('');
-      document.getElementById('growthTableHead').innerHTML = '<tr>' + config.columns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
-      document.getElementById('growthTableBody').innerHTML = config.rows.filter(function(row) {
-        return !search || row.join(' ').toLowerCase().indexOf(search) > -1;
-      }).map(function(row) {
-        return '<tr>' + row.map(function(cell, index) {
-          var cls = '';
-          if (index === row.length - 1 && cell.indexOf('$') === 0) cls = ' class="metric-positive"';
-          else if (cell === 'High') cls = ' class="metric-positive"';
-          else if (cell === 'Medium' || cell === 'Healthy') cls = ' class="metric-neutral"';
-          else if (cell === 'Low' || cell === 'Review') cls = ' class="metric-warning"';
-          return '<td' + cls + '>' + cell + '</td>';
-        }).join('') + '</tr>';
-      }).join('');
-    }
-
-    function renderMciView() {
-      var config = mciViews[currentMciTab];
-      var search = document.getElementById('mciSearchInput').value.toLowerCase();
-      document.getElementById('mciKpiRow').innerHTML = config.kpis.map(function(kpi) {
-        return '<div class="kpi-tile"><span class="kpi-value">' + kpi.value + '</span><span class="kpi-label">' + kpi.label + '</span></div>';
-      }).join('');
-      document.getElementById('mciTableHead').innerHTML = '<tr>' + config.columns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
-      document.getElementById('mciTableBody').innerHTML = config.rows.filter(function(row) {
-        return !search || row.join(' ').toLowerCase().indexOf(search) > -1;
-      }).map(function(row) {
-        return '<tr>' + row.map(function(cell, index) {
-          var cls = '';
-          if (index === 5 && cell.indexOf('%') > -1) cls = ' class="metric-positive"';
-          else if (index === 4 && cell.indexOf('$') === 0) cls = ' class="metric-neutral"';
-          return '<td' + cls + '>' + cell + '</td>';
-        }).join('') + '</tr>';
-      }).join('');
-    }
-
-    // ═══════ DASHBOARD ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DASHBOARD Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     function renderDashboard() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const filterStatus = document.getElementById('filterStatus').value;
@@ -1110,7 +752,7 @@
         return 0;
       });
 
-      // KPIs — differ by view
+      // KPIs Ã¢â‚¬â€ differ by view
       const total = campaigns.length;
       const blocked = campaigns.filter(c => c.status === 'Blocked').length;
       const inProgress = campaigns.filter(c => c.status !== 'Closed').length;
@@ -1245,7 +887,7 @@
       return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
     }
 
-    // ═══════ DETAIL VIEW ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     function openCampaign(id) {
       currentCampaign = campaigns.find(c => c.id === id);
       if (!currentCampaign) return;
@@ -1329,7 +971,7 @@
         html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Outreach') {
-        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">— Select —</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner → Blocked</option><option value="declined">Customer no longer requires assistance → Blocked</option><option value="external">Customer cannot engage at this time → Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner Ã¢â€ â€™ Blocked</option><option value="declined">Customer no longer requires assistance Ã¢â€ â€™ Blocked</option><option value="external">Customer cannot engage at this time Ã¢â€ â€™ Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         const step1Done = c.funding.submitted;
@@ -1337,7 +979,7 @@
         if (!step1Done) {
           html += '<div class="form-group"><label>Funding Submitted? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSubmitted"> Yes, submitted</label></div></div><div class="form-group"><label>Submission Date <span class="required">*</span></label><input type="date" id="gateFundingSubDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment" placeholder="Notes on funding submission..."></textarea></div>';
         } else {
-          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">— Select —</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">— Select —</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
+          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
         }
         html += '</div></div>';
       }
@@ -1345,7 +987,7 @@
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
-        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">— Select —</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
 
       panel.innerHTML = html;
@@ -1381,7 +1023,7 @@
       bar.innerHTML = '<div class="action-bar-left">'+left+' <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div>'+closeBtn+'</div>';
     }
 
-    // ═══════ STATE TRANSITIONS ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     function advanceFromNew() {
       const checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
       const date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
@@ -1418,14 +1060,14 @@
 
       if (selectedOutcome === 'agreed') {
         c.status = 'Funding';
-        c.history.push({ date: today(), text: 'Customer engaged — agreed to campaign', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Customer engaged Ã¢â‚¬â€ agreed to campaign', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Funding');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked Ã¢â‚¬â€ ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
         showToast('Campaign blocked');
       }
       selectedOutcome = '';
@@ -1462,7 +1104,7 @@
       if (secured === 'yes') {
         c.dates.fundingApproval = date || today();
         c.status = 'Committed';
-        c.history.push({ date: today(), text: 'Funding approved — campaign committed', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding approved Ã¢â‚¬â€ campaign committed', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed');
       } else {
         var reason = document.getElementById('gateFundingDeclineReason') && document.getElementById('gateFundingDeclineReason').value;
@@ -1471,8 +1113,8 @@
         c.previousState = 'Funding';
         c.blockReason = reason;
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Funding declined — ' + reason, type: 'blocked', actor: c.partnerDRI });
-        showToast('Campaign blocked — funding declined');
+        c.history.push({ date: today(), text: 'Funding declined Ã¢â‚¬â€ ' + reason, type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked Ã¢â‚¬â€ funding declined');
       }
       renderDetail();
     }
@@ -1485,9 +1127,9 @@
       c.previousState = null;
       c.blockReason = '';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Unblocked — returned to ' + c.status, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Unblocked Ã¢â‚¬â€ returned to ' + c.status, type: 'success', actor: c.partnerDRI });
       renderDetail();
-      showToast('Campaign unblocked — returned to ' + c.status);
+      showToast('Campaign unblocked Ã¢â‚¬â€ returned to ' + c.status);
     }
 
     function reactivateCampaign() {
@@ -1496,7 +1138,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated Ã¢â‚¬â€ ' + reason, type: 'success', actor: c.partnerDRI });
       renderDetail();
       showToast('Campaign reactivated to Committed');
     }
@@ -1508,7 +1150,7 @@
       c.previousState = c.status;
       c.status = 'Closed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Campaign manually closed — ' + reason, type: 'closed', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Campaign manually closed Ã¢â‚¬â€ ' + reason, type: 'closed', actor: c.partnerDRI });
       hideModal('closeModal');
       document.getElementById('closeReasonText').value = '';
       renderDetail();
@@ -1524,9 +1166,9 @@
       if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
         c.status = 'Closed';
         c.dates.updated = today();
-        c.history.push({ date: today(), text: 'All workloads closed — campaign auto-closed', type: 'closed', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'All workloads closed Ã¢â‚¬â€ campaign auto-closed', type: 'closed', actor: c.partnerDRI });
         renderDetail();
-        showToast('All workloads closed — campaign auto-closed');
+        showToast('All workloads closed Ã¢â‚¬â€ campaign auto-closed');
       }
     }
 
@@ -1535,7 +1177,7 @@
       showToast('Changes saved');
     }
 
-    // ═══════ UTILITIES ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â UTILITIES Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     function today() { return new Date().toISOString().split('T')[0]; }
 
     function showToast(msg, isError) {
@@ -1560,7 +1202,7 @@
       renderDashboard();
     }
 
-    // ═══════ INIT ═══════
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â INIT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     switchView('partner');
   </script>
 </body>
