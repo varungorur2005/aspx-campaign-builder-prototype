@@ -154,6 +154,7 @@
     }
     .status-badge.new { background: #e8f0fe; color: #0078d4; }
     .status-badge.outreach { background: #e6f2ff; color: #005a9e; }
+    .status-badge.engaged { background: #f3e8ff; color: #6b21a8; }
     .status-badge.funding { background: #fff4ce; color: #8a6d00; }
     .status-badge.committed { background: #dff6dd; color: #107c10; }
     .status-badge.blocked { background: #fed9cc; color: #d83b01; }
@@ -509,6 +510,7 @@
           <option value="">All</option>
           <option value="New">New</option>
           <option value="Outreach">Outreach</option>
+          <option value="Engaged">Engaged</option>
           <option value="Funding">Funding</option>
           <option value="Committed">Committed</option>
           <option value="Blocked">Blocked</option>
@@ -519,9 +521,11 @@
         <label>Source</label>
         <select id="filterSource" onchange="renderDashboard()">
           <option value="">All</option>
-          <option value="Summit">Summit</option>
-          <option value="CSU">CSU</option>
-          <option value="Field Referral">Field Referral</option>
+          <option value="Security CSU Partner Clinic | ANZ">Security CSU Partner Clinic | ANZ</option>
+          <option value="Security CSU Partner Clinic | APAC">Security CSU Partner Clinic | APAC</option>
+          <option value="Security CSU Partner Clinic | EMEA">Security CSU Partner Clinic | EMEA</option>
+          <option value="Security CSU Partner Clinic | FSI">Security CSU Partner Clinic | FSI</option>
+          <option value="Security CSU Partner Clinic | US">Security CSU Partner Clinic | US</option>
         </select>
       </div>
       <div class="filter-section">
@@ -569,13 +573,14 @@
       {
         id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
         tpid: 'TP-44201', segment: 'Enterprise', region: 'ANZ', industry: 'Government',
-        source: 'Security CSU Partner Summit | ANZ',
+        source: 'Security CSU Partner Clinic | ANZ',
         workloads: ['IRM','MIP P2','MDE','MDA','Sentinel'],
         status: 'New', previousState: null, blockReason: '',
         partnerDRI: 'John.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
         unified: 'Unified', opportunityId: '7-123456789',
         dates: { created: '2026-05-28', updated: '2026-06-03' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: '' },
         workloadData: [
           { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' },
@@ -585,19 +590,20 @@
           { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
         ],
         history: [
-          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Summit | ANZ', type: 'info', actor: 'scottweeden@microsoft.com' }
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Clinic | ANZ', type: 'info', actor: 'scottweeden@microsoft.com' }
         ]
       },
       {
         id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro India Private Ltd',
         tpid: 'TP-55102', segment: 'Enterprise', region: 'India', industry: 'Financial Services',
-        source: 'Security CSU Partner Summit | FSI',
+        source: 'Security CSU Partner Clinic | FSI',
         workloads: ['MDE','MDA','MDO','MDI','IRM'],
         status: 'New', previousState: null, blockReason: '',
         partnerDRI: 'Jane.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-123456787',
         dates: { created: '2026-05-28', updated: '2026-06-02' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: '' },
         workloadData: [
           { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
@@ -607,19 +613,20 @@
           { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
         ],
         history: [
-          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Summit | FSI', type: 'info', actor: 'scottweeden@microsoft.com' }
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Clinic | FSI', type: 'info', actor: 'scottweeden@microsoft.com' }
         ]
       },
       {
         id: '334455', customer: 'Contoso Ltd', partner: 'Acme Consulting',
         tpid: 'TP-33098', segment: 'Enterprise', region: 'US West', industry: 'Technology',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','MDI','MDE'],
         status: 'Committed', previousState: null, blockReason: '',
         partnerDRI: 'partner@acme.com', microsoftDRI: 'field@microsoft.com',
         unified: 'Unified', opportunityId: '7-334455001',
         dates: { created: '2026-05-10', outreach: '2026-05-12', engagement: '2026-05-18', fundingSubmission: '2026-05-22', fundingApproval: '2026-05-28', updated: '2026-06-04' },
         funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MDO', status: 'Committed', seats: 120000, notes: 'Full tenant rollout' },
@@ -638,13 +645,14 @@
       {
         id: '556677', customer: 'Northwind Traders', partner: 'TechData Corp',
         tpid: 'TP-77451', segment: 'Mid-Market', region: 'EMEA North', industry: 'Retail',
-        source: 'Security CSU Partner Summit | EMEA',
+        source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['MDE','MDA','Sentinel'],
         status: 'Blocked', previousState: 'Outreach', blockReason: 'Customer prefers to work with another partner',
         partnerDRI: 'rep@techdata.com', microsoftDRI: 'msftfield@microsoft.com',
         unified: 'Unified', opportunityId: '7-556677001',
         dates: { created: '2026-05-15', outreach: '2026-05-18', engagement: '2026-05-25', updated: '2026-06-01' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: 'preference' },
         workloadData: [
           { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
@@ -660,13 +668,14 @@
       {
         id: '889900', customer: 'Tailspin Toys', partner: 'Insight Direct',
         tpid: 'TP-12399', segment: 'SMB', region: 'APAC', industry: 'Consumer Goods',
-        source: 'Security CSU Partner Summit | APAC',
+        source: 'Security CSU Partner Clinic | APAC',
         workloads: ['MDO','MDE'],
-        status: 'Funding', previousState: null, blockReason: '',
+        status: 'Engaged', previousState: null, blockReason: '',
         partnerDRI: 'sales@insight.com', microsoftDRI: 'apacfield@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-889900001',
         dates: { created: '2026-05-20', outreach: '2026-05-22', engagement: '2026-05-28', fundingSubmission: '', updated: '2026-06-02' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
@@ -675,20 +684,21 @@
         history: [
           { date: '2026-05-20', text: 'Campaign created', type: 'info', actor: 'apacfield@microsoft.com' },
           { date: '2026-05-22', text: 'Outreach completed', type: 'success', actor: 'sales@insight.com' },
-          { date: '2026-05-28', text: 'Customer agreed', type: 'success', actor: 'sales@insight.com' },
-          { date: '2026-06-02', text: 'Awaiting funding submission', type: 'info', actor: 'apacfield@microsoft.com' }
+          { date: '2026-05-28', text: 'Customer engaged Ã¢â‚¬â€ agreed to campaign', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-06-02', text: 'Awaiting funding requirement decision', type: 'info', actor: 'apacfield@microsoft.com' }
         ]
       },
       {
         id: '101010', customer: 'Woodgrove Bank', partner: 'Avanade',
         tpid: 'TP-88210', segment: 'Enterprise', region: 'US East', industry: 'Financial Services',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','MDI','MDE','Sentinel'],
         status: 'Outreach', previousState: null, blockReason: '',
         partnerDRI: 'exec@avanade.com', microsoftDRI: 'usfield@microsoft.com',
         unified: 'Unified', opportunityId: '7-101010001',
         dates: { created: '2026-06-01', outreach: '', updated: '2026-06-03' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: '' },
         workloadData: [
           { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
@@ -704,13 +714,14 @@
       {
         id: '777888', customer: 'Litware Inc', partner: 'Softchoice',
         tpid: 'TP-65477', segment: 'Mid-Market', region: 'US East', industry: 'Technology',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDA'],
         status: 'Closed', previousState: null, blockReason: '',
         partnerDRI: 'dri@softchoice.com', microsoftDRI: 'usfield2@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-777888001',
         dates: { created: '2026-04-15', outreach: '2026-04-17', engagement: '2026-04-22', fundingSubmission: '2026-04-25', fundingApproval: '2026-04-30', updated: '2026-05-25' },
         funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MDE', status: 'Closed', seats: 15000, notes: 'Complete' },
@@ -728,13 +739,14 @@
       {
         id: '445566', customer: 'Adventure Works', partner: 'Computacenter',
         tpid: 'TP-77190', segment: 'Enterprise', region: 'EMEA North', industry: 'Manufacturing',
-        source: 'Security CSU Partner Summit | EMEA',
+        source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['Sentinel','MDE','MDI'],
         status: 'Committed', previousState: null, blockReason: '',
         partnerDRI: 'lead@computacenter.com', microsoftDRI: 'emeafield@microsoft.com',
         unified: 'Unified', opportunityId: '7-445566001',
         dates: { created: '2026-04-20', outreach: '2026-04-24', engagement: '2026-05-01', fundingSubmission: '2026-05-05', fundingApproval: '2026-05-10', updated: '2026-06-01' },
         funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'Sentinel', status: 'Committed', seats: 22000, notes: 'SOC expansion' },
@@ -752,13 +764,14 @@
       {
         id: '998877', customer: 'Fabrikam Industries', partner: 'SoftwareOne',
         tpid: 'TP-44210', segment: 'Enterprise', region: 'EMEA North', industry: 'Energy',
-        source: 'Security CSU Partner Summit | EMEA',
+        source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['MIP P2','IRM','MDA'],
         status: 'Funding', previousState: null, blockReason: '',
         partnerDRI: 'pm@softwareone.com', microsoftDRI: 'emeafield@microsoft.com',
         unified: 'Unified', opportunityId: '7-998877001',
         dates: { created: '2026-05-10', outreach: '2026-05-14', engagement: '2026-05-20', updated: '2026-06-03' },
         funding: { submitted: true, secured: '' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MIP P2', status: 'Uncommitted', seats: 0, notes: '' },
@@ -775,13 +788,14 @@
       {
         id: '112233', customer: 'Relecloud', partner: 'Pax8',
         tpid: 'TP-90881', segment: 'Mid-Market', region: 'US West', industry: 'Media',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','Sentinel'],
         status: 'Outreach', previousState: null, blockReason: '',
         partnerDRI: 'sales@pax8.com', microsoftDRI: 'uswestfield@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-112233001',
         dates: { created: '2026-05-30', updated: '2026-06-04' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: '' },
         workloadData: [
           { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
@@ -795,13 +809,14 @@
       {
         id: '667788', customer: 'Wide World Importers', partner: 'CDW',
         tpid: 'TP-90234', segment: 'Enterprise', region: 'US East', industry: 'Logistics',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDI','Sentinel','MDA'],
         status: 'Blocked', previousState: 'Funding', blockReason: 'Customer budget freeze until Q2',
         partnerDRI: 'rep@cdw.com', microsoftDRI: 'usfield2@microsoft.com',
         unified: 'Unified', opportunityId: '7-667788001',
         dates: { created: '2026-04-28', outreach: '2026-05-01', engagement: '2026-05-06', updated: '2026-05-22' },
         funding: { submitted: true, secured: '' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
@@ -820,13 +835,14 @@
       {
         id: '334400', customer: 'Coho Vineyard', partner: 'TD Synnex',
         tpid: 'TP-11762', segment: 'Mid-Market', region: 'US West', industry: 'Food & Beverage',
-        source: 'Security CSU Partner Summit | US',
+        source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDA','MDO'],
         status: 'Closed', previousState: null, blockReason: '',
         partnerDRI: 'partner@tdsynnex.com', microsoftDRI: 'uswestfield@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-334400001',
         dates: { created: '2026-03-20', outreach: '2026-03-22', engagement: '2026-03-28', fundingSubmission: '2026-04-02', fundingApproval: '2026-04-08', updated: '2026-05-15' },
         funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
           { name: 'MDE', status: 'Closed', seats: 5200, notes: 'Complete' },
@@ -845,13 +861,14 @@
       {
         id: '556600', customer: 'Humongous Insurance', partner: 'Wipro',
         tpid: 'TP-88412', segment: 'Enterprise', region: 'APAC', industry: 'Insurance',
-        source: 'Security CSU Partner Summit | APAC',
+        source: 'Security CSU Partner Clinic | APAC',
         workloads: ['Sentinel','MDI','IRM'],
         status: 'New', previousState: null, blockReason: '',
         partnerDRI: 'lead@wipro.com', microsoftDRI: 'apacfield@microsoft.com',
         unified: 'Unified', opportunityId: '7-556600001',
         dates: { created: '2026-06-03', updated: '2026-06-03' },
         funding: { submitted: false, secured: '' },
+        fundingRequired: '',
         engagement: { outcome: '' },
         workloadData: [
           { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' },
@@ -859,14 +876,24 @@
           { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
         ],
         history: [
-          { date: '2026-06-03', text: 'Campaign created from Security CSU Partner Summit | APAC', type: 'info', actor: 'apacfield@microsoft.com' }
+          { date: '2026-06-03', text: 'Campaign created from Security CSU Partner Clinic | APAC', type: 'info', actor: 'apacfield@microsoft.com' }
         ]
       }
     ];
 
     let currentCampaign = null;
     let currentView = 'partner';
-    const STATE_ORDER = ['New', 'Outreach', 'Funding', 'Committed', 'Closed'];
+    const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
+    function getStatusBadgeText(c) {
+      if (c.status === 'Funding') {
+        if (c.funding.submitted === true && c.funding.secured === 'yes') return 'Funding Secured';
+        if (c.funding.submitted === true && c.funding.secured === '') return 'Funding Requested';
+      }
+      return c.status;
+    }
+    function renderStatusBadge(c) {
+      return '<span class="status-badge '+c.status.toLowerCase()+'">'+getStatusBadgeText(c)+'</span>';
+    }
     // â•â•â•â•â•â•â• VIEW SWITCH â•â•â•â•â•â•â•
     function switchView(view) {
       currentView = view;
@@ -995,9 +1022,9 @@
       tbody.innerHTML = filtered.map(c => {
         var wl = c.workloads.map(w => '<span class="workload-pill">'+w+'</span>').join('');
         if (currentView === 'partner') {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td><span class="status-badge '+c.status.toLowerCase()+'">'+c.status+'</span></td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
         } else {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td><span class="status-badge '+c.status.toLowerCase()+'">'+c.status+'</span></td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
         }
       }).join('');
     }
@@ -1006,7 +1033,7 @@
       const chartsRow = document.getElementById('chartsRow');
       const statusCounts = {};
       campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
-      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
+      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Engaged: '#6b21a8', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
       // Pie: Status distribution
       var statusChart = buildPieChart(statusCounts, statusColors, 'By Status', 'status');
@@ -1111,6 +1138,7 @@
         let dateStr = '';
         if (state === 'New' && c.dates.created) dateStr = c.dates.created;
         else if (state === 'Outreach' && c.dates.outreach) dateStr = c.dates.outreach;
+        else if (state === 'Engaged' && c.dates.engagement) dateStr = c.dates.engagement;
         else if (state === 'Funding' && c.dates.fundingSubmission) dateStr = c.dates.fundingSubmission;
         else if (state === 'Committed' && c.dates.fundingApproval) dateStr = c.dates.fundingApproval;
         else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
@@ -1132,6 +1160,7 @@
       const msgs = {
         'New': { cls: 'info', text: '<strong>New:</strong> Partner and field have engaged with the customer. Confirm outreach to advance.' },
         'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Confirm engagement outcome to advance.' },
+        'Engaged': { cls: 'info', text: '<strong>Engaged:</strong> Customer is engaged. Determine if ECIF funding is required to proceed.' },
         'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
         'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
         'Blocked': { cls: 'danger', text: '<strong>Blocked:</strong> '+( c.blockReason || 'Campaign is blocked.') },
@@ -1151,6 +1180,9 @@
       }
       else if (c.status === 'Outreach') {
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner Ã¢â€ â€™ Blocked</option><option value="declined">Customer no longer requires assistance Ã¢â€ â€™ Blocked</option><option value="external">Customer cannot engage at this time Ã¢â€ â€™ Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Engaged') {
+        html = '<div class="panel-card"><h2>Funding Requirement</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Does this campaign require ECIF funding?</p><div class="form-grid"><div class="form-group"><label>Funding Required? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingRequired" value="yes"> Yes, ECIF funding needed</label><label><input type="radio" name="fundingRequired" value="no"> No, $0 offer / no funding needed</label></div></div><div class="form-group full-width"><label>Notes</label><textarea id="gateEngagedNotes" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         const step1Done = c.funding.submitted;
@@ -1190,6 +1222,7 @@
       let left = '';
       if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
       else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
+      else if (c.status === 'Engaged') left = '<button class="btn btn-primary" onclick="advanceFromEngaged()">Advance &rarr;</button>';
       else if (c.status === 'Funding') {
         if (!c.funding.submitted) left = '<button class="btn btn-primary" onclick="advanceFundingStep1()">Submit Funding &rarr;</button>';
         else left = '<button class="btn btn-primary" onclick="advanceFundingStep2()">Confirm Funding &rarr;</button>';
@@ -1238,9 +1271,9 @@
       c.engagement.outcome = selectedOutcome;
 
       if (selectedOutcome === 'agreed') {
-        c.status = 'Funding';
-        c.history.push({ date: today(), text: 'Customer engaged Ã¢â‚¬â€ agreed to campaign', type: 'success', actor: c.partnerDRI });
-        showToast('Advanced to Funding');
+        c.status = 'Engaged';
+        c.history.push({ date: today(), text: 'Customer engaged Ã¢â‚¬â€ advanced to Engaged', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Engaged');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
@@ -1250,6 +1283,29 @@
         showToast('Campaign blocked');
       }
       selectedOutcome = '';
+      renderDetail();
+    }
+
+    function advanceFromEngaged() {
+      var fundingReq = document.querySelector('input[name="fundingRequired"]:checked');
+      if (!fundingReq) { showToast('Please select whether funding is required', true); return; }
+      var c = currentCampaign;
+      c.fundingRequired = fundingReq.value;
+      c.dates.updated = today();
+
+      if (fundingReq.value === 'no') {
+        c.dates.fundingApproval = today();
+        c.status = 'Committed';
+        c.history.push({ date: today(), text: 'No funding required Ã¢â‚¬â€ advanced to Committed', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed (no funding required)');
+      } else {
+        c.funding.submitted = false;
+        c.funding.secured = '';
+        c.dates.fundingApproval = '';
+        c.status = 'Funding';
+        c.history.push({ date: today(), text: 'Funding required Ã¢â‚¬â€ advanced to Funding', type: 'info', actor: c.partnerDRI });
+        showToast('Advanced to Funding');
+      }
       renderDetail();
     }
 
