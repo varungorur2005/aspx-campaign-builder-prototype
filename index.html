@@ -393,6 +393,7 @@
       <nav class="sidebar-nav">
         <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
         <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
+        <a href="#" class="sidebar-link" onclick="switchView('corp'); return false" id="navCorp"><span>Campaign Builder (Corp View)</span></a>
       </nav>
     </aside>
 
@@ -468,6 +469,15 @@
     <!-- Header -->
     <div class="detail-header" id="detailHeader"></div>
 
+        <!-- Customer Usage (Field/Corp only) -->
+        <div class="panel-card" id="usagePanel" style="display:none;">
+          <h2>Customer Security Workload Usage</h2>
+          <table class="workloads-table">
+            <thead><tr><th>Workload</th><th>MAU</th><th>PAU</th><th>Utilization %</th><th>Whitespace</th></tr></thead>
+            <tbody id="usageBody"></tbody>
+          </table>
+        </div>
+
         <!-- Lifecycle Stepper -->
         <div class="lifecycle-stepper" id="lifecycleStepper"></div>
 
@@ -529,9 +539,11 @@
         </select>
       </div>
       <div class="filter-section">
-        <label>Sub-Region</label>
-        <select id="filterRegion" onchange="renderDashboard()">
+        <label>Area</label>
+        <select id="filterArea" onchange="renderDashboard()">
           <option value="">All</option>
+          <option value="ANZ">ANZ</option>
+          <option value="India">India</option>
           <option value="US West">US West</option>
           <option value="US East">US East</option>
           <option value="EMEA North">EMEA North</option>
@@ -572,7 +584,7 @@
     const campaigns = [
       {
         id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
-        tpid: 'TP-44201', segment: 'Enterprise', region: 'ANZ', industry: 'Government',
+        tpid: 'TP-44201', segment: 'Enterprise', area: 'ANZ', industry: 'Government',
         source: 'Security CSU Partner Clinic | ANZ',
         workloads: ['IRM','MIP P2','MDE','MDA','Sentinel'],
         status: 'New', previousState: null, blockReason: '',
@@ -595,7 +607,7 @@
       },
       {
         id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro India Private Ltd',
-        tpid: 'TP-55102', segment: 'Enterprise', region: 'India', industry: 'Financial Services',
+        tpid: 'TP-55102', segment: 'Enterprise', area: 'India', industry: 'Financial Services',
         source: 'Security CSU Partner Clinic | FSI',
         workloads: ['MDE','MDA','MDO','MDI','IRM'],
         status: 'New', previousState: null, blockReason: '',
@@ -618,7 +630,7 @@
       },
       {
         id: '334455', customer: 'Contoso Ltd', partner: 'Acme Consulting',
-        tpid: 'TP-33098', segment: 'Enterprise', region: 'US West', industry: 'Technology',
+        tpid: 'TP-33098', segment: 'Enterprise', area: 'US West', industry: 'Technology',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','MDI','MDE'],
         status: 'Committed', previousState: null, blockReason: '',
@@ -644,7 +656,7 @@
       },
       {
         id: '556677', customer: 'Northwind Traders', partner: 'TechData Corp',
-        tpid: 'TP-77451', segment: 'Mid-Market', region: 'EMEA North', industry: 'Retail',
+        tpid: 'TP-77451', segment: 'Mid-Market', area: 'EMEA North', industry: 'Retail',
         source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['MDE','MDA','Sentinel'],
         status: 'Blocked', previousState: 'Outreach', blockReason: 'Customer prefers to work with another partner',
@@ -667,7 +679,7 @@
       },
       {
         id: '889900', customer: 'Tailspin Toys', partner: 'Insight Direct',
-        tpid: 'TP-12399', segment: 'SMB', region: 'APAC', industry: 'Consumer Goods',
+        tpid: 'TP-12399', segment: 'SMB', area: 'APAC', industry: 'Consumer Goods',
         source: 'Security CSU Partner Clinic | APAC',
         workloads: ['MDO','MDE'],
         status: 'Engaged', previousState: null, blockReason: '',
@@ -690,7 +702,7 @@
       },
       {
         id: '101010', customer: 'Woodgrove Bank', partner: 'Avanade',
-        tpid: 'TP-88210', segment: 'Enterprise', region: 'US East', industry: 'Financial Services',
+        tpid: 'TP-88210', segment: 'Enterprise', area: 'US East', industry: 'Financial Services',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','MDI','MDE','Sentinel'],
         status: 'Outreach', previousState: null, blockReason: '',
@@ -713,7 +725,7 @@
       },
       {
         id: '777888', customer: 'Litware Inc', partner: 'Softchoice',
-        tpid: 'TP-65477', segment: 'Mid-Market', region: 'US East', industry: 'Technology',
+        tpid: 'TP-65477', segment: 'Mid-Market', area: 'US East', industry: 'Technology',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDA'],
         status: 'Closed', previousState: null, blockReason: '',
@@ -738,7 +750,7 @@
       },
       {
         id: '445566', customer: 'Adventure Works', partner: 'Computacenter',
-        tpid: 'TP-77190', segment: 'Enterprise', region: 'EMEA North', industry: 'Manufacturing',
+        tpid: 'TP-77190', segment: 'Enterprise', area: 'EMEA North', industry: 'Manufacturing',
         source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['Sentinel','MDE','MDI'],
         status: 'Committed', previousState: null, blockReason: '',
@@ -763,7 +775,7 @@
       },
       {
         id: '998877', customer: 'Fabrikam Industries', partner: 'SoftwareOne',
-        tpid: 'TP-44210', segment: 'Enterprise', region: 'EMEA North', industry: 'Energy',
+        tpid: 'TP-44210', segment: 'Enterprise', area: 'EMEA North', industry: 'Energy',
         source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['MIP P2','IRM','MDA'],
         status: 'Funding', previousState: null, blockReason: '',
@@ -787,7 +799,7 @@
       },
       {
         id: '112233', customer: 'Relecloud', partner: 'Pax8',
-        tpid: 'TP-90881', segment: 'Mid-Market', region: 'US West', industry: 'Media',
+        tpid: 'TP-90881', segment: 'Mid-Market', area: 'US West', industry: 'Media',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','Sentinel'],
         status: 'Outreach', previousState: null, blockReason: '',
@@ -808,7 +820,7 @@
       },
       {
         id: '667788', customer: 'Wide World Importers', partner: 'CDW',
-        tpid: 'TP-90234', segment: 'Enterprise', region: 'US East', industry: 'Logistics',
+        tpid: 'TP-90234', segment: 'Enterprise', area: 'US East', industry: 'Logistics',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDI','Sentinel','MDA'],
         status: 'Blocked', previousState: 'Funding', blockReason: 'Customer budget freeze until Q2',
@@ -834,7 +846,7 @@
       },
       {
         id: '334400', customer: 'Coho Vineyard', partner: 'TD Synnex',
-        tpid: 'TP-11762', segment: 'Mid-Market', region: 'US West', industry: 'Food & Beverage',
+        tpid: 'TP-11762', segment: 'Mid-Market', area: 'US West', industry: 'Food & Beverage',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDE','MDA','MDO'],
         status: 'Closed', previousState: null, blockReason: '',
@@ -860,7 +872,7 @@
       },
       {
         id: '556600', customer: 'Humongous Insurance', partner: 'Wipro',
-        tpid: 'TP-88412', segment: 'Enterprise', region: 'APAC', industry: 'Insurance',
+        tpid: 'TP-88412', segment: 'Enterprise', area: 'APAC', industry: 'Insurance',
         source: 'Security CSU Partner Clinic | APAC',
         workloads: ['Sentinel','MDI','IRM'],
         status: 'New', previousState: null, blockReason: '',
@@ -881,6 +893,38 @@
       }
     ];
 
+    const usageBenchmarks = {
+      'MDE': { mau: 12500, pau: 15000, utilization: 83 },
+      'MDI': { mau: 8200, pau: 10000, utilization: 82 },
+      'MDA': { mau: 7600, pau: 9600, utilization: 79 },
+      'MDO': { mau: 9800, pau: 12100, utilization: 81 },
+      'Sentinel': { mau: 6900, pau: 8800, utilization: 78 },
+      'IRM': { mau: 5400, pau: 7100, utilization: 76 },
+      'MIP P2': { mau: 6100, pau: 7900, utilization: 77 }
+    };
+
+    function buildUsageData(c) {
+      return c.workloads.map(function(w, idx) {
+        var base = usageBenchmarks[w] || { mau: 7000, pau: 9000, utilization: 75 };
+        var seed = (parseInt(c.id.slice(-2), 10) || 12) + (idx * 9);
+        var seats = c.workloadData[idx] ? c.workloadData[idx].seats : 0;
+        var mau = base.mau + (seed * 55) + Math.min(seats, 12000);
+        var pau = Math.max(mau + 900, base.pau + (seed * 70) + Math.min(seats, 15000));
+        var utilization = Math.min(94, Math.max(55, base.utilization + (seed % 7) - 3));
+        return {
+          workload: w,
+          mau: mau,
+          pau: pau,
+          utilization: utilization,
+          whitespace: Math.max(500, pau - mau)
+        };
+      });
+    }
+
+    campaigns.forEach(function(c) {
+      c.usageData = buildUsageData(c);
+    });
+
     let currentCampaign = null;
     let currentView = 'partner';
     const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
@@ -899,10 +943,22 @@
       currentView = view;
       document.getElementById('navPartner').classList.toggle('active', view === 'partner');
       document.getElementById('navField').classList.toggle('active', view === 'field');
+      document.getElementById('navCorp').classList.toggle('active', view === 'corp');
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.getElementById('pageTitle').textContent =
-        view === 'partner' ? 'Campaign Builder (Partner View)' : 'Campaign Builder (MSFT Field View)';
-      document.getElementById('dashboardTitle').textContent = view === 'partner' ? 'Campaigns - Partner View' : 'Campaigns - Field | Corp View';
+        view === 'partner' ? 'Campaign Builder (Partner View)' :
+        view === 'field' ? 'Campaign Builder (MSFT Field View)' :
+        'Campaign Builder (Corp View)';
+      document.getElementById('dashboardTitle').textContent =
+        view === 'partner' ? 'Campaigns - Partner View' :
+        view === 'field' ? 'Campaigns - Field View' :
+        'Campaigns - Corp (CSA Manager)';
+      activeKpiFilter = null;
+      activeChartFilter = null;
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
       showDashboard();
       toggleFilter(false);
       renderDashboard();
@@ -916,7 +972,7 @@
       const statusEl = document.getElementById('filterStatus');
       statusEl.value = '';
       document.getElementById('filterSource').value = '';
-      document.getElementById('filterRegion').value = '';
+      document.getElementById('filterArea').value = '';
       document.getElementById('searchInput').value = '';
       activeChartFilter = null;
 
@@ -933,7 +989,7 @@
     function filterByChart(type, value) {
       document.getElementById('filterStatus').value = '';
       document.getElementById('filterSource').value = '';
-      document.getElementById('filterRegion').value = '';
+      document.getElementById('filterArea').value = '';
       document.getElementById('searchInput').value = '';
       activeKpiFilter = null;
 
@@ -942,7 +998,7 @@
       } else {
         activeChartFilter = { type: type, value: value };
         if (type === 'status') document.getElementById('filterStatus').value = value;
-        else if (type === 'region') document.getElementById('filterRegion').value = value;
+        else if (type === 'area') document.getElementById('filterArea').value = value;
       }
       renderDashboard();
     }
@@ -952,14 +1008,14 @@
       const search = document.getElementById('searchInput').value.toLowerCase();
       const filterStatus = document.getElementById('filterStatus').value;
       const filterSource = document.getElementById('filterSource').value;
-      const filterRegion = document.getElementById('filterRegion').value;
+      const filterArea = document.getElementById('filterArea').value;
       const sortBy = document.getElementById('sortSelect').value;
 
       let filtered = campaigns.filter(c => {
         if (search && !c.customer.toLowerCase().includes(search) && !c.id.toLowerCase().includes(search)) return false;
         if (filterStatus && c.status !== filterStatus) return false;
         if (filterSource && c.source !== filterSource) return false;
-        if (filterRegion && c.region !== filterRegion) return false;
+        if (filterArea && c.area !== filterArea) return false;
         // KPI-based filters
         if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
         if (activeKpiFilter === 'pending' && (c.status === 'Closed' || c.status === 'Blocked')) return false;
@@ -968,6 +1024,8 @@
         if (activeKpiFilter === 'seats' && c.workloadData.reduce((s,w) => s + w.seats, 0) === 0) return false;
         // Chart-based filters
         if (activeChartFilter && activeChartFilter.type === 'workload' && !c.workloads.includes(activeChartFilter.value)) return false;
+        if (activeChartFilter && activeChartFilter.type === 'area' && c.area !== activeChartFilter.value) return false;
+        if (activeChartFilter && activeChartFilter.type === 'partner' && c.partner !== activeChartFilter.value) return false;
         return true;
       });
 
@@ -1043,16 +1101,22 @@
       campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
       var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload', 'workload');
 
-      // Pie: Region distribution
+      // Pie: Area distribution
       var areaCounts = {};
-      campaigns.forEach(c => { areaCounts[c.region] = (areaCounts[c.region] || 0) + 1; });
+      campaigns.forEach(c => { areaCounts[c.area] = (areaCounts[c.area] || 0) + 1; });
       var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-      var areaChart = buildPieChart(areaCounts, areaColors, 'By Region', 'region');
+      var areaChart = buildPieChart(areaCounts, areaColors, 'By Area', 'area');
+
+      var partnerCounts = {};
+      campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
+      var partnerChart = buildVBarChart(partnerCounts, '#7719aa', 'By Partner', 'partner');
 
       if (currentView === 'partner') {
         chartsRow.innerHTML = statusChart + workloadChart + areaChart;
+      } else if (currentView === 'field') {
+        chartsRow.innerHTML = statusChart + areaChart;
       } else {
-        chartsRow.innerHTML = statusChart + workloadChart + areaChart;
+        chartsRow.innerHTML = statusChart + areaChart + partnerChart;
       }
     }
 
@@ -1110,8 +1174,9 @@
       const c = currentCampaign;
       if (!c) return;
 
-      document.getElementById('detailHeader').innerHTML = '<h1>'+c.id+' &mdash; '+c.customer+'</h1><div class="detail-meta"><div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div><div class="detail-meta-item"><strong>Source:</strong> '+c.source+'</div><div class="detail-meta-item"><strong>TPID:</strong> '+c.tpid+'</div><div class="detail-meta-item"><strong>Segment:</strong> '+c.segment+'</div><div class="detail-meta-item"><strong>Region:</strong> '+c.region+'</div><div class="detail-meta-item"><strong>Partner DRI:</strong> '+c.partnerDRI+'</div><div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+c.microsoftDRI+'</div><div class="detail-meta-item"><strong>Workloads:</strong> '+c.workloads.join(', ')+'</div></div>';
+      document.getElementById('detailHeader').innerHTML = '<h1>'+c.id+' &mdash; '+c.customer+'</h1><div class="detail-meta"><div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div><div class="detail-meta-item"><strong>Source:</strong> '+c.source+'</div><div class="detail-meta-item"><strong>TPID:</strong> '+c.tpid+'</div><div class="detail-meta-item"><strong>Segment:</strong> '+c.segment+'</div><div class="detail-meta-item"><strong>Area:</strong> '+c.area+'</div><div class="detail-meta-item"><strong>Partner DRI:</strong> '+c.partnerDRI+'</div><div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+c.microsoftDRI+'</div><div class="detail-meta-item"><strong>Workloads:</strong> '+c.workloads.join(', ')+'</div></div>';
 
+      renderUsage(c);
       renderStepper(c);
       renderBanner(c);
       renderActionPanel(c);
@@ -1144,10 +1209,13 @@
         else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
 
         var closeLink = '';
-        if (state === 'Closed' && c.status !== 'Closed') {
+        if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
           closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
-        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+state+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
+        var labelHtml = state === 'Funding'
+          ? 'Funding<br><span style="font-size:8px;font-weight:400;color:#888;">Request &amp; Secured</span>'
+          : state;
+        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+labelHtml+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
         if (i < STATE_ORDER.length - 1) {
           html += '<div class="step-connector '+(i < stateIdx ? 'filled' : '')+'"></div>';
         }
@@ -1174,6 +1242,13 @@
     function renderActionPanel(c) {
       const panel = document.getElementById('actionPanel');
       let html = '';
+
+      if (currentView === 'field' || currentView === 'corp') {
+        html = '<div class="panel-card"><h2>Campaign State</h2><p style="font-size:12px;color:#616161;">Campaign is in <strong>'+c.status+'</strong> state. State changes are managed by the partner.</p>' +
+          '<div class="detail-meta" style="margin-top:12px;"><div class="detail-meta-item"><strong>Last Updated:</strong> '+(c.dates.updated || '&mdash;')+'</div><div class="detail-meta-item"><strong>Funding Required:</strong> '+(c.fundingRequired === 'yes' ? 'Yes' : c.fundingRequired === 'no' ? 'No' : 'TBD')+'</div></div></div>';
+        panel.innerHTML = html;
+        return;
+      }
 
       if (c.status === 'New') {
         html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
@@ -1210,7 +1285,30 @@
       panel.style.display = '';
 
       const tbody = document.getElementById('workloadsBody');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
+      var notesGroup = panel.querySelector('.form-group.full-width');
+      if (currentView === 'field' || currentView === 'corp') {
+        tbody.innerHTML = c.workloadData.map(function(w) {
+          return '<tr><td><strong>'+w.name+'</strong></td><td>'+w.status+'</td><td>'+w.seats.toLocaleString()+'</td><td>'+(w.notes || '&mdash;')+'</td></tr>';
+        }).join('');
+        notesGroup.style.display = 'none';
+      } else {
+        tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
+        notesGroup.style.display = '';
+      }
+    }
+
+    function renderUsage(c) {
+      var panel = document.getElementById('usagePanel');
+      var body = document.getElementById('usageBody');
+      if (currentView !== 'field' && currentView !== 'corp') {
+        panel.style.display = 'none';
+        body.innerHTML = '';
+        return;
+      }
+      panel.style.display = '';
+      body.innerHTML = c.usageData.map(function(u) {
+        return '<tr><td><strong>'+u.workload+'</strong></td><td>'+u.mau.toLocaleString()+'</td><td>'+u.pau.toLocaleString()+'</td><td>'+u.utilization+'%</td><td>'+u.whitespace.toLocaleString()+'</td></tr>';
+      }).join('');
     }
 
     function renderAudit(c) {
@@ -1219,6 +1317,10 @@
 
     function renderActionBar(c) {
       const bar = document.getElementById('detailActionBar');
+      if (currentView === 'field' || currentView === 'corp') {
+        bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div></div>';
+        return;
+      }
       let left = '';
       if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
       else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
@@ -1433,7 +1535,10 @@
     function resetFilters() {
       document.getElementById('filterStatus').value = '';
       document.getElementById('filterSource').value = '';
-      document.getElementById('filterRegion').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
+      activeKpiFilter = null;
+      activeChartFilter = null;
       renderDashboard();
     }
 
