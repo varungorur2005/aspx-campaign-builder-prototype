@@ -1,1495 +1,1549 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Security CSU Campaigns</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>ASPX - Campaign Builder</title>
   <style>
-    :root {
-      --nav-blue: #1b3a5c;
-      --primary: #0078d4;
-      --bg: #f5f5f5;
-      --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      --border: #e8e8e8;
-      --text: #242424;
-      --muted: #616161;
-      --new: #0078d4;
-      --outreach: #00bcf2;
-      --engaged: #8661c5;
-      --funding: #ff8c00;
-      --committed: #107c10;
-      --closed: #767676;
-      --blocked: #d13438;
-      --transition: 0.3s ease;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       RESET & BASE
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', -apple-system, sans-serif;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5; color: #242424; min-height: 100vh;
       font-size: 13px;
-      color: var(--text);
-      background: var(--bg);
     }
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
 
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       TOP NAV
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .top-nav {
-      height: 48px;
-      background: var(--nav-blue);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 48px; padding: 0 20px;
+      background: #1b3a5c; position: sticky; top: 0; z-index: 500;
     }
-    .nav-left, .nav-right { display: flex; align-items: center; }
-    .nav-left { gap: 10px; }
-    .nav-right { gap: 12px; }
-    .waffle {
-      border: 0;
-      background: transparent;
-      color: #fff;
-      font-size: 18px;
-      line-height: 1;
-      padding: 0;
-      width: 20px;
-    }
-    .brand-text { font-size: 14px; font-weight: 600; white-space: nowrap; }
-    .nav-select {
-      height: 30px;
-      min-width: 130px;
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 4px;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      padding: 0 28px 0 10px;
-      outline: none;
-    }
-    .nav-select option { color: #242424; }
-    .nav-icon {
-      width: 28px;
-      height: 28px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 16px;
-      opacity: 0.9;
-    }
-    .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #4b89c8;
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 12px;
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-title { font-size: 14px; color: #fff; font-weight: 400; }
+    .nav-platform-name { font-weight: 700; }
+    .nav-separator { color: rgba(255,255,255,0.4); font-weight: 300; }
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #4a8bc2; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; cursor: pointer;
     }
 
-    .app-shell {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      min-height: calc(100vh - 48px);
-    }
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       APP LAYOUT
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    .app-layout { display: flex; min-height: calc(100vh - 48px); }
+
+    /* Sidebar */
     .sidebar {
-      background: #f8f8f8;
-      border-right: 1px solid #dddddd;
-      padding: 10px 0 18px;
+      width: 200px; background: #fafafa; border-right: 1px solid #e0e0e0;
+      padding: 12px 0; flex-shrink: 0;
     }
-    .sidebar-section-title {
-      padding: 14px 18px 6px;
-      font-size: 11px;
-      color: #707070;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-weight: 600;
+    .sidebar-nav { display: flex; flex-direction: column; }
+    .sidebar-link {
+      display: flex; align-items: center; padding: 9px 14px;
+      font-size: 13px; color: #424242; text-decoration: none;
+      border-left: 3px solid transparent; transition: all 0.12s;
     }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      min-height: 34px;
-      padding: 0 18px;
-      color: #333;
-      text-decoration: none;
-      border-left: 3px solid transparent;
-      gap: 8px;
-    }
-    .nav-item:hover { background: #f0f4f8; }
-    .nav-item.active {
-      background: #eaf3ff;
-      border-left-color: var(--primary);
-      color: var(--primary);
-      font-weight: 600;
-    }
-    .nav-item.expanded { font-weight: 600; }
-    .nav-item.level-1 { padding-left: 30px; }
-    .nav-item.level-2 { padding-left: 42px; font-size: 12px; }
-    .nav-item .caret { width: 10px; color: #707070; }
-    .nav-item.active .caret { color: var(--primary); }
+    .sidebar-link:hover { background: #f0f0f0; }
+    .sidebar-link.active { background: #e8f0fe; color: #0078d4; border-left-color: #0078d4; font-weight: 600; }
 
-    .content {
-      padding: 18px 24px 28px;
-      overflow: auto;
-    }
-    .breadcrumb {
-      color: #666;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-    .breadcrumb.hidden { display: none; }
-    .page-subtitle {
-      color: #666;
-      margin-top: 4px;
-      margin-bottom: 18px;
-    }
-    .page-title {
-      font-size: 24px;
-      line-height: 1.2;
-      margin: 0;
-      font-weight: 600;
-    }
+    /* Main */
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
 
-    .kpi-row {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .kpi-row.partner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .kpi-row.default { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .card {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: var(--card-shadow);
-      border: 1px solid rgba(0,0,0,0.04);
-    }
-    .kpi-card {
-      padding: 14px 16px 12px;
-      border-left: 4px solid var(--primary);
-      min-height: 90px;
-      position: relative;
-    }
-    .kpi-card.green { border-left-color: var(--committed); }
-    .kpi-card.red { border-left-color: var(--blocked); }
-    .kpi-info {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 1px solid #cfcfcf;
-      color: #7a7a7a;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-    }
-    .kpi-value {
-      font-size: 24px;
-      font-weight: 700;
-      margin-top: 10px;
-      line-height: 1;
-    }
-    .kpi-label {
-      color: #666;
-      margin-top: 8px;
-      font-weight: 600;
-    }
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       DASHBOARD VIEW
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    .dashboard-view { padding: 20px 24px 40px; }
+    .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(300px, 1fr));
-      gap: 16px;
-      margin-bottom: 18px;
+    /* KPI Row */
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-tile {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 16px; text-align: left;
     }
-    .chart-card {
-      padding: 16px;
-      min-height: 320px;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin: 0 0 12px;
-    }
-    .chart-canvas-wrap {
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .chart-canvas-wrap canvas {
-      max-width: 100%;
-      max-height: 200px;
-    }
-    .chart-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px solid #f0f0f0;
-    }
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #555;
-      font-size: 12px;
-    }
-    .legend-swatch {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-    }
+    .kpi-clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .kpi-clickable:hover { border-color: #0078d4; box-shadow: 0 2px 8px rgba(0,120,212,0.12); }
+    .kpi-clickable .kpi-value { text-decoration: underline; cursor: pointer; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #0078d4; display: block; }
+    .kpi-label { font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 8px; display: block; }
 
-    .table-card { overflow: hidden; }
+    /* Charts Row */
+    .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .chart-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+    .chart-card h3 { font-size: 11px; font-weight: 700; margin-bottom: 10px; color: #424242; }
+
+    /* Pie Chart */
+    .pie-chart-wrap { display: flex; align-items: center; gap: 12px; }
+    .pie-chart { width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; }
+    .pie-legend { display: flex; flex-direction: column; gap: 3px; }
+    .pie-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #424242; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
+    .pie-legend-item:hover { background: #f0f0f0; color: #0078d4; }
+    .pie-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+    /* Vertical Bar Chart */
+    .vbar-wrap { position: relative; padding: 0 4px; }
+    .vbar-grid { position: absolute; top: 0; left: 0; right: 0; height: 130px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .vbar-grid-line { border-top: 1px dashed #d4d4d4; width: 100%; }
+    .vbar-grid-line:last-child { border-top: 1.5px solid #bbb; }
+    .vbar-chart { display: flex; align-items: flex-end; gap: 10px; height: 130px; position: relative; z-index: 1; border-bottom: 1.5px solid #999; padding: 0; }
+    .vbar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; cursor: pointer; min-width: 0; }
+    .vbar-bar { width: 100%; max-width: 36px; border-radius: 4px 4px 0 0; min-height: 6px; cursor: pointer; opacity: 0.85; transition: opacity 0.15s, box-shadow 0.15s; }
+    .vbar-bar:hover { opacity: 1; box-shadow: 0 0 0 2px rgba(0,120,212,0.35); }
+    .vbar-val { font-size: 11px; font-weight: 700; color: #242424; margin-bottom: 4px; }
+    .vbar-labels { display: flex; gap: 10px; margin-top: 6px; min-width: 0; }
+    .vbar-lbl { flex: 1; font-size: 10px; color: #424242; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; cursor: pointer; min-width: 0; }
+
+    /* Table Toolbar */
     .table-toolbar {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0;
     }
-    .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; }
-    .search-box {
-      width: 280px;
-      height: 34px;
-      border: 1px solid #cfcfcf;
-      border-radius: 4px;
-      padding: 0 12px;
-      background: #fff;
+    .toolbar-left { display: flex; align-items: center; gap: 8px; }
+    .toolbar-right { display: flex; align-items: center; gap: 8px; }
+    .toolbar-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; font-size: 12px; font-weight: 500;
+      color: #424242; background: transparent; border: none; border-radius: 4px;
+      transition: all 0.12s;
     }
-    .table-btn {
-      height: 32px;
-      padding: 0 12px;
-      border-radius: 4px;
-      border: 1px solid #d0d0d0;
-      background: #fff;
-      color: #333;
+    .toolbar-btn:hover { background: #f0f0f0; color: #0078d4; }
+    .toolbar-search {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border: 1px solid #d1d1d1; border-radius: 4px; background: #fff;
     }
-    .table-btn:hover { border-color: #bcbcbc; background: #f9f9f9; }
-    .table-wrap { overflow: auto; }
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 1080px;
+    .toolbar-search:focus-within { border-color: #0078d4; }
+    .toolbar-search input { border: none; outline: none; font-size: 12px; width: 180px; }
+    .toolbar-sort select {
+      font-size: 12px; padding: 5px 8px; border: 1px solid #d1d1d1;
+      border-radius: 4px; background: #fff;
     }
-    thead th {
-      background: #f5f5f5;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #555;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      white-space: nowrap;
-      user-select: none;
-    }
-    thead th:last-child, tbody td:last-child { border-right: 0; }
-    thead th.sortable { cursor: pointer; }
-    tbody td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      vertical-align: top;
+
+    /* Campaign Table */
+    .campaign-table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .campaign-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .campaign-table thead { position: sticky; top: 0; z-index: 10; }
+    .campaign-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: #616161;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      padding: 10px 12px; border-bottom: 2px solid #e0e0e0; background: #fafafa;
       white-space: nowrap;
     }
-    tbody tr:nth-child(even) td { background: #fafafa; }
-    tbody tr:hover td { background: #f0f6ff; }
-    tbody tr { cursor: pointer; }
-    .sort-indicator { margin-left: 6px; color: #666; }
-    .state-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 20px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      line-height: 1.2;
+    .campaign-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    .campaign-table tr:hover td { background: #f8f9fa; }
+    .campaign-id-link { color: #0078d4; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .campaign-id-link:hover { text-decoration: underline; }
+
+    /* Shared view switching */
+    .content-view { display: none; }
+    .content-view.active { display: block; }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
     }
-    .state-New { background: var(--new); }
-    .state-Outreach { background: var(--outreach); }
-    .state-Engaged { background: var(--engaged); }
-    .state-Funding { background: var(--funding); }
-    .state-Committed { background: var(--committed); }
-    .state-Closed { background: var(--closed); }
-    .state-Blocked { background: var(--blocked); }
-    .workload-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      max-width: 220px;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid #d2d2d2;
-      background: #fff;
-      color: #444;
-      font-size: 12px;
-      line-height: 1;
-    }
-    .empty-state {
-      padding: 28px;
-      text-align: center;
-      color: #666;
+    .status-badge.new { background: #e8f0fe; color: #0078d4; }
+    .status-badge.outreach { background: #e6f2ff; color: #005a9e; }
+    .status-badge.engaged { background: #f3e8ff; color: #6b21a8; }
+    .status-badge.funding { background: #fff4ce; color: #8a6d00; }
+    .status-badge.committed { background: #dff6dd; color: #107c10; }
+    .status-badge.blocked { background: #fed9cc; color: #d83b01; }
+    .status-badge.closed { background: #f0f0f0; color: #605e5c; }
+
+    /* Workload pills */
+    .workload-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+    .workload-pill {
+      font-size: 10px; padding: 2px 6px; border-radius: 3px;
+      background: #e8f0fe; color: #0078d4; font-weight: 500;
     }
 
-    .overlay {
-      position: fixed;
-      inset: 48px 0 0 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition);
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       FILTER FLYOUT
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    .filter-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 400;
     }
-    .overlay.open {
-      opacity: 1;
-      pointer-events: auto;
+    .filter-overlay.show { display: block; }
+    .filter-panel {
+      position: fixed; top: 48px; right: 0; bottom: 0; width: 320px;
+      background: #fff; box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+      padding: 20px; overflow-y: auto; z-index: 401;
+      transform: translateX(100%); transition: transform 0.2s ease;
     }
-    .overlay.filter { background: rgba(0,0,0,0.18); z-index: 80; }
-    .overlay.detail { background: rgba(0,0,0,0.3); z-index: 90; }
+    .filter-overlay.show .filter-panel { transform: translateX(0); }
+    .filter-panel h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .filter-section { margin-bottom: 16px; }
+    .filter-section label { display: block; font-size: 11px; font-weight: 600; color: #616161; margin-bottom: 4px; text-transform: uppercase; }
+    .filter-section select, .filter-section input {
+      width: 100%; padding: 7px 10px; font-size: 12px;
+      border: 1px solid #d1d1d1; border-radius: 4px;
+    }
+    .filter-actions { display: flex; gap: 8px; margin-top: 16px; }
 
-    .side-panel {
-      position: fixed;
-      top: 48px;
-      bottom: 0;
-      right: 0;
-      background: #fff;
-      transform: translateX(100%);
-      transition: transform var(--transition);
-      z-index: 95;
-      box-shadow: -4px 0 12px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       DETAIL FLYOUT
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    .detail-view {
+      position: fixed; top: 48px; right: 0; bottom: 0;
+      width: 620px; max-width: 50vw; background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      border-left: 1px solid #e0e0e0;
+      transform: translateX(100%); transition: transform 0.25s ease;
+      overflow-y: auto; padding: 20px 24px 80px; z-index: 301;
     }
-    .side-panel.open { transform: translateX(0); }
-    .filter-panel { width: 320px; z-index: 85; }
-    .detail-panel { width: 480px; z-index: 96; }
-    .panel-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+    .detail-view.show { transform: translateX(0); }
+    .flyout-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
     }
-    .panel-title { font-size: 18px; font-weight: 600; margin: 0; }
-    .panel-subtitle { margin-top: 6px; }
-    .close-btn {
-      border: 0;
-      background: transparent;
-      font-size: 22px;
-      line-height: 1;
-      color: #666;
-      padding: 0;
+    .flyout-close {
+      width: 32px; height: 32px; border-radius: 4px; border: none;
+      background: transparent; font-size: 18px; color: #616161;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.12s;
     }
-    .panel-body {
-      padding: 16px 18px 18px;
-      overflow: auto;
-      flex: 1;
-    }
-    .panel-footer {
-      padding: 16px 18px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #fff;
-    }
+    .flyout-close:hover { background: #f0f0f0; color: #242424; }
 
-    .filter-group + .filter-group { margin-top: 18px; }
-    .filter-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #444;
+    /* Detail Header */
+    .detail-header { margin-bottom: 20px; }
+    .detail-header h1 { font-size: 20px; font-weight: 700; }
+    .detail-meta { display: flex; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+    .detail-meta-item { font-size: 12px; color: #616161; }
+    .detail-meta-item strong { color: #424242; }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      display: flex; align-items: flex-start; gap: 0;
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 20px 24px; margin-bottom: 20px; position: relative;
     }
-    .checkbox-list {
-      display: grid;
-      gap: 8px;
-      max-height: 220px;
-      overflow: auto;
-      padding-right: 4px;
+    .step-item {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1; position: relative;
     }
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
+    .step-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #e0e0e0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #616161;
+      transition: all 0.2s; border: 2px solid transparent; position: relative; z-index: 2;
     }
-    .filter-select {
-      width: 100%;
-      height: 34px;
-      border: 1px solid #cfcfcf;
-      border-radius: 4px;
-      padding: 0 10px;
-      background: #fff;
+    .step-item.completed .step-dot { background: #107c10; color: #fff; }
+    .step-item.active .step-dot { background: #0078d4; color: #fff; border-color: #005a9e; box-shadow: 0 0 0 3px rgba(0,120,212,0.2); }
+    .step-item.blocked .step-dot { background: #d83b01; color: #fff; }
+    .step-item.closed-state .step-dot { background: #605e5c; color: #fff; }
+    .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
+    .step-item.active .step-label { color: #0078d4; }
+    .step-item.blocked .step-label { color: #d83b01; }
+    .step-date { font-size: 9px; color: #999; margin-top: 2px; }
+    .step-connector {
+      flex: 1; height: 2px; background: #e0e0e0;
+      align-self: flex-start; margin-top: 16px; z-index: 1;
     }
-    .primary-btn {
-      height: 34px;
-      padding: 0 14px;
-      border-radius: 4px;
-      border: 1px solid var(--primary);
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
+    .step-connector.filled { background: #107c10; }
+
+    /* Panel Cards */
+    .panel-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 20px; margin-bottom: 16px;
     }
-    .primary-btn[disabled] { opacity: 0.55; cursor: default; }
-    .outline-danger {
-      height: 34px;
-      padding: 0 14px;
-      border-radius: 4px;
-      border: 1px solid var(--blocked);
-      background: #fff;
-      color: var(--blocked);
-      font-weight: 600;
-    }
-    .text-btn {
-      border: 0;
-      background: transparent;
-      color: #666;
-      padding: 0;
-    }
-    .reset-link {
-      color: #666;
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
+    .panel-card h2 {
+      font-size: 14px; font-weight: 700; color: #242424;
+      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0;
     }
 
-    .stepper {
-      margin-bottom: 18px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #f0f0f0;
+    /* State Description Banner */
+    .state-banner {
+      padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;
+      font-size: 12px; border-left: 3px solid;
     }
-    .stepper-track {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      position: relative;
-      margin: 0 8px 10px;
+    .state-banner.info { background: #e8f0fe; border-color: #0078d4; color: #1a3a5c; }
+    .state-banner.warning { background: #fff4ce; border-color: #8a6d00; color: #5c4600; }
+    .state-banner.danger { background: #fed9cc; border-color: #d83b01; color: #5c1a00; }
+    .state-banner.neutral { background: #f0f0f0; border-color: #605e5c; color: #3b3a39; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group label { font-size: 11px; font-weight: 600; color: #424242; text-transform: uppercase; letter-spacing: 0.2px; }
+    .form-group label .required { color: #d83b01; }
+    .form-group input, .form-group select, .form-group textarea {
+      font-size: 13px; padding: 8px 12px;
+      border: 1px solid #d1d1d1; border-radius: 4px; background: #fff; color: #242424;
+      transition: border-color 0.15s;
     }
-    .stepper-track::before {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 14px;
-      right: 14px;
-      height: 2px;
-      background: #d7d7d7;
-      z-index: 0;
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0078d4; }
+    .form-group textarea { resize: vertical; min-height: 56px; }
+    .form-group input:disabled, .form-group select:disabled { background: #f5f5f5; color: #a0a0a0; }
+
+    .radio-group { display: flex; gap: 16px; padding-top: 4px; }
+    .radio-group label { font-weight: 400; font-size: 13px; display: flex; align-items: center; gap: 4px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+    /* Outcome Cards */
+    .outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .outcome-card {
+      border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px 14px;
+      cursor: pointer; transition: all 0.15s;
     }
-    .step {
-      position: relative;
-      z-index: 1;
-      flex: 1;
-      text-align: center;
+    .outcome-card:hover { border-color: #0078d4; background: #f8fbff; }
+    .outcome-card.selected { border-color: #0078d4; background: #e8f0fe; box-shadow: 0 0 0 1px #0078d4; }
+    .outcome-card .oc-title { font-size: 12px; font-weight: 600; color: #242424; }
+    .outcome-card .oc-effect { font-size: 11px; color: #616161; margin-top: 3px; }
+    .outcome-card .oc-badge { font-size: 10px; font-weight: 600; margin-top: 4px; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+    .oc-badge.success { background: #dff6dd; color: #107c10; }
+    .oc-badge.danger { background: #fed9cc; color: #d83b01; }
+
+    /* Workloads Table */
+    .workloads-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .workloads-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: #616161;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      padding: 8px 12px; border-bottom: 2px solid #e0e0e0; background: #fafafa;
     }
-    .step-circle {
-      width: 30px;
-      height: 30px;
-      margin: 0 auto 6px;
-      border-radius: 50%;
-      border: 2px solid #bcbcbc;
-      background: #fff;
-      color: #666;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 12px;
-    }
-    .step.completed .step-circle {
-      background: var(--committed);
-      border-color: var(--committed);
-      color: #fff;
-    }
-    .step.current .step-circle {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-    }
-    .step-label {
-      font-size: 11px;
-      color: #555;
-      line-height: 1.2;
-    }
-    .blocked-tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--blocked);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: 8px;
+    .workloads-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+    .workloads-table tr:hover td { background: #f8f9fa; }
+    .workloads-table select, .workloads-table input[type="number"], .workloads-table input[type="text"] {
+      font-size: 12px; padding: 5px 8px; border: 1px solid #d1d1d1; border-radius: 4px; width: 100%;
     }
 
-    .stage-panel {
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: #fff;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-    .stage-panel summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 12px 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #fafafa;
-    }
-    .stage-panel summary::-webkit-details-marker { display: none; }
-    .stage-panel[open] summary { background: #f5f9ff; }
-    .stage-toggle::before { content: '+'; color: #666; }
-    .stage-panel[open] .stage-toggle::before { content: '−'; }
-    .stage-panel-body { padding: 14px; }
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 14px;
-    }
-    .field { min-width: 0; }
-    .field.span-2 { grid-column: span 2; }
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #444;
-    }
-    .field input,
-    .field select,
-    .field textarea {
-      width: 100%;
-      border: 1px solid #cfcfcf;
-      border-radius: 4px;
-      padding: 8px 10px;
-      background: #fff;
-      color: #222;
-    }
-    .field textarea { min-height: 72px; resize: vertical; }
-    .field-static {
-      min-height: 34px;
-      border: 1px solid #e1e1e1;
-      border-radius: 4px;
-      padding: 8px 10px;
-      background: #fafafa;
-      color: #333;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .radio-group {
-      display: flex;
-      gap: 16px;
-      padding-top: 8px;
-    }
-    .chip-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chip-button {
-      border: 1px solid #cfcfcf;
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: #fff;
-      color: #444;
-    }
-    .chip-button.selected {
-      background: #e8f2fd;
-      border-color: var(--primary);
-      color: var(--primary);
-      font-weight: 600;
-    }
-    .usage-section { margin-top: 18px; }
-    .usage-section h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
-      font-weight: 600;
-    }
-    .usage-table {
-      width: 100%;
-      min-width: 0;
-      border-collapse: collapse;
-    }
-    .usage-table th,
-    .usage-table td {
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .usage-table th {
-      background: #f5f5f5;
-      font-size: 11px;
-      text-transform: uppercase;
-      color: #555;
-    }
+    /* Notes / Audit Timeline */
+    .audit-timeline { margin-top: 12px; }
+    .audit-entry { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f8f8; }
+    .audit-dot { width: 8px; height: 8px; border-radius: 50%; background: #0078d4; margin-top: 5px; flex-shrink: 0; }
+    .audit-dot.blocked { background: #d83b01; }
+    .audit-dot.closed { background: #605e5c; }
+    .audit-dot.success { background: #107c10; }
+    .audit-text { font-size: 12px; color: #424242; }
+    .audit-date { font-size: 10px; color: #999; margin-top: 2px; }
 
-    @media (max-width: 1360px) {
-      .charts-grid { grid-template-columns: 1fr; }
-      .kpi-row.default { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* Buttons */
+    .btn {
+      font-size: 13px; font-weight: 600; padding: 8px 20px;
+      border-radius: 4px; border: none; transition: all 0.15s;
     }
+    .btn-primary { background: #0078d4; color: #fff; }
+    .btn-primary:hover { background: #005a9e; }
+    .btn-secondary { background: #fff; color: #424242; border: 1px solid #d1d1d1; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    .btn-danger { background: #d83b01; color: #fff; }
+    .btn-danger:hover { background: #b83200; }
+    .btn-success { background: #107c10; color: #fff; }
+    .btn-success:hover { background: #0b5e0b; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-group { display: flex; gap: 8px; margin-top: 16px; }
+
+    /* Action Bar (inside flyout) */
+    #detailActionBar .action-bar-left { display: flex; gap: 8px; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 600;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 8px; padding: 24px; width: 440px; max-width: 90vw; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: #616161; margin-bottom: 16px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 80px; right: 24px;
+      background: #107c10; color: #fff; padding: 12px 20px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(20px); opacity: 0; transition: all 0.3s ease; z-index: 700;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: #d83b01; }
   </style>
 </head>
 <body>
-  <div class="top-nav">
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP NAV Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <nav class="top-nav">
     <div class="nav-left">
-      <button class="waffle" type="button" aria-label="Menu">☰</button>
-      <div id="brandText" class="brand-text"></div>
+      <svg width="20" height="20" viewBox="0 0 21 21">
+        <rect x="0" y="0" width="10" height="10" fill="#f25022"/>
+        <rect x="11" y="0" width="10" height="10" fill="#7fba00"/>
+        <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
+        <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
+      </svg>
+      <span class="nav-title nav-platform-name">AI Business Solutions &amp; Security</span>
+      <span class="nav-separator">|</span>
+      <span class="nav-title" id="pageTitle">Campaign Builder (Partner View)</span>
     </div>
     <div class="nav-right">
-      <select id="viewSwitcher" class="nav-select" aria-label="View switcher">
-        <option value="partner">Partner View</option>
-        <option value="field">Field View</option>
-        <option value="corp">Corp View</option>
-      </select>
-      <span class="nav-icon" aria-hidden="true">🔔</span>
-      <span class="avatar">VG</span>
+      <div class="nav-avatar" title="Varun Gorur">VG</div>
     </div>
-  </div>
+  </nav>
 
-  <div class="app-shell">
-    <aside class="sidebar" id="sidebar"></aside>
-    <main class="content">
-      <div id="breadcrumb" class="breadcrumb"></div>
-      <h1 id="pageTitle" class="page-title"></h1>
-      <div id="pageSubtitle" class="page-subtitle"></div>
-      <section id="kpiRow"></section>
-      <section id="chartsGrid" class="charts-grid"></section>
-      <section class="card table-card">
+  <div class="app-layout">
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SIDEBAR Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
+        <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
+        <a href="#" class="sidebar-link" onclick="switchView('corp'); return false" id="navCorp"><span>Campaign Builder (Corp View)</span></a>
+      </nav>
+    </aside>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MAIN CONTENT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <main class="main-content" id="mainContent">
+
+      <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+           DASHBOARD VIEW
+           Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+      <div class="dashboard-view content-view active" id="dashboardView">
+        <h1 class="page-title" id="dashboardTitle">Campaigns - Partner View</h1>
+
+        <!-- KPIs -->
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- Charts -->
+        <div class="charts-row" id="chartsRow"></div>
+
+        <!-- Table Toolbar -->
         <div class="table-toolbar">
           <div class="toolbar-left">
-            <input id="searchInput" class="search-box" type="search" placeholder="Search campaigns">
+            <button class="toolbar-btn" onclick="showToast('Campaign data export prepared')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Download
+            </button>
+            <div class="toolbar-sort">
+              <select id="sortSelect" onchange="renderDashboard()">
+                <option value="updated">Latest Update</option>
+                <option value="created">Created Date</option>
+                <option value="blocked">Blocked First</option>
+                <option value="status">By Status</option>
+              </select>
+            </div>
           </div>
           <div class="toolbar-right">
-            <button id="exportBtn" class="table-btn" type="button">Export</button>
-            <button id="filterBtn" class="table-btn" type="button">Filter</button>
+            <div class="toolbar-search">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
+            </div>
+            <button class="toolbar-btn" onclick="showToast('Column customization is not available in this prototype')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 2v12M6 2v12M10 2v12M14 2v12"/><path d="M2 5h2M6 5h2M10 5h2" stroke-width="2"/></svg>
+              Change columns
+            </button>
+            <button class="toolbar-btn" onclick="toggleFilter()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
+              Filters
+            </button>
           </div>
         </div>
-        <div id="tableWrap" class="table-wrap"></div>
-      </section>
+
+        <!-- Table -->
+        <div class="campaign-table-wrap">
+          <table class="campaign-table">
+            <thead id="campaignTableHead"></thead>
+            <tbody id="campaignTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
     </main>
   </div>
 
-  <div id="filterOverlay" class="overlay filter"></div>
-  <aside id="filterPanel" class="side-panel filter-panel">
-    <div class="panel-header">
-      <h2 class="panel-title">Filters</h2>
-      <button id="closeFilterBtn" class="close-btn" type="button" aria-label="Close filters">×</button>
-    </div>
-    <div id="filterBody" class="panel-body"></div>
-    <div class="panel-footer">
-      <button id="applyFiltersBtn" class="primary-btn" type="button">Apply</button>
-      <a id="resetFiltersBtn" class="reset-link">Reset</a>
-    </div>
-  </aside>
 
-  <div id="detailOverlay" class="overlay detail"></div>
-  <aside id="detailPanel" class="side-panel detail-panel"></aside>
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       DETAIL FLYOUT
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <div class="detail-view" id="detailView">
+    <div class="flyout-header">
+      <span style="font-size:11px;color:#616161;">Campaign Detail</span>
+      <button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button>
+    </div>
 
+    <!-- Header -->
+    <div class="detail-header" id="detailHeader"></div>
+
+        <!-- Customer Usage (Field/Corp only) -->
+        <div class="panel-card" id="usagePanel" style="display:none;">
+          <h2>Customer Security Workload Usage</h2>
+          <table class="workloads-table">
+            <thead><tr><th>Workload</th><th>MAU</th><th>PAU</th><th>Utilization %</th><th>Whitespace</th></tr></thead>
+            <tbody id="usageBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Lifecycle Stepper -->
+        <div class="lifecycle-stepper" id="lifecycleStepper"></div>
+
+        <!-- State Banner -->
+        <div class="state-banner info" id="stateBanner"></div>
+
+        <!-- Contextual Action Panel -->
+        <div id="actionPanel"></div>
+
+        <!-- Workloads (only in Committed) -->
+        <div class="panel-card" id="workloadsPanel" style="display:none;">
+          <h2>Workloads</h2>
+          <table class="workloads-table">
+            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change</th><th>Notes</th></tr></thead>
+            <tbody id="workloadsBody"></tbody>
+          </table>
+          <div class="form-group full-width" style="margin-top:14px;">
+            <label>Notes</label>
+            <textarea placeholder="General notes for this campaign..."></textarea>
+          </div>
+        </div>
+
+        <!-- Notes / Audit History -->
+        <div class="panel-card">
+          <h2>Activity &amp; Audit History</h2>
+          <div class="audit-timeline" id="auditTimeline"></div>
+        </div>
+
+      <!-- Action Bar -->
+      <div id="detailActionBar" style="padding:12px 0; border-top:1px solid #e0e0e0; margin-top:16px; display:flex; align-items:center; justify-content:space-between;"></div>
+  </div>
+
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â FILTER FLYOUT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()">
+    <div class="filter-panel" onclick="event.stopPropagation()">
+      <h3>Filters <button class="btn btn-sm btn-secondary" onclick="resetFilters()">Reset</button></h3>
+      <div class="filter-section">
+        <label>Status</label>
+        <select id="filterStatus" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="New">New</option>
+          <option value="Outreach">Outreach</option>
+          <option value="Engaged">Engaged</option>
+          <option value="Funding">Funding</option>
+          <option value="Committed">Committed</option>
+          <option value="Blocked">Blocked</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div class="filter-section">
+        <label>Source</label>
+        <select id="filterSource" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="Security CSU Partner Clinic | ANZ">Security CSU Partner Clinic | ANZ</option>
+          <option value="Security CSU Partner Clinic | APAC">Security CSU Partner Clinic | APAC</option>
+          <option value="Security CSU Partner Clinic | EMEA">Security CSU Partner Clinic | EMEA</option>
+          <option value="Security CSU Partner Clinic | FSI">Security CSU Partner Clinic | FSI</option>
+          <option value="Security CSU Partner Clinic | US">Security CSU Partner Clinic | US</option>
+        </select>
+      </div>
+      <div class="filter-section">
+        <label>Area</label>
+        <select id="filterArea" onchange="renderDashboard()">
+          <option value="">All</option>
+          <option value="ANZ">ANZ</option>
+          <option value="India">India</option>
+          <option value="US West">US West</option>
+          <option value="US East">US East</option>
+          <option value="EMEA North">EMEA North</option>
+          <option value="APAC">APAC</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary btn-sm" onclick="toggleFilter()">Apply</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â CLOSE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <div class="modal-overlay" id="closeModal">
+    <div class="modal">
+      <h3>Close Campaign</h3>
+      <p>Are you sure you want to close this campaign? You can reactivate it later if needed.</p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Please provide reason for closing <span style="color:#d83b01;">*</span></label>
+        <textarea id="closeReasonText" placeholder="Enter reason for closing..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-danger" onclick="confirmCloseCampaign()">Yes, Close Campaign</button>
+        <button class="btn btn-secondary" onclick="hideModal('closeModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOAST Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+       JAVASCRIPT
+       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <script>
-    const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
-    const FILTER_STATE_ORDER = [...STATE_ORDER, 'Blocked'];
-    const STATE_COLORS = {
-      New: '#0078d4',
-      Outreach: '#00bcf2',
-      Engaged: '#8661c5',
-      Funding: '#ff8c00',
-      Committed: '#107c10',
-      Closed: '#767676',
-      Blocked: '#d13438'
-    };
-    const AREAS = ['West', 'Central', 'East', 'Southeast', 'Northeast'];
-    const SOURCES = ['Partner Initiated', 'Microsoft Initiated', 'Joint'];
-    const ENGAGEMENT_TYPES = ['Clinic', 'Workshop', 'Assessment', 'POC'];
-    const WORKLOADS = ['Security', 'Compliance', 'Identity', 'M365', 'Azure'];
-    const CLOSE_REASONS = ['Won', 'Lost', 'Abandoned', 'Duplicate'];
-
-    const CAMPAIGNS = [
-      { id: 'CSU-2025-001', customer: 'Contoso Ltd', area: 'West', partner: 'Acme Solutions', partnerId: 'PLA-4521', state: 'Committed', partnerDri: 'John Smith', msDri: 'Sarah Chen', workloads: ['Security', 'Identity'], source: 'Partner Initiated', engagementType: 'Clinic', fundingRequired: true, fundingRequested: 25000, fundingSecured: 25000, opportunityId: 'OPP-78234', committedAmount: 150000, blocked: false, unified: true },
-      { id: 'CSU-2025-002', customer: 'Fabrikam Inc', area: 'Central', partner: 'CloudFirst', partnerId: 'PLA-3892', state: 'Funding', partnerDri: 'Mike Johnson', msDri: 'David Park', workloads: ['Security', 'Compliance'], source: 'Microsoft Initiated', engagementType: 'Workshop', fundingRequired: true, fundingRequested: 50000, fundingSecured: 0, blocked: false, unified: false },
-      { id: 'CSU-2025-003', customer: 'Woodgrove Bank', area: 'East', partner: 'SecureIT Partners', partnerId: 'PLA-7234', state: 'Engaged', partnerDri: 'Lisa Wang', msDri: 'Tom Miller', workloads: ['Security', 'M365'], source: 'Joint', engagementType: 'Assessment', fundingRequired: false, blocked: false, unified: true },
-      { id: 'CSU-2025-004', customer: 'Adventure Works', area: 'Southeast', partner: 'Acme Solutions', partnerId: 'PLA-4521', state: 'New', partnerDri: 'John Smith', msDri: 'Sarah Chen', workloads: ['Azure', 'Security'], source: 'Partner Initiated', blocked: false, unified: false },
-      { id: 'CSU-2025-005', customer: 'Northwind Traders', area: 'West', partner: 'DataShield Corp', partnerId: 'PLA-9012', state: 'Outreach', partnerDri: 'Amy Lee', msDri: 'James Wilson', workloads: ['Security', 'Identity', 'Compliance'], source: 'Microsoft Initiated', blocked: false, unified: true },
-      { id: 'CSU-2025-006', customer: 'Tailspin Toys', area: 'Northeast', partner: 'CloudFirst', partnerId: 'PLA-3892', state: 'Closed', partnerDri: 'Mike Johnson', msDri: 'David Park', workloads: ['Security'], source: 'Joint', closeReason: 'Won', blocked: false, unified: true },
-      { id: 'CSU-2025-007', customer: 'Litware Inc', area: 'Central', partner: 'CyberGuard LLC', partnerId: 'PLA-5567', state: 'Committed', partnerDri: 'Robert Kim', msDri: 'Emily Davis', workloads: ['Security', 'Azure'], source: 'Partner Initiated', engagementType: 'POC', fundingRequired: true, fundingRequested: 35000, fundingSecured: 35000, opportunityId: 'OPP-91456', committedAmount: 200000, blocked: false, unified: true },
-      { id: 'CSU-2025-008', customer: 'Proseware Corp', area: 'West', partner: 'SecureIT Partners', partnerId: 'PLA-7234', state: 'Outreach', partnerDri: 'Lisa Wang', msDri: 'Tom Miller', workloads: ['M365', 'Security'], source: 'Microsoft Initiated', blocked: true, blockReason: 'Customer unresponsive', unified: false },
-      { id: 'CSU-2025-009', customer: 'VanArsdel Ltd', area: 'East', partner: 'Acme Solutions', partnerId: 'PLA-4521', state: 'New', partnerDri: 'John Smith', msDri: 'Sarah Chen', workloads: ['Security', 'Compliance'], source: 'Joint', blocked: false, unified: false },
-      { id: 'CSU-2025-010', customer: 'Trey Research', area: 'Southeast', partner: 'DataShield Corp', partnerId: 'PLA-9012', state: 'Engaged', partnerDri: 'Amy Lee', msDri: 'James Wilson', workloads: ['Identity', 'Security'], source: 'Partner Initiated', engagementType: 'Clinic', fundingRequired: true, blocked: false, unified: true },
-      { id: 'CSU-2025-011', customer: 'Wingtip Toys', area: 'Northeast', partner: 'CyberGuard LLC', partnerId: 'PLA-5567', state: 'Funding', partnerDri: 'Robert Kim', msDri: 'Emily Davis', workloads: ['Security', 'Azure', 'M365'], source: 'Microsoft Initiated', fundingRequired: true, fundingRequested: 75000, fundingSecured: 50000, blocked: false, unified: true },
-      { id: 'CSU-2025-012', customer: 'Margie Travel', area: 'Central', partner: 'CloudFirst', partnerId: 'PLA-3892', state: 'Closed', partnerDri: 'Mike Johnson', msDri: 'David Park', workloads: ['Security', 'Compliance'], source: 'Joint', closeReason: 'Lost', blocked: false, unified: false },
-      { id: 'CSU-2025-013', customer: 'Humongous Insurance', area: 'West', partner: 'SecureIT Partners', partnerId: 'PLA-7234', state: 'Committed', partnerDri: 'Lisa Wang', msDri: 'Tom Miller', workloads: ['Security', 'Identity', 'Azure'], source: 'Partner Initiated', engagementType: 'Workshop', fundingRequired: true, fundingRequested: 40000, fundingSecured: 40000, opportunityId: 'OPP-33789', committedAmount: 180000, blocked: false, unified: true },
-      { id: 'CSU-2025-014', customer: 'Datum Corp', area: 'East', partner: 'DataShield Corp', partnerId: 'PLA-9012', state: 'New', partnerDri: 'Amy Lee', msDri: 'James Wilson', workloads: ['Security'], source: 'Microsoft Initiated', blocked: false, unified: false },
-      { id: 'CSU-2025-015', customer: 'Coho Vineyard', area: 'Central', partner: 'Acme Solutions', partnerId: 'PLA-4521', state: 'Outreach', partnerDri: 'John Smith', msDri: 'Sarah Chen', workloads: ['Security', 'M365', 'Compliance'], source: 'Joint', blocked: false, unified: true }
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MOCK DATA Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    const campaigns = [
+      {
+        id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
+        tpid: 'TP-44201', segment: 'Enterprise', area: 'ANZ', industry: 'Government',
+        source: 'Security CSU Partner Clinic | ANZ',
+        workloads: ['IRM','MIP P2','MDE','MDA','Sentinel'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'John.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
+        unified: 'Unified', opportunityId: '7-123456789',
+        dates: { created: '2026-05-28', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MIP P2', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Clinic | ANZ', type: 'info', actor: 'scottweeden@microsoft.com' }
+        ]
+      },
+      {
+        id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro India Private Ltd',
+        tpid: 'TP-55102', segment: 'Enterprise', area: 'India', industry: 'Financial Services',
+        source: 'Security CSU Partner Clinic | FSI',
+        workloads: ['MDE','MDA','MDO','MDI','IRM'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'Jane.Doe@contoso.com', microsoftDRI: 'scottweeden@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-123456787',
+        dates: { created: '2026-05-28', updated: '2026-06-02' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-28', text: 'Campaign created from Security CSU Partner Clinic | FSI', type: 'info', actor: 'scottweeden@microsoft.com' }
+        ]
+      },
+      {
+        id: '334455', customer: 'Contoso Ltd', partner: 'Acme Consulting',
+        tpid: 'TP-33098', segment: 'Enterprise', area: 'US West', industry: 'Technology',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDO','MDI','MDE'],
+        status: 'Committed', previousState: null, blockReason: '',
+        partnerDRI: 'partner@acme.com', microsoftDRI: 'field@microsoft.com',
+        unified: 'Unified', opportunityId: '7-334455001',
+        dates: { created: '2026-05-10', outreach: '2026-05-12', engagement: '2026-05-18', fundingSubmission: '2026-05-22', fundingApproval: '2026-05-28', updated: '2026-06-04' },
+        funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDO', status: 'Committed', seats: 120000, notes: 'Full tenant rollout' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Closed', seats: 50000, notes: 'Phase 1 complete' }
+        ],
+        history: [
+          { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
+          { date: '2026-05-12', text: 'Outreach completed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-18', text: 'Customer engaged Ã¢â‚¬â€ agreed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-22', text: 'ECIF funding submitted', type: 'info', actor: 'partner@acme.com' },
+          { date: '2026-05-28', text: 'Funding approved', type: 'success', actor: 'field@microsoft.com' },
+          { date: '2026-06-04', text: 'MDE workload marked as Closed', type: 'success', actor: 'partner@acme.com' }
+        ]
+      },
+      {
+        id: '556677', customer: 'Northwind Traders', partner: 'TechData Corp',
+        tpid: 'TP-77451', segment: 'Mid-Market', area: 'EMEA North', industry: 'Retail',
+        source: 'Security CSU Partner Clinic | EMEA',
+        workloads: ['MDE','MDA','Sentinel'],
+        status: 'Blocked', previousState: 'Outreach', blockReason: 'Customer prefers to work with another partner',
+        partnerDRI: 'rep@techdata.com', microsoftDRI: 'msftfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-556677001',
+        dates: { created: '2026-05-15', outreach: '2026-05-18', engagement: '2026-05-25', updated: '2026-06-01' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: 'preference' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-15', text: 'Campaign created', type: 'info', actor: 'msftfield@microsoft.com' },
+          { date: '2026-05-18', text: 'Outreach completed', type: 'success', actor: 'rep@techdata.com' },
+          { date: '2026-05-25', text: 'Customer prefers another partner Ã¢â‚¬â€ blocked', type: 'blocked', actor: 'rep@techdata.com' }
+        ]
+      },
+      {
+        id: '889900', customer: 'Tailspin Toys', partner: 'Insight Direct',
+        tpid: 'TP-12399', segment: 'SMB', area: 'APAC', industry: 'Consumer Goods',
+        source: 'Security CSU Partner Clinic | APAC',
+        workloads: ['MDO','MDE'],
+        status: 'Engaged', previousState: null, blockReason: '',
+        partnerDRI: 'sales@insight.com', microsoftDRI: 'apacfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-889900001',
+        dates: { created: '2026-05-20', outreach: '2026-05-22', engagement: '2026-05-28', fundingSubmission: '', updated: '2026-06-02' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-20', text: 'Campaign created', type: 'info', actor: 'apacfield@microsoft.com' },
+          { date: '2026-05-22', text: 'Outreach completed', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-05-28', text: 'Customer engaged Ã¢â‚¬â€ agreed to campaign', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-06-02', text: 'Awaiting funding requirement decision', type: 'info', actor: 'apacfield@microsoft.com' }
+        ]
+      },
+      {
+        id: '101010', customer: 'Woodgrove Bank', partner: 'Avanade',
+        tpid: 'TP-88210', segment: 'Enterprise', area: 'US East', industry: 'Financial Services',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDO','MDI','MDE','Sentinel'],
+        status: 'Outreach', previousState: null, blockReason: '',
+        partnerDRI: 'exec@avanade.com', microsoftDRI: 'usfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-101010001',
+        dates: { created: '2026-06-01', outreach: '', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-06-01', text: 'Campaign created', type: 'info', actor: 'usfield@microsoft.com' },
+          { date: '2026-06-03', text: 'Partner initiated outreach', type: 'info', actor: 'exec@avanade.com' }
+        ]
+      },
+      {
+        id: '777888', customer: 'Litware Inc', partner: 'Softchoice',
+        tpid: 'TP-65477', segment: 'Mid-Market', area: 'US East', industry: 'Technology',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDE','MDA'],
+        status: 'Closed', previousState: null, blockReason: '',
+        partnerDRI: 'dri@softchoice.com', microsoftDRI: 'usfield2@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-777888001',
+        dates: { created: '2026-04-15', outreach: '2026-04-17', engagement: '2026-04-22', fundingSubmission: '2026-04-25', fundingApproval: '2026-04-30', updated: '2026-05-25' },
+        funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Closed', seats: 15000, notes: 'Complete' },
+          { name: 'MDA', status: 'Closed', seats: 8000, notes: 'Complete' }
+        ],
+        history: [
+          { date: '2026-04-15', text: 'Campaign created', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-04-17', text: 'Outreach completed', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-04-22', text: 'Customer engaged', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-04-30', text: 'Funding approved', type: 'success', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-20', text: 'All workloads closed', type: 'success', actor: 'dri@softchoice.com' },
+          { date: '2026-05-25', text: 'Campaign auto-closed', type: 'closed', actor: 'System' }
+        ]
+      },
+      {
+        id: '445566', customer: 'Adventure Works', partner: 'Computacenter',
+        tpid: 'TP-77190', segment: 'Enterprise', area: 'EMEA North', industry: 'Manufacturing',
+        source: 'Security CSU Partner Clinic | EMEA',
+        workloads: ['Sentinel','MDE','MDI'],
+        status: 'Committed', previousState: null, blockReason: '',
+        partnerDRI: 'lead@computacenter.com', microsoftDRI: 'emeafield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-445566001',
+        dates: { created: '2026-04-20', outreach: '2026-04-24', engagement: '2026-05-01', fundingSubmission: '2026-05-05', fundingApproval: '2026-05-10', updated: '2026-06-01' },
+        funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'Sentinel', status: 'Committed', seats: 22000, notes: 'SOC expansion' },
+          { name: 'MDE', status: 'Committed', seats: 18000, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: 'Pending approval' }
+        ],
+        history: [
+          { date: '2026-04-20', text: 'Campaign created', type: 'info', actor: 'emeafield@microsoft.com' },
+          { date: '2026-04-24', text: 'Outreach completed', type: 'success', actor: 'lead@computacenter.com' },
+          { date: '2026-05-01', text: 'Customer engaged - agreed', type: 'success', actor: 'lead@computacenter.com' },
+          { date: '2026-05-10', text: 'Funding secured', type: 'success', actor: 'emeafield@microsoft.com' },
+          { date: '2026-06-01', text: 'Workloads committed', type: 'success', actor: 'lead@computacenter.com' }
+        ]
+      },
+      {
+        id: '998877', customer: 'Fabrikam Industries', partner: 'SoftwareOne',
+        tpid: 'TP-44210', segment: 'Enterprise', area: 'EMEA North', industry: 'Energy',
+        source: 'Security CSU Partner Clinic | EMEA',
+        workloads: ['MIP P2','IRM','MDA'],
+        status: 'Funding', previousState: null, blockReason: '',
+        partnerDRI: 'pm@softwareone.com', microsoftDRI: 'emeafield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-998877001',
+        dates: { created: '2026-05-10', outreach: '2026-05-14', engagement: '2026-05-20', updated: '2026-06-03' },
+        funding: { submitted: true, secured: '' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MIP P2', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'emeafield@microsoft.com' },
+          { date: '2026-05-14', text: 'Outreach completed', type: 'success', actor: 'pm@softwareone.com' },
+          { date: '2026-05-20', text: 'Customer agreed', type: 'success', actor: 'pm@softwareone.com' },
+          { date: '2026-06-03', text: 'Funding submitted, awaiting approval', type: 'info', actor: 'emeafield@microsoft.com' }
+        ]
+      },
+      {
+        id: '112233', customer: 'Relecloud', partner: 'Pax8',
+        tpid: 'TP-90881', segment: 'Mid-Market', area: 'US West', industry: 'Media',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDO','Sentinel'],
+        status: 'Outreach', previousState: null, blockReason: '',
+        partnerDRI: 'sales@pax8.com', microsoftDRI: 'uswestfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-112233001',
+        dates: { created: '2026-05-30', updated: '2026-06-04' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'MDO', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-05-30', text: 'Campaign created', type: 'info', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-06-04', text: 'Partner initiating outreach', type: 'info', actor: 'sales@pax8.com' }
+        ]
+      },
+      {
+        id: '667788', customer: 'Wide World Importers', partner: 'CDW',
+        tpid: 'TP-90234', segment: 'Enterprise', area: 'US East', industry: 'Logistics',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDE','MDI','Sentinel','MDA'],
+        status: 'Blocked', previousState: 'Funding', blockReason: 'Customer budget freeze until Q2',
+        partnerDRI: 'rep@cdw.com', microsoftDRI: 'usfield2@microsoft.com',
+        unified: 'Unified', opportunityId: '7-667788001',
+        dates: { created: '2026-04-28', outreach: '2026-05-01', engagement: '2026-05-06', updated: '2026-05-22' },
+        funding: { submitted: true, secured: '' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDA', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-04-28', text: 'Campaign created', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-01', text: 'Outreach completed', type: 'success', actor: 'rep@cdw.com' },
+          { date: '2026-05-06', text: 'Customer engaged', type: 'success', actor: 'rep@cdw.com' },
+          { date: '2026-05-15', text: 'Funding submitted', type: 'info', actor: 'usfield2@microsoft.com' },
+          { date: '2026-05-22', text: 'Blocked: Customer budget freeze until Q2', type: 'blocked', actor: 'rep@cdw.com' }
+        ]
+      },
+      {
+        id: '334400', customer: 'Coho Vineyard', partner: 'TD Synnex',
+        tpid: 'TP-11762', segment: 'Mid-Market', area: 'US West', industry: 'Food & Beverage',
+        source: 'Security CSU Partner Clinic | US',
+        workloads: ['MDE','MDA','MDO'],
+        status: 'Closed', previousState: null, blockReason: '',
+        partnerDRI: 'partner@tdsynnex.com', microsoftDRI: 'uswestfield@microsoft.com',
+        unified: 'Non-Unified', opportunityId: '7-334400001',
+        dates: { created: '2026-03-20', outreach: '2026-03-22', engagement: '2026-03-28', fundingSubmission: '2026-04-02', fundingApproval: '2026-04-08', updated: '2026-05-15' },
+        funding: { submitted: true, secured: 'yes' },
+        fundingRequired: 'yes',
+        engagement: { outcome: 'agreed' },
+        workloadData: [
+          { name: 'MDE', status: 'Closed', seats: 5200, notes: 'Complete' },
+          { name: 'MDA', status: 'Closed', seats: 3800, notes: 'Complete' },
+          { name: 'MDO', status: 'Closed', seats: 4100, notes: 'Complete' }
+        ],
+        history: [
+          { date: '2026-03-20', text: 'Campaign created', type: 'info', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-03-22', text: 'Outreach completed', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-03-28', text: 'Customer engaged', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-04-08', text: 'Funding approved', type: 'success', actor: 'uswestfield@microsoft.com' },
+          { date: '2026-05-10', text: 'All workloads closed', type: 'success', actor: 'partner@tdsynnex.com' },
+          { date: '2026-05-15', text: 'Campaign auto-closed', type: 'closed', actor: 'System' }
+        ]
+      },
+      {
+        id: '556600', customer: 'Humongous Insurance', partner: 'Wipro',
+        tpid: 'TP-88412', segment: 'Enterprise', area: 'APAC', industry: 'Insurance',
+        source: 'Security CSU Partner Clinic | APAC',
+        workloads: ['Sentinel','MDI','IRM'],
+        status: 'New', previousState: null, blockReason: '',
+        partnerDRI: 'lead@wipro.com', microsoftDRI: 'apacfield@microsoft.com',
+        unified: 'Unified', opportunityId: '7-556600001',
+        dates: { created: '2026-06-03', updated: '2026-06-03' },
+        funding: { submitted: false, secured: '' },
+        fundingRequired: '',
+        engagement: { outcome: '' },
+        workloadData: [
+          { name: 'Sentinel', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
+          { name: 'IRM', status: 'Uncommitted', seats: 0, notes: '' }
+        ],
+        history: [
+          { date: '2026-06-03', text: 'Campaign created from Security CSU Partner Clinic | APAC', type: 'info', actor: 'apacfield@microsoft.com' }
+        ]
+      }
     ];
 
-    const USAGE_DATA = {
-      'CSU-2025-001': [
-        { product: 'Microsoft 365 E5', mau: 12500, pau: 10200, utilization: 82, whitespace: 18400 },
-        { product: 'Azure Security', mau: 8900, pau: 6700, utilization: 75, whitespace: 22100 },
-        { product: 'Microsoft Defender', mau: 15000, pau: 11250, utilization: 75, whitespace: 30000 }
-      ]
+    const usageBenchmarks = {
+      'MDE': { mau: 12500, pau: 15000, utilization: 83 },
+      'MDI': { mau: 8200, pau: 10000, utilization: 82 },
+      'MDA': { mau: 7600, pau: 9600, utilization: 79 },
+      'MDO': { mau: 9800, pau: 12100, utilization: 81 },
+      'Sentinel': { mau: 6900, pau: 8800, utilization: 78 },
+      'IRM': { mau: 5400, pau: 7100, utilization: 76 },
+      'MIP P2': { mau: 6100, pau: 7900, utilization: 77 }
     };
 
-    const VIEW_CONFIG = {
-      partner: {
-        brand: 'Microsoft Partner Center',
-        title: 'Insights | Security CSU Campaigns',
-        subtitle: 'AI Business Solutions & Security',
-        breadcrumb: 'Home > Insights > AI Business Solutions & Security > Security CSU Campaigns',
-        sidebar: [
-          { label: 'Home' },
-          { label: 'Marketplace' },
-          { label: 'Customers' },
-          { label: 'Insights', expanded: true },
-          { label: 'AI Business Solutions & Security', level: 1 },
-          { label: 'Security CSU Campaigns', level: 2, active: true },
-          { label: 'Referrals' },
-          { label: 'Benefits' },
-          { label: 'Incentives' },
-          { label: 'Membership' }
-        ],
-        columns: [
-          ['id', 'Campaign ID'],
-          ['customer', 'Customer Name'],
-          ['area', 'Customer Area'],
-          ['partner', 'Partner Name'],
-          ['partnerId', 'Partner ID (PLA)'],
-          ['displayState', 'State'],
-          ['partnerDri', 'Partner DRI'],
-          ['msDri', 'Microsoft DRI'],
-          ['workloads', 'Targeted Workloads'],
-          ['source', 'Campaign Source']
-        ]
-      },
-      field: {
-        brand: 'ASPXi',
-        title: 'Security CSU Campaigns',
-        subtitle: 'AI Business Solutions & Security',
-        breadcrumb: '',
-        sidebar: [
-          { label: 'Growth Opportunities' },
-          { label: 'MCI Performance' },
-          { label: 'FastTrack Referrals' },
-          { label: 'Security CSU Campaigns', active: true },
-          { label: 'ASPXi Readiness' }
-        ],
-        columns: [
-          ['id', 'Campaign ID'],
-          ['customer', 'Customer Name'],
-          ['partner', 'Partner Name'],
-          ['displayState', 'State'],
-          ['partnerDri', 'Partner DRI'],
-          ['msDri', 'Microsoft DRI'],
-          ['workloads', 'Targeted Workloads'],
-          ['unifiedText', 'Unified'],
-          ['opportunityIdText', 'Opportunity ID'],
-          ['campaignStatus', 'Campaign Status'],
-          ['source', 'Campaign Source']
-        ]
-      },
-      corp: {
-        brand: 'ASPXi',
-        title: 'Security CSU Campaigns',
-        subtitle: 'AI Business Solutions & Security',
-        breadcrumb: '',
-        sidebar: [
-          { label: 'Growth Opportunities' },
-          { label: 'MCI Performance' },
-          { label: 'FastTrack Referrals' },
-          { label: 'Security CSU Campaigns', active: true },
-          { label: 'ASPXi Readiness' },
-          { section: 'Portfolio Analytics' },
-          { label: 'Portfolio Analytics' }
-        ],
-        columns: [
-          ['id', 'Campaign ID'],
-          ['customer', 'Customer Name'],
-          ['partner', 'Partner Name'],
-          ['displayState', 'State'],
-          ['partnerDri', 'Partner DRI'],
-          ['msDri', 'Microsoft DRI'],
-          ['workloads', 'Targeted Workloads'],
-          ['unifiedText', 'Unified'],
-          ['opportunityIdText', 'Opportunity ID'],
-          ['campaignStatus', 'Campaign Status'],
-          ['source', 'Campaign Source']
-        ]
+    function buildUsageData(c) {
+      return c.workloads.map(function(w, idx) {
+        var base = usageBenchmarks[w] || { mau: 7000, pau: 9000, utilization: 75 };
+        var seed = (parseInt(c.id.slice(-2), 10) || 12) + (idx * 9);
+        var seats = c.workloadData[idx] ? c.workloadData[idx].seats : 0;
+        var mau = base.mau + (seed * 55) + Math.min(seats, 12000);
+        var pau = Math.max(mau + 900, base.pau + (seed * 70) + Math.min(seats, 15000));
+        var utilization = Math.min(94, Math.max(55, base.utilization + (seed % 7) - 3));
+        return {
+          workload: w,
+          mau: mau,
+          pau: pau,
+          utilization: utilization,
+          whitespace: Math.max(500, pau - mau)
+        };
+      });
+    }
+
+    campaigns.forEach(function(c) {
+      c.usageData = buildUsageData(c);
+    });
+
+    let currentCampaign = null;
+    let currentView = 'partner';
+    const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
+    function getStatusBadgeText(c) {
+      if (c.status === 'Funding') {
+        if (c.funding.submitted === true && c.funding.secured === 'yes') return 'Funding Secured';
+        if (c.funding.submitted === true && c.funding.secured === '') return 'Funding Requested';
       }
-    };
-
-    const appState = {
-      view: 'partner',
-      campaigns: CAMPAIGNS.map(normalizeCampaign),
-      search: '',
-      sort: { key: 'id', direction: 'asc' },
-      filters: createDefaultFilters('partner'),
-      filterDraft: null,
-      filterOpen: false,
-      detailOpen: false,
-      selectedId: null,
-      detailDraft: null,
-      charts: { stateChart: null, secondaryChart: null }
-    };
-
-    function normalizeCampaign(campaign) {
-      return Object.assign({
-        outreachNotes: '',
-        engagementNotes: '',
-        fundingNotes: '',
-        committedNotes: '',
-        closeNotes: '',
-        fundingRequired: false,
-        fundingRequested: 0,
-        fundingSecured: 0,
-        committedAmount: 0,
-        opportunityId: '',
-        engagementType: '',
-        closeReason: '',
-        blockReason: '',
-        unified: false
-      }, structuredClone(campaign));
+      return c.status;
+    }
+    function renderStatusBadge(c) {
+      return '<span class="status-badge '+c.status.toLowerCase()+'">'+getStatusBadgeText(c)+'</span>';
+    }
+    // â•â•â•â•â•â•â• VIEW SWITCH â•â•â•â•â•â•â•
+    function switchView(view) {
+      currentView = view;
+      document.getElementById('navPartner').classList.toggle('active', view === 'partner');
+      document.getElementById('navField').classList.toggle('active', view === 'field');
+      document.getElementById('navCorp').classList.toggle('active', view === 'corp');
+      document.getElementById('dashboardView').classList.toggle('active', true);
+      document.getElementById('pageTitle').textContent =
+        view === 'partner' ? 'Campaign Builder (Partner View)' :
+        view === 'field' ? 'Campaign Builder (MSFT Field View)' :
+        'Campaign Builder (Corp View)';
+      document.getElementById('dashboardTitle').textContent =
+        view === 'partner' ? 'Campaigns - Partner View' :
+        view === 'field' ? 'Campaigns - Field View' :
+        'Campaigns - Corp (CSA Manager)';
+      activeKpiFilter = null;
+      activeChartFilter = null;
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
+      showDashboard();
+      toggleFilter(false);
+      renderDashboard();
     }
 
-    function createDefaultFilters(view) {
-      return {
-        states: [...FILTER_STATE_ORDER],
-        source: 'All',
-        areas: view === 'partner' ? [...AREAS] : [],
-        partners: view !== 'partner' ? getPartners() : []
-      };
-    }
 
-    function ensureUsageData() {
-      appState.campaigns.forEach(function(campaign, index) {
-        if (!USAGE_DATA[campaign.id]) {
-          const base = 7800 + index * 470;
-          USAGE_DATA[campaign.id] = [
-            { product: 'Microsoft 365 E5', mau: base, pau: Math.round(base * 0.79), utilization: 79, whitespace: 14500 + index * 920 },
-            { product: 'Azure Security', mau: base - 900, pau: Math.round((base - 900) * 0.73), utilization: 73, whitespace: 17200 + index * 1040 },
-            { product: 'Microsoft Defender', mau: base + 1800, pau: Math.round((base + 1800) * 0.76), utilization: 76, whitespace: 19600 + index * 1260 },
-            { product: 'Compliance Manager', mau: base - 1400, pau: Math.round((base - 1400) * 0.68), utilization: 68, whitespace: 11800 + index * 760 }
-          ];
-        }
-      });
-    }
+    // KPI FILTER
+    let activeKpiFilter = null;
+    let activeChartFilter = null;
+    function filterByKpi(filter) {
+      const statusEl = document.getElementById('filterStatus');
+      statusEl.value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
+      activeChartFilter = null;
 
-    function getPartners() {
-      return [...new Set(appState.campaigns.map(function(campaign) { return campaign.partner; }))].sort();
-    }
-
-    function displayState(campaign) {
-      return campaign.blocked ? 'Blocked' : campaign.state;
-    }
-
-    function formatNumber(value) {
-      return Number(value || 0).toLocaleString('en-US');
-    }
-
-    function formatCurrency(value) {
-      if (value === null || value === undefined || value === '') { return '—'; }
-      return '$' + Number(value || 0).toLocaleString('en-US');
-    }
-
-    function escapeHtml(value) {
-      return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function getCampaignStatus(campaign) {
-      if (campaign.blocked) { return 'Blocked'; }
-      if (campaign.state === 'Closed') { return campaign.closeReason ? 'Closed - ' + campaign.closeReason : 'Closed'; }
-      if (campaign.state === 'Committed') { return 'Committed'; }
-      if (campaign.state === 'Funding') { return 'Awaiting Funding'; }
-      if (campaign.state === 'Engaged') { return 'Engaged'; }
-      if (campaign.state === 'Outreach') { return 'Outreach'; }
-      return 'Queued';
-    }
-
-    function getCampaignWithDerived(campaign) {
-      return Object.assign({}, campaign, {
-        displayState: displayState(campaign),
-        unifiedText: campaign.unified ? 'Yes' : 'No',
-        opportunityIdText: campaign.opportunityId || '—',
-        campaignStatus: getCampaignStatus(campaign)
-      });
-    }
-
-    function getFilterDataset() {
-      return appState.campaigns.filter(function(campaign) {
-        const filters = appState.filters;
-        const stateOk = filters.states.includes(displayState(campaign));
-        const sourceOk = filters.source === 'All' || campaign.source === filters.source;
-        const areaOk = appState.view !== 'partner' || filters.areas.includes(campaign.area);
-        const partnerOk = appState.view === 'partner' || filters.partners.includes(campaign.partner);
-        return stateOk && sourceOk && areaOk && partnerOk;
-      });
-    }
-
-    function getTableDataset() {
-      const search = appState.search.trim().toLowerCase();
-      const rows = getFilterDataset().map(getCampaignWithDerived).filter(function(row) {
-        if (!search) { return true; }
-        const haystack = [
-          row.id,
-          row.customer,
-          row.area,
-          row.partner,
-          row.partnerId,
-          row.displayState,
-          row.partnerDri,
-          row.msDri,
-          row.workloads.join(' '),
-          row.source,
-          row.unifiedText,
-          row.opportunityIdText,
-          row.campaignStatus
-        ].join(' ').toLowerCase();
-        return haystack.includes(search);
-      });
-
-      const direction = appState.sort.direction === 'asc' ? 1 : -1;
-      rows.sort(function(a, b) {
-        const key = appState.sort.key;
-        let valueA = a[key];
-        let valueB = b[key];
-        if (Array.isArray(valueA)) { valueA = valueA.join(', '); }
-        if (Array.isArray(valueB)) { valueB = valueB.join(', '); }
-        valueA = valueA == null ? '' : valueA;
-        valueB = valueB == null ? '' : valueB;
-        if (!isNaN(Number(valueA)) && !isNaN(Number(valueB)) && valueA !== '' && valueB !== '') {
-          return (Number(valueA) - Number(valueB)) * direction;
-        }
-        return String(valueA).localeCompare(String(valueB)) * direction;
-      });
-      return rows;
-    }
-
-    function computeKpis(dataset) {
-      if (appState.view === 'partner') {
-        return [
-          { label: 'New', value: dataset.filter(function(c) { return !c.blocked && c.state === 'New'; }).length, accent: 'blue' },
-          { label: 'In Progress', value: dataset.filter(function(c) { return !c.blocked && ['Outreach', 'Engaged', 'Funding', 'Committed'].includes(c.state); }).length, accent: 'green' },
-          { label: 'Blocked', value: dataset.filter(function(c) { return c.blocked; }).length, accent: 'red' }
-        ];
+      if (filter === activeKpiFilter || filter === 'all') {
+        activeKpiFilter = null;
+      } else {
+        activeKpiFilter = filter;
+        if (filter === 'blocked') statusEl.value = 'Blocked';
+        else if (filter === 'committed') statusEl.value = 'Committed';
       }
-      const partners = new Set(dataset.map(function(c) { return c.partner; }));
-      const whitespace = dataset.reduce(function(total, campaign) {
-        return total + (USAGE_DATA[campaign.id] || []).reduce(function(sum, row) { return sum + row.whitespace; }, 0);
-      }, 0);
-      const unifiedPct = dataset.length ? Math.round(dataset.filter(function(c) { return c.unified; }).length / dataset.length * 100) : 0;
-      return [
-        { label: 'Campaigns', value: dataset.length },
-        { label: 'Partners Engaged', value: partners.size },
-        { label: 'Usage Whitespace', value: formatNumber(whitespace) },
-        { label: 'Unified Percentage', value: unifiedPct + '%' }
-      ];
+      renderDashboard();
     }
 
-    function renderShell() {
-      const config = VIEW_CONFIG[appState.view];
-      document.getElementById('brandText').textContent = config.brand;
-      document.getElementById('pageTitle').textContent = config.title;
-      document.getElementById('pageSubtitle').textContent = config.subtitle;
-      const breadcrumb = document.getElementById('breadcrumb');
-      breadcrumb.textContent = config.breadcrumb;
-      breadcrumb.classList.toggle('hidden', !config.breadcrumb);
-      document.getElementById('viewSwitcher').value = appState.view;
-      document.getElementById('sidebar').innerHTML = config.sidebar.map(function(item) {
-        if (item.section) {
-          return '<div class="sidebar-section-title">' + escapeHtml(item.section) + '</div>';
-        }
-        const classes = ['nav-item'];
-        if (item.level) { classes.push('level-' + item.level); }
-        if (item.active) { classes.push('active'); }
-        if (item.expanded) { classes.push('expanded'); }
-        const caret = item.expanded ? '<span class="caret">▾</span>' : '<span class="caret"></span>';
-        return '<a href="#" class="' + classes.join(' ') + '" onclick="return false;">' + caret + '<span>' + escapeHtml(item.label) + '</span></a>';
-      }).join('');
-    }
+    function filterByChart(type, value) {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
+      activeKpiFilter = null;
 
-    function renderKpis() {
-      const dataset = getFilterDataset();
-      const cards = computeKpis(dataset);
-      const row = document.getElementById('kpiRow');
-      row.className = 'kpi-row ' + (appState.view === 'partner' ? 'partner' : 'default');
-      row.innerHTML = cards.map(function(card) {
-        const accent = card.accent === 'green' ? ' green' : card.accent === 'red' ? ' red' : '';
-        return '<div class="card kpi-card' + accent + '">' +
-          '<span class="kpi-info">i</span>' +
-          '<div class="kpi-value">' + escapeHtml(card.value) + '</div>' +
-          '<div class="kpi-label">' + escapeHtml(card.label) + '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    function createDonutChart(canvasId, labels, data, colors) {
-      if (appState.charts[canvasId]) {
-        appState.charts[canvasId].destroy();
+      if (activeChartFilter && activeChartFilter.type === type && activeChartFilter.value === value) {
+        activeChartFilter = null;
+      } else {
+        activeChartFilter = { type: type, value: value };
+        if (type === 'status') document.getElementById('filterStatus').value = value;
+        else if (type === 'area') document.getElementById('filterArea').value = value;
       }
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      appState.charts[canvasId] = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '64%',
-          plugins: { legend: { display: false }, tooltip: { enabled: true } }
-        }
-      });
+      renderDashboard();
     }
 
-    function renderLegend(targetId, labels, values, colors) {
-      document.getElementById(targetId).innerHTML = labels.map(function(label, index) {
-        return '<div class="legend-item"><span class="legend-swatch" style="background:' + colors[index] + '"></span><span>' + escapeHtml(label) + ' (' + values[index] + ')</span></div>';
+    // DASHBOARD
+    function renderDashboard() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const filterStatus = document.getElementById('filterStatus').value;
+      const filterSource = document.getElementById('filterSource').value;
+      const filterArea = document.getElementById('filterArea').value;
+      const sortBy = document.getElementById('sortSelect').value;
+
+      let filtered = campaigns.filter(c => {
+        if (search && !c.customer.toLowerCase().includes(search) && !c.id.toLowerCase().includes(search)) return false;
+        if (filterStatus && c.status !== filterStatus) return false;
+        if (filterSource && c.source !== filterSource) return false;
+        if (filterArea && c.area !== filterArea) return false;
+        // KPI-based filters
+        if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
+        if (activeKpiFilter === 'pending' && (c.status === 'Closed' || c.status === 'Blocked')) return false;
+        if (activeKpiFilter === 'engaged' && c.status === 'New') return false;
+        if (activeKpiFilter === 'unified' && c.unified !== 'Unified') return false;
+        if (activeKpiFilter === 'seats' && c.workloadData.reduce((s,w) => s + w.seats, 0) === 0) return false;
+        // Chart-based filters
+        if (activeChartFilter && activeChartFilter.type === 'workload' && !c.workloads.includes(activeChartFilter.value)) return false;
+        if (activeChartFilter && activeChartFilter.type === 'area' && c.area !== activeChartFilter.value) return false;
+        if (activeChartFilter && activeChartFilter.type === 'partner' && c.partner !== activeChartFilter.value) return false;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (sortBy === 'updated') return (b.dates.updated || '').localeCompare(a.dates.updated || '');
+        if (sortBy === 'created') return (b.dates.created || '').localeCompare(a.dates.created || '');
+        if (sortBy === 'blocked') return (b.status === 'Blocked' ? 1 : 0) - (a.status === 'Blocked' ? 1 : 0);
+        if (sortBy === 'status') return STATE_ORDER.indexOf(a.status === 'Blocked' ? 'Committed' : a.status) - STATE_ORDER.indexOf(b.status === 'Blocked' ? 'Committed' : b.status);
+        return 0;
+      });
+
+      // KPIs Ã¢â‚¬â€ differ by view
+      const total = campaigns.length;
+      const blocked = campaigns.filter(c => c.status === 'Blocked').length;
+      const inProgress = campaigns.filter(c => c.status !== 'Closed').length;
+      const partnersEngaged = new Set(campaigns.filter(c => c.status !== 'New').map(c => c.partner)).size;
+      const usageWhitespace = '1.2M'; // mock
+      const unifiedPct = Math.round(campaigns.filter(c => c.unified === 'Unified').length / total * 100);
+      const totalSeats = campaigns.reduce(function(sum, c) { return sum + c.workloadData.reduce(function(s, w) { return s + w.seats; }, 0); }, 0);
+      const workloadsCommitted = campaigns.reduce(function(sum, c) { return sum + c.workloadData.filter(function(w) { return w.status === 'Committed'; }).length; }, 0);
+      const pendingActions = campaigns.filter(c => c.status !== 'Closed' && c.status !== 'Blocked').length;
+      const blockedLong = campaigns.filter(c => c.status === 'Blocked').length; // mock: all blocked > 14 days
+
+      if (currentView === 'partner') {
+        document.getElementById('kpiRow').innerHTML =
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span><span class="kpi-label">Blocked (!)</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'pending\')"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
+      } else {
+        document.getElementById('kpiRow').innerHTML =
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blockedLong+' &#9888;</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'committed\')"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
+      }
+
+      renderCharts();
+
+      // Table headers based on view
+      const thead = document.getElementById('campaignTableHead');
+      if (currentView === 'partner') {
+        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Source</th></tr>';
+      } else {
+        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Unified</th><th>Opportunity ID</th><th>Source</th></tr>';
+      }
+
+      const tbody = document.getElementById('campaignTableBody');
+      tbody.innerHTML = filtered.map(c => {
+        var wl = c.workloads.map(w => '<span class="workload-pill">'+w+'</span>').join('');
+        if (currentView === 'partner') {
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
+        } else {
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
+        }
       }).join('');
     }
 
     function renderCharts() {
-      const dataset = getFilterDataset();
-      const secondaryTitle = appState.view === 'partner' ? 'Customers by Area' : 'Campaigns by Partner';
-      document.getElementById('chartsGrid').innerHTML = [
-        '<div class="card chart-card"><h2 class="card-title">Campaigns by State</h2><div class="chart-canvas-wrap"><canvas id="stateChart"></canvas></div><div id="stateLegend" class="chart-legend"></div></div>',
-        '<div class="card chart-card"><h2 class="card-title">' + secondaryTitle + '</h2><div class="chart-canvas-wrap"><canvas id="secondaryChart"></canvas></div><div id="secondaryLegend" class="chart-legend"></div></div>'
-      ].join('');
+      const chartsRow = document.getElementById('chartsRow');
+      const statusCounts = {};
+      campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
+      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Engaged: '#6b21a8', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
-      const stateCounts = FILTER_STATE_ORDER.map(function(state) {
-        return dataset.filter(function(campaign) { return displayState(campaign) === state; }).length;
-      });
-      createDonutChart('stateChart', FILTER_STATE_ORDER, stateCounts, FILTER_STATE_ORDER.map(function(state) { return STATE_COLORS[state]; }));
-      renderLegend('stateLegend', FILTER_STATE_ORDER, stateCounts, FILTER_STATE_ORDER.map(function(state) { return STATE_COLORS[state]; }));
+      // Pie: Status distribution
+      var statusChart = buildPieChart(statusCounts, statusColors, 'By Status', 'status');
 
-      const secondaryMap = {};
-      dataset.forEach(function(campaign) {
-        const key = appState.view === 'partner' ? campaign.area : campaign.partner;
-        secondaryMap[key] = (secondaryMap[key] || 0) + 1;
-      });
-      const secondaryLabels = Object.keys(secondaryMap);
-      const secondaryCounts = secondaryLabels.map(function(label) { return secondaryMap[label]; });
-      const palette = ['#0078d4', '#00bcf2', '#8661c5', '#ff8c00', '#107c10', '#5c2d91', '#d13438', '#8764b8'];
-      createDonutChart('secondaryChart', secondaryLabels, secondaryCounts, secondaryLabels.map(function(_, index) { return palette[index % palette.length]; }));
-      renderLegend('secondaryLegend', secondaryLabels, secondaryCounts, secondaryLabels.map(function(_, index) { return palette[index % palette.length]; }));
+      // Bar: Workloads
+      var wlCounts = {};
+      campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
+      var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload', 'workload');
+
+      // Pie: Area distribution
+      var areaCounts = {};
+      campaigns.forEach(c => { areaCounts[c.area] = (areaCounts[c.area] || 0) + 1; });
+      var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
+      var areaChart = buildPieChart(areaCounts, areaColors, 'By Area', 'area');
+
+      var partnerCounts = {};
+      campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
+      var partnerChart = buildVBarChart(partnerCounts, '#7719aa', 'By Partner', 'partner');
+
+      if (currentView === 'partner') {
+        chartsRow.innerHTML = statusChart + workloadChart + areaChart;
+      } else if (currentView === 'field') {
+        chartsRow.innerHTML = statusChart + areaChart;
+      } else {
+        chartsRow.innerHTML = statusChart + areaChart + partnerChart;
+      }
     }
 
-    function formatCell(key, row) {
-      if (key === 'displayState') {
-        return '<span class="state-badge state-' + escapeHtml(row.displayState) + '">' + escapeHtml(row.displayState) + '</span>';
-      }
-      if (key === 'workloads') {
-        return '<div class="workload-list">' + row.workloads.map(function(workload) {
-          return '<span class="chip">' + escapeHtml(workload) + '</span>';
-        }).join('') + '</div>';
-      }
-      return escapeHtml(row[key] == null || row[key] === '' ? '—' : row[key]);
-    }
-
-    function renderTable() {
-      const config = VIEW_CONFIG[appState.view];
-      const rows = getTableDataset();
-      if (!rows.length) {
-        document.getElementById('tableWrap').innerHTML = '<div class="empty-state">No campaigns match the current search and filters.</div>';
-        return;
-      }
-      const head = '<thead><tr>' + config.columns.map(function(column) {
-        const key = column[0];
-        const label = column[1];
-        const active = appState.sort.key === key;
-        const indicator = active ? (appState.sort.direction === 'asc' ? '▲' : '▼') : '';
-        return '<th class="sortable" data-sort-key="' + key + '">' + escapeHtml(label) + '<span class="sort-indicator">' + indicator + '</span></th>';
-      }).join('') + '</tr></thead>';
-      const body = rows.map(function(row) {
-        return '<tr data-row-id="' + row.id + '">' + config.columns.map(function(column) {
-          return '<td>' + formatCell(column[0], row) + '</td>';
-        }).join('') + '</tr>';
+    function buildVBarChart(data, colors, title, filterType) {
+      var entries = Object.entries(data);
+      var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
+      var bars = entries.map(function(e) {
+        var pct = Math.max(5, Math.round((e[1] / maxVal) * 100));
+        var color = (typeof colors === 'string') ? colors : (colors[e[0]] || '#0078d4');
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<div class="vbar-col" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')"><span class="vbar-val">'+e[1]+'</span><div class="vbar-bar" style="height:'+pct+'%;background:'+color+'" title="'+e[0]+': '+e[1]+'"></div></div>';
       }).join('');
-      document.getElementById('tableWrap').innerHTML = '<table>' + head + '<tbody>' + body + '</tbody></table>';
+      var labels = entries.map(function(e) {
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<span class="vbar-lbl" title="'+e[0]+'" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')">'+e[0]+'</span>';
+      }).join('');
+      var gridLines = '<div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div>';
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-wrap"><div class="vbar-grid">'+gridLines+'</div><div class="vbar-chart">'+bars+'</div><div class="vbar-labels">'+labels+'</div></div></div>';
     }
 
-    function checkboxRow(group, value, checked, label) {
-      return '<label class="checkbox-item"><input type="checkbox" data-filter-group="' + group + '" value="' + escapeHtml(value) + '"' + (checked ? ' checked' : '') + '><span>' + escapeHtml(label) + '</span></label>';
+    function buildPieChart(data, colors, title, filterType) {
+      var entries = Object.entries(data).filter(function(e) { return e[1] > 0; });
+      var total = entries.reduce(function(sum, e) { return sum + e[1]; }, 0);
+      var gradientParts = [];
+      var angle = 0;
+      entries.forEach(function(e) {
+        var pct = (e[1] / total) * 360;
+        var color = colors[e[0]] || '#999';
+        gradientParts.push(color + ' ' + angle + 'deg ' + (angle + pct) + 'deg');
+        angle += pct;
+      });
+      var gradient = 'conic-gradient(' + gradientParts.join(', ') + ')';
+      var legend = entries.map(function(e) {
+        var color = colors[e[0]] || '#999';
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<div class="pie-legend-item" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
+      }).join('');
+      return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
     }
 
-    function toggleFilter(open) {
-      appState.filterOpen = open;
-      document.getElementById('filterOverlay').classList.toggle('open', open);
-      document.getElementById('filterPanel').classList.toggle('open', open);
-      if (!open) { appState.filterDraft = null; }
-    }
-
-    function toggleDetail(open) {
-      appState.detailOpen = open;
-      document.getElementById('detailOverlay').classList.toggle('open', open);
-      document.getElementById('detailPanel').classList.toggle('open', open);
-      if (!open) {
-        appState.selectedId = null;
-        appState.detailDraft = null;
-        document.getElementById('detailPanel').innerHTML = '';
-      }
-    }
-
-    function renderFilterPanel() {
-      const isPartner = appState.view === 'partner';
-      const draft = appState.filterDraft || structuredClone(appState.filters);
-      const options = isPartner ? AREAS : getPartners();
-      const optionKey = isPartner ? 'areas' : 'partners';
-      const optionLabel = isPartner ? 'Area' : 'Partner';
-      document.getElementById('filterBody').innerHTML = [
-        '<div class="filter-group"><span class="filter-label">State</span><div class="checkbox-list">' + FILTER_STATE_ORDER.map(function(state) {
-          return checkboxRow('states', state, draft.states.includes(state), state);
-        }).join('') + '</div></div>',
-        '<div class="filter-group"><label class="filter-label" for="filterSource">Campaign Source</label><select id="filterSource" class="filter-select" data-filter-select="source">' + ['All'].concat(SOURCES).map(function(source) {
-          return '<option value="' + escapeHtml(source) + '"' + (draft.source === source ? ' selected' : '') + '>' + escapeHtml(source) + '</option>';
-        }).join('') + '</select></div>',
-        '<div class="filter-group"><span class="filter-label">' + optionLabel + '</span><div class="checkbox-list">' + options.map(function(value) {
-          return checkboxRow(optionKey, value, draft[optionKey].includes(value), value);
-        }).join('') + '</div></div>'
-      ].join('');
-      toggleFilter(true);
-    }
-
-    function openDetail(id) {
-      toggleFilter(false);
-      const campaign = appState.campaigns.find(function(item) { return item.id === id; });
-      appState.selectedId = id;
-      appState.detailDraft = structuredClone(campaign);
-      appState.detailOpen = true;
-      document.getElementById('detailOverlay').classList.add('open');
-      document.getElementById('detailPanel').classList.add('open');
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    function openCampaign(id) {
+      currentCampaign = campaigns.find(c => c.id === id);
+      if (!currentCampaign) return;
+      document.getElementById('detailView').classList.add('show');
       renderDetail();
     }
 
-    function buildStagePanel(title, body, open) {
-      return '<details class="stage-panel"' + (open ? ' open' : '') + '><summary><span>' + escapeHtml(title) + '</span><span class="stage-toggle"></span></summary><div class="stage-panel-body">' + body + '</div></details>';
-    }
-
-    function renderField(label, content, spanTwo) {
-      return '<div class="field' + (spanTwo ? ' span-2' : '') + '"><label>' + escapeHtml(label) + '</label>' + content + '</div>';
-    }
-
-    function renderStatic(value) {
-      return '<div class="field-static">' + (value || value === 0 ? value : '—') + '</div>';
-    }
-
-    function inputHtml(name, value, type) {
-      return '<input data-detail-field="' + name + '" type="' + (type || 'text') + '" value="' + escapeHtml(value == null ? '' : value) + '">';
-    }
-
-    function selectHtml(name, value, options) {
-      return '<select data-detail-field="' + name + '">' + options.map(function(option) {
-        return '<option value="' + escapeHtml(option) + '"' + (value === option ? ' selected' : '') + '>' + escapeHtml(option) + '</option>';
-      }).join('') + '</select>';
-    }
-
-    function textareaHtml(name, value) {
-      return '<textarea data-detail-field="' + name + '">' + escapeHtml(value || '') + '</textarea>';
-    }
-
-    function renderWorkloads(workloads, editable) {
-      if (!editable) {
-        return renderStatic('<div class="workload-list">' + workloads.map(function(item) {
-          return '<span class="chip">' + escapeHtml(item) + '</span>';
-        }).join('') + '</div>');
-      }
-      return '<div class="chip-picker">' + WORKLOADS.map(function(item) {
-        const selected = workloads.includes(item);
-        return '<button class="chip-button' + (selected ? ' selected' : '') + '" type="button" data-workload="' + escapeHtml(item) + '">' + escapeHtml(item) + '</button>';
-      }).join('') + '</div>';
-    }
-
-    function renderFundingRequired(value, editable) {
-      if (!editable) { return renderStatic(value ? 'Yes' : 'No'); }
-      return '<div class="radio-group">' +
-        '<label><input type="radio" name="fundingRequired" data-detail-radio="fundingRequired" value="true"' + (value ? ' checked' : '') + '> Yes</label>' +
-        '<label><input type="radio" name="fundingRequired" data-detail-radio="fundingRequired" value="false"' + (!value ? ' checked' : '') + '> No</label>' +
-      '</div>';
-    }
-
-    function renderNewStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Customer Name', readOnly ? renderStatic(escapeHtml(campaign.customer)) : inputHtml('customer', campaign.customer)),
-        renderField('Customer Area', readOnly ? renderStatic(escapeHtml(campaign.area)) : selectHtml('area', campaign.area, AREAS)),
-        renderField('Partner Name', readOnly ? renderStatic(escapeHtml(campaign.partner)) : inputHtml('partner', campaign.partner)),
-        renderField('Partner ID / PLA', readOnly ? renderStatic(escapeHtml(campaign.partnerId)) : inputHtml('partnerId', campaign.partnerId)),
-        renderField('Targeted Workloads', renderWorkloads(campaign.workloads, !readOnly), true),
-        renderField('Campaign Source', readOnly ? renderStatic(escapeHtml(campaign.source)) : selectHtml('source', campaign.source, SOURCES)),
-        renderField('Partner DRI', readOnly ? renderStatic(escapeHtml(campaign.partnerDri)) : inputHtml('partnerDri', campaign.partnerDri)),
-        renderField('Microsoft DRI', readOnly ? renderStatic(escapeHtml(campaign.msDri)) : inputHtml('msDri', campaign.msDri))
-      ].join('') + '</div>';
-    }
-
-    function renderOutreachStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Engagement Type', readOnly ? renderStatic(escapeHtml(campaign.engagementType || '—')) : selectHtml('engagementType', campaign.engagementType || ENGAGEMENT_TYPES[0], ENGAGEMENT_TYPES)),
-        renderField('Outreach Notes', readOnly ? renderStatic(escapeHtml(campaign.outreachNotes || '—')) : textareaHtml('outreachNotes', campaign.outreachNotes), true)
-      ].join('') + '</div>';
-    }
-
-    function renderEngagedStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Funding Required?', renderFundingRequired(campaign.fundingRequired, !readOnly)),
-        renderField('Engagement Notes', readOnly ? renderStatic(escapeHtml(campaign.engagementNotes || '—')) : textareaHtml('engagementNotes', campaign.engagementNotes), true)
-      ].join('') + '</div>';
-    }
-
-    function renderFundingStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Funding Amount Requested', readOnly ? renderStatic(formatCurrency(campaign.fundingRequested)) : inputHtml('fundingRequested', campaign.fundingRequested || 0, 'number')),
-        renderField('Funding Amount Secured', readOnly ? renderStatic(formatCurrency(campaign.fundingSecured)) : inputHtml('fundingSecured', campaign.fundingSecured || 0, 'number')),
-        renderField('Funding Notes', readOnly ? renderStatic(escapeHtml(campaign.fundingNotes || '—')) : textareaHtml('fundingNotes', campaign.fundingNotes), true)
-      ].join('') + '</div>';
-    }
-
-    function renderCommittedStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Opportunity ID', readOnly ? renderStatic(escapeHtml(campaign.opportunityId || '—')) : inputHtml('opportunityId', campaign.opportunityId)),
-        renderField('Committed Amount', readOnly ? renderStatic(formatCurrency(campaign.committedAmount)) : inputHtml('committedAmount', campaign.committedAmount || 0, 'number')),
-        renderField('Committed Notes', readOnly ? renderStatic(escapeHtml(campaign.committedNotes || '—')) : textareaHtml('committedNotes', campaign.committedNotes), true)
-      ].join('') + '</div>';
-    }
-
-    function renderClosedStage(campaign, readOnly) {
-      return '<div class="field-grid">' + [
-        renderField('Close Reason', readOnly ? renderStatic(escapeHtml(campaign.closeReason || '—')) : selectHtml('closeReason', campaign.closeReason || CLOSE_REASONS[0], CLOSE_REASONS)),
-        renderField('Close Notes', readOnly ? renderStatic(escapeHtml(campaign.closeNotes || '—')) : textareaHtml('closeNotes', campaign.closeNotes), true)
-      ].join('') + '</div>';
-    }
-
-    function renderUsageSection(id) {
-      const rows = (USAGE_DATA[id] || []).map(function(row) {
-        return '<tr><td>' + escapeHtml(row.product) + '</td><td>' + formatNumber(row.mau) + '</td><td>' + formatNumber(row.pau) + '</td><td>' + row.utilization + '%</td><td>' + formatNumber(row.whitespace) + '</td></tr>';
-      }).join('');
-      return '<section class="usage-section"><h3>Customer Usage Data</h3><table class="usage-table"><thead><tr><th>Product</th><th>MAU</th><th>PAU</th><th>Utilization (%)</th><th>Whitespace</th></tr></thead><tbody>' + rows + '</tbody></table></section>';
-    }
-
-    function renderStepper(currentIndex, blocked) {
-      return '<div class="stepper"><div class="stepper-track">' + STATE_ORDER.map(function(state, index) {
-        const classes = ['step'];
-        if (index < currentIndex) { classes.push('completed'); }
-        else if (index === currentIndex) { classes.push('current'); }
-        const marker = index < currentIndex ? '✓' : index + 1;
-        const blockedBadge = blocked && index === currentIndex ? '<span class="blocked-tag">Blocked</span>' : '';
-        return '<div class="' + classes.join(' ') + '"><div class="step-circle">' + marker + '</div><div class="step-label">' + escapeHtml(state) + blockedBadge + '</div></div>';
-      }).join('') + '</div></div>';
-    }
-
-    function renderStagePanels(campaign, currentIndex, readOnly) {
-      return [
-        buildStagePanel(currentIndex === 0 ? 'New' : 'Campaign Details', renderNewStage(campaign, readOnly || currentIndex !== 0), currentIndex === 0),
-        buildStagePanel('Outreach', renderOutreachStage(campaign, readOnly || currentIndex !== 1), currentIndex === 1),
-        buildStagePanel('Engaged', renderEngagedStage(campaign, readOnly || currentIndex !== 2), currentIndex === 2),
-        buildStagePanel('Funding', renderFundingStage(campaign, readOnly || currentIndex !== 3), currentIndex === 3),
-        buildStagePanel('Committed', renderCommittedStage(campaign, readOnly || currentIndex !== 4), currentIndex === 4),
-        buildStagePanel('Closed', renderClosedStage(campaign, readOnly || currentIndex !== 5), currentIndex === 5)
-      ].join('');
+    function showDashboard() {
+      document.getElementById('detailView').classList.remove('show');
+      currentCampaign = null;
     }
 
     function renderDetail() {
-      const panel = document.getElementById('detailPanel');
-      const campaign = appState.detailDraft;
-      if (!campaign) {
-        panel.innerHTML = '';
-        return;
-      }
-      const currentIndex = STATE_ORDER.indexOf(campaign.state);
-      const readOnly = appState.view !== 'partner';
-      panel.innerHTML = [
-        '<div class="panel-header"><div><h2 class="panel-title">Campaign ' + escapeHtml(campaign.id) + '</h2><div class="panel-subtitle"><span class="state-badge state-' + escapeHtml(displayState(campaign)) + '">' + escapeHtml(displayState(campaign)) + '</span></div></div><button id="closeDetailBtn" class="close-btn" type="button" aria-label="Close details">×</button></div>',
-        '<div class="panel-body">',
-          renderStepper(currentIndex, campaign.blocked),
-          renderStagePanels(campaign, currentIndex, readOnly),
-          readOnly ? renderUsageSection(campaign.id) : '',
-        '</div>',
-        readOnly ? '' : '<div class="panel-footer"><div style="display:flex; gap:10px;"><button id="saveContinueBtn" class="primary-btn" type="button">' + (campaign.state === 'Closed' ? 'Save Changes' : 'Save & Continue') + '</button><button id="toggleBlockedBtn" class="outline-danger" type="button">' + (campaign.blocked ? 'Unblock Campaign' : 'Mark as Blocked') + '</button></div><button id="cancelDetailBtn" class="text-btn" type="button">Cancel</button></div>'
-      ].join('');
+      const c = currentCampaign;
+      if (!c) return;
+
+      document.getElementById('detailHeader').innerHTML = '<h1>'+c.id+' &mdash; '+c.customer+'</h1><div class="detail-meta"><div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div><div class="detail-meta-item"><strong>Source:</strong> '+c.source+'</div><div class="detail-meta-item"><strong>TPID:</strong> '+c.tpid+'</div><div class="detail-meta-item"><strong>Segment:</strong> '+c.segment+'</div><div class="detail-meta-item"><strong>Area:</strong> '+c.area+'</div><div class="detail-meta-item"><strong>Partner DRI:</strong> '+c.partnerDRI+'</div><div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+c.microsoftDRI+'</div><div class="detail-meta-item"><strong>Workloads:</strong> '+c.workloads.join(', ')+'</div></div>';
+
+      renderUsage(c);
+      renderStepper(c);
+      renderBanner(c);
+      renderActionPanel(c);
+      renderWorkloads(c);
+      renderAudit(c);
+      renderActionBar(c);
     }
 
-    function applyDetailChanges(advanceState) {
-      const index = appState.campaigns.findIndex(function(item) { return item.id === appState.selectedId; });
-      if (index === -1 || !appState.detailDraft) { return; }
-      const next = structuredClone(appState.detailDraft);
-      if (advanceState) {
-        const currentIndex = STATE_ORDER.indexOf(next.state);
-        if (currentIndex < STATE_ORDER.length - 1) {
-          next.state = STATE_ORDER[currentIndex + 1];
+    function renderStepper(c) {
+      const stateIdx = STATE_ORDER.indexOf(c.status === 'Blocked' ? (c.previousState || 'Outreach') : c.status);
+      const isBlocked = c.status === 'Blocked';
+      const isClosed = c.status === 'Closed';
+
+      let html = '';
+      STATE_ORDER.forEach((state, i) => {
+        let cls = '';
+        if (isBlocked && i === stateIdx) cls = 'blocked';
+        else if (isClosed && i === STATE_ORDER.length - 1) cls = 'closed-state';
+        else if (i < stateIdx) cls = 'completed';
+        else if (i === stateIdx) cls = 'active';
+
+        const dotContent = (cls === 'completed') ? '&#10003;' : (cls === 'blocked' ? '!' : (i + 1));
+
+        let dateStr = '';
+        if (state === 'New' && c.dates.created) dateStr = c.dates.created;
+        else if (state === 'Outreach' && c.dates.outreach) dateStr = c.dates.outreach;
+        else if (state === 'Engaged' && c.dates.engagement) dateStr = c.dates.engagement;
+        else if (state === 'Funding' && c.dates.fundingSubmission) dateStr = c.dates.fundingSubmission;
+        else if (state === 'Committed' && c.dates.fundingApproval) dateStr = c.dates.fundingApproval;
+        else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
+
+        var closeLink = '';
+        if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
+          closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
+        var labelHtml = state === 'Funding'
+          ? 'Funding<br><span style="font-size:8px;font-weight:400;color:#888;">Request &amp; Secured</span>'
+          : state;
+        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+labelHtml+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
+        if (i < STATE_ORDER.length - 1) {
+          html += '<div class="step-connector '+(i < stateIdx ? 'filled' : '')+'"></div>';
+        }
+      });
+      document.getElementById('lifecycleStepper').innerHTML = html;
+    }
+
+    function renderBanner(c) {
+      const banner = document.getElementById('stateBanner');
+      const msgs = {
+        'New': { cls: 'info', text: '<strong>New:</strong> Partner and field have engaged with the customer. Confirm outreach to advance.' },
+        'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Confirm engagement outcome to advance.' },
+        'Engaged': { cls: 'info', text: '<strong>Engaged:</strong> Customer is engaged. Determine if ECIF funding is required to proceed.' },
+        'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
+        'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
+        'Blocked': { cls: 'danger', text: '<strong>Blocked:</strong> '+( c.blockReason || 'Campaign is blocked.') },
+        'Closed': { cls: 'neutral', text: '<strong>Closed:</strong> Campaign is closed. Reactivate if additional work is needed.' }
+      };
+      const m = msgs[c.status] || msgs['New'];
+      banner.className = 'state-banner ' + m.cls;
+      banner.innerHTML = m.text;
+    }
+
+    function renderActionPanel(c) {
+      const panel = document.getElementById('actionPanel');
+      let html = '';
+
+      if (currentView === 'field' || currentView === 'corp') {
+        html = '<div class="panel-card"><h2>Campaign State</h2><p style="font-size:12px;color:#616161;">Campaign is in <strong>'+c.status+'</strong> state. State changes are managed by the partner.</p>' +
+          '<div class="detail-meta" style="margin-top:12px;"><div class="detail-meta-item"><strong>Last Updated:</strong> '+(c.dates.updated || '&mdash;')+'</div><div class="detail-meta-item"><strong>Funding Required:</strong> '+(c.fundingRequired === 'yes' ? 'Yes' : c.fundingRequired === 'no' ? 'No' : 'TBD')+'</div></div></div>';
+        panel.innerHTML = html;
+        return;
       }
-      appState.campaigns[index] = next;
-      appState.detailDraft = structuredClone(next);
-      renderAll();
+
+      if (c.status === 'New') {
+        html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Outreach') {
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner Ã¢â€ â€™ Blocked</option><option value="declined">Customer no longer requires assistance Ã¢â€ â€™ Blocked</option><option value="external">Customer cannot engage at this time Ã¢â€ â€™ Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Engaged') {
+        html = '<div class="panel-card"><h2>Funding Requirement</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Does this campaign require ECIF funding?</p><div class="form-grid"><div class="form-group"><label>Funding Required? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingRequired" value="yes"> Yes, ECIF funding needed</label><label><input type="radio" name="fundingRequired" value="no"> No, $0 offer / no funding needed</label></div></div><div class="form-group full-width"><label>Notes</label><textarea id="gateEngagedNotes" placeholder="Additional context..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Funding') {
+        const step1Done = c.funding.submitted;
+        html = '<div class="panel-card"><h2>Funding &mdash; '+(step1Done ? 'Step 2: Funding Secured' : 'Step 1: Submit Funding')+'</h2><div class="form-grid">';
+        if (!step1Done) {
+          html += '<div class="form-group"><label>Funding Submitted? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSubmitted"> Yes, submitted</label></div></div><div class="form-group"><label>Submission Date <span class="required">*</span></label><input type="date" id="gateFundingSubDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment" placeholder="Notes on funding submission..."></textarea></div>';
+        } else {
+          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
+        }
+        html += '</div></div>';
+      }
+      else if (c.status === 'Blocked') {
+        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Closed') {
+        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+      }
+
+      panel.innerHTML = html;
+    }
+
+    function renderWorkloads(c) {
+      const panel = document.getElementById('workloadsPanel');
+      if (c.status !== 'Committed') { panel.style.display = 'none'; return; }
+      panel.style.display = '';
+
+      const tbody = document.getElementById('workloadsBody');
+      var notesGroup = panel.querySelector('.form-group.full-width');
+      if (currentView === 'field' || currentView === 'corp') {
+        tbody.innerHTML = c.workloadData.map(function(w) {
+          return '<tr><td><strong>'+w.name+'</strong></td><td>'+w.status+'</td><td>'+w.seats.toLocaleString()+'</td><td>'+(w.notes || '&mdash;')+'</td></tr>';
+        }).join('');
+        notesGroup.style.display = 'none';
+      } else {
+        tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
+        notesGroup.style.display = '';
+      }
+    }
+
+    function renderUsage(c) {
+      var panel = document.getElementById('usagePanel');
+      var body = document.getElementById('usageBody');
+      if (currentView !== 'field' && currentView !== 'corp') {
+        panel.style.display = 'none';
+        body.innerHTML = '';
+        return;
+      }
+      panel.style.display = '';
+      body.innerHTML = c.usageData.map(function(u) {
+        return '<tr><td><strong>'+u.workload+'</strong></td><td>'+u.mau.toLocaleString()+'</td><td>'+u.pau.toLocaleString()+'</td><td>'+u.utilization+'%</td><td>'+u.whitespace.toLocaleString()+'</td></tr>';
+      }).join('');
+    }
+
+    function renderAudit(c) {
+      document.getElementById('auditTimeline').innerHTML = c.history.slice().reverse().map(h => '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+h.text+'</div><div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>').join('');
+    }
+
+    function renderActionBar(c) {
+      const bar = document.getElementById('detailActionBar');
+      if (currentView === 'field' || currentView === 'corp') {
+        bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div></div>';
+        return;
+      }
+      let left = '';
+      if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
+      else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
+      else if (c.status === 'Engaged') left = '<button class="btn btn-primary" onclick="advanceFromEngaged()">Advance &rarr;</button>';
+      else if (c.status === 'Funding') {
+        if (!c.funding.submitted) left = '<button class="btn btn-primary" onclick="advanceFundingStep1()">Submit Funding &rarr;</button>';
+        else left = '<button class="btn btn-primary" onclick="advanceFundingStep2()">Confirm Funding &rarr;</button>';
+      }
+      else if (c.status === 'Committed') left = '<button class="btn btn-secondary" onclick="saveDraft()">Save Changes</button>';
+      else if (c.status === 'Blocked') left = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
+      else if (c.status === 'Closed') left = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
+
+      const closeBtn = '';
+      bar.innerHTML = '<div class="action-bar-left">'+left+' <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div>'+closeBtn+'</div>';
+    }
+
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    function advanceFromNew() {
+      const checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
+      const date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
+      if (!checked || !date) { showToast('Please confirm outreach and provide a date', true); return; }
+      const c = currentCampaign;
+      c.status = 'Outreach';
+      c.dates.outreach = date;
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Outreach confirmed', type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Advanced to Outreach');
+    }
+
+    let selectedOutcome = '';
+    function onOutcomeChange() {
+      var sel = document.getElementById('gateEngagementOutcome');
+      selectedOutcome = sel ? sel.value : '';
+      var grp = document.getElementById('engageCommentGroup');
+      if (grp) grp.style.display = (selectedOutcome && selectedOutcome !== 'agreed') ? '' : 'none';
+    }
+
+    function advanceFromOutreach() {
+      var checked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
+      var date = document.getElementById('gateEngagementDate') && document.getElementById('gateEngagementDate').value;
+      if (!checked || !date || !selectedOutcome) { showToast('Please complete all required fields', true); return; }
+      if (selectedOutcome !== 'agreed') {
+        var comment = document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value;
+        if (!comment) { showToast('Notes required for non-success outcomes', true); return; }
+      }
+      var c = currentCampaign;
+      c.dates.engagement = date;
+      c.dates.updated = today();
+      c.engagement.outcome = selectedOutcome;
+
+      if (selectedOutcome === 'agreed') {
+        c.status = 'Engaged';
+        c.history.push({ date: today(), text: 'Customer engaged Ã¢â‚¬â€ advanced to Engaged', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Engaged');
+      } else {
+        var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
+        c.previousState = 'Outreach';
+        c.blockReason = reasons[selectedOutcome];
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Blocked Ã¢â‚¬â€ ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked');
+      }
+      selectedOutcome = '';
       renderDetail();
     }
 
-    function renderAll() {
-      renderShell();
-      renderKpis();
-      renderCharts();
-      renderTable();
-      document.getElementById('searchInput').value = appState.search;
-      if (appState.detailOpen) {
-        document.getElementById('detailOverlay').classList.add('open');
-        document.getElementById('detailPanel').classList.add('open');
+    function advanceFromEngaged() {
+      var fundingReq = document.querySelector('input[name="fundingRequired"]:checked');
+      if (!fundingReq) { showToast('Please select whether funding is required', true); return; }
+      var c = currentCampaign;
+      c.fundingRequired = fundingReq.value;
+      c.dates.updated = today();
+
+      if (fundingReq.value === 'no') {
+        c.dates.fundingApproval = today();
+        c.status = 'Committed';
+        c.history.push({ date: today(), text: 'No funding required Ã¢â‚¬â€ advanced to Committed', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed (no funding required)');
+      } else {
+        c.funding.submitted = false;
+        c.funding.secured = '';
+        c.dates.fundingApproval = '';
+        c.status = 'Funding';
+        c.history.push({ date: today(), text: 'Funding required Ã¢â‚¬â€ advanced to Funding', type: 'info', actor: c.partnerDRI });
+        showToast('Advanced to Funding');
+      }
+      renderDetail();
+    }
+
+    function advanceFundingStep1() {
+      var checked = document.getElementById('gateFundingSubmitted') && document.getElementById('gateFundingSubmitted').checked;
+      var date = document.getElementById('gateFundingSubDate') && document.getElementById('gateFundingSubDate').value;
+      if (!checked || !date) { showToast('Please confirm submission and date', true); return; }
+      var c = currentCampaign;
+      c.funding.submitted = true;
+      c.dates.fundingSubmission = date;
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'ECIF funding submitted', type: 'info', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Funding submission recorded');
+    }
+
+    function toggleFundingDecline() {
+      var val = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').value;
+      var grp = document.getElementById('fundingDeclineReasonGroup');
+      if (grp) grp.style.display = val === 'no' ? '' : 'none';
+    }
+
+    function advanceFundingStep2() {
+      var secured = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').value;
+      var date = document.getElementById('gateFundingDate') && document.getElementById('gateFundingDate').value;
+      if (!secured) { showToast('Please select whether funding was secured', true); return; }
+      var c = currentCampaign;
+      c.funding.secured = secured;
+      c.dates.updated = today();
+
+      if (secured === 'yes') {
+        c.dates.fundingApproval = date || today();
+        c.status = 'Committed';
+        c.history.push({ date: today(), text: 'Funding approved Ã¢â‚¬â€ campaign committed', type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed');
+      } else {
+        var reason = document.getElementById('gateFundingDeclineReason') && document.getElementById('gateFundingDeclineReason').value;
+        if (!reason) { showToast('Please select a decline reason', true); return; }
+        c.funding.declineReason = reason;
+        c.previousState = 'Funding';
+        c.blockReason = reason;
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Funding declined Ã¢â‚¬â€ ' + reason, type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked Ã¢â‚¬â€ funding declined');
+      }
+      renderDetail();
+    }
+
+    function unblockCampaign() {
+      var reason = document.getElementById('gateUnblockReason') && document.getElementById('gateUnblockReason').value;
+      if (!reason) { showToast('Please provide an unblock explanation', true); return; }
+      var c = currentCampaign;
+      c.status = c.previousState || 'Outreach';
+      c.previousState = null;
+      c.blockReason = '';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Unblocked Ã¢â‚¬â€ returned to ' + c.status, type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Campaign unblocked Ã¢â‚¬â€ returned to ' + c.status);
+    }
+
+    function reactivateCampaign() {
+      var reason = document.getElementById('gateReactivateReason') && document.getElementById('gateReactivateReason').value;
+      if (!reason) { showToast('Please select a reactivation reason', true); return; }
+      var c = currentCampaign;
+      c.status = 'Committed';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Reactivated Ã¢â‚¬â€ ' + reason, type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      showToast('Campaign reactivated to Committed');
+    }
+
+    function confirmCloseCampaign() {
+      var reason = document.getElementById('closeReasonText') && document.getElementById('closeReasonText').value.trim();
+      if (!reason) { showToast('Please provide a reason for closing', true); return; }
+      var c = currentCampaign;
+      c.previousState = c.status;
+      c.status = 'Closed';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Campaign manually closed Ã¢â‚¬â€ ' + reason, type: 'closed', actor: c.partnerDRI });
+      hideModal('closeModal');
+      document.getElementById('closeReasonText').value = '';
+      renderDetail();
+      showToast('Campaign closed');
+    }
+
+    function updateWorkload(idx, field, value) {
+      var c = currentCampaign;
+      if (field === 'seats') c.workloadData[idx].seats = parseInt(value) || 0;
+      else c.workloadData[idx][field] = value;
+
+      // Auto-close if all workloads closed
+      if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
+        c.status = 'Closed';
+        c.dates.updated = today();
+        c.history.push({ date: today(), text: 'All workloads closed Ã¢â‚¬â€ campaign auto-closed', type: 'closed', actor: c.partnerDRI });
+        renderDetail();
+        showToast('All workloads closed Ã¢â‚¬â€ campaign auto-closed');
       }
     }
 
-    document.addEventListener('click', function(event) {
-      const sortHeader = event.target.closest('[data-sort-key]');
-      if (sortHeader) {
-        const key = sortHeader.getAttribute('data-sort-key');
-        if (appState.sort.key === key) {
-          appState.sort.direction = appState.sort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-          appState.sort = { key: key, direction: 'asc' };
-        }
-        renderTable();
-        return;
-      }
+    function saveDraft() {
+      if (currentCampaign) currentCampaign.dates.updated = today();
+      showToast('Changes saved');
+    }
 
-      const row = event.target.closest('[data-row-id]');
-      if (row) {
-        openDetail(row.getAttribute('data-row-id'));
-        return;
-      }
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â UTILITIES Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    function today() { return new Date().toISOString().split('T')[0]; }
 
-      if (event.target.id === 'filterBtn') {
-        toggleDetail(false);
-        appState.filterDraft = structuredClone(appState.filters);
-        renderFilterPanel();
-        return;
-      }
-      if (event.target.id === 'closeFilterBtn' || event.target.id === 'filterOverlay') {
-        toggleFilter(false);
-        return;
-      }
-      if (event.target.id === 'applyFiltersBtn') {
-        if (appState.filterDraft) {
-          appState.filters = structuredClone(appState.filterDraft);
-        }
-        toggleFilter(false);
-        renderAll();
-        return;
-      }
-      if (event.target.id === 'resetFiltersBtn') {
-        appState.filterDraft = createDefaultFilters(appState.view);
-        renderFilterPanel();
-        return;
-      }
-      if (event.target.id === 'closeDetailBtn' || event.target.id === 'cancelDetailBtn' || event.target.id === 'detailOverlay') {
-        toggleDetail(false);
-        return;
-      }
-      if (event.target.id === 'saveContinueBtn') {
-        applyDetailChanges(true);
-        return;
-      }
-      if (event.target.id === 'toggleBlockedBtn') {
-        const draft = appState.detailDraft;
-        if (!draft) { return; }
-        draft.blocked = !draft.blocked;
-        if (!draft.blocked) { draft.blockReason = ''; }
-        const index = appState.campaigns.findIndex(function(item) { return item.id === draft.id; });
-        appState.campaigns[index] = structuredClone(draft);
-        renderAll();
-        renderDetail();
-        return;
-      }
-      if (event.target.matches('[data-workload]')) {
-        const workload = event.target.getAttribute('data-workload');
-        const list = appState.detailDraft.workloads;
-        const exists = list.includes(workload);
-        appState.detailDraft.workloads = exists ? list.filter(function(item) { return item !== workload; }) : list.concat(workload);
-        renderDetail();
-      }
-    });
+    function showToast(msg, isError) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
 
-    document.addEventListener('input', function(event) {
-      if (event.target.id === 'searchInput') {
-        appState.search = event.target.value;
-        renderTable();
-        return;
-      }
-      if (event.target.matches('[data-detail-field]')) {
-        const field = event.target.getAttribute('data-detail-field');
-        let value = event.target.value;
-        if (['fundingRequested', 'fundingSecured', 'committedAmount'].includes(field)) {
-          value = Number(value || 0);
-        }
-        appState.detailDraft[field] = value;
-      }
-    });
+    function showModal(id) { document.getElementById(id).classList.add('show'); }
+    function hideModal(id) { document.getElementById(id).classList.remove('show'); }
 
-    document.addEventListener('change', function(event) {
-      if (event.target.id === 'viewSwitcher') {
-        appState.view = event.target.value;
-        appState.filters = createDefaultFilters(appState.view);
-        appState.filterDraft = null;
-        toggleFilter(false);
-        toggleDetail(false);
-        renderAll();
-        return;
-      }
-      if (event.target.matches('[data-filter-group]')) {
-        const group = event.target.getAttribute('data-filter-group');
-        const value = event.target.value;
-        const list = appState.filterDraft[group];
-        if (event.target.checked && !list.includes(value)) {
-          list.push(value);
-        }
-        if (!event.target.checked) {
-          appState.filterDraft[group] = list.filter(function(item) { return item !== value; });
-        }
-        return;
-      }
-      if (event.target.matches('[data-filter-select]')) {
-        appState.filterDraft[event.target.getAttribute('data-filter-select')] = event.target.value;
-        return;
-      }
-      if (event.target.matches('[data-detail-field]')) {
-        appState.detailDraft[event.target.getAttribute('data-detail-field')] = event.target.value;
-        return;
-      }
-      if (event.target.matches('[data-detail-radio]')) {
-        appState.detailDraft[event.target.getAttribute('data-detail-radio')] = event.target.value === 'true';
-      }
-    });
+    function toggleFilter(forceState) {
+      var overlay = document.getElementById('filterOverlay');
+      if (typeof forceState === 'boolean') overlay.classList.toggle('show', forceState);
+      else overlay.classList.toggle('show');
+    }
+    function resetFilters() {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterArea').value = '';
+      document.getElementById('searchInput').value = '';
+      activeKpiFilter = null;
+      activeChartFilter = null;
+      renderDashboard();
+    }
 
-    document.getElementById('exportBtn').addEventListener('click', function() {});
-
-    ensureUsageData();
-    renderAll();
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â INIT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    switchView('partner');
   </script>
 </body>
 </html>
