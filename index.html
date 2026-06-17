@@ -244,8 +244,6 @@
     .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
     .step-item.active .step-label { color: #0078d4; }
     .step-item.blocked .step-label { color: #d83b01; }
-    .step-edit-icon { cursor: pointer; font-size: 10px; color: #0078d4; margin-left: 2px; }
-    .step-edit-icon:hover { color: #005a9e; }
     .step-date { font-size: 9px; color: #999; margin-top: 2px; }
     .step-connector {
       flex: 1; height: 2px; background: #e0e0e0;
@@ -575,16 +573,13 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="editStepModal">
+  <div class="modal-overlay" id="moveStateModal">
     <div class="modal">
-      <h3 id="editStepModalTitle">Are you sure you want to make changes to Outreach?</h3>
-      <div class="form-group" style="margin-bottom:12px;">
-        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Provide comments on why changes are needed. <span style="color:#d83b01;">*</span></label>
-        <textarea id="editStepComment" placeholder="Add comments..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
-      </div>
+      <h3 id="moveStateModalTitle">Move to next state?</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Once you move to the next state, you will not be able to return to the previous state. Are you sure you want to proceed?</p>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="executeEditStep()">Edit</button>
-        <button class="btn btn-secondary" onclick="hideModal('editStepModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="executeMoveToNextState()">Confirm</button>
+        <button class="btn btn-secondary" onclick="hideModal('moveStateModal')">Cancel</button>
       </div>
     </div>
   </div>
@@ -1226,11 +1221,7 @@
           closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
 
-        // Pencil edit icon for completed steps (partner view only)
         var editIcon = '';
-        if (currentView === 'partner' && cls === 'completed') {
-          editIcon = ' <span class="step-edit-icon" onclick="confirmEditStep(\'' + state + '\')" title="Edit ' + state + '">&#9998;</span>';
-        }
 
         var labelHtml = state;
 
@@ -1277,10 +1268,10 @@
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromEngaged()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Customer declined engagement</span></div></div>';
       }
       else if (c.status === 'Funding') {
-        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Have you requested funding? <span class="required">*</span></label><select id="gateFundingRequested"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option><option value="na">Not Applicable</option></select></div><div class="form-group"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Have you requested funding? <span class="required">*</span></label><select id="gateFundingRequested"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option><option value="na">Not Applicable</option></select></div><div class="form-group"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromFunding()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Funding blocked</span></div></div>';
       }
       else if (c.status === 'Blocked') {
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
@@ -1346,7 +1337,7 @@
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-function onSowSignedChange() {
+    function onSowSignedChange() {
       var cb = document.getElementById('gateSowCompleted');
       var display = document.getElementById('sowSignedDateDisplay');
       if (cb && cb.checked) {
@@ -1356,7 +1347,33 @@ function onSowSignedChange() {
       } else {
         if (display) { display.style.display = 'none'; display.textContent = ''; }
       }
-    }    function advanceFromNew() {
+    }
+
+    function blockFromEngaged() {
+      var c = currentCampaign;
+      c.previousState = 'Engaged';
+      c.blockReason = 'Customer declined engagement';
+      c.status = 'Blocked';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Blocked — Customer declined engagement', type: 'blocked', actor: c.partnerDRI });
+      showToast('Campaign blocked');
+      renderDetail();
+      renderDashboard();
+    }
+
+    function blockFromFunding() {
+      var c = currentCampaign;
+      c.previousState = 'Funding';
+      c.blockReason = 'Funding blocked';
+      c.status = 'Blocked';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Blocked — Funding blocked', type: 'blocked', actor: c.partnerDRI });
+      showToast('Campaign blocked');
+      renderDetail();
+      renderDashboard();
+    }
+
+    function advanceFromNew() {
       const checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
       const date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
       if (!checked || !date) { showToast('Please confirm outreach and provide a date', true); return; }
@@ -1536,25 +1553,46 @@ function onSowSignedChange() {
     function showModal(id) { document.getElementById(id).classList.add('show'); }
     function hideModal(id) { document.getElementById(id).classList.remove('show'); }
 
-    var pendingEditStep = null;
-    function confirmEditStep(stepName) {
-      pendingEditStep = stepName;
-      document.getElementById('editStepModalTitle').textContent = 'Are you sure you want to make changes to ' + stepName + '?';
-      document.getElementById('editStepComment').value = '';
-      showModal('editStepModal');
-    }
-    function executeEditStep() {
-      var comment = document.getElementById('editStepComment').value.trim();
-      if (!comment) { showToast('Please provide a comment for the change', true); return; }
+    function moveToNextState() {
       var c = currentCampaign;
-      c.previousState = c.status;
-      c.status = pendingEditStep;
-      c.history.push({ date: today(), text: 'Reverted to ' + pendingEditStep + ' for edit: ' + comment, type: 'info', actor: c.partnerDRI });
-      c.dates.updated = today();
-      hideModal('editStepModal');
-      showToast('Reverted to ' + pendingEditStep + ' for editing');
-      renderDetail();
-      renderDashboard();
+      // Validate first
+      if (c.status === 'New') {
+        var checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
+        var date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
+        if (!checked || !date) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+      } else if (c.status === 'Outreach') {
+        var engChecked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
+        if (!engChecked || !selectedOutcome) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        if (selectedOutcome !== 'agreed') {
+          var comment = document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value;
+          if (!comment) { showToast('Notes required for non-success outcomes', true); return; }
+        }
+      } else if (c.status === 'Engaged') {
+        var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
+        if (!sowChecked) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+      } else if (c.status === 'Funding') {
+        var sel = document.getElementById('gateFundingRequested');
+        if (!sel || !sel.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        var sowCb = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
+        if (!sowCb) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+      }
+      // Show confirmation modal
+      var nextState = '';
+      if (c.status === 'New') nextState = 'Outreach';
+      else if (c.status === 'Outreach') nextState = 'Engaged';
+      else if (c.status === 'Engaged') nextState = 'Funding';
+      else if (c.status === 'Funding') nextState = 'Committed';
+      document.getElementById('moveStateModalTitle').textContent = 'Move to ' + nextState + '?';
+      showModal('moveStateModal');
+    }
+
+    function executeMoveToNextState() {
+      hideModal('moveStateModal');
+      var c = currentCampaign;
+      if (c.status === 'New') advanceFromNew();
+      else if (c.status === 'Outreach') advanceFromOutreach();
+      else if (c.status === 'Engaged') advanceFromEngaged();
+      else if (c.status === 'Funding') advanceFromFunding();
     }
 
     function toggleFilter(forceState) {
