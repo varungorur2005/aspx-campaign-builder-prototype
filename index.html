@@ -1420,20 +1420,28 @@
         valid = checked && date;
       } else if (c.status === 'Outreach') {
         var engChecked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
-        valid = engChecked && selectedOutcome && (selectedOutcome === 'agreed' || (document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value));
+        var engDate = document.getElementById('gateEngageDate') && document.getElementById('gateEngageDate').value;
+        valid = engChecked && engDate && selectedOutcome && (selectedOutcome === 'agreed' || (document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value));
       } else if (c.status === 'Engaged') {
         var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
         valid = sowChecked;
       } else if (c.status === 'Funding') {
-        var yesRadio = document.getElementById('gateFundingYes');
-        var noRadio = document.getElementById('gateFundingNo');
-        var sowCb = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
-        if (noRadio && noRadio.checked) {
-          valid = sowCb;
-        } else if (yesRadio && yesRadio.checked) {
-          var reqCb = document.getElementById('gateFundingRequested') && document.getElementById('gateFundingRequested').checked;
+        if (c.fundingSubState === 'requested') {
           var secCb = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').checked;
-          valid = reqCb && secCb && sowCb;
+          var secDate = document.getElementById('gateFundingSecuredDate') && document.getElementById('gateFundingSecuredDate').value;
+          var sowCb = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
+          valid = secCb && secDate && sowCb;
+        } else {
+          var yesRadio = document.getElementById('gateFundingYes');
+          var noRadio = document.getElementById('gateFundingNo');
+          if (noRadio && noRadio.checked) {
+            var sowNoFunding = document.getElementById('gateSowNoFunding') && document.getElementById('gateSowNoFunding').checked;
+            valid = sowNoFunding;
+          } else if (yesRadio && yesRadio.checked) {
+            var reqCb = document.getElementById('gateFundingRequested') && document.getElementById('gateFundingRequested').checked;
+            var reqDate = document.getElementById('gateFundingRequestedDate') && document.getElementById('gateFundingRequestedDate').value;
+            valid = reqCb && reqDate;
+          }
         }
       }
       if (valid) {
@@ -1619,7 +1627,7 @@
       if (cb && cb.checked) {
         var c = currentCampaign;
         c.dates.sowSigned = today();
-        if (display) { display.style.display = ''; display.textContent = 'Signed on: ' + today(); }
+        if (display) { display.style.display = ''; display.innerHTML = '<strong>Signed on:</strong> ' + today(); }
       } else {
         if (display) { display.style.display = 'none'; display.textContent = ''; }
       }
