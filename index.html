@@ -241,6 +241,7 @@
     .step-item.active .step-dot { background: #0078d4; color: #fff; border-color: #005a9e; box-shadow: 0 0 0 3px rgba(0,120,212,0.2); }
     .step-item.blocked .step-dot { background: #d83b01; color: #fff; }
     .step-item.closed-state .step-dot { background: #605e5c; color: #fff; }
+    input[type="date"] { cursor: pointer; } input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; opacity: 0; } input[type="date"] { position: relative; }
     .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
     .step-item.active .step-label { color: #0078d4; }
     .step-item.blocked .step-label { color: #d83b01; }
@@ -1237,7 +1238,9 @@
         else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
 
         var closeLink = '';
-        if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
+        if (currentView === 'partner' && state === 'Closed' && c.status === 'Closed') {
+          closeLink = '<div style="margin-top:6px;"><button onclick="showReactivateModal()" class="btn btn-success" style="font-size:10px;padding:4px 10px;">Reactivate</button></div>';
+        } else if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
           closeLink = '<div style="margin-top:4px;"><a onclick="closeCampaignCheck()" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
 
@@ -1291,7 +1294,7 @@
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged" onchange="onEngagedChange()"> Yes</label> <span id="engageDateGroup" style="display:none;margin-left:12px;vertical-align:middle;"><input type="date" id="gateEngageDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></span></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted" onchange="onSowDraftedChange()"> Yes</label></div><span id="sowDraftedDateGroup" style="display:none;margin-left:12px;vertical-align:middle;"><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></span></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted" onchange="onSowDraftedChange()"> Yes</label> <span id="sowDraftedDateGroup" style="display:none;margin-left:12px;vertical-align:middle;"><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></span></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
@@ -1405,7 +1408,7 @@
       }
       else if (c.status === 'Committed') moveBtn = '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
-      else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="showReactivateModal()">Reactivate</button>';
+      else if (c.status === 'Closed') moveBtn = '';
 
       bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save</button> ' + moveBtn + '</div><div></div>';
       // Check validity after render
@@ -1503,7 +1506,7 @@
       var dateInput = document.getElementById('gateOutreachDate');
       if (cb && cb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1531,7 +1534,7 @@
       var dateInput = document.getElementById('gateEngageDate');
       if (cb && cb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1583,7 +1586,7 @@
       var dateInput = document.getElementById('gateSowDraftedDate');
       if (cb && cb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1644,7 +1647,7 @@
       var dateInput = document.getElementById('gateFundingRequestedDate');
       if (reqCb && reqCb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1658,7 +1661,7 @@
       var dateInput = document.getElementById('gateFundingSecuredDate');
       if (secCb && secCb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1672,7 +1675,7 @@
       var dateInput = document.getElementById('gateSowNoFundingDate');
       if (cb && cb.checked) {
         if (dateGrp) dateGrp.style.display = '';
-        if (dateInput && !dateInput.value) dateInput.value = today();
+        // user selects date manually
       } else {
         if (dateGrp) dateGrp.style.display = 'none';
         if (dateInput) dateInput.value = '';
@@ -1736,6 +1739,23 @@
       c.history.push({ date: today(), text: 'Unblocked — returned to ' + c.status, type: 'success', actor: c.partnerDRI });
       renderDetail();
       showToast('Campaign unblocked — returned to ' + c.status);
+    }
+
+    function showReactivateModal() {
+      showModal('reactivateModal');
+    }
+
+    function confirmReactivate() {
+      var reason = document.getElementById('reactivateReasonSelect') && document.getElementById('reactivateReasonSelect').value;
+      if (!reason) { showToast('Please select a reactivation reason', true); return; }
+      hideModal('reactivateModal');
+      var c = currentCampaign;
+      c.status = 'Committed';
+      c.dates.updated = today();
+      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
+      renderDetail();
+      renderDashboard();
+      showToast('Campaign reactivated to Committed');
     }
 
     function reactivateCampaign() {
