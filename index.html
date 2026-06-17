@@ -244,6 +244,8 @@
     .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
     .step-item.active .step-label { color: #0078d4; }
     .step-item.blocked .step-label { color: #d83b01; }
+    .step-edit-icon { cursor: pointer; font-size: 10px; color: #0078d4; margin-left: 2px; }
+    .step-edit-icon:hover { color: #005a9e; }
     .step-date { font-size: 9px; color: #999; margin-top: 2px; }
     .step-connector {
       flex: 1; height: 2px; background: #e0e0e0;
@@ -573,6 +575,20 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="editStepModal">
+    <div class="modal">
+      <h3 id="editStepModalTitle">Are you sure you want to make changes to Outreach?</h3>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Provide comments on why changes are needed. <span style="color:#d83b01;">*</span></label>
+        <textarea id="editStepComment" placeholder="Add comments..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="executeEditStep()">Edit</button>
+        <button class="btn btn-secondary" onclick="hideModal('editStepModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOAST Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="toast" id="toast"></div>
 
@@ -648,7 +664,7 @@
         history: [
           { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
           { date: '2026-05-12', text: 'Outreach completed', type: 'success', actor: 'partner@acme.com' },
-          { date: '2026-05-18', text: 'Customer engaged Ã¢â‚¬â€ agreed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-18', text: 'Customer engaged — agreed', type: 'success', actor: 'partner@acme.com' },
           { date: '2026-05-22', text: 'ECIF funding requested', type: 'info', actor: 'partner@acme.com' },
           { date: '2026-05-28', text: 'Funding approved', type: 'success', actor: 'field@microsoft.com' },
           { date: '2026-06-04', text: 'MDE workload marked as Closed', type: 'success', actor: 'partner@acme.com' }
@@ -674,7 +690,7 @@
         history: [
           { date: '2026-05-15', text: 'Campaign created', type: 'info', actor: 'msftfield@microsoft.com' },
           { date: '2026-05-18', text: 'Outreach completed', type: 'success', actor: 'rep@techdata.com' },
-          { date: '2026-05-25', text: 'Customer prefers another partner Ã¢â‚¬â€ blocked', type: 'blocked', actor: 'rep@techdata.com' }
+          { date: '2026-05-25', text: 'Customer prefers another partner — blocked', type: 'blocked', actor: 'rep@techdata.com' }
         ]
       },
       {
@@ -696,7 +712,7 @@
         history: [
           { date: '2026-05-20', text: 'Campaign created', type: 'info', actor: 'apacfield@microsoft.com' },
           { date: '2026-05-22', text: 'Outreach completed', type: 'success', actor: 'sales@insight.com' },
-          { date: '2026-05-28', text: 'Customer engaged Ã¢â‚¬â€ agreed to campaign', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-05-28', text: 'Customer engaged — agreed to campaign', type: 'success', actor: 'sales@insight.com' },
           { date: '2026-06-02', text: 'Awaiting funding requirement decision', type: 'info', actor: 'apacfield@microsoft.com' }
         ]
       },
@@ -1038,7 +1054,7 @@
         return 0;
       });
 
-      // KPIs Ã¢â‚¬â€ differ by view
+      // KPIs — differ by view
       const total = campaigns.length;
       const blocked = campaigns.filter(c => c.status === 'Blocked').length;
       const inProgress = campaigns.filter(c => c.status !== 'Closed').length;
@@ -1213,10 +1229,24 @@
         if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
           closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
+
+        // Pencil edit icon for completed steps (partner view only)
+        var editIcon = '';
+        if (currentView === 'partner' && cls === 'completed') {
+          editIcon = ' <span class="step-edit-icon" onclick="confirmEditStep(\'' + state + '\')" title="Edit ' + state + '">&#9998;</span>';
+        }
+
         var labelHtml = state === 'Funding'
           ? 'Funding<br><span style="font-size:8px;font-weight:400;color:#888;">Request &amp; Secured</span>'
           : state === 'Customer Engaged' ? 'Customer<br>Engaged' : state;
-        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+labelHtml+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
+
+        // Show (Pending) sub-label when funding is requested but not yet secured
+        var pendingSublabel = '';
+        if (state === 'Funding' && c.status === 'Funding' && c.funding && c.funding.submitted && c.funding.secured !== 'yes') {
+          pendingSublabel = '<div style="font-size:9px;color:#c19c00;font-weight:600;margin-top:2px;">(Pending)</div>';
+        }
+
+        html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+labelHtml+editIcon+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+pendingSublabel+closeLink+'</div>';
         if (i < STATE_ORDER.length - 1) {
           html += '<div class="step-connector '+(i < stateIdx ? 'filled' : '')+'"></div>';
         }
@@ -1255,7 +1285,7 @@
         html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Outreach') {
-        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner Ã¢â€ â€™ Blocked</option><option value="declined">Customer no longer requires assistance Ã¢â€ â€™ Blocked</option><option value="external">Customer cannot engage at this time Ã¢â€ â€™ Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">— Select —</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner → Blocked</option><option value="declined">Customer no longer requires assistance → Blocked</option><option value="external">Customer cannot engage at this time → Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Customer Engaged') {
         html = '<div class="panel-card"><h2>Funding Requirement</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Does this campaign require ECIF funding?</p><div class="form-grid"><div class="form-group"><label>Funding Required? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingRequired" value="yes"> Yes, ECIF funding needed</label><label><input type="radio" name="fundingRequired" value="no"> No, $0 offer / no funding needed</label></div></div><div class="form-group full-width"><label>Notes</label><textarea id="gateEngagedNotes" placeholder="Additional context..."></textarea></div></div></div>';
@@ -1266,7 +1296,7 @@
         if (!step1Done) {
           html += '<div class="form-group"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSubmitted"> Yes, requested</label></div></div><div class="form-group"><label>Request Date <span class="required">*</span></label><input type="date" id="gateFundingSubDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment" placeholder="Notes on funding request..."></textarea></div>';
         } else {
-          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
+          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">— Select —</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">— Select —</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
         }
         html += '</div></div>';
       }
@@ -1274,7 +1304,7 @@
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
-        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Ã¢â‚¬â€ Select Ã¢â‚¬â€</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">— Select —</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
 
       panel.innerHTML = html;
@@ -1293,7 +1323,7 @@
         }).join('');
         notesGroup.style.display = 'none';
       } else {
-        tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
+        tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:110px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><input type="text" value="'+w.notes+'" placeholder="Add notes..." onchange="updateWorkload('+i+',\'notes\',this.value)"></td></tr>').join('');
         notesGroup.style.display = '';
       }
     }
@@ -1375,14 +1405,14 @@
 
       if (selectedOutcome === 'agreed') {
         c.status = 'Customer Engaged';
-        c.history.push({ date: today(), text: 'Customer engaged Ã¢â‚¬â€ advanced to Customer Engaged', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Customer engaged — advanced to Customer Engaged', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Customer Engaged');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked Ã¢â‚¬â€ ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
         showToast('Campaign blocked');
       }
       selectedOutcome = '';
@@ -1399,14 +1429,14 @@
       if (fundingReq.value === 'no') {
         c.dates.fundingApproval = today();
         c.status = 'Committed';
-        c.history.push({ date: today(), text: 'No funding required Ã¢â‚¬â€ advanced to Committed', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'No funding required — advanced to Committed', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed (no funding required)');
       } else {
         c.funding.submitted = false;
         c.funding.secured = '';
         c.dates.fundingApproval = '';
         c.status = 'Funding';
-        c.history.push({ date: today(), text: 'Funding required Ã¢â‚¬â€ advanced to Funding', type: 'info', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding required — advanced to Funding', type: 'info', actor: c.partnerDRI });
         showToast('Advanced to Funding');
       }
       renderDetail();
@@ -1442,7 +1472,7 @@
       if (secured === 'yes') {
         c.dates.fundingApproval = date || today();
         c.status = 'Committed';
-        c.history.push({ date: today(), text: 'Funding approved Ã¢â‚¬â€ campaign committed', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding approved — campaign committed', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed');
       } else {
         var reason = document.getElementById('gateFundingDeclineReason') && document.getElementById('gateFundingDeclineReason').value;
@@ -1451,8 +1481,8 @@
         c.previousState = 'Funding';
         c.blockReason = reason;
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Funding declined Ã¢â‚¬â€ ' + reason, type: 'blocked', actor: c.partnerDRI });
-        showToast('Campaign blocked Ã¢â‚¬â€ funding declined');
+        c.history.push({ date: today(), text: 'Funding declined — ' + reason, type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked — funding declined');
       }
       renderDetail();
     }
@@ -1465,9 +1495,9 @@
       c.previousState = null;
       c.blockReason = '';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Unblocked Ã¢â‚¬â€ returned to ' + c.status, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Unblocked — returned to ' + c.status, type: 'success', actor: c.partnerDRI });
       renderDetail();
-      showToast('Campaign unblocked Ã¢â‚¬â€ returned to ' + c.status);
+      showToast('Campaign unblocked — returned to ' + c.status);
     }
 
     function reactivateCampaign() {
@@ -1476,7 +1506,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated Ã¢â‚¬â€ ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
       renderDetail();
       showToast('Campaign reactivated to Committed');
     }
@@ -1488,7 +1518,7 @@
       c.previousState = c.status;
       c.status = 'Closed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Campaign manually closed Ã¢â‚¬â€ ' + reason, type: 'closed', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Campaign manually closed — ' + reason, type: 'closed', actor: c.partnerDRI });
       hideModal('closeModal');
       document.getElementById('closeReasonText').value = '';
       renderDetail();
@@ -1504,9 +1534,9 @@
       if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
         c.status = 'Closed';
         c.dates.updated = today();
-        c.history.push({ date: today(), text: 'All workloads closed Ã¢â‚¬â€ campaign auto-closed', type: 'closed', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'All workloads closed — campaign auto-closed', type: 'closed', actor: c.partnerDRI });
         renderDetail();
-        showToast('All workloads closed Ã¢â‚¬â€ campaign auto-closed');
+        showToast('All workloads closed — campaign auto-closed');
       }
     }
 
@@ -1527,6 +1557,24 @@
 
     function showModal(id) { document.getElementById(id).classList.add('show'); }
     function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    var pendingEditStep = null;
+    function confirmEditStep(stepName) {
+      pendingEditStep = stepName;
+      document.getElementById('editStepModalTitle').textContent = 'Are you sure you want to make changes to ' + stepName + '?';
+      document.getElementById('editStepComment').value = '';
+      showModal('editStepModal');
+    }
+    function executeEditStep() {
+      var comment = document.getElementById('editStepComment').value.trim();
+      if (!comment) { showToast('Please provide a comment for the change', true); return; }
+      var c = currentCampaign;
+      c.history.push({ date: today(), text: 'Edited ' + pendingEditStep + ' step: ' + comment, type: 'info', actor: c.partnerDRI });
+      c.dates.updated = today();
+      hideModal('editStepModal');
+      showToast('Edit recorded for ' + pendingEditStep);
+      renderDetail();
+    }
 
     function toggleFilter(forceState) {
       var overlay = document.getElementById('filterOverlay');
