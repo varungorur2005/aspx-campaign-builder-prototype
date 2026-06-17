@@ -1241,14 +1241,14 @@
         if (currentView === 'partner' && state === 'Closed' && c.status === 'Closed') {
           closeLink = '<div style="margin-top:6px;"><button onclick="showReactivateModal()" class="btn btn-success" style="font-size:10px;padding:4px 10px;">Reactivate</button></div>';
         } else if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
-          closeLink = '<div style="margin-top:4px;"><a onclick="closeCampaignCheck()" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
+          closeLink = '<div style="margin-top:4px;"><a onclick="closeCampaignCheck()" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;white-space:nowrap;">Close now</a></div>';
         }
 
         var editIcon = '';
 
         var labelHtml = state;
         if (state === 'Funding' && c.status === 'Funding' && c.fundingSubState === 'requested') {
-          labelHtml = 'Funding<br><span style="font-size:10px;color:#0078d4;font-weight:400;">Pending</span>';
+          labelHtml = 'Funding<br><span style="font-size:10px;color:#d83b01;font-weight:400;">Pending</span>';
         }
 
 
