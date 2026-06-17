@@ -1281,6 +1281,9 @@
       }
 
       panel.innerHTML = html;
+      // Attach change listeners for move button validation
+      panel.addEventListener('change', checkMoveButtonState);
+      panel.addEventListener('input', checkMoveButtonState);
     }
 
     function renderWorkloads(c) {
@@ -1363,15 +1366,55 @@
         return;
       }
       let moveBtn = '';
-      if (c.status === 'New') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Outreach</button>';
-      else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Engaged</button>';
-      else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Funding</button>';
-      else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Committed</button>';
+      if (c.status === 'New') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Outreach</button>';
+      else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Engaged</button>';
+      else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Funding</button>';
+      else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
       else if (c.status === 'Committed') moveBtn = '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
       else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
 
       bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save</button> ' + moveBtn + '</div><div></div>';
+      // Check validity after render
+      setTimeout(checkMoveButtonState, 50);
+    }
+
+    function checkMoveButtonState() {
+      var btn = document.getElementById('moveBtnNext');
+      if (!btn) return;
+      var c = currentCampaign;
+      var valid = false;
+      if (c.status === 'New') {
+        var checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
+        var date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
+        valid = checked && date;
+      } else if (c.status === 'Outreach') {
+        var engChecked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
+        valid = engChecked && selectedOutcome && (selectedOutcome === 'agreed' || (document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value));
+      } else if (c.status === 'Engaged') {
+        var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
+        valid = sowChecked;
+      } else if (c.status === 'Funding') {
+        var yesRadio = document.getElementById('gateFundingYes');
+        var noRadio = document.getElementById('gateFundingNo');
+        var sowCb = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
+        if (noRadio && noRadio.checked) {
+          valid = sowCb;
+        } else if (yesRadio && yesRadio.checked) {
+          var reqCb = document.getElementById('gateFundingRequested') && document.getElementById('gateFundingRequested').checked;
+          var secCb = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').checked;
+          valid = reqCb && secCb && sowCb;
+        }
+      }
+      if (valid) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -1385,6 +1428,7 @@
       } else {
         if (display) { display.style.display = 'none'; display.textContent = ''; }
       }
+      checkMoveButtonState();
     }
 
     function blockFromEngaged() {
@@ -1430,6 +1474,7 @@
       selectedOutcome = sel ? sel.value : '';
       var grp = document.getElementById('engageCommentGroup');
       if (grp) grp.style.display = (selectedOutcome && selectedOutcome !== 'agreed') ? '' : 'none';
+      checkMoveButtonState();
     }
 
     function advanceFromOutreach() {
@@ -1488,16 +1533,13 @@
       if (yesRadio && yesRadio.checked) {
         reqCb.disabled = false;
         reqGroup.style.opacity = '1';
-        // Secured stays disabled until Requested is checked
         secCb.disabled = true;
         secCb.checked = false;
         secGroup.style.opacity = '0.4';
-        // SOW stays disabled until Secured is checked
         sowCb.disabled = true;
         sowCb.checked = false;
         sowGroup.style.opacity = '0.4';
       } else if (noRadio && noRadio.checked) {
-        // Not needed: grey out Requested and Secured, enable SOW directly
         reqCb.disabled = true;
         secCb.disabled = true;
         reqCb.checked = false;
@@ -1507,6 +1549,7 @@
         sowCb.disabled = false;
         sowGroup.style.opacity = '1';
       }
+      checkMoveButtonState();
     }
 
     function onFundingRequestedChange() {
@@ -1526,6 +1569,7 @@
         sowCb.checked = false;
         sowGroup.style.opacity = '0.4';
       }
+      checkMoveButtonState();
     }
 
     function onFundingSecuredChange() {
@@ -1540,6 +1584,7 @@
         sowCb.checked = false;
         sowGroup.style.opacity = '0.4';
       }
+      checkMoveButtonState();
     }
 
     function advanceFromFunding() {
