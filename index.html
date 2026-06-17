@@ -1271,7 +1271,7 @@
         'Engaged': { cls: 'info', text: '<strong>Engaged:</strong> Customer is engaged. Draft the SOW to advance.' },
         'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
         'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
-        'Blocked': { cls: 'danger', text: '<strong>Blocked:</strong> '+( c.blockReason || 'Campaign is blocked.') },
+        'Blocked': { cls: 'neutral', text: '' },
         'Closed': { cls: 'neutral', text: '<strong>Closed:</strong> Campaign is closed. Reactivate if additional work is needed.' }
       };
       const m = msgs[c.status] || msgs['New'];
@@ -1430,7 +1430,7 @@
       } else if (c.status === 'Outreach') {
         var engChecked = document.getElementById('gateEngaged') && document.getElementById('gateEngaged').checked;
         var engDate = document.getElementById('gateEngageDate') && document.getElementById('gateEngageDate').value;
-        valid = engChecked && engDate && selectedOutcome && (selectedOutcome === 'agreed' || (document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value));
+        valid = engChecked && engDate && selectedOutcome === 'agreed';
       } else if (c.status === 'Engaged') {
         var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
         var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
