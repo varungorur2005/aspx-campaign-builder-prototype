@@ -154,7 +154,7 @@
     }
     .status-badge.new { background: #e8f0fe; color: #0078d4; }
     .status-badge.outreach { background: #e6f2ff; color: #005a9e; }
-    .status-badge.customer-engaged { background: #f3e8ff; color: #6b21a8; }
+
     .status-badge.funding { background: #fff4ce; color: #8a6d00; }
     .status-badge.committed { background: #dff6dd; color: #107c10; }
     .status-badge.blocked { background: #fed9cc; color: #d83b01; }
@@ -522,7 +522,7 @@
           <option value="">All</option>
           <option value="New">New</option>
           <option value="Outreach">Outreach</option>
-          <option value="Customer Engaged">Customer Engaged</option>
+
           <option value="Funding">Funding</option>
           <option value="Committed">Committed</option>
           <option value="Blocked">Blocked</option>
@@ -698,7 +698,7 @@
         tpid: 'TP-12399', segment: 'SMB', area: 'APAC', industry: 'Consumer Goods',
         source: 'Security CSU Partner Clinic | APAC',
         workloads: ['MDO','MDE'],
-        status: 'Customer Engaged', previousState: null, blockReason: '',
+        status: 'Outreach', previousState: null, blockReason: '', outreachSubState: 'engaged',
         partnerDRI: 'sales@insight.com', microsoftDRI: 'apacfield@microsoft.com',
         unified: 'Non-Unified', opportunityId: '7-889900001',
         dates: { created: '2026-05-20', outreach: '2026-05-22', engagement: '2026-05-28', fundingSubmission: '', updated: '2026-06-02' },
@@ -939,11 +939,12 @@
 
     campaigns.forEach(function(c) {
       c.usageData = buildUsageData(c);
+      if (!c.outreachSubState) c.outreachSubState = '';
     });
 
     let currentCampaign = null;
     let currentView = 'partner';
-    const STATE_ORDER = ['New', 'Outreach', 'Customer Engaged', 'Funding', 'Committed', 'Closed'];
+    const STATE_ORDER = ['New', 'Outreach', 'Funding', 'Committed', 'Closed'];
     function getStatusBadgeText(c) {
       if (c.status === 'Funding') {
         if (c.funding.submitted === true && c.funding.secured === 'yes') return 'Funding Secured';
@@ -1108,7 +1109,7 @@
       const chartsRow = document.getElementById('chartsRow');
       const statusCounts = {};
       campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
-      const statusColors = { New: '#0078d4', Outreach: '#005a9e', 'Customer Engaged': '#6b21a8', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
+      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
 
       // Pie: Status distribution
       var statusChart = buildPieChart(statusCounts, statusColors, 'By Status', 'status');
@@ -1203,8 +1204,9 @@
     }
 
     function renderStepper(c) {
+      const isFundingBlocked = c.status === 'Funding' && c.funding && c.funding.secured === 'no';
       const stateIdx = STATE_ORDER.indexOf(c.status === 'Blocked' ? (c.previousState || 'Outreach') : c.status);
-      const isBlocked = c.status === 'Blocked';
+      const isBlocked = c.status === 'Blocked' || isFundingBlocked;
       const isClosed = c.status === 'Closed';
 
       let html = '';
@@ -1220,7 +1222,7 @@
         let dateStr = '';
         if (state === 'New' && c.dates.created) dateStr = c.dates.created;
         else if (state === 'Outreach' && c.dates.outreach) dateStr = c.dates.outreach;
-        else if (state === 'Customer Engaged' && c.dates.engagement) dateStr = c.dates.engagement;
+        
         else if (state === 'Funding' && c.dates.fundingSubmission) dateStr = c.dates.fundingSubmission;
         else if (state === 'Committed' && c.dates.fundingApproval) dateStr = c.dates.fundingApproval;
         else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
@@ -1238,7 +1240,7 @@
 
         var labelHtml = state === 'Funding'
           ? 'Funding<br><span style="font-size:8px;font-weight:400;color:#888;">Request &amp; Secured</span>'
-          : state === 'Customer Engaged' ? 'Customer<br>Engaged' : state;
+          : state;
 
         // Show (Pending) sub-label when funding is requested but not yet secured
         var pendingSublabel = '';
@@ -1258,8 +1260,7 @@
       const banner = document.getElementById('stateBanner');
       const msgs = {
         'New': { cls: 'info', text: '<strong>New:</strong> Partner and field have engaged with the customer. Confirm outreach to advance.' },
-        'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Confirm engagement outcome to advance.' },
-        'Customer Engaged': { cls: 'info', text: '<strong>Customer Engaged:</strong> Customer is engaged. Determine if ECIF funding is required to proceed.' },
+        'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Complete engagement and funding requirement to advance.' },
         'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
         'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
         'Blocked': { cls: 'danger', text: '<strong>Blocked:</strong> '+( c.blockReason || 'Campaign is blocked.') },
@@ -1284,11 +1285,11 @@
       if (c.status === 'New') {
         html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
       }
-      else if (c.status === 'Outreach') {
-        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">— Select —</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner → Blocked</option><option value="declined">Customer no longer requires assistance → Blocked</option><option value="external">Customer cannot engage at this time → Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
-      }
-      else if (c.status === 'Customer Engaged') {
+      else if (c.status === 'Outreach' && c.outreachSubState === 'engaged') {
         html = '<div class="panel-card"><h2>Funding Requirement</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Does this campaign require ECIF funding?</p><div class="form-grid"><div class="form-group"><label>Funding Required? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingRequired" value="yes"> Yes, ECIF funding needed</label><label><input type="radio" name="fundingRequired" value="no"> No, $0 offer / no funding needed</label></div></div><div class="form-group full-width"><label>Notes</label><textarea id="gateEngagedNotes" placeholder="Additional context..."></textarea></div></div></div>';
+      }
+      else if (c.status === 'Outreach') {
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngagementDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner → Blocked</option><option value="declined">Customer no longer requires assistance → Blocked</option><option value="external">Customer cannot engage at this time → Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         const step1Done = c.funding.submitted;
@@ -1296,7 +1297,7 @@
         if (!step1Done) {
           html += '<div class="form-group"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSubmitted"> Yes, requested</label></div></div><div class="form-group"><label>Request Date <span class="required">*</span></label><input type="date" id="gateFundingSubDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment" placeholder="Notes on funding request..."></textarea></div>';
         } else {
-          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">— Select —</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">— Select —</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
+          html += '<div class="form-group"><label>Funding Secured? <span class="required">*</span></label><select id="gateFundingSecured" onchange="toggleFundingDecline()"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option></select></div><div class="form-group" id="fundingApprovalDateGroup"><label>Approval/Decline Date</label><input type="date" id="gateFundingDate"></div><div class="form-group" id="fundingDeclineReasonGroup" style="display:none;"><label>Decline Reason <span class="required">*</span></label><select id="gateFundingDeclineReason"><option value="">Select an option</option><option value="Funding unavailable">Funding unavailable</option><option value="Funding declined">Funding declined</option></select></div><div class="form-group full-width"><label>Notes</label><textarea id="gateFundingComment2" placeholder="Notes..."></textarea></div>';
         }
         html += '</div></div>';
       }
@@ -1304,7 +1305,7 @@
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
-        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">— Select —</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Select an option</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
 
       panel.innerHTML = html;
@@ -1354,8 +1355,8 @@
       }
       let left = '';
       if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
+      else if (c.status === 'Outreach' && c.outreachSubState === 'engaged') left = '<button class="btn btn-primary" onclick="advanceFromEngaged()">Advance &rarr;</button>';
       else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
-      else if (c.status === 'Customer Engaged') left = '<button class="btn btn-primary" onclick="advanceFromEngaged()">Advance &rarr;</button>';
       else if (c.status === 'Funding') {
         if (!c.funding.submitted) left = '<button class="btn btn-primary" onclick="advanceFundingStep1()">Request Funding &rarr;</button>';
         else left = '<button class="btn btn-primary" onclick="advanceFundingStep2()">Confirm Funding &rarr;</button>';
@@ -1404,9 +1405,9 @@
       c.engagement.outcome = selectedOutcome;
 
       if (selectedOutcome === 'agreed') {
-        c.status = 'Customer Engaged';
-        c.history.push({ date: today(), text: 'Customer engaged — advanced to Customer Engaged', type: 'success', actor: c.partnerDRI });
-        showToast('Advanced to Customer Engaged');
+        c.outreachSubState = 'engaged';
+        c.history.push({ date: today(), text: 'Customer engaged — outreach completed', type: 'success', actor: c.partnerDRI });
+        showToast('Customer engaged - confirm funding requirement');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
@@ -1530,8 +1531,19 @@
       if (field === 'seats') c.workloadData[idx].seats = parseInt(value) || 0;
       else c.workloadData[idx][field] = value;
 
+      // Auto-block if all workloads are blocked
+      if (c.workloadData.every(function(w) { return w.status === 'Blocked'; })) {
+        c.previousState = 'Committed';
+        c.blockReason = 'All workloads blocked';
+        c.status = 'Blocked';
+        c.dates.updated = today();
+        c.history.push({ date: today(), text: 'All workloads blocked', type: 'blocked', actor: c.partnerDRI });
+        renderDetail();
+        renderDashboard();
+        showToast('All workloads blocked - campaign blocked');
+      }
       // Auto-close if all workloads closed
-      if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
+      else if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
         c.status = 'Closed';
         c.dates.updated = today();
         c.history.push({ date: today(), text: 'All workloads closed — campaign auto-closed', type: 'closed', actor: c.partnerDRI });
@@ -1569,11 +1581,15 @@
       var comment = document.getElementById('editStepComment').value.trim();
       if (!comment) { showToast('Please provide a comment for the change', true); return; }
       var c = currentCampaign;
-      c.history.push({ date: today(), text: 'Edited ' + pendingEditStep + ' step: ' + comment, type: 'info', actor: c.partnerDRI });
+      c.previousState = c.status;
+      c.status = pendingEditStep;
+      c.outreachSubState = '';
+      c.history.push({ date: today(), text: 'Reverted to ' + pendingEditStep + ' for edit: ' + comment, type: 'info', actor: c.partnerDRI });
       c.dates.updated = today();
       hideModal('editStepModal');
-      showToast('Edit recorded for ' + pendingEditStep);
+      showToast('Reverted to ' + pendingEditStep + ' for editing');
       renderDetail();
+      renderDashboard();
     }
 
     function toggleFilter(forceState) {
