@@ -1218,7 +1218,7 @@
 
         var closeLink = '';
         if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
-          closeLink = '<div style="margin-top:4px;"><a onclick="showModal(\'closeModal\')" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
+          closeLink = '<div style="margin-top:4px;"><a onclick="closeCampaignCheck()" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;">Close now</a></div>';
         }
 
         var editIcon = '';
@@ -1254,7 +1254,7 @@
       const panel = document.getElementById('actionPanel');
       let html = '';
 
-      if (currentView === 'field' || currentView === 'corp') {
+      if (currentView === 'field' || currentView === 'corp' || c.status === 'Closed') {
         html = '<div class="panel-card"><h2>Campaign State</h2><p style="font-size:12px;color:#616161;">Campaign is in <strong>'+c.status+'</strong> state. State changes are managed by the partner.</p>' +
           '<div class="detail-meta" style="margin-top:12px;"><div class="detail-meta-item"><strong>Last Updated:</strong> '+(c.dates.updated || '&mdash;')+'</div><div class="detail-meta-item"><strong>Funding Required:</strong> '+(c.fundingRequired === 'yes' ? 'Yes' : c.fundingRequired === 'no' ? 'No' : 'TBD')+'</div></div></div>';
         panel.innerHTML = html;
@@ -1285,7 +1285,7 @@
 
     function renderWorkloads(c) {
       const panel = document.getElementById('workloadsPanel');
-      if (c.status !== 'Committed') { panel.style.display = 'none'; return; }
+      if (c.status !== 'Committed' && c.status !== 'Closed') { panel.style.display = 'none'; return; }
       panel.style.display = '';
 
       const tbody = document.getElementById('workloadsBody');
@@ -1330,6 +1330,7 @@
       else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Engaged</button>';
       else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Funding</button>';
       else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Committed</button>';
+      else if (c.status === 'Committed') moveBtn = '<button class="btn btn-danger" onclick="closeCampaignCheck()">Close Campaign</button>';
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
       else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
 
@@ -1561,6 +1562,28 @@
       c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
       renderDetail();
       showToast('Campaign reactivated to Committed');
+    }
+
+    function closeCampaignCheck() {
+      var c = currentCampaign;
+      if (c.status === 'Committed') {
+        // Check if all workloads have valid status
+        var hasUncommitted = c.workloadData.some(function(w) {
+          return w.status === 'Uncommitted';
+        });
+        if (hasUncommitted) {
+          showToast('All workloads must have a status (Committed, Blocked, or Closed) before closing', true);
+          return;
+        }
+        var missingSeatValues = c.workloadData.some(function(w) {
+          return (w.status === 'Committed' || w.status === 'Closed') && w.seats === 0;
+        });
+        if (missingSeatValues) {
+          showToast('Please enter seat values for all Committed/Closed workloads', true);
+          return;
+        }
+      }
+      showModal('closeModal');
     }
 
     function confirmCloseCampaign() {
