@@ -503,7 +503,7 @@
         <div class="lifecycle-stepper" id="lifecycleStepper"></div>
 
         <!-- State Banner -->
-        <div class="state-banner info" id="stateBanner"></div>
+        <div class="state-banner info" id="stateBanner" style="display:none;"></div>
 
         <!-- Contextual Action Panel -->
         <div id="actionPanel"></div>
@@ -1308,7 +1308,7 @@
         }
       }
       else if (c.status === 'Blocked') {
-        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
         html = '';
