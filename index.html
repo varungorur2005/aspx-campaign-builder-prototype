@@ -369,6 +369,26 @@
   </style>
 </head>
 <body>
+  <div class="modal-overlay" id="reactivateModal">
+    <div class="modal">
+      <h3>Reactivate Campaign</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Reactivating will return this campaign to <strong>Committed</strong> state.</p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Reactivation Reason <span style="color:#d83b01;">*</span></label>
+        <select id="reactivateReasonSelect" style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;margin-top:4px;">
+          <option value="">Select an option</option>
+          <option>Accidentally closed</option>
+          <option>Additional workloads targeted</option>
+          <option>Changes to existing workloads</option>
+        </select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="confirmReactivate()">Reactivate</button>
+        <button class="btn btn-secondary" onclick="hideModal('reactivateModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP NAV Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <nav class="top-nav">
     <div class="nav-left">
@@ -1262,22 +1282,26 @@
       }
 
       if (c.status === 'New') {
-        html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes, outreach confirmed</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label>Customer Outreach Initiated? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateOutreach"> Yes</label></div></div><div class="form-group"><label>Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Outreach') {
-        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged"> Yes</label></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged" onchange="onEngagedChange()"> Yes</label></div></div><div class="form-group" id="engageDateGroup" style="display:none;"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngageDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
-        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding needed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes needed</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> Not needed</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()"> Yes</label></div></div><div class="form-group" id="fundingSecuredGroup" style="opacity:0.4;"><label>Funding Secured? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSecured" disabled onchange="onFundingSecuredChange()"> Yes</label></div></div><div class="form-group" id="sowSignedGroup" style="opacity:0.4;"><label>SOW Signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" disabled onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+        if (!c.fundingSubState || c.fundingSubState === 'initial') {
+          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding needed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()"> Yes</label></div><div id="fundingRequestedDateGroup" style="display:none;margin-top:8px;"><label style="font-size:11px;font-weight:600;">Date <span style="color:#d83b01;">*</span></label><input type="date" id="gateFundingRequestedDate" onchange="checkMoveButtonState()"></div></div><div class="form-group" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()"> Yes</label></div><div id="sowSignedNoFundingDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+        } else if (c.fundingSubState === 'requested') {
+          html = '<div class="panel-card"><h2>Funding Requested</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Microsoft funding has been requested. Confirm when funding is secured.</p><div class="form-grid"><div class="form-group"><label>Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSecured" onchange="onFundingSecuredSubChange()"> Yes</label></div></div><div class="form-group" id="fundingSecuredDateGroup" style="display:none;"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" onchange="checkMoveButtonState()"></div><div class="form-group" id="sowSignedFundingGroup" style="opacity:0.4;"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" disabled onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+        }
       }
       else if (c.status === 'Blocked') {
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
-        html = '<div class="panel-card"><h2>Reactivate</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">This campaign is closed. Reactivating will return it to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Select an option</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '';
       }
 
       panel.innerHTML = html;
@@ -1369,10 +1393,16 @@
       if (c.status === 'New') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Outreach</button>';
       else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Engaged</button>';
       else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Funding</button>';
-      else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
+      else if (c.status === 'Funding') {
+        if (c.fundingSubState === 'requested') {
+          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
+        } else {
+          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
+        }
+      }
       else if (c.status === 'Committed') moveBtn = '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
-      else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
+      else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="showReactivateModal()">Reactivate</button>';
 
       bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save</button> ' + moveBtn + '</div><div></div>';
       // Check validity after render
@@ -1469,6 +1499,17 @@
     }
 
     let selectedOutcome = '';
+    function onEngagedChange() {
+      var cb = document.getElementById('gateEngaged');
+      var dateGrp = document.getElementById('engageDateGroup');
+      if (cb && cb.checked) {
+        if (dateGrp) dateGrp.style.display = '';
+      } else {
+        if (dateGrp) dateGrp.style.display = 'none';
+      }
+      checkMoveButtonState();
+    }
+
     function onOutcomeChange() {
       var sel = document.getElementById('gateEngagementOutcome');
       selectedOutcome = sel ? sel.value : '';
@@ -1485,7 +1526,8 @@
         if (!comment) { showToast('Notes required for non-success outcomes', true); return; }
       }
       var c = currentCampaign;
-      c.dates.engagement = today();
+      var engDate = document.getElementById('gateEngageDate') ? document.getElementById('gateEngageDate').value : today();
+      c.dates.engagement = engDate;
       c.dates.updated = today();
       c.engagement.outcome = selectedOutcome;
 
@@ -1524,100 +1566,107 @@
     function onFundingNeededChange() {
       var yesRadio = document.getElementById('gateFundingYes');
       var noRadio = document.getElementById('gateFundingNo');
-      var reqCb = document.getElementById('gateFundingRequested');
-      var secCb = document.getElementById('gateFundingSecured');
-      var sowCb = document.getElementById('gateSowCompleted');
       var reqGroup = document.getElementById('fundingRequestedGroup');
-      var secGroup = document.getElementById('fundingSecuredGroup');
-      var sowGroup = document.getElementById('sowSignedGroup');
+      var reqCb = document.getElementById('gateFundingRequested');
+      var sowNoFundingGroup = document.getElementById('sowSignedNoFundingGroup');
+      var sowNoFundingCb = document.getElementById('gateSowNoFunding');
       if (yesRadio && yesRadio.checked) {
-        reqCb.disabled = false;
         reqGroup.style.opacity = '1';
-        secCb.disabled = true;
-        secCb.checked = false;
-        secGroup.style.opacity = '0.4';
-        sowCb.disabled = true;
-        sowCb.checked = false;
-        sowGroup.style.opacity = '0.4';
+        reqCb.disabled = false;
+        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = 'none'; sowNoFundingCb.disabled = true; sowNoFundingCb.checked = false; }
       } else if (noRadio && noRadio.checked) {
-        reqCb.disabled = true;
-        secCb.disabled = true;
-        reqCb.checked = false;
-        secCb.checked = false;
         reqGroup.style.opacity = '0.4';
-        secGroup.style.opacity = '0.4';
-        sowCb.disabled = false;
-        sowGroup.style.opacity = '1';
+        reqCb.disabled = true;
+        reqCb.checked = false;
+        var dateGrp = document.getElementById('fundingRequestedDateGroup');
+        if (dateGrp) dateGrp.style.display = 'none';
+        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = ''; sowNoFundingGroup.style.opacity = '1'; sowNoFundingCb.disabled = false; }
       }
       checkMoveButtonState();
     }
 
     function onFundingRequestedChange() {
       var reqCb = document.getElementById('gateFundingRequested');
-      var secCb = document.getElementById('gateFundingSecured');
-      var secGroup = document.getElementById('fundingSecuredGroup');
-      var sowCb = document.getElementById('gateSowCompleted');
-      var sowGroup = document.getElementById('sowSignedGroup');
+      var dateGrp = document.getElementById('fundingRequestedDateGroup');
       if (reqCb && reqCb.checked) {
-        secCb.disabled = false;
-        secGroup.style.opacity = '1';
+        if (dateGrp) dateGrp.style.display = '';
       } else {
-        secCb.disabled = true;
-        secCb.checked = false;
-        secGroup.style.opacity = '0.4';
-        sowCb.disabled = true;
-        sowCb.checked = false;
-        sowGroup.style.opacity = '0.4';
+        if (dateGrp) dateGrp.style.display = 'none';
       }
       checkMoveButtonState();
     }
 
-    function onFundingSecuredChange() {
+    function onFundingSecuredSubChange() {
       var secCb = document.getElementById('gateFundingSecured');
+      var dateGrp = document.getElementById('fundingSecuredDateGroup');
+      var sowGroup = document.getElementById('sowSignedFundingGroup');
       var sowCb = document.getElementById('gateSowCompleted');
-      var sowGroup = document.getElementById('sowSignedGroup');
       if (secCb && secCb.checked) {
-        sowCb.disabled = false;
-        sowGroup.style.opacity = '1';
+        if (dateGrp) dateGrp.style.display = '';
+        if (sowGroup) { sowGroup.style.opacity = '1'; }
+        if (sowCb) sowCb.disabled = false;
       } else {
-        sowCb.disabled = true;
-        sowCb.checked = false;
-        sowGroup.style.opacity = '0.4';
+        if (dateGrp) dateGrp.style.display = 'none';
+        if (sowGroup) { sowGroup.style.opacity = '0.4'; }
+        if (sowCb) { sowCb.disabled = true; sowCb.checked = false; }
+      }
+      checkMoveButtonState();
+    }
+    
+    function onSowSignedNoFundingChange() {
+      var cb = document.getElementById('gateSowNoFunding');
+      var display = document.getElementById('sowSignedNoFundingDateDisplay');
+      if (cb && cb.checked) {
+        var c = currentCampaign;
+        c.dates.sowSigned = today();
+        if (display) { display.style.display = ''; display.textContent = 'Signed on: ' + today(); }
+      } else {
+        if (display) { display.style.display = 'none'; display.textContent = ''; }
       }
       checkMoveButtonState();
     }
 
     function advanceFromFunding() {
-      var yesRadio = document.getElementById('gateFundingYes');
-      var noRadio = document.getElementById('gateFundingNo');
-      if (!yesRadio.checked && !noRadio.checked) { showToast('Please select if Microsoft funding is needed', true); return; }
-      if (yesRadio.checked) {
-        var reqCb = document.getElementById('gateFundingRequested');
-        var secCb = document.getElementById('gateFundingSecured');
-        if (!reqCb.checked) { showToast('Please confirm funding has been requested', true); return; }
-        if (!secCb.checked) { showToast('Please confirm funding has been secured', true); return; }
-      }
-      var sowChecked = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
-      if (!sowChecked) { showToast('Please confirm SOW is signed', true); return; }
       var c = currentCampaign;
       c.dates.updated = today();
-      c.dates.sowSigned = c.dates.sowSigned || today();
-      c.fundingNeeded = yesRadio.checked ? 'yes' : 'no';
       var comments = document.getElementById('gateFundingComment') ? document.getElementById('gateFundingComment').value : '';
 
-      if (yesRadio.checked) {
-        c.funding.submitted = true;
+      if (!c.fundingSubState || c.fundingSubState === 'initial') {
+        var yesRadio = document.getElementById('gateFundingYes');
+        var noRadio = document.getElementById('gateFundingNo');
+
+        if (noRadio && noRadio.checked) {
+          // No funding needed - SOW signed, go to Committed
+          c.dates.sowSigned = c.dates.sowSigned || today();
+          c.fundingNeeded = 'no';
+          c.status = 'Committed';
+          c.fundingSubState = null;
+          c.dates.fundingApproval = today();
+          c.history.push({ date: today(), text: 'Funding not needed, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+          showToast('Advanced to Committed');
+        } else if (yesRadio && yesRadio.checked) {
+          // Yes funding needed - move to Funding Requested sub-state
+          c.fundingNeeded = 'yes';
+          c.fundingSubState = 'requested';
+          var reqDate = document.getElementById('gateFundingRequestedDate') ? document.getElementById('gateFundingRequestedDate').value : today();
+          c.dates.fundingRequested = reqDate;
+          c.funding.submitted = true;
+          c.dates.fundingSubmission = reqDate;
+          c.history.push({ date: today(), text: 'Microsoft funding requested' + (comments ? ': ' + comments : ''), type: 'info', actor: c.partnerDRI });
+          showToast('Moved to Funding Requested');
+        }
+      } else if (c.fundingSubState === 'requested') {
+        // In Funding Requested - securing funding and SOW
         c.funding.secured = true;
-        c.dates.fundingSubmission = today();
-        c.dates.fundingApproval = today();
+        var secDate = document.getElementById('gateFundingSecuredDate') ? document.getElementById('gateFundingSecuredDate').value : today();
+        c.dates.fundingSecured = secDate;
+        c.dates.fundingApproval = secDate;
+        c.dates.sowSigned = c.dates.sowSigned || today();
         c.status = 'Committed';
+        c.fundingSubState = null;
         c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-      } else {
-        c.status = 'Committed';
-        c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding not needed, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed');
       }
-      showToast('Advanced to Committed');
       renderDetail();
       renderDashboard();
     }
