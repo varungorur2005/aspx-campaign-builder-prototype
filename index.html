@@ -1271,7 +1271,7 @@
         html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromEngaged()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Customer declined engagement</span></div></div>';
       }
       else if (c.status === 'Funding') {
-        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Have you requested funding? <span class="required">*</span></label><select id="gateFundingRequested"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option><option value="na">Not Applicable</option></select></div><div class="form-group"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromFunding()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Funding blocked</span></div></div>';
+        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Is Microsoft funding required? <span class="required">*</span></label><select id="gateFundingType" onchange="onFundingTypeChange()"><option value="">Select an option</option><option value="microsoft">Yes — Microsoft Funding</option><option value="external">No — External / Not Needed</option></select></div><div class="form-group" id="fundingStatusGroup" style="display:none;"><label>Funding Status <span class="required">*</span></label><select id="gateFundingStatus"><option value="">Select an option</option><option value="requested">Requested</option><option value="secured">Secured</option></select></div><div class="form-group"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromFunding()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Funding blocked</span></div></div>';
       }
       else if (c.status === 'Blocked') {
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
@@ -1438,34 +1438,41 @@
       renderDashboard();
     }
 
+    function onFundingTypeChange() {
+      var sel = document.getElementById('gateFundingType');
+      var grp = document.getElementById('fundingStatusGroup');
+      if (grp) grp.style.display = (sel && sel.value === 'microsoft') ? '' : 'none';
+    }
+
     function advanceFromFunding() {
-      var sel = document.getElementById('gateFundingRequested');
-      if (!sel || !sel.value) { showToast('Please select a funding status', true); return; }
+      var typeSel = document.getElementById('gateFundingType');
+      if (!typeSel || !typeSel.value) { showToast('Please select funding type', true); return; }
+      if (typeSel.value === 'microsoft') {
+        var statusSel = document.getElementById('gateFundingStatus');
+        if (!statusSel || !statusSel.value) { showToast('Please select funding status', true); return; }
+        if (statusSel.value !== 'secured') { showToast('Funding must be secured before advancing', true); return; }
+      }
       var sowChecked = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
       if (!sowChecked) { showToast('Please confirm SOW is signed', true); return; }
       var c = currentCampaign;
       c.dates.updated = today();
-      c.fundingRequired = sel.value;
       c.dates.sowSigned = c.dates.sowSigned || today();
+      c.fundingType = typeSel.value;
       var comments = document.getElementById('gateFundingComment') ? document.getElementById('gateFundingComment').value : '';
 
-      if (sel.value === 'yes') {
+      if (typeSel.value === 'microsoft') {
         c.funding.submitted = true;
+        c.funding.secured = true;
         c.dates.fundingSubmission = today();
-        c.status = 'Committed';
         c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding requested, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.status = 'Committed';
+        c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed');
-      } else if (sel.value === 'no') {
-        c.status = 'Committed';
-        c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding not requested, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-        showToast('Advanced to Committed (no funding)');
       } else {
         c.status = 'Committed';
         c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding N/A, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-        showToast('Advanced to Committed (N/A)');
+        c.history.push({ date: today(), text: 'External funding (not needed), SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Committed');
       }
       renderDetail();
       renderDashboard();
@@ -1571,8 +1578,12 @@
         var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
         if (!sowChecked) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
       } else if (c.status === 'Funding') {
-        var sel = document.getElementById('gateFundingRequested');
-        if (!sel || !sel.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        var typeSel = document.getElementById('gateFundingType');
+        if (!typeSel || !typeSel.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        if (typeSel.value === 'microsoft') {
+          var statusSel = document.getElementById('gateFundingStatus');
+          if (!statusSel || !statusSel.value || statusSel.value !== 'secured') { showToast('Funding must be secured before advancing', true); return; }
+        }
         var sowCb = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
         if (!sowCb) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
       }
