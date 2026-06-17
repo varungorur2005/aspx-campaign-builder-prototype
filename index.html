@@ -1288,7 +1288,7 @@
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label>Engaged Customer? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateEngaged" onchange="onEngagedChange()"> Yes</label></div></div><div class="form-group" id="engageDateGroup" style="display:none;"><label>Engagement Date <span class="required">*</span></label><input type="date" id="gateEngageDate"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted" onchange="onSowDraftedChange()"> Yes</label></div><div id="sowDraftedDateGroup" style="display:none;margin-top:8px;"><label style="font-size:11px;font-weight:600;">Date <span style="color:#d83b01;">*</span></label><input type="date" id="gateSowDraftedDate" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
@@ -1424,7 +1424,8 @@
         valid = engChecked && engDate && selectedOutcome && (selectedOutcome === 'agreed' || (document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value));
       } else if (c.status === 'Engaged') {
         var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-        valid = sowChecked;
+        var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+        valid = sowChecked && sowDate;
       } else if (c.status === 'Funding') {
         if (c.fundingSubState === 'requested') {
           var secCb = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').checked;
@@ -1556,11 +1557,27 @@
       renderDashboard();
     }
 
+    function onSowDraftedChange() {
+      var cb = document.getElementById('gateSowDrafted');
+      var dateGrp = document.getElementById('sowDraftedDateGroup');
+      var dateInput = document.getElementById('gateSowDraftedDate');
+      if (cb && cb.checked) {
+        if (dateGrp) dateGrp.style.display = '';
+        if (dateInput && !dateInput.value) dateInput.value = today();
+      } else {
+        if (dateGrp) dateGrp.style.display = 'none';
+        if (dateInput) dateInput.value = '';
+      }
+      checkMoveButtonState();
+    }
+
     function advanceFromEngaged() {
       var checked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-      if (!checked) { showToast('Please confirm SOW has been drafted', true); return; }
+      var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+      if (!checked || !sowDate) { showToast('Please confirm SOW has been prepared with date', true); return; }
       var c = currentCampaign;
       c.dates.updated = today();
+      c.dates.sowPrepared = sowDate;
       c.status = 'Funding';
       c.funding.submitted = false;
       c.funding.secured = '';
@@ -1807,7 +1824,8 @@
         }
       } else if (c.status === 'Engaged') {
         var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-        if (!sowChecked) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        var sowDateVal = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+        if (!sowChecked || !sowDateVal) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
       } else if (c.status === 'Funding') {
         var yesRadio = document.getElementById('gateFundingYes');
         var noRadio = document.getElementById('gateFundingNo');
