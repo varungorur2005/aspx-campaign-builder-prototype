@@ -1266,17 +1266,18 @@
     function renderBanner(c) {
       const banner = document.getElementById('stateBanner');
       const msgs = {
-        'New': { cls: 'info', text: '<strong>New:</strong> Partner and field have engaged with the customer. Confirm outreach to advance.' },
-        'Outreach': { cls: 'info', text: '<strong>Outreach:</strong> Active conversations with the customer. Confirm engagement to advance.' },
-        'Engaged': { cls: 'info', text: '<strong>Engaged:</strong> Customer is engaged. Draft the SOW to advance.' },
-        'Funding': { cls: 'warning', text: '<strong>Funding:</strong> Partner needs to secure ECIF funding. Submit and track funding status.' },
-        'Committed': { cls: 'info', text: '<strong>Committed:</strong> Partner is executing. Update workload statuses and seat changes below.' },
+        'New': { cls: 'neutral', text: '' },
+        'Outreach': { cls: 'neutral', text: '' },
+        'Engaged': { cls: 'neutral', text: '' },
+        'Funding': { cls: 'neutral', text: '' },
+        'Committed': { cls: 'neutral', text: '' },
         'Blocked': { cls: 'neutral', text: '' },
-        'Closed': { cls: 'neutral', text: '<strong>Closed:</strong> Campaign is closed. Reactivate if additional work is needed.' }
+        'Closed': { cls: 'neutral', text: '' }
       };
       const m = msgs[c.status] || msgs['New'];
       banner.className = 'state-banner ' + m.cls;
       banner.innerHTML = m.text;
+      banner.style.display = 'none';
     }
 
     function renderActionPanel(c) {
