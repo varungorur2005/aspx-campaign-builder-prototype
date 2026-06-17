@@ -1250,6 +1250,9 @@
         if (state === 'Funding' && c.status === 'Funding' && c.fundingSubState === 'requested') {
           labelHtml = 'Funding<br><span style="font-size:10px;color:#d83b01;font-weight:400;">Pending</span>';
         }
+        if (isBlocked && i === stateIdx) {
+          labelHtml = state + '<br><span style="font-size:10px;color:#d83b01;font-weight:600;">Blocked</span>';
+        }
 
 
         html += '<div class="step-item '+cls+'"><div class="step-dot">'+dotContent+'</div><div class="step-label">'+labelHtml+editIcon+'</div>'+(dateStr ? '<div class="step-date">'+dateStr+'</div>' : '')+closeLink+'</div>';
@@ -1832,7 +1835,23 @@
     }
 
     function saveDraft() {
-      if (currentCampaign) currentCampaign.dates.updated = today();
+      var c = currentCampaign;
+      if (!c) return;
+      c.dates.updated = today();
+      // If in Outreach and a blocked outcome is selected, move to Blocked
+      if (c.status === 'Outreach' && selectedOutcome && selectedOutcome !== 'agreed') {
+        var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
+        var comment = document.getElementById('gateEngageComment') && document.getElementById('gateEngageComment').value;
+        c.previousState = 'Outreach';
+        c.blockReason = reasons[selectedOutcome];
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome] + (comment ? ': ' + comment : ''), type: 'blocked', actor: c.partnerDRI });
+        selectedOutcome = '';
+        renderDetail();
+        renderDashboard();
+        showToast('Campaign blocked');
+        return;
+      }
       showToast('Changes saved');
     }
 
