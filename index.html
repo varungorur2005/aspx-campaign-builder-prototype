@@ -1280,7 +1280,7 @@
         html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
-        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Have you requested funding? <span class="required">*</span></label><select id="gateFundingRequested"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option><option value="na">Not Applicable</option></select></div><div class="form-group"><label>Customer SOW completed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted"> Yes</label></div></div><div class="form-group"><label>SOW Completion Date <span class="required">*</span></label><input type="date" id="gateSowDate"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group"><label>Have you requested funding? <span class="required">*</span></label><select id="gateFundingRequested"><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option><option value="na">Not Applicable</option></select></div><div class="form-group"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
       }
       else if (c.status === 'Blocked') {
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
@@ -1331,24 +1331,32 @@
     function renderActionBar(c) {
       const bar = document.getElementById('detailActionBar');
       if (currentView === 'field' || currentView === 'corp') {
-        bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div></div>';
+        bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save</button></div><div></div>';
         return;
       }
-      let left = '';
-      if (c.status === 'New') left = '<button class="btn btn-primary" onclick="advanceFromNew()">Confirm Outreach &rarr;</button>';
-      else if (c.status === 'Outreach') left = '<button class="btn btn-primary" onclick="advanceFromOutreach()">Submit Engagement &rarr;</button>';
-      else if (c.status === 'Engaged') left = '<button class="btn btn-primary" onclick="advanceFromEngaged()">Advance &rarr;</button>';
-      else if (c.status === 'Funding') left = '<button class="btn btn-primary" onclick="advanceFromFunding()">Submit Funding &rarr;</button>';
-      else if (c.status === 'Committed') left = '<button class="btn btn-secondary" onclick="saveDraft()">Save Changes</button>';
-      else if (c.status === 'Blocked') left = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
-      else if (c.status === 'Closed') left = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
+      let moveBtn = '';
+      if (c.status === 'New') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Outreach</button>';
+      else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Engaged</button>';
+      else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Funding</button>';
+      else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Committed</button>';
+      else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
+      else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
 
-      const closeBtn = '';
-      bar.innerHTML = '<div class="action-bar-left">'+left+' <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button></div><div>'+closeBtn+'</div>';
+      bar.innerHTML = '<div class="action-bar-left"><button class="btn btn-secondary" onclick="saveDraft()">Save</button> ' + moveBtn + '</div><div></div>';
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-    function advanceFromNew() {
+function onSowSignedChange() {
+      var cb = document.getElementById('gateSowCompleted');
+      var display = document.getElementById('sowSignedDateDisplay');
+      if (cb && cb.checked) {
+        var c = currentCampaign;
+        c.dates.sowSigned = today();
+        if (display) { display.style.display = ''; display.textContent = 'Signed on: ' + today(); }
+      } else {
+        if (display) { display.style.display = 'none'; display.textContent = ''; }
+      }
+    }    function advanceFromNew() {
       const checked = document.getElementById('gateOutreach') && document.getElementById('gateOutreach').checked;
       const date = document.getElementById('gateOutreachDate') && document.getElementById('gateOutreachDate').value;
       if (!checked || !date) { showToast('Please confirm outreach and provide a date', true); return; }
@@ -1417,12 +1425,11 @@
       var sel = document.getElementById('gateFundingRequested');
       if (!sel || !sel.value) { showToast('Please select a funding status', true); return; }
       var sowChecked = document.getElementById('gateSowCompleted') && document.getElementById('gateSowCompleted').checked;
-      var sowDate = document.getElementById('gateSowDate') && document.getElementById('gateSowDate').value;
-      if (!sowChecked || !sowDate) { showToast('Please confirm SOW completion and select a date', true); return; }
+      if (!sowChecked) { showToast('Please confirm SOW is signed', true); return; }
       var c = currentCampaign;
       c.dates.updated = today();
       c.fundingRequired = sel.value;
-      c.dates.sowCompleted = sowDate;
+      c.dates.sowSigned = c.dates.sowSigned || today();
       var comments = document.getElementById('gateFundingComment') ? document.getElementById('gateFundingComment').value : '';
 
       if (sel.value === 'yes') {
@@ -1430,17 +1437,17 @@
         c.dates.fundingSubmission = today();
         c.status = 'Committed';
         c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding requested, SOW completed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding requested, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed');
       } else if (sel.value === 'no') {
         c.status = 'Committed';
         c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding not requested, SOW completed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding not requested, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed (no funding)');
       } else {
         c.status = 'Committed';
         c.dates.fundingApproval = today();
-        c.history.push({ date: today(), text: 'Funding N/A, SOW completed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Funding N/A, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed (N/A)');
       }
       renderDetail();
