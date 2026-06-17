@@ -1271,7 +1271,7 @@
         html = '<div class="panel-card"><h2>Customer SOW</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Customer is engaged. Confirm Statement of Work (SOW) status to proceed.</p><div class="form-grid"><div class="form-group"><label>Have you drafted the customer SOW? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowDrafted"> Yes</label></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
-        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding needed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes needed</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> Not needed</label></div></div><div class="form-group" id="fundingRequestedGroup"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingRequested" disabled> Yes</label></div></div><div class="form-group" id="fundingSecuredGroup"><label>Funding Secured? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSecured" disabled> Yes</label></div></div><div class="form-group"><label>SOW Signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;"><button class="btn" style="background:#d83b01;color:#fff;font-size:12px;" onclick="blockFromFunding()">Block Campaign</button> <span style="font-size:11px;color:#616161;">Funding blocked</span></div></div>';
+        html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding needed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes needed</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> Not needed</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()"> Yes</label></div></div><div class="form-group" id="fundingSecuredGroup" style="opacity:0.4;"><label>Funding Secured? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateFundingSecured" disabled onchange="onFundingSecuredChange()"> Yes</label></div></div><div class="form-group" id="sowSignedGroup" style="opacity:0.4;"><label>SOW Signed? <span class="required">*</span></label><div class="radio-group"><label><input type="checkbox" id="gateSowCompleted" disabled onchange="onSowSignedChange()"> Yes</label></div><div id="sowSignedDateDisplay" style="margin-top:6px;font-size:12px;color:#616161;display:none;"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
       }
       else if (c.status === 'Blocked') {
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
@@ -1440,22 +1440,67 @@
 
     function onFundingNeededChange() {
       var yesRadio = document.getElementById('gateFundingYes');
+      var noRadio = document.getElementById('gateFundingNo');
       var reqCb = document.getElementById('gateFundingRequested');
       var secCb = document.getElementById('gateFundingSecured');
+      var sowCb = document.getElementById('gateSowCompleted');
       var reqGroup = document.getElementById('fundingRequestedGroup');
       var secGroup = document.getElementById('fundingSecuredGroup');
+      var sowGroup = document.getElementById('sowSignedGroup');
       if (yesRadio && yesRadio.checked) {
         reqCb.disabled = false;
-        secCb.disabled = false;
         reqGroup.style.opacity = '1';
-        secGroup.style.opacity = '1';
-      } else {
+        // Secured stays disabled until Requested is checked
+        secCb.disabled = true;
+        secCb.checked = false;
+        secGroup.style.opacity = '0.4';
+        // SOW stays disabled until Secured is checked
+        sowCb.disabled = true;
+        sowCb.checked = false;
+        sowGroup.style.opacity = '0.4';
+      } else if (noRadio && noRadio.checked) {
+        // Not needed: grey out Requested and Secured, enable SOW directly
         reqCb.disabled = true;
         secCb.disabled = true;
         reqCb.checked = false;
         secCb.checked = false;
         reqGroup.style.opacity = '0.4';
         secGroup.style.opacity = '0.4';
+        sowCb.disabled = false;
+        sowGroup.style.opacity = '1';
+      }
+    }
+
+    function onFundingRequestedChange() {
+      var reqCb = document.getElementById('gateFundingRequested');
+      var secCb = document.getElementById('gateFundingSecured');
+      var secGroup = document.getElementById('fundingSecuredGroup');
+      var sowCb = document.getElementById('gateSowCompleted');
+      var sowGroup = document.getElementById('sowSignedGroup');
+      if (reqCb && reqCb.checked) {
+        secCb.disabled = false;
+        secGroup.style.opacity = '1';
+      } else {
+        secCb.disabled = true;
+        secCb.checked = false;
+        secGroup.style.opacity = '0.4';
+        sowCb.disabled = true;
+        sowCb.checked = false;
+        sowGroup.style.opacity = '0.4';
+      }
+    }
+
+    function onFundingSecuredChange() {
+      var secCb = document.getElementById('gateFundingSecured');
+      var sowCb = document.getElementById('gateSowCompleted');
+      var sowGroup = document.getElementById('sowSignedGroup');
+      if (secCb && secCb.checked) {
+        sowCb.disabled = false;
+        sowGroup.style.opacity = '1';
+      } else {
+        sowCb.disabled = true;
+        sowCb.checked = false;
+        sowGroup.style.opacity = '0.4';
       }
     }
 
