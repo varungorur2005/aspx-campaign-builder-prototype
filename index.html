@@ -491,7 +491,7 @@
         <div class="panel-card" id="workloadsPanel" style="display:none;">
           <h2>Workloads</h2>
           <table class="workloads-table">
-            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change</th><th>Notes</th></tr></thead>
+            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Notes</th></tr></thead>
             <tbody id="workloadsBody"></tbody>
           </table>
           <div class="form-group full-width" style="margin-top:14px;">
@@ -1254,7 +1254,7 @@
       const panel = document.getElementById('actionPanel');
       let html = '';
 
-      if (currentView === 'field' || currentView === 'corp' || c.status === 'Closed') {
+      if (currentView === 'field' || currentView === 'corp') {
         html = '<div class="panel-card"><h2>Campaign State</h2><p style="font-size:12px;color:#616161;">Campaign is in <strong>'+c.status+'</strong> state. State changes are managed by the partner.</p>' +
           '<div class="detail-meta" style="margin-top:12px;"><div class="detail-meta-item"><strong>Last Updated:</strong> '+(c.dates.updated || '&mdash;')+'</div><div class="detail-meta-item"><strong>Funding Required:</strong> '+(c.fundingRequired === 'yes' ? 'Yes' : c.fundingRequired === 'no' ? 'No' : 'TBD')+'</div></div></div>';
         panel.innerHTML = html;
@@ -1277,7 +1277,7 @@
         html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="state-banner danger" style="margin-bottom:14px;"><strong>Block Reason:</strong> '+c.blockReason+'</div><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
-        html = '<div class="panel-card"><h2>Reactivate Campaign</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">Reactivating will return the campaign to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Select an option</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Reactivate</h2><p style="font-size:12px;color:#616161;margin-bottom:14px;">This campaign is closed. Reactivating will return it to <strong>Committed</strong> state.</p><div class="form-grid"><div class="form-group"><label>Reactivation Reason <span class="required">*</span></label><select id="gateReactivateReason"><option value="">Select an option</option><option>Accidentally closed</option><option>Additional workloads targeted</option><option>Changes to existing workloads</option></select></div><div class="form-group full-width"><label>Notes</label><textarea placeholder="Additional notes..."></textarea></div></div></div>';
       }
 
       panel.innerHTML = html;
@@ -1285,7 +1285,7 @@
 
     function renderWorkloads(c) {
       const panel = document.getElementById('workloadsPanel');
-      if (c.status !== 'Committed' && c.status !== 'Closed') { panel.style.display = 'none'; return; }
+      if (c.status !== 'Committed') { panel.style.display = 'none'; return; }
       panel.style.display = '';
 
       const tbody = document.getElementById('workloadsBody');
@@ -1316,7 +1316,44 @@
     }
 
     function renderAudit(c) {
-      document.getElementById('auditTimeline').innerHTML = c.history.slice().reverse().map(h => '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+h.text+'</div><div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>').join('');
+      if (c.status === 'Closed') {
+        // Group history by state phases
+        var phases = [
+          { name: 'New', entries: [] },
+          { name: 'Outreach', entries: [] },
+          { name: 'Engaged', entries: [] },
+          { name: 'Funding', entries: [] },
+          { name: 'Committed', entries: [] },
+          { name: 'Closed', entries: [] }
+        ];
+        var currentPhase = 0;
+        c.history.forEach(function(h) {
+          var text = h.text.toLowerCase();
+          if (text.indexOf('outreach') > -1 && currentPhase < 1) currentPhase = 1;
+          else if ((text.indexOf('engaged') > -1 || text.indexOf('sow drafted') > -1) && currentPhase < 2) currentPhase = 2;
+          else if ((text.indexOf('funding') > -1 || text.indexOf('sow signed') > -1) && currentPhase < 3) currentPhase = 3;
+          else if ((text.indexOf('committed') > -1 || text.indexOf('workload') > -1) && currentPhase < 4) currentPhase = 4;
+          else if ((text.indexOf('closed') > -1 || text.indexOf('close') > -1) && currentPhase < 5) currentPhase = 5;
+          phases[currentPhase].entries.push(h);
+        });
+        var auditHtml = '';
+        phases.forEach(function(phase) {
+          if (phase.entries.length === 0) return;
+          auditHtml += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:13px;color:#0078d4;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;">'+phase.name+'</div>';
+          phase.entries.forEach(function(h) {
+            var parts = h.text.split(' — ');
+            var action = parts[0];
+            var comment = parts.length > 1 ? parts[1] : '';
+            auditHtml += '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+action+'</div>';
+            if (comment) auditHtml += '<div style="font-size:11px;color:#424242;font-style:italic;margin-top:2px;">Comment: '+comment+'</div>';
+            auditHtml += '<div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>';
+          });
+          auditHtml += '</div>';
+        });
+        document.getElementById('auditTimeline').innerHTML = auditHtml;
+      } else {
+        document.getElementById('auditTimeline').innerHTML = c.history.slice().reverse().map(h => '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+h.text+'</div><div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>').join('');
+      }
     }
 
     function renderActionBar(c) {
@@ -1330,7 +1367,7 @@
       else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Engaged</button>';
       else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Funding</button>';
       else if (c.status === 'Funding') moveBtn = '<button class="btn btn-primary" onclick="moveToNextState()">Move to Committed</button>';
-      else if (c.status === 'Committed') moveBtn = '<button class="btn btn-danger" onclick="closeCampaignCheck()">Close Campaign</button>';
+      else if (c.status === 'Committed') moveBtn = '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
       else if (c.status === 'Closed') moveBtn = '<button class="btn btn-success" onclick="reactivateCampaign()">Reactivate</button>';
 
