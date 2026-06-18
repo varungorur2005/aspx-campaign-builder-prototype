@@ -1288,13 +1288,6 @@
       const panel = document.getElementById('actionPanel');
       let html = '';
 
-      if (currentView === 'field' || currentView === 'corp') {
-        html = '<div class="panel-card"><h2>Campaign State</h2><p style="font-size:12px;color:#616161;">Campaign is in <strong>'+c.status+'</strong> state. State changes are managed by the partner.</p>' +
-          '<div class="detail-meta" style="margin-top:12px;"><div class="detail-meta-item"><strong>Last Updated:</strong> '+(c.dates.updated || '&mdash;')+'</div><div class="detail-meta-item"><strong>Funding Required:</strong> '+(c.fundingRequired === 'yes' ? 'Yes' : c.fundingRequired === 'no' ? 'No' : 'TBD')+'</div></div></div>';
-        panel.innerHTML = html;
-        return;
-      }
-
       if (c.status === 'New') {
         html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateOutreach" onchange="checkMoveButtonState()" style="margin-right:6px;"> Customer Outreach Initiated? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateOutreachDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Notes</label><textarea id="gateOutreachComment" placeholder="Optional notes..."></textarea></div></div></div>';
       }
@@ -1331,15 +1324,8 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      if (currentView === 'field' || currentView === 'corp') {
-        tbody.innerHTML = c.workloadData.map(function(w) {
-          return '<tr><td><strong>'+w.name+'</strong></td><td>'+w.status+'</td><td>'+w.seats.toLocaleString()+'</td><td>'+(w.notes || '&mdash;')+'</td><td></td></tr>';
-        }).join('');
-        notesGroup.style.display = 'none';
-      } else {
-        tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><textarea rows="2" style="width:100%;min-height:32px;resize:vertical;" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+w.notes+'</textarea></td><td style="width:28px;"><button onclick="saveWorkloadRow('+i+')" title="Save" style="cursor:pointer;border:none;background:none;padding:2px;font-size:14px;color:#0078d4;">💾</button></td></tr>').join('');
-        notesGroup.style.display = '';
-      }
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><textarea rows="2" style="width:100%;min-height:32px;resize:vertical;" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+w.notes+'</textarea></td><td style="width:28px;"><button onclick="saveWorkloadRow('+i+')" title="Save" style="cursor:pointer;border:none;background:none;padding:2px;font-size:14px;color:#0078d4;">💾</button></td></tr>').join('');
+      notesGroup.style.display = '';
     }
 
     function renderUsage(c) {
@@ -1399,10 +1385,6 @@
 
     function renderActionBar(c) {
       const bar = document.getElementById('detailActionBar');
-      if (currentView === 'field' || currentView === 'corp') {
-        bar.innerHTML = '<div class="action-bar-left"></div><div></div>';
-        return;
-      }
       let moveBtn = '';
       if (c.status === 'New') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Outreach</button>';
       else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Engaged</button>';
