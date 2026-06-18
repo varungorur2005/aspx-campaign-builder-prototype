@@ -455,10 +455,16 @@
               <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
               <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
             </div>
-            <button class="toolbar-btn" onclick="showToast('Column customization is not available in this prototype')">
+            <div style="position:relative;display:inline-block;">
+            <button class="toolbar-btn" onclick="toggleColumnPicker()">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 2v12M6 2v12M10 2v12M14 2v12"/><path d="M2 5h2M6 5h2M10 5h2" stroke-width="2"/></svg>
               Change columns
             </button>
+            <div id="columnPickerDropdown" style="display:none;position:absolute;top:36px;left:0;background:#fff;border:1px solid #d2d0ce;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;z-index:100;min-width:200px;">
+              <div style="font-weight:600;font-size:12px;margin-bottom:8px;">Show/Hide Columns</div>
+              <div id="columnPickerList"></div>
+            </div>
+            </div>
             <button class="toolbar-btn" onclick="toggleFilter()">
               <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
               Filters
@@ -991,6 +997,7 @@
       document.getElementById('filterSource').value = '';
       document.getElementById('filterArea').value = '';
       document.getElementById('searchInput').value = '';
+      initColumns();
       showDashboard();
       toggleFilter(false);
       renderDashboard();
@@ -1000,6 +1007,58 @@
     // KPI FILTER
     let activeKpiFilter = null;
     let activeChartFilter = null;
+
+    // COLUMN PICKER
+    var allColumns = [
+      { key: 'id', label: 'Campaign ID', alwaysOn: true },
+      { key: 'customer', label: 'Customer Name' },
+      { key: 'partner', label: 'Partner Name' },
+      { key: 'status', label: 'Status' },
+      { key: 'partnerDRI', label: 'Partner DRI' },
+      { key: 'microsoftDRI', label: 'Microsoft DRI' },
+      { key: 'workloads', label: 'Targeted Workloads' },
+      { key: 'unified', label: 'Unified', fieldCorpOnly: true },
+      { key: 'opportunityId', label: 'Opportunity ID', fieldCorpOnly: true },
+      { key: 'source', label: 'Source' }
+    ];
+    var visibleColumns = {};
+    function initColumns() {
+      allColumns.forEach(function(col) {
+        if (col.fieldCorpOnly && currentView === 'partner') visibleColumns[col.key] = false;
+        else visibleColumns[col.key] = true;
+      });
+    }
+    initColumns();
+
+    function toggleColumnPicker() {
+      var dropdown = document.getElementById('columnPickerDropdown');
+      if (dropdown.style.display === 'none') {
+        var listHtml = allColumns.map(function(col) {
+          if (col.fieldCorpOnly && currentView === 'partner') return '';
+          var checked = visibleColumns[col.key] ? 'checked' : '';
+          var disabled = col.alwaysOn ? 'disabled' : '';
+          return '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" '+checked+' '+disabled+' onchange="toggleColumn(\''+col.key+'\',this.checked)"> '+col.label+'</label>';
+        }).join('');
+        document.getElementById('columnPickerList').innerHTML = listHtml;
+        dropdown.style.display = '';
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+
+    function toggleColumn(key, visible) {
+      visibleColumns[key] = visible;
+      renderDashboard();
+    }
+
+    document.addEventListener('click', function(e) {
+      var dropdown = document.getElementById('columnPickerDropdown');
+      if (dropdown && dropdown.style.display !== 'none') {
+        if (!e.target.closest('#columnPickerDropdown') && !e.target.closest('.toolbar-btn')) {
+          dropdown.style.display = 'none';
+        }
+      }
+    });
     function filterByKpi(filter) {
       const statusEl = document.getElementById('filterStatus');
       statusEl.value = '';
@@ -1100,22 +1159,38 @@
 
       renderCharts();
 
-      // Table headers based on view
+      // Table headers based on view and visible columns
       const thead = document.getElementById('campaignTableHead');
-      if (currentView === 'partner') {
-        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Source</th></tr>';
-      } else {
-        thead.innerHTML = '<tr><th>Campaign ID</th><th>Customer Name</th><th>Partner Name</th><th>Status</th><th>Partner DRI</th><th>Microsoft DRI</th><th>Targeted Workloads</th><th>Unified</th><th>Opportunity ID</th><th>Source</th></tr>';
-      }
+      var headerCells = '';
+      allColumns.forEach(function(col) {
+        if (col.fieldCorpOnly && currentView === 'partner') return;
+        if (!visibleColumns[col.key]) return;
+        headerCells += '<th>'+col.label+'</th>';
+      });
+      thead.innerHTML = '<tr>'+headerCells+'</tr>';
 
       const tbody = document.getElementById('campaignTableBody');
       tbody.innerHTML = filtered.map(c => {
         var wl = c.workloads.map(w => '<span class="workload-pill">'+w+'</span>').join('');
-        if (currentView === 'partner') {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
-        } else {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td><a class="campaign-id-link" onclick="openCustomerUsage(\''+c.id+'\')">'+c.customer+'</a></td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
-        }
+        var cells = '';
+        allColumns.forEach(function(col) {
+          if (col.fieldCorpOnly && currentView === 'partner') return;
+          if (!visibleColumns[col.key]) return;
+          if (col.key === 'id') cells += '<td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td>';
+          else if (col.key === 'customer') {
+            if (currentView === 'partner') cells += '<td>'+c.customer+'</td>';
+            else cells += '<td><a class="campaign-id-link" onclick="openCustomerUsage(\''+c.id+'\')">'+c.customer+'</a></td>';
+          }
+          else if (col.key === 'partner') cells += '<td>'+c.partner+'</td>';
+          else if (col.key === 'status') cells += '<td>'+renderStatusBadge(c)+'</td>';
+          else if (col.key === 'partnerDRI') cells += '<td>'+c.partnerDRI+'</td>';
+          else if (col.key === 'microsoftDRI') cells += '<td>'+c.microsoftDRI+'</td>';
+          else if (col.key === 'workloads') cells += '<td><div class="workload-pills">'+wl+'</div></td>';
+          else if (col.key === 'unified') cells += '<td>'+c.unified+'</td>';
+          else if (col.key === 'opportunityId') cells += '<td>'+c.opportunityId+'</td>';
+          else if (col.key === 'source') cells += '<td>'+c.source+'</td>';
+        });
+        return '<tr>'+cells+'</tr>';
       }).join('');
     }
 
