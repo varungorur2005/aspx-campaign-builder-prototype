@@ -415,7 +415,7 @@
       <nav class="sidebar-nav">
         <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
         <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
-        <a href="#" class="sidebar-link" onclick="switchView('corp'); return false" id="navCorp"><span>Campaign Builder (Corp View)</span></a>
+        <a href="#" class="sidebar-link" onclick="switchView('corp'); return false" id="navCorp"><span>Campaign Builder (MSFT Corp View)</span></a>
       </nav>
     </aside>
 
@@ -980,7 +980,7 @@
       document.getElementById('pageTitle').textContent =
         view === 'partner' ? 'Campaign Builder (Partner View)' :
         view === 'field' ? 'Campaign Builder (MSFT Field View)' :
-        'Campaign Builder (Corp View)';
+        'Campaign Builder (MSFT Corp View)';
       document.getElementById('dashboardTitle').textContent =
         view === 'partner' ? 'Campaigns - Partner View' :
         view === 'field' ? 'Campaigns - Field View' :
