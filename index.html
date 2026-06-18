@@ -241,6 +241,7 @@
     .step-item.active .step-dot { background: #0078d4; color: #fff; border-color: #005a9e; box-shadow: 0 0 0 3px rgba(0,120,212,0.2); }
     .step-item.blocked .step-dot { background: #d83b01; color: #fff; }
     .step-item.closed-state .step-dot { background: #605e5c; color: #fff; }
+    .step-item.funding-pending .step-dot { background: #c19c00; color: #fff; border-color: #a38300; box-shadow: 0 0 0 3px rgba(193,156,0,0.2); }
     input[type="date"] { cursor: pointer; } input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; opacity: 0; } input[type="date"] { position: relative; }
     .step-label { font-size: 11px; font-weight: 600; color: #616161; margin-top: 6px; text-align: center; }
     .step-item.active .step-label { color: #0078d4; }
@@ -1225,7 +1226,10 @@
         if (isBlocked && i === stateIdx) cls = 'blocked';
         else if (isClosed && i === STATE_ORDER.length - 1) cls = 'closed-state';
         else if (i < stateIdx) cls = 'completed';
-        else if (i === stateIdx) cls = 'active';
+        else if (i === stateIdx) {
+          if (state === 'Funding' && c.fundingSubState === 'requested') cls = 'funding-pending';
+          else cls = 'active';
+        }
 
         const dotContent = (cls === 'completed') ? '&#10003;' : (cls === 'blocked' ? '!' : (i + 1));
 
@@ -1248,7 +1252,7 @@
 
         var labelHtml = state;
         if (state === 'Funding' && c.status === 'Funding' && c.fundingSubState === 'requested') {
-          labelHtml = 'Funding<br><span style="font-size:10px;color:#d83b01;font-weight:400;">Pending</span>';
+          labelHtml = 'Funding<br><span style="font-size:10px;color:#c19c00;font-weight:400;">Pending</span>';
         }
         if (isBlocked && i === stateIdx) {
           labelHtml = state + '<br><span style="font-size:10px;color:#d83b01;font-weight:600;">Blocked</span>';
