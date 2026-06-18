@@ -639,7 +639,7 @@
         ]
       },
       {
-        id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro India Private Ltd',
+        id: '222222', customer: 'Genpact India Private Limited', partner: 'Ingram Micro UK Ltd',
         tpid: 'TP-55102', segment: 'Enterprise', area: 'India', industry: 'Financial Services',
         source: 'Security CSU Partner Clinic | FSI',
         workloads: ['MDE','MDA','MDO','MDI','IRM'],
@@ -688,7 +688,7 @@
         ]
       },
       {
-        id: '556677', customer: 'Northwind Traders', partner: 'TechData Corp',
+        id: '556677', customer: 'Northwind Traders', partner: 'Acme Consulting',
         tpid: 'TP-77451', segment: 'Mid-Market', area: 'EMEA North', industry: 'Retail',
         source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['MDE','MDA','Sentinel'],
@@ -711,7 +711,7 @@
         ]
       },
       {
-        id: '889900', customer: 'Tailspin Toys', partner: 'Insight Direct',
+        id: '889900', customer: 'Tailspin Toys', partner: 'Avanade',
         tpid: 'TP-12399', segment: 'SMB', area: 'APAC', industry: 'Consumer Goods',
         source: 'Security CSU Partner Clinic | APAC',
         workloads: ['MDO','MDE'],
@@ -782,7 +782,7 @@
         ]
       },
       {
-        id: '445566', customer: 'Adventure Works', partner: 'Computacenter',
+        id: '445566', customer: 'Adventure Works', partner: 'Softchoice',
         tpid: 'TP-77190', segment: 'Enterprise', area: 'EMEA North', industry: 'Manufacturing',
         source: 'Security CSU Partner Clinic | EMEA',
         workloads: ['Sentinel','MDE','MDI'],
@@ -831,7 +831,7 @@
         ]
       },
       {
-        id: '112233', customer: 'Relecloud', partner: 'Pax8',
+        id: '112233', customer: 'Relecloud', partner: 'CDW',
         tpid: 'TP-90881', segment: 'Mid-Market', area: 'US West', industry: 'Media',
         source: 'Security CSU Partner Clinic | US',
         workloads: ['MDO','Sentinel'],
@@ -904,7 +904,7 @@
         ]
       },
       {
-        id: '556600', customer: 'Humongous Insurance', partner: 'Wipro',
+        id: '556600', customer: 'Humongous Insurance', partner: 'SoftwareOne',
         tpid: 'TP-88412', segment: 'Enterprise', area: 'APAC', industry: 'Insurance',
         source: 'Security CSU Partner Clinic | APAC',
         workloads: ['Sentinel','MDI','IRM'],
@@ -1139,7 +1139,7 @@
 
       var partnerCounts = {};
       campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
-      var partnerChart = buildVBarChart(partnerCounts, '#7719aa', 'By Partner', 'partner');
+      var partnerChart = buildHBarChart(partnerCounts, '#7719aa', 'By Partner', 'partner');
 
       if (currentView === 'partner') {
         chartsRow.innerHTML = statusChart + workloadChart + areaChart;
@@ -1165,6 +1165,21 @@
       }).join('');
       var gridLines = '<div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div><div class="vbar-grid-line"></div>';
       return '<div class="chart-card"><h3>'+title+'</h3><div class="vbar-wrap"><div class="vbar-grid">'+gridLines+'</div><div class="vbar-chart">'+bars+'</div><div class="vbar-labels">'+labels+'</div></div></div>';
+    }
+
+    function buildHBarChart(data, color, title, filterType) {
+      var entries = Object.entries(data).sort(function(a, b) { return b[1] - a[1]; });
+      var maxVal = Math.max.apply(null, entries.map(function(e) { return e[1]; }).concat([1]));
+      var rows = entries.map(function(e) {
+        var pct = Math.max(8, Math.round((e[1] / maxVal) * 100));
+        var escaped = e[0].replace(/'/g, "\\'");
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')">' +
+          '<div style="width:100px;font-size:10px;color:#424242;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+e[0]+'">'+e[0]+'</div>' +
+          '<div style="flex:1;height:18px;background:#f0f0f0;border-radius:3px;overflow:hidden;">' +
+          '<div style="width:'+pct+'%;height:100%;background:'+color+';border-radius:3px;transition:width 0.3s;"></div></div>' +
+          '<div style="font-size:11px;font-weight:600;color:#424242;min-width:20px;">'+e[1]+'</div></div>';
+      }).join('');
+      return '<div class="chart-card"><h3>'+title+'</h3><div style="padding:4px 0;">'+rows+'</div></div>';
     }
 
     function buildPieChart(data, colors, title, filterType) {
