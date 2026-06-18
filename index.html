@@ -1112,7 +1112,7 @@
         if (currentView === 'partner') {
           return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
         } else {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.customer+'</a></td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td><a class="campaign-id-link" onclick="openCustomerUsage(\''+c.id+'\')">'+c.customer+'</a></td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
         }
       }).join('');
     }
@@ -1188,9 +1188,20 @@
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    var detailMode = 'campaign'; // 'campaign' or 'usage'
+
     function openCampaign(id) {
       currentCampaign = campaigns.find(c => c.id === id);
       if (!currentCampaign) return;
+      detailMode = 'campaign';
+      document.getElementById('detailView').classList.add('show');
+      renderDetail();
+    }
+
+    function openCustomerUsage(id) {
+      currentCampaign = campaigns.find(c => c.id === id);
+      if (!currentCampaign) return;
+      detailMode = 'usage';
       document.getElementById('detailView').classList.add('show');
       renderDetail();
     }
@@ -1206,13 +1217,29 @@
 
       document.getElementById('detailHeader').innerHTML = '<h1>'+c.id+' &mdash; '+c.customer+'</h1><div class="detail-meta"><div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div><div class="detail-meta-item"><strong>Source:</strong> '+c.source+'</div><div class="detail-meta-item"><strong>TPID:</strong> '+c.tpid+'</div><div class="detail-meta-item"><strong>Segment:</strong> '+c.segment+'</div><div class="detail-meta-item"><strong>Area:</strong> '+c.area+'</div><div class="detail-meta-item"><strong>Partner DRI:</strong> '+c.partnerDRI+'</div><div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+c.microsoftDRI+'</div><div class="detail-meta-item"><strong>Workloads:</strong> '+c.workloads.join(', ')+'</div></div>';
 
-      renderUsage(c);
-      renderStepper(c);
-      renderBanner(c);
-      renderActionPanel(c);
-      renderWorkloads(c);
-      renderAudit(c);
-      renderActionBar(c);
+      if (detailMode === 'usage') {
+        // Usage mode: show only usage table, hide state flow
+        document.getElementById('usagePanel').style.display = '';
+        document.getElementById('usageBody').innerHTML = c.usageData.map(function(u) {
+          return '<tr><td><strong>'+u.workload+'</strong></td><td>'+u.mau.toLocaleString()+'</td><td>'+u.pau.toLocaleString()+'</td><td>'+u.utilization+'%</td><td>'+u.whitespace.toLocaleString()+'</td></tr>';
+        }).join('');
+        document.getElementById('lifecycleStepper').innerHTML = '';
+        document.getElementById('stateBanner').style.display = 'none';
+        document.getElementById('actionPanel').innerHTML = '';
+        document.getElementById('workloadsPanel').style.display = 'none';
+        document.getElementById('detailActionBar').innerHTML = '';
+        renderAudit(c);
+      } else {
+        // Campaign mode: show state flow, hide usage table
+        document.getElementById('usagePanel').style.display = 'none';
+        document.getElementById('usageBody').innerHTML = '';
+        renderStepper(c);
+        renderBanner(c);
+        renderActionPanel(c);
+        renderWorkloads(c);
+        renderAudit(c);
+        renderActionBar(c);
+      }
     }
 
     function renderStepper(c) {
