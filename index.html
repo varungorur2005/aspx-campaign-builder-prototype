@@ -1112,7 +1112,7 @@
         if (currentView === 'partner') {
           return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.source+'</td></tr>';
         } else {
-          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td>'+c.customer+'</td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
+          return '<tr><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td><td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.customer+'</a></td><td>'+c.partner+'</td><td>'+renderStatusBadge(c)+'</td><td>'+c.partnerDRI+'</td><td>'+c.microsoftDRI+'</td><td><div class="workload-pills">'+wl+'</div></td><td>'+c.unified+'</td><td>'+c.opportunityId+'</td><td>'+c.source+'</td></tr>';
         }
       }).join('');
     }
