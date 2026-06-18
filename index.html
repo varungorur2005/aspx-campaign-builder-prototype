@@ -400,7 +400,7 @@
         <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
         <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
       </svg>
-      <span class="nav-title nav-platform-name">AI Business Solutions &amp; Security</span>
+      <span class="nav-title nav-platform-name">ASPX</span>
       <span class="nav-separator">|</span>
       <span class="nav-title" id="pageTitle">Campaign Builder (Partner View)</span>
     </div>
@@ -975,6 +975,8 @@
       document.getElementById('navField').classList.toggle('active', view === 'field');
       document.getElementById('navCorp').classList.toggle('active', view === 'corp');
       document.getElementById('dashboardView').classList.toggle('active', true);
+      document.querySelector('.nav-platform-name').textContent =
+        view === 'partner' ? 'ASPX' : 'ASPXi';
       document.getElementById('pageTitle').textContent =
         view === 'partner' ? 'Campaign Builder (Partner View)' :
         view === 'field' ? 'Campaign Builder (MSFT Field View)' :
