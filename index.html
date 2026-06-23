@@ -572,18 +572,19 @@
         <div class="panel-card" id="workloadsPanel" style="display:none;">
           <h2>Workloads</h2>
           <table class="workloads-table">
-            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Notes</th><th></th></tr></thead>
+            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Notes</th></tr></thead>
             <tbody id="workloadsBody"></tbody>
           </table>
           <div class="form-group full-width" style="margin-top:14px;">
             <label>Notes</label>
             <textarea placeholder="General notes for this campaign..."></textarea>
           </div>
+          <button class="btn btn-primary" style="margin-top:12px;" onclick="saveAllWorkloads()">Update Workloads</button>
         </div>
 
         <!-- Notes / Audit History -->
         <div class="panel-card" id="auditPanel">
-          <h2>Activity &amp; Audit History</h2>
+          <h2>Activity History</h2>
           <div class="audit-timeline" id="auditTimeline"></div>
         </div>
 
@@ -1654,7 +1655,7 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><textarea rows="2" style="width:100%;min-height:32px;resize:vertical;" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+w.notes+'</textarea></td><td style="width:28px;"><button onclick="saveWorkloadRow('+i+')" title="Save" style="cursor:pointer;border:none;background:none;padding:2px;font-size:14px;color:#0078d4;">💾</button></td></tr>').join('');
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value)" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><textarea rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+w.notes+'</textarea></td></tr>').join('');
       notesGroup.style.display = '';
     }
 
@@ -2179,6 +2180,20 @@
       c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       renderAudit(c);
       showToast('Workload "' + w.name + '" saved');
+    }
+
+    function saveAllWorkloads() {
+      var c = currentCampaign;
+      if (!c) return;
+      c.dates.updated = today();
+      c.workloadData.forEach(function(w) {
+        var historyText = 'Workload "' + w.name + '" updated — Status: ' + w.status + ', Seats: ' + w.seats;
+        if (w.notes) historyText += ' — ' + w.notes;
+        c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
+      });
+      renderAudit(c);
+      renderDashboard();
+      showToast('All workloads updated');
     }
 
     function saveDraft() {
