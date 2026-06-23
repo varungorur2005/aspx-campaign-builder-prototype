@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ASPX - Campaign Builder</title>
   <style>
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        RESET & BASE
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -17,9 +17,9 @@
     button { font-family: inherit; cursor: pointer; }
     input, select, textarea { font-family: inherit; }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        TOP NAV
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     .top-nav {
       display: flex; align-items: center; justify-content: space-between;
       height: 48px; padding: 0 20px;
@@ -38,9 +38,9 @@
       font-size: 12px; font-weight: 600; cursor: pointer;
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        APP LAYOUT
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     .app-layout { display: flex; min-height: calc(100vh - 48px); }
 
     /* Sidebar */
@@ -64,9 +64,9 @@
     /* Main */
     .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        DASHBOARD VIEW
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     .dashboard-view { padding: 20px 24px 40px; }
     .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
@@ -202,9 +202,9 @@
       background: #e8f0fe; color: #0078d4; font-weight: 500;
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        FILTER FLYOUT
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     .filter-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 400;
     }
@@ -234,9 +234,9 @@
       accent-color: #0078d4; flex-shrink: 0;
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    /* ============================================================
        DETAIL FLYOUT
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+       ============================================================ */
     .detail-view {
       position: fixed; top: 48px; right: 0; bottom: 0;
       width: 620px; max-width: 50vw; background: #fff;
@@ -435,7 +435,7 @@
     </div>
   </div>
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP NAV Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <!-- ========== TOP NAV ========== -->
   <nav class="top-nav">
     <div class="nav-left">
       <button style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;">&#9776;</button>
@@ -463,10 +463,10 @@
   </nav>
 
   <div class="app-layout">
-    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SIDEBAR Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar" id="sidebar"></aside>
 
-    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MAIN CONTENT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ========== MAIN CONTENT ========== -->
     <main class="main-content" id="mainContent">
       <div id="breadcrumb" style="padding:8px 24px;font-size:12px;color:#616161;border-bottom:1px solid #e0e0e0;background:#fff;">
         <span style="color:#0078d4;cursor:pointer;">Home</span> &gt;
@@ -475,9 +475,9 @@
         <span style="font-weight:600;color:#242424;">Security CSU Campaigns</span>
       </div>
 
-      <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+      <!-- ==========
            DASHBOARD VIEW
-           Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+           ========== -->
       <div class="dashboard-view content-view active" id="dashboardView">
         <h1 class="page-title" id="dashboardTitle" style="display:none;"></h1>
 
@@ -538,9 +538,9 @@
   </div>
 
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+  <!-- ==========
        DETAIL FLYOUT
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+       ========== -->
   <div class="detail-view" id="detailView">
     <div class="flyout-header">
       <span style="font-size:11px;color:#616161;">Campaign Detail</span>
@@ -592,7 +592,7 @@
       <div id="detailActionBar" style="padding:12px 0; border-top:1px solid #e0e0e0; margin-top:16px; display:flex; align-items:center; justify-content:space-between;"></div>
   </div>
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â FILTER FLYOUT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <!-- ========== FILTER FLYOUT ========== -->
   <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()">
     <div class="filter-panel" onclick="event.stopPropagation()">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -629,7 +629,7 @@
     </div>
   </div>
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â CLOSE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <!-- ========== CLOSE MODAL ========== -->
   <div class="modal-overlay" id="closeModal">
     <div class="modal">
       <h3>Close Campaign</h3>
@@ -656,14 +656,14 @@
     </div>
   </div>
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOAST Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+  <!-- ========== TOAST ========== -->
   <div class="toast" id="toast"></div>
 
-  <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+  <!-- ==========
        JAVASCRIPT
-       Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+       ========== -->
   <script>
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MOCK DATA Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    //  MOCK DATA 
     const campaigns = [
       {
         id: '123456', customer: 'DEPARTMENT OF HEALTH', partner: 'Ingram Micro UK Ltd',
@@ -731,7 +731,7 @@
         history: [
           { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
           { date: '2026-05-12', text: 'Outreach completed', type: 'success', actor: 'partner@acme.com' },
-          { date: '2026-05-18', text: 'Customer engaged — agreed', type: 'success', actor: 'partner@acme.com' },
+          { date: '2026-05-18', text: 'Customer engaged - agreed', type: 'success', actor: 'partner@acme.com' },
           { date: '2026-05-22', text: 'ECIF funding requested', type: 'info', actor: 'partner@acme.com' },
           { date: '2026-05-28', text: 'Funding approved', type: 'success', actor: 'field@microsoft.com' },
           { date: '2026-06-04', text: 'MDE workload marked as Closed', type: 'success', actor: 'partner@acme.com' }
@@ -757,7 +757,7 @@
         history: [
           { date: '2026-05-15', text: 'Campaign created', type: 'info', actor: 'msftfield@microsoft.com' },
           { date: '2026-05-18', text: 'Outreach completed', type: 'success', actor: 'rep@techdata.com' },
-          { date: '2026-05-25', text: 'Customer prefers another partner — blocked', type: 'blocked', actor: 'rep@techdata.com' }
+          { date: '2026-05-25', text: 'Customer prefers another partner - blocked', type: 'blocked', actor: 'rep@techdata.com' }
         ]
       },
       {
@@ -779,7 +779,7 @@
         history: [
           { date: '2026-05-20', text: 'Campaign created', type: 'info', actor: 'apacfield@microsoft.com' },
           { date: '2026-05-22', text: 'Outreach completed', type: 'success', actor: 'sales@insight.com' },
-          { date: '2026-05-28', text: 'Customer engaged — agreed to campaign', type: 'success', actor: 'sales@insight.com' },
+          { date: '2026-05-28', text: 'Customer engaged - agreed to campaign', type: 'success', actor: 'sales@insight.com' },
           { date: '2026-06-02', text: 'Awaiting funding requirement decision', type: 'info', actor: 'apacfield@microsoft.com' }
         ]
       },
@@ -1076,7 +1076,7 @@
           '</nav>';
       }
     }
-    // â•â•â•â•â•â•â• VIEW SWITCH â•â•â•â•â•â•â•
+    //  VIEW SWITCH 
     function switchView(view) {
       currentView = view;
       document.body.classList.toggle('partner-view', view === 'partner');
@@ -1242,7 +1242,7 @@
         return 0;
       });
 
-      // KPIs — differ by view
+      // KPIs - differ by view
       const total = campaigns.length;
       const newCount = campaigns.filter(c => c.status === 'New').length;
       const blocked = campaigns.filter(c => c.status === 'Blocked').length;
@@ -1490,7 +1490,7 @@
       });
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    //  DETAIL VIEW 
     var detailMode = 'campaign'; // 'campaign' or 'usage'
 
     function openCampaign(id) {
@@ -1699,7 +1699,7 @@
           if (phase.entries.length === 0) return;
           auditHtml += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:13px;color:#0078d4;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;">'+phase.name+'</div>';
           phase.entries.forEach(function(h) {
-            var parts = h.text.split(' — ');
+            var parts = h.text.split(' - ');
             var action = parts[0];
             var comment = parts.length > 1 ? parts[1] : '';
             auditHtml += '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+action+'</div>';
@@ -1788,7 +1788,7 @@
       }
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â STATE TRANSITIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    //  STATE TRANSITIONS 
     function onSowSignedChange() {
       var cb = document.getElementById('gateSowCompleted');
       var display = document.getElementById('sowSignedDateDisplay');
@@ -1808,7 +1808,7 @@
       c.blockReason = 'Customer declined engagement';
       c.status = 'Blocked';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Blocked — Customer declined engagement', type: 'blocked', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Blocked - Customer declined engagement', type: 'blocked', actor: c.partnerDRI });
       showToast('Campaign blocked');
       renderDetail();
       renderDashboard();
@@ -1820,7 +1820,7 @@
       c.blockReason = 'Funding blocked';
       c.status = 'Blocked';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Blocked — Funding blocked', type: 'blocked', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Blocked - Funding blocked', type: 'blocked', actor: c.partnerDRI });
       showToast('Campaign blocked');
       renderDetail();
       renderDashboard();
@@ -1903,14 +1903,14 @@
 
       if (selectedOutcome === 'agreed') {
         c.status = 'Engaged';
-        c.history.push({ date: today(), text: 'Customer engaged — advanced to Engaged', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Customer engaged - advanced to Engaged', type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Engaged');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
         showToast('Campaign blocked');
       }
       selectedOutcome = '';
@@ -1943,7 +1943,7 @@
       c.funding.submitted = false;
       c.funding.secured = '';
       var comments = document.getElementById('gateSowComments') ? document.getElementById('gateSowComments').value : '';
-      c.history.push({ date: today(), text: 'SOW drafted — advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'SOW drafted - advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
       showToast('Advanced to Funding');
       renderDetail();
       renderDashboard();
@@ -2039,7 +2039,7 @@
           c.status = 'Committed';
           c.fundingSubState = null;
           c.dates.fundingApproval = today();
-          c.history.push({ date: today(), text: 'Funding not needed, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+          c.history.push({ date: today(), text: 'Funding not needed, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
           showToast('Advanced to Committed');
         } else if (yesRadio && yesRadio.checked) {
           // Yes funding needed - move to Funding Requested sub-state
@@ -2061,7 +2061,7 @@
         c.dates.sowSigned = c.dates.sowSigned || today();
         c.status = 'Committed';
         c.fundingSubState = null;
-        c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed — advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
         showToast('Advanced to Committed');
       }
       renderDetail();
@@ -2076,9 +2076,9 @@
       c.previousState = null;
       c.blockReason = '';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Unblocked — returned to ' + c.status, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Unblocked - returned to ' + c.status, type: 'success', actor: c.partnerDRI });
       renderDetail();
-      showToast('Campaign unblocked — returned to ' + c.status);
+      showToast('Campaign unblocked - returned to ' + c.status);
     }
 
     function showReactivateModal() {
@@ -2092,7 +2092,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: c.partnerDRI });
       renderDetail();
       renderDashboard();
       showToast('Campaign reactivated to Committed');
@@ -2104,7 +2104,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated — ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: c.partnerDRI });
       renderDetail();
       showToast('Campaign reactivated to Committed');
     }
@@ -2138,7 +2138,7 @@
       c.previousState = c.status;
       c.status = 'Closed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Campaign manually closed — ' + reason, type: 'closed', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Campaign manually closed - ' + reason, type: 'closed', actor: c.partnerDRI });
       hideModal('closeModal');
       document.getElementById('closeReasonText').value = '';
       renderDetail();
@@ -2165,9 +2165,9 @@
       else if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
         c.status = 'Closed';
         c.dates.updated = today();
-        c.history.push({ date: today(), text: 'All workloads closed — campaign auto-closed', type: 'closed', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'All workloads closed - campaign auto-closed', type: 'closed', actor: c.partnerDRI });
         renderDetail();
-        showToast('All workloads closed — campaign auto-closed');
+        showToast('All workloads closed - campaign auto-closed');
       }
     }
 
@@ -2175,8 +2175,8 @@
       var c = currentCampaign;
       var w = c.workloadData[idx];
       c.dates.updated = today();
-      var historyText = 'Workload "' + w.name + '" updated — Status: ' + w.status + ', Seats: ' + w.seats;
-      if (w.notes) historyText += ' — ' + w.notes;
+      var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
+      if (w.notes) historyText += ' - ' + w.notes;
       c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       renderAudit(c);
       showToast('Workload "' + w.name + '" saved');
@@ -2187,8 +2187,8 @@
       if (!c) return;
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
-        var historyText = 'Workload "' + w.name + '" updated — Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.notes) historyText += ' — ' + w.notes;
+        var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
+        if (w.notes) historyText += ' - ' + w.notes;
         c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       });
       renderAudit(c);
@@ -2207,7 +2207,7 @@
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked — ' + reasons[selectedOutcome] + (comment ? ': ' + comment : ''), type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome] + (comment ? ': ' + comment : ''), type: 'blocked', actor: c.partnerDRI });
         selectedOutcome = '';
         renderDetail();
         renderDashboard();
@@ -2217,7 +2217,7 @@
       showToast('Changes saved');
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â UTILITIES Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    //  UTILITIES 
     function today() { return new Date().toISOString().split('T')[0]; }
 
     function showToast(msg, isError) {
@@ -2310,7 +2310,7 @@
       renderDashboard();
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â INIT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    //  INIT 
     switchView('partner');
   </script>
 </body>
