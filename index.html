@@ -1657,7 +1657,7 @@
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
-          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()" style="margin-right:6px;"> Funding Requested? <span class="required">*</span></label></div><div class="form-group" id="fundingRequestedDateGroup" style="opacity:0.4;"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;"><label><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()" style="margin-right:6px;"> Customer SOW signed? <span class="required">*</span></label></div><div class="form-group" id="sowSignedNoFundingDateGroup" style="opacity:0.4;display:none;"><label>Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;display:flex;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()" style="margin-right:6px;"> Funding Requested? <span class="required">*</span></label><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()" style="margin-right:6px;"> Customer SOW signed? <span class="required">*</span></label><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         } else if (c.fundingSubState === 'requested') {
           html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateFundingSecured" onchange="onFundingSecuredSubChange()" style="margin-right:6px;"> Is Microsoft funding secured? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         }
@@ -1981,32 +1981,26 @@
       var noRadio = document.getElementById('gateFundingNo');
       var reqGroup = document.getElementById('fundingRequestedGroup');
       var reqCb = document.getElementById('gateFundingRequested');
-      var reqDateGroup = document.getElementById('fundingRequestedDateGroup');
       var reqDate = document.getElementById('gateFundingRequestedDate');
-      var sowNoFundingGroup = document.getElementById('sowSignedNoFundingGroup');
-      var sowNoFundingCb = document.getElementById('gateSowNoFunding');
-      var sowNoFundingDateGroup = document.getElementById('sowSignedNoFundingDateGroup');
-      var sowNoFundingDate = document.getElementById('gateSowNoFundingDate');
+      var sowGroup = document.getElementById('sowSignedNoFundingGroup');
+      var sowCb = document.getElementById('gateSowNoFunding');
+      var sowDate = document.getElementById('gateSowNoFundingDate');
       if (yesRadio && yesRadio.checked) {
         // Show both Funding Requested and SOW Signed
-        if (reqGroup) reqGroup.style.opacity = '1';
+        if (reqGroup) { reqGroup.style.opacity = '1'; reqGroup.style.display = 'flex'; }
         if (reqCb) reqCb.disabled = false;
-        if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = ''; }
         if (reqDate) reqDate.disabled = false;
-        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = ''; sowNoFundingGroup.style.opacity = '1'; }
-        if (sowNoFundingDateGroup) { sowNoFundingDateGroup.style.display = ''; sowNoFundingDateGroup.style.opacity = '1'; }
-        if (sowNoFundingCb) sowNoFundingCb.disabled = false;
-        if (sowNoFundingDate) sowNoFundingDate.disabled = false;
+        if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
+        if (sowCb) sowCb.disabled = false;
+        if (sowDate) sowDate.disabled = false;
       } else if (noRadio && noRadio.checked) {
         // Hide Funding Requested, show SOW Signed
-        if (reqGroup) reqGroup.style.opacity = '0.4';
+        if (reqGroup) { reqGroup.style.opacity = '0.4'; reqGroup.style.display = 'flex'; }
         if (reqCb) { reqCb.disabled = true; reqCb.checked = false; }
-        if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
-        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = ''; sowNoFundingGroup.style.opacity = '1'; }
-        if (sowNoFundingDateGroup) { sowNoFundingDateGroup.style.display = ''; sowNoFundingDateGroup.style.opacity = '1'; }
-        if (sowNoFundingCb) sowNoFundingCb.disabled = false;
-        if (sowNoFundingDate) sowNoFundingDate.disabled = false;
+        if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
+        if (sowCb) sowCb.disabled = false;
+        if (sowDate) sowDate.disabled = false;
       }
       var moveBtn = document.getElementById("moveBtnNext");
       if (moveBtn) {
