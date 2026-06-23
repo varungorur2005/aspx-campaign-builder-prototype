@@ -1800,7 +1800,9 @@
           } else if (yesRadio && yesRadio.checked) {
             var reqCb = document.getElementById('gateFundingRequested') && document.getElementById('gateFundingRequested').checked;
             var reqDate = document.getElementById('gateFundingRequestedDate') && document.getElementById('gateFundingRequestedDate').value;
-            valid = reqCb && reqDate;
+            var sowCb = document.getElementById('gateSowNoFunding') && document.getElementById('gateSowNoFunding').checked;
+            var sowDate = document.getElementById('gateSowNoFundingDate') && document.getElementById('gateSowNoFundingDate').value;
+            valid = reqCb && reqDate && sowCb && sowDate;
           }
         }
       }
