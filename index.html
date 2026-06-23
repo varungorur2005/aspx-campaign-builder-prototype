@@ -505,7 +505,7 @@
           <option value="partner">Partner View</option>
           <option value="field">MSFT Field View</option>
           <option value="corp">MSFT Corp View</option>
-          <option value="psm">MSFT PSM View</option>
+          <option value="psm">MSFT PSM View (V2)</option>
         </select>
       </div>
       <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#128276;</button>
@@ -1051,14 +1051,14 @@
     ];
 
     const psmCampaigns = [
-      { id: 'PSM-001', name: 'Copilot Growth - West US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 245, status: 'Active', goal: 'MAU Growth', created: '2026-05-15', mauGrowth: 12.4, revenueGrowth: '$45K', engagement: 78 },
-      { id: 'PSM-002', name: 'SharePoint Adoption - EMEA', partner: 'Fabrikam Inc', region: 'EMEA', workload: 'SharePoint', tenantCount: 180, status: 'Measuring', goal: 'Adoption', created: '2026-04-22', mauGrowth: 8.7, revenueGrowth: '$32K', engagement: 65 },
-      { id: 'PSM-003', name: 'Teams Phone Upsell - ANZ', partner: 'Woodgrove Bank', region: 'APAC', workload: 'Teams', tenantCount: 92, status: 'Active', goal: 'Upsell', created: '2026-05-01', mauGrowth: 15.2, revenueGrowth: '$78K', engagement: 82 },
-      { id: 'PSM-004', name: 'M365 E5 Upgrade - Central', partner: 'Adventure Works', region: 'Americas', workload: 'M365', tenantCount: 520, status: 'Accepted', goal: 'Revenue Growth', created: '2026-06-01', mauGrowth: 0, revenueGrowth: '$0', engagement: 25 },
-      { id: 'PSM-005', name: 'Security Posture - India', partner: 'Litware Inc', region: 'APAC', workload: 'Security', tenantCount: 310, status: 'Completed', goal: 'GTM Attach', created: '2026-03-10', mauGrowth: 22.1, revenueGrowth: '$120K', engagement: 95 },
-      { id: 'PSM-006', name: 'Viva Engage Rollout - UK', partner: 'Proseware Ltd', region: 'EMEA', workload: 'Viva', tenantCount: 67, status: 'Draft', goal: 'Adoption', created: '2026-06-18', mauGrowth: 0, revenueGrowth: '$0', engagement: 0 },
-      { id: 'PSM-007', name: 'Copilot Expansion - East US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 415, status: 'Submitted', goal: 'MAU Growth', created: '2026-06-10', mauGrowth: 0, revenueGrowth: '$0', engagement: 10 },
-      { id: 'PSM-008', name: 'Security Compliance - APAC', partner: 'Northwind Traders', region: 'APAC', workload: 'Security', tenantCount: 156, status: 'Active', goal: 'GTM Attach', created: '2026-04-15', mauGrowth: 9.8, revenueGrowth: '$55K', engagement: 71 },
+      { id: 'PSM-001', name: 'Copilot Growth - West US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 245, status: 'Active', goal: 'MAU Growth', created: '2026-05-15', mauGrowth: 12.4, revenueGrowth: '$45K', engagement: 78, executionType: 'Bulk' },
+      { id: 'PSM-002', name: 'SharePoint Adoption - EMEA', partner: 'Fabrikam Inc', region: 'EMEA', workload: 'SharePoint', tenantCount: 180, status: 'Measuring', goal: 'Adoption', created: '2026-04-22', mauGrowth: 8.7, revenueGrowth: '$32K', engagement: 65, executionType: 'Hybrid', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
+      { id: 'PSM-003', name: 'Teams Phone Upsell - ANZ', partner: 'Woodgrove Bank', region: 'APAC', workload: 'Teams', tenantCount: 92, status: 'Active', goal: 'Upsell', created: '2026-05-01', mauGrowth: 15.2, revenueGrowth: '$78K', engagement: 82, executionType: 'Hybrid' },
+      { id: 'PSM-004', name: 'M365 E5 Upgrade - Central', partner: 'Adventure Works', region: 'Americas', workload: 'M365', tenantCount: 520, status: 'Accepted', goal: 'Revenue Growth', created: '2026-06-01', mauGrowth: 0, revenueGrowth: '$0', engagement: 25, executionType: 'Bulk' },
+      { id: 'PSM-005', name: 'Security Posture - India', partner: 'Litware Inc', region: 'APAC', workload: 'Security', tenantCount: 310, status: 'Completed', goal: 'GTM Attach', created: '2026-03-10', mauGrowth: 22.1, revenueGrowth: '$120K', engagement: 95, executionType: 'Bulk', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
+      { id: 'PSM-006', name: 'Viva Engage Rollout - UK', partner: 'Proseware Ltd', region: 'EMEA', workload: 'Viva', tenantCount: 24, status: 'Draft', goal: 'Adoption', created: '2026-06-18', mauGrowth: 0, revenueGrowth: '$0', engagement: 0, executionType: 'Targeted' },
+      { id: 'PSM-007', name: 'Copilot Expansion - East US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 415, status: 'Submitted', goal: 'MAU Growth', created: '2026-06-10', mauGrowth: 0, revenueGrowth: '$0', engagement: 10, executionType: 'Bulk' },
+      { id: 'PSM-008', name: 'Security Compliance - APAC', partner: 'Northwind Traders', region: 'APAC', workload: 'Security', tenantCount: 156, status: 'Active', goal: 'GTM Attach', created: '2026-04-15', mauGrowth: 9.8, revenueGrowth: '$55K', engagement: 71, executionType: 'Hybrid' },
     ];
 
     const usageBenchmarks = {
@@ -1171,11 +1171,12 @@
         sidebar.innerHTML =
           '<nav class="sidebar-nav">' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>ASPXi Insights</span></a>' +
-            '<a href="#" class="sidebar-link active" onclick="switchView(\'psm\'); return false"><span>Campaign Builder</span></a>' +
+            '<a href="#" class="sidebar-link active" onclick="return false;"><span>Campaign Builder</span></a>' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Partner Performance</span></a>' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Analytics &amp; Reporting</span></a>' +
             '<div class="sidebar-divider"></div>' +
-            '<a href="#" class="sidebar-link" onclick="showToast(\'Executive Dashboard coming soon\'); return false"><span>Executive Dashboard</span></a>' +
+            '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'Executive Dashboard coming soon\'); return false"><span>Executive Dashboard &#8599;</span></a>' +
+            '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'API Integration portal coming soon\'); return false"><span>API Integration &#8599;</span></a>' +
           '</nav>';
       } else {
         sidebar.innerHTML =
@@ -1604,7 +1605,8 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
-        '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT PSM View</span></h1>' +
+        '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT PSM View (V2)</span></h1>' +
+        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model:</strong> A campaign represents a group of tenants sharing the same next best action. Partners commit to engaging these customers individually or in bulk. This differs from CSU engagements which track impact at individual TPID level.</div>' +
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn btn-primary" onclick="psmOpenWizard()">Create Campaign</button>' +
@@ -1649,7 +1651,7 @@
       psmRenderFunnel();
 
       document.getElementById('psmCampaignTableHead').innerHTML =
-        '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Status</th><th>Goal</th><th>MAU Growth</th><th>Revenue</th></tr>';
+        '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Status</th><th>Goal</th><th>Execution</th><th>MAU Growth</th><th>Revenue</th></tr>';
       document.getElementById('psmCampaignTableBody').innerHTML = filtered.length ? filtered.map(function(c) {
         return '<tr class="psm-clickable-row" onclick="psmOpenDetail(\''+c.id+'\')">' +
           '<td><a class="campaign-id-link" onclick="psmOpenDetail(\''+c.id+'\'); return false;">'+c.id+'</a></td>' +
@@ -1660,10 +1662,11 @@
           '<td>'+c.tenantCount.toLocaleString()+'</td>' +
           '<td>'+psmRenderStatusBadge(c.status)+'</td>' +
           '<td>'+c.goal+'</td>' +
+          '<td>'+(c.executionType || psmGetExecutionType(c.tenantCount))+'</td>' +
           '<td>'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '—')+'</td>' +
           '<td>'+c.revenueGrowth+'</td>' +
         '</tr>';
-      }).join('') : '<tr><td colspan="10" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or chart selection.</td></tr>';
+      }).join('') : '<tr><td colspan="11" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or chart selection.</td></tr>';
     }
 
     function psmRenderKpis() {
@@ -1674,6 +1677,7 @@
       var activeCampaigns = psmCampaigns.filter(function(c) { return activeStatuses.indexOf(c.status) > -1; });
       var avgMau = activeCampaigns.length ? activeCampaigns.reduce(function(sum, c) { return sum + c.mauGrowth; }, 0) / activeCampaigns.length : 0;
       var revenueTotal = psmCampaigns.reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
+      var pipelineRevenue = psmCampaigns.filter(function(c) { return c.status !== 'Completed' && c.status !== 'Draft'; }).reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
       var partnerCount = new Set(psmCampaigns.filter(function(c) { return partnerStatuses.indexOf(c.status) > -1; }).map(function(c) { return c.partner; })).size;
       var completedCount = psmCampaigns.filter(function(c) { return c.status === 'Completed'; }).length;
 
@@ -1683,7 +1687,9 @@
         '<div class="kpi-tile"><span class="kpi-value">'+avgMau.toFixed(1)+'%</span><span class="kpi-label">MAU Growth</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(revenueTotal)+'</span><span class="kpi-label">Revenue Growth</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+partnerCount+'</span><span class="kpi-label">Partner Participation</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+completedCount+'</span><span class="kpi-label">Campaigns Completed</span></div>';
+        '<div class="kpi-tile"><span class="kpi-value">'+completedCount+'</span><span class="kpi-label">Campaigns Completed</span></div>' +
+        '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(pipelineRevenue)+'</span><span class="kpi-label">Pipeline Value</span></div>' +
+        '<div class="kpi-tile"><span class="kpi-value">62%</span><span class="kpi-label">Target Attainment</span></div>';
     }
 
     function psmRenderCharts() {
@@ -1754,10 +1760,13 @@
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
         '</div>' +
-        '<div class="panel-card"><h2>Goals</h2><div class="psm-detail-grid"><div><strong>Primary Goal</strong><div style="margin-top:6px;color:#616161;">'+c.goal+'</div></div><div><strong>Execution Model</strong><div style="margin-top:6px;color:#616161;">Campaign-level tracking across partner-managed tenant cohorts.</div></div></div></div>' +
+        '<div class="panel-card"><h2>Goals</h2><div class="psm-detail-grid"><div><strong>Primary Goal</strong><div style="margin-top:6px;color:#616161;">'+c.goal+'</div></div><div><strong>Execution Model</strong><div style="margin-top:6px;color:#616161;">'+(c.executionType || psmGetExecutionType(c.tenantCount))+' partner execution across campaign-managed tenant cohorts.</div></div></div></div>' +
         '<div class="panel-card psm-membership"><h2>Customer Membership</h2><details><summary>'+c.tenantCount.toLocaleString()+' tenants in this campaign</summary><div class="psm-membership-copy">Tenant membership is intentionally rolled up in this PSM experience. Individual customers are abstracted so the campaign can focus on partner execution, aggregate outcomes, and campaign-level performance.</div></details></div>' +
+        '<div class="panel-card"><h2>Partner Lead Selection</h2><div style="font-size:13px;color:#424242;margin-bottom:12px;">Partners review assigned tenant lists and confirm which leads they will pursue. This ensures partner buy-in and efficient resource allocation.</div><div style="display:flex;gap:16px;flex-wrap:wrap;"><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Leads Assigned</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.tenantCount+'</div></div><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Leads Accepted</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+Math.round(c.tenantCount * (c.engagement/100))+'</div></div><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Acceptance Rate</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.engagement+'%</div></div></div></div>' +
         '<div class="panel-card"><h2>Performance Metrics</h2><div class="psm-metric-grid"><div class="psm-metric-card"><span class="label">MAU Change</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div><div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div><div class="psm-metric-card"><span class="label">Engagement Score</span><span class="value">'+c.engagement+'</span></div></div></div>' +
-        '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>';
+        (c.status === 'Completed' ? '<div class="panel-card"><h2>Campaign Outcome Summary</h2><div class="psm-detail-grid"><div><strong>Activities Delivered</strong><div style="margin-top:6px;color:#616161;">Pre-sales consultation, Email outreach, Webinar series, Post-sales enablement</div></div><div><strong>GTM Attach</strong><div style="margin-top:6px;color:#616161;">3 new GTM motions activated</div></div><div><strong>Partner Feedback</strong><div style="margin-top:6px;color:#616161;">Campaign well-structured. Tenant list quality was high. Recommend expanding to adjacent workloads.</div></div><div><strong>Next Steps</strong><div style="margin-top:6px;color:#616161;">Evaluate expansion campaign for upsell opportunities identified during outreach.</div></div></div></div>' : '') +
+        '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
+        '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance Note:</strong> Campaign data shared with partners is limited to tenant identifiers and recommended actions. Customer usage metrics (MAU, PAU) are visible to Microsoft users only and are not exposed to partner views.</div>';
     }
 
     function psmOpenWizard() {
@@ -1788,7 +1797,7 @@
         var options = psmGetPartners().map(function(partner) {
           return '<option value="'+partner+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+partner+'</option>';
         }).join('');
-        return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div></div>';
+        return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
       }
       if (step === 3) {
         return '<div class="form-group"><label>Campaign Goal</label><div class="radio-group" style="flex-direction:column;gap:10px;">'+['MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell', 'Adoption'].map(function(goal) { return '<label><input type="radio" name="psmGoal" value="'+goal+'"'+(psmWizardState.goal === goal ? ' checked' : '')+' onchange="psmWizardState.goal=this.value"> '+goal+'</label>'; }).join('')+'</div></div>';
@@ -1837,7 +1846,8 @@
         created: today(),
         mauGrowth: 0,
         revenueGrowth: '$0',
-        engagement: 0
+        engagement: 0,
+        executionType: psmGetExecutionType(0)
       };
       psmCampaigns.unshift(newCampaign);
       hideModal('psmWizardModal');
@@ -1865,6 +1875,12 @@
 
     function psmRevenueToNumber(value) {
       return parseInt(String(value || '').replace(/[^0-9]/g, ''), 10) || 0;
+    }
+
+    function psmGetExecutionType(tenantCount) {
+      if (tenantCount > 200) return 'Bulk';
+      if (tenantCount > 50) return 'Hybrid';
+      return 'Targeted';
     }
 
     function psmFormatRevenue(value) {
