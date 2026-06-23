@@ -557,6 +557,7 @@
             <thead><tr><th>Workload</th><th>MAU</th><th>PAU</th><th>Utilization %</th><th>Whitespace</th></tr></thead>
             <tbody id="usageBody"></tbody>
           </table>
+          <p style="font-size:11px;color:#616161;margin-top:12px;font-style:italic;">Note: Metrics shown are MAU and PAU. For additional compensable metrics (e.g., DPU), please refer to <a href="https://msxi.microsoft.com" target="_blank" style="color:#0078d4;">MSxI</a>.</p>
         </div>
 
         <!-- Lifecycle Stepper -->
@@ -599,27 +600,31 @@
         <h3 style="font-size:18px;font-weight:700;margin:0;">Filter</h3>
         <button style="background:none;border:none;font-size:20px;color:#616161;cursor:pointer;" onclick="toggleFilter()">&times;</button>
       </div>
-      <p style="font-size:13px;color:#616161;margin-bottom:20px;">Filter data in the table by selecting criteria across categories. Use Apply or Cancel to confirm changes. <a href="#" style="color:#0078d4;" onclick="return false;">Learn more</a></p>
+      <p style="font-size:13px;color:#616161;margin-bottom:20px;">Filter data in the table by selecting criteria across categories. Use Apply or Cancel to confirm changes. <a href="https://learn.microsoft.com/en-us/partner-center/" target="_blank" style="color:#0078d4;">Learn more</a></p>
       
-      <div class="filter-section">
+      <div class="filter-section" id="filterSectionState">
         <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">State</label>
         <div id="filterStateCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
-      <div class="filter-section">
-        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Campaign Source</label>
-        <div id="filterSourceCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
-      </div>
-      <div class="filter-section">
+      <div class="filter-section" id="filterSectionArea">
         <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Customer Area</label>
         <div id="filterAreaCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
-      <div class="filter-section">
-        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Partner ID (PLA)</label>
-        <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #d1d1d1;border-radius:4px;margin-bottom:8px;">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-          <input type="text" id="filterPLASearch" placeholder="Search for Tenant Country/Region" style="border:none;outline:none;font-size:12px;width:100%;" oninput="filterPLACheckboxes()">
-        </div>
-        <div id="filterPLACheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div class="filter-section" id="filterSectionSource">
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Campaign Source</label>
+        <div id="filterSourceCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <div class="filter-section" id="filterSectionPartnerName">
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Partner Name</label>
+        <div id="filterPartnerNameCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <div class="filter-section" id="filterSectionUnified">
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Unified</label>
+        <div id="filterUnifiedCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <div class="filter-section" id="filterSectionCampaignStatus">
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Campaign Status</label>
+        <div id="filterCampaignStatusCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       
       <div class="filter-actions" style="display:flex;gap:8px;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;">
@@ -1019,7 +1024,7 @@
     const AREA_GROUP_MAP = { 'US West': 'US MFM', 'US East': 'US PRO', 'EMEA North': 'US OGE', 'ANZ': 'ANZ', 'India': 'ANZ', 'APAC': 'ANZ' };
     const COLOR_PALETTE = ['#0078d4', '#d83b01', '#005a9e', '#c19c00', '#107c10', '#7719aa'];
     function createEmptyFilterState() {
-      return { statuses: [], sources: [], areas: [], plas: [] };
+      return { statuses: [], sources: [], areas: [], partnerNames: [], unified: [], campaignStatus: [] };
     }
     var filterState = createEmptyFilterState();
     function getAreaGroup(area) {
@@ -1211,7 +1216,9 @@
       const filterStatuses = filterState.statuses;
       const filterSources = filterState.sources;
       const filterAreas = filterState.areas;
-      const filterPLAs = filterState.plas;
+      const filterPartnerNames = filterState.partnerNames || [];
+      const filterUnified = filterState.unified || [];
+      const filterCampaignStatus = filterState.campaignStatus || [];
       const sortBy = document.getElementById('sortSelect').value;
 
       let filtered = campaigns.filter(c => {
@@ -1219,7 +1226,13 @@
         if (filterStatuses.length > 0 && filterStatuses.indexOf(c.status) === -1) return false;
         if (filterSources.length > 0 && filterSources.indexOf(c.source) === -1) return false;
         if (filterAreas.length > 0 && filterAreas.indexOf(getAreaGroup(c.area)) === -1) return false;
-        if (filterPLAs.length > 0 && filterPLAs.indexOf(c.partnerPLA) === -1) return false;
+        if (filterPartnerNames.length > 0 && filterPartnerNames.indexOf(c.partner) === -1) return false;
+        if (filterUnified.length > 0 && filterUnified.indexOf(c.unified) === -1) return false;
+        if (filterCampaignStatus.length > 0) {
+          var hasCommitted = c.workloadData.some(function(w){return w.status === 'Committed';});
+          var cStatus = hasCommitted ? 'Committed' : 'Uncommitted';
+          if (filterCampaignStatus.indexOf(cStatus) === -1) return false;
+        }
         // KPI-based filters
         if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
         if (activeKpiFilter === 'pending' && (c.status === 'Closed' || c.status === 'Blocked')) return false;
@@ -1456,18 +1469,37 @@
 
     function renderFilterCheckboxes() {
       var sources = Array.from(new Set(campaigns.map(function(c) { return c.source; }).filter(Boolean))).sort();
-      var plas = Array.from(new Set(campaigns.map(function(c) { return c.partnerPLA; }).filter(Boolean))).sort();
+      var partnerNames = Array.from(new Set(campaigns.map(function(c) { return c.partner; }).filter(Boolean))).sort();
+      var unifiedOptions = ['Unified', 'Non-Unified'];
+      var campaignStatusOptions = ['Uncommitted', 'Committed'];
+
+      // Always show State
       document.getElementById('filterStateCheckboxes').innerHTML = buildFilterCheckboxMarkup(FILTER_STATUS_OPTIONS, filterState.statuses, 'statuses');
+
+      // Partner view: State, Customer Area, Campaign Source
+      // Field view: Partner Name, State, Unified, Campaign Status, Campaign Source
+      // Corp view: Partner Name, State, Unified, Campaign Status, Campaign Source, Customer Area
+      var isPartner = currentView === 'partner';
+      var isCorp = currentView === 'corp';
+
+      document.getElementById('filterSectionArea').style.display = (isPartner || isCorp) ? '' : 'none';
+      document.getElementById('filterSectionSource').style.display = '';
+      document.getElementById('filterSectionPartnerName').style.display = isPartner ? 'none' : '';
+      document.getElementById('filterSectionUnified').style.display = isPartner ? 'none' : '';
+      document.getElementById('filterSectionCampaignStatus').style.display = isPartner ? 'none' : '';
+
       document.getElementById('filterSourceCheckboxes').innerHTML = buildFilterCheckboxMarkup(sources, filterState.sources, 'sources');
       document.getElementById('filterAreaCheckboxes').innerHTML = buildFilterCheckboxMarkup(FILTER_AREA_OPTIONS, filterState.areas, 'areas');
-      document.getElementById('filterPLACheckboxes').innerHTML = buildFilterCheckboxMarkup(plas, filterState.plas, 'plas');
-      var plaSearch = document.getElementById('filterPLASearch');
-      if (plaSearch) filterPLACheckboxes();
+      document.getElementById('filterPartnerNameCheckboxes').innerHTML = buildFilterCheckboxMarkup(partnerNames, filterState.partnerNames || [], 'partnerNames');
+      document.getElementById('filterUnifiedCheckboxes').innerHTML = buildFilterCheckboxMarkup(unifiedOptions, filterState.unified || [], 'unified');
+      document.getElementById('filterCampaignStatusCheckboxes').innerHTML = buildFilterCheckboxMarkup(campaignStatusOptions, filterState.campaignStatus || [], 'campaignStatus');
     }
 
     function applyFilters() {
       function getCheckedValues(containerId) {
-        return Array.from(document.querySelectorAll('#'+containerId+' input[type="checkbox"]:checked')).map(function(input) {
+        var container = document.getElementById(containerId);
+        if (!container) return [];
+        return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(function(input) {
           return input.value;
         });
       }
@@ -1475,19 +1507,14 @@
         statuses: getCheckedValues('filterStateCheckboxes'),
         sources: getCheckedValues('filterSourceCheckboxes'),
         areas: getCheckedValues('filterAreaCheckboxes'),
-        plas: getCheckedValues('filterPLACheckboxes')
+        partnerNames: getCheckedValues('filterPartnerNameCheckboxes'),
+        unified: getCheckedValues('filterUnifiedCheckboxes'),
+        campaignStatus: getCheckedValues('filterCampaignStatusCheckboxes')
       };
       activeKpiFilter = null;
       activeChartFilter = null;
       renderDashboard();
       toggleFilter(false);
-    }
-
-    function filterPLACheckboxes() {
-      var searchValue = (document.getElementById('filterPLASearch').value || '').toLowerCase();
-      Array.from(document.querySelectorAll('#filterPLACheckboxes .filter-checkbox-item')).forEach(function(item) {
-        item.style.display = item.getAttribute('data-value').indexOf(searchValue) > -1 ? 'flex' : 'none';
-      });
     }
 
     //  DETAIL VIEW 
@@ -1630,7 +1657,7 @@
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
-          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding needed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()" style="margin-right:6px;"> Funding Requested? <span class="required">*</span></label></div><div class="form-group" id="fundingRequestedDateGroup" style="opacity:0.4;"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;"><label><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()" style="margin-right:6px;"> Customer SOW signed? <span class="required">*</span></label></div><div class="form-group" id="sowSignedNoFundingDateGroup" style="opacity:0.4;display:none;"><label>Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group" id="fundingRequestedGroup" style="opacity:0.4;"><label><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()" style="margin-right:6px;"> Funding Requested? <span class="required">*</span></label></div><div class="form-group" id="fundingRequestedDateGroup" style="opacity:0.4;"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;"><label><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()" style="margin-right:6px;"> Customer SOW signed? <span class="required">*</span></label></div><div class="form-group" id="sowSignedNoFundingDateGroup" style="opacity:0.4;display:none;"><label>Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         } else if (c.fundingSubState === 'requested') {
           html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateFundingSecured" onchange="onFundingSecuredSubChange()" style="margin-right:6px;"> Is Microsoft funding secured? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         }
@@ -1961,15 +1988,17 @@
       var sowNoFundingDateGroup = document.getElementById('sowSignedNoFundingDateGroup');
       var sowNoFundingDate = document.getElementById('gateSowNoFundingDate');
       if (yesRadio && yesRadio.checked) {
+        // Show both Funding Requested and SOW Signed
         if (reqGroup) reqGroup.style.opacity = '1';
         if (reqCb) reqCb.disabled = false;
         if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = ''; }
         if (reqDate) reqDate.disabled = false;
-        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = 'none'; }
-        if (sowNoFundingDateGroup) { sowNoFundingDateGroup.style.display = 'none'; }
-        if (sowNoFundingCb) { sowNoFundingCb.disabled = true; sowNoFundingCb.checked = false; }
-        if (sowNoFundingDate) { sowNoFundingDate.disabled = true; sowNoFundingDate.value = ''; }
+        if (sowNoFundingGroup) { sowNoFundingGroup.style.display = ''; sowNoFundingGroup.style.opacity = '1'; }
+        if (sowNoFundingDateGroup) { sowNoFundingDateGroup.style.display = ''; sowNoFundingDateGroup.style.opacity = '1'; }
+        if (sowNoFundingCb) sowNoFundingCb.disabled = false;
+        if (sowNoFundingDate) sowNoFundingDate.disabled = false;
       } else if (noRadio && noRadio.checked) {
+        // Hide Funding Requested, show SOW Signed
         if (reqGroup) reqGroup.style.opacity = '0.4';
         if (reqCb) { reqCb.disabled = true; reqCb.checked = false; }
         if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
