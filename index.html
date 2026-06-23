@@ -448,6 +448,14 @@
       </div>
     </div>
     <div class="nav-right">
+      <div id="prototypeViewSwitcher" style="display:flex;align-items:center;gap:8px;background:#0078d4;border-radius:4px;padding:5px 12px;margin-right:12px;">
+        <span style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;">Prototype Views</span>
+        <select id="viewSwitcherSelect" onchange="switchView(this.value)" style="background:#005a9e;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:3px 8px;font-size:12px;font-weight:500;cursor:pointer;outline:none;">
+          <option value="partner">Partner View</option>
+          <option value="field">MSFT Field View</option>
+          <option value="corp">MSFT Corp View</option>
+        </select>
+      </div>
       <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#128276;</button>
       <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#9881;</button>
       <div class="nav-avatar" title="Varun Gorur">VG</div>
@@ -1056,11 +1064,6 @@
             '<a href="#" class="sidebar-link active" onclick="switchView(\'partner\'); return false" id="partnerCampaignNav"><span>Security CSU Campaigns</span></a>' +
             '<div class="sidebar-section">Referrals</div>' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Referrals</span></a>' +
-            '<div class="sidebar-divider"></div>' +
-            '<div class="sidebar-section">Prototype Views</div>' +
-            '<a href="#" class="sidebar-link" onclick="switchView(\'partner\'); return false" id="viewPartner"><span>Partner View</span></a>' +
-            '<a href="#" class="sidebar-link" onclick="switchView(\'field\'); return false" id="navField"><span>MSFT Field View</span></a>' +
-            '<a href="#" class="sidebar-link" onclick="switchView(\'corp\'); return false" id="navCorp"><span>MSFT Corp View</span></a>' +
           '</nav>';
       } else {
         sidebar.innerHTML =
@@ -1071,11 +1074,6 @@
             '<a href="#" class="sidebar-link active" onclick="switchView(\''+currentView+'\'); return false"><span>Security CSU Campaigns</span></a>' +
             '<div class="sidebar-divider"></div>' +
             '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'ASPXi Readiness coming soon\'); return false"><span>ASPXi Readiness &#8599;</span></a>' +
-            '<div class="sidebar-divider"></div>' +
-            '<div class="sidebar-section">Prototype Views</div>' +
-            '<a href="#" class="sidebar-link" onclick="switchView(\'partner\'); return false" id="navPartner"><span>Partner View</span></a>' +
-            '<a href="#" class="sidebar-link'+(currentView === 'field' ? ' active' : '')+'" onclick="switchView(\'field\'); return false" id="navField"><span>MSFT Field View</span></a>' +
-            '<a href="#" class="sidebar-link'+(currentView === 'corp' ? ' active' : '')+'" onclick="switchView(\'corp\'); return false" id="navCorp"><span>MSFT Corp View</span></a>' +
           '</nav>';
       }
     }
@@ -1083,10 +1081,8 @@
     function switchView(view) {
       currentView = view;
       document.body.classList.toggle('partner-view', view === 'partner');
+      document.getElementById('viewSwitcherSelect').value = view;
       renderSidebar();
-      if (document.getElementById('navPartner')) document.getElementById('navPartner').classList.toggle('active', view === 'partner');
-      if (document.getElementById('navField')) document.getElementById('navField').classList.toggle('active', view === 'field');
-      if (document.getElementById('navCorp')) document.getElementById('navCorp').classList.toggle('active', view === 'corp');
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
         view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi';
