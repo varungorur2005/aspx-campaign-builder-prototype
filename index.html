@@ -23,9 +23,10 @@
     .top-nav {
       display: flex; align-items: center; justify-content: space-between;
       height: 48px; padding: 0 20px;
-      background: #1b3a5c; position: sticky; top: 0; z-index: 500;
+      background: #201f1e; position: sticky; top: 0; z-index: 500;
     }
     .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-center { display: flex; align-items: center; }
     .nav-title { font-size: 14px; color: #fff; font-weight: 400; }
     .nav-platform-name { font-weight: 700; }
     .nav-separator { color: rgba(255,255,255,0.4); font-weight: 300; }
@@ -47,6 +48,7 @@
       width: 200px; background: #fafafa; border-right: 1px solid #e0e0e0;
       padding: 12px 0; flex-shrink: 0;
     }
+    body.partner-view .sidebar { width: 220px; }
     .sidebar-nav { display: flex; flex-direction: column; }
     .sidebar-link {
       display: flex; align-items: center; padding: 9px 14px;
@@ -55,6 +57,9 @@
     }
     .sidebar-link:hover { background: #f0f0f0; }
     .sidebar-link.active { background: #e8f0fe; color: #0078d4; border-left-color: #0078d4; font-weight: 600; }
+    .sidebar-link.decorative { cursor: default; }
+    .sidebar-section { font-size: 11px; font-weight: 700; color: #242424; padding: 16px 14px 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .sidebar-divider { margin: 12px 14px 0; border-top: 1px solid #e5e5e5; }
 
     /* Main */
     .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
@@ -67,6 +72,7 @@
 
     /* KPI Row */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    body.partner-view .kpi-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .kpi-tile {
       background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
       padding: 16px; text-align: left;
@@ -79,6 +85,7 @@
 
     /* Charts Row */
     .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    body.partner-view .charts-row { grid-template-columns: 1fr 1fr; }
     .chart-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
     .chart-card h3 { font-size: 11px; font-weight: 700; margin-bottom: 10px; color: #424242; }
 
@@ -89,6 +96,34 @@
     .pie-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #424242; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
     .pie-legend-item:hover { background: #f0f0f0; color: #0078d4; }
     .pie-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+    /* Donut Chart */
+    .chart-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .chart-title { font-size: 14px; font-weight: 600; color: #242424; }
+    .chart-meta { font-size: 11px; color: #616161; margin-top: 2px; }
+    .chart-header-actions { display: flex; align-items: center; gap: 4px; }
+    .chart-icon-btn {
+      border: none; background: transparent; color: #616161; font-size: 14px;
+      padding: 4px 6px; border-radius: 4px;
+    }
+    .chart-icon-btn:hover { background: #f3f2f1; color: #242424; }
+    .donut-chart-wrap { display:flex; flex-direction:column; align-items:center; }
+    .donut-chart-shell { position: relative; width: 210px; height: 210px; display:flex; align-items:center; justify-content:center; }
+    .donut-chart { width:160px; height:160px; border-radius:50%; position:relative; }
+    .donut-hole {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 94px; height: 94px; border-radius: 50%; background: #fff;
+      box-shadow: inset 0 0 0 1px #f0f0f0;
+    }
+    .donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:32px; font-weight:700; color:#242424; z-index:1; }
+    .donut-segment-label {
+      position: absolute; transform: translate(-50%,-50%);
+      font-size: 11px; font-weight: 700; color: #242424; pointer-events: none;
+    }
+    .donut-legend { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+    .donut-legend-item { display:flex; align-items:center; gap:4px; font-size:11px; color:#424242; cursor:pointer; }
+    .donut-legend-item:hover { color: #0078d4; }
+    .donut-legend-dot { width:10px; height:10px; border-radius:2px; }
 
     /* Vertical Bar Chart */
     .vbar-wrap { position: relative; padding: 0 4px; }
@@ -182,13 +217,22 @@
     }
     .filter-overlay.show .filter-panel { transform: translateX(0); }
     .filter-panel h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-    .filter-section { margin-bottom: 16px; }
+    .filter-section { margin-bottom: 20px; }
     .filter-section label { display: block; font-size: 11px; font-weight: 600; color: #616161; margin-bottom: 4px; text-transform: uppercase; }
     .filter-section select, .filter-section input {
       width: 100%; padding: 7px 10px; font-size: 12px;
       border: 1px solid #d1d1d1; border-radius: 4px;
     }
     .filter-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .filter-checkbox-item {
+      display: flex; align-items: center; gap: 8px; margin: 0;
+      font-size: 12px; font-weight: 400 !important; color: #242424;
+      text-transform: none !important; cursor: pointer;
+    }
+    .filter-checkbox-item input {
+      width: 14px; height: 14px; margin: 0;
+      accent-color: #0078d4; flex-shrink: 0;
+    }
 
     /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        DETAIL FLYOUT
@@ -394,33 +438,34 @@
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP NAV Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <nav class="top-nav">
     <div class="nav-left">
-      <svg width="20" height="20" viewBox="0 0 21 21">
-        <rect x="0" y="0" width="10" height="10" fill="#f25022"/>
-        <rect x="11" y="0" width="10" height="10" fill="#7fba00"/>
-        <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
-        <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
-      </svg>
-      <span class="nav-title nav-platform-name">ASPX</span>
-      <span class="nav-separator">|</span>
-      <span class="nav-title" id="pageTitle">Campaign Builder (Partner View)</span>
+      <button style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;">&#9776;</button>
+      <span class="nav-title nav-platform-name" style="font-weight:600;">Microsoft Partner Center</span>
+    </div>
+    <div class="nav-center">
+      <div style="display:flex;align-items:center;background:rgba(255,255,255,0.15);border-radius:4px;padding:5px 12px;min-width:280px;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="rgba(255,255,255,0.7)"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+        <input type="text" placeholder="Search" style="background:none;border:none;outline:none;color:#fff;font-size:13px;margin-left:8px;width:200px;" />
+      </div>
     </div>
     <div class="nav-right">
+      <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#128276;</button>
+      <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#9881;</button>
       <div class="nav-avatar" title="Varun Gorur">VG</div>
     </div>
   </nav>
 
   <div class="app-layout">
     <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SIDEBAR Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-    <aside class="sidebar">
-      <nav class="sidebar-nav">
-        <a href="#" class="sidebar-link active" onclick="switchView('partner'); return false" id="navPartner"><span>Campaign Builder (Partner View)</span></a>
-        <a href="#" class="sidebar-link" onclick="switchView('field'); return false" id="navField"><span>Campaign Builder (MSFT Field View)</span></a>
-        <a href="#" class="sidebar-link" onclick="switchView('corp'); return false" id="navCorp"><span>Campaign Builder (MSFT Corp View)</span></a>
-      </nav>
-    </aside>
+    <aside class="sidebar" id="sidebar"></aside>
 
     <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MAIN CONTENT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
     <main class="main-content" id="mainContent">
+      <div id="breadcrumb" style="padding:8px 24px;font-size:12px;color:#616161;border-bottom:1px solid #e0e0e0;background:#fff;">
+        <span style="color:#0078d4;cursor:pointer;">Home</span> &gt;
+        <span style="color:#0078d4;cursor:pointer;">Insights</span> &gt;
+        <span style="color:#0078d4;cursor:pointer;">AI Business Solutions &amp; Security</span> &gt;
+        <span style="font-weight:600;color:#242424;">Security CSU Campaigns</span>
+      </div>
 
       <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
            DASHBOARD VIEW
@@ -441,7 +486,7 @@
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               Download
             </button>
-            <div class="toolbar-sort">
+            <div class="toolbar-sort" id="toolbarSortWrapper">
               <select id="sortSelect" onchange="renderDashboard()">
                 <option value="updated">Latest Update</option>
                 <option value="created">Created Date</option>
@@ -451,11 +496,7 @@
             </div>
           </div>
           <div class="toolbar-right">
-            <div class="toolbar-search">
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
-            </div>
-            <div style="position:relative;display:inline-block;">
+            <div id="columnPickerWrap" style="position:relative;display:inline-block;">
             <button class="toolbar-btn" onclick="toggleColumnPicker()">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 2v12M6 2v12M10 2v12M14 2v12"/><path d="M2 5h2M6 5h2M10 5h2" stroke-width="2"/></svg>
               Change columns
@@ -465,10 +506,14 @@
               <div id="columnPickerList"></div>
             </div>
             </div>
-            <button class="toolbar-btn" onclick="toggleFilter()">
+            <button class="toolbar-btn" id="filterButton" onclick="toggleFilter()">
               <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg>
               Filters
             </button>
+            <div class="toolbar-search" id="toolbarSearch">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+              <input type="text" placeholder="Search campaigns..." id="searchInput" oninput="renderDashboard()">
+            </div>
           </div>
         </div>
 
@@ -541,46 +586,36 @@
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â FILTER FLYOUT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()">
     <div class="filter-panel" onclick="event.stopPropagation()">
-      <h3>Filters <button class="btn btn-sm btn-secondary" onclick="resetFilters()">Reset</button></h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:18px;font-weight:700;margin:0;">Filter</h3>
+        <button style="background:none;border:none;font-size:20px;color:#616161;cursor:pointer;" onclick="toggleFilter()">&times;</button>
+      </div>
+      <p style="font-size:13px;color:#616161;margin-bottom:20px;">Filter data in the table by selecting criteria across categories. Use Apply or Cancel to confirm changes. <a href="#" style="color:#0078d4;" onclick="return false;">Learn more</a></p>
+      
       <div class="filter-section">
-        <label>Status</label>
-        <select id="filterStatus" onchange="renderDashboard()">
-          <option value="">All</option>
-          <option value="New">New</option>
-          <option value="Outreach">Outreach</option>
-          <option value="Engaged">Engaged</option>
-          <option value="Funding">Funding</option>
-          <option value="Committed">Committed</option>
-          <option value="Blocked">Blocked</option>
-          <option value="Closed">Closed</option>
-        </select>
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">State</label>
+        <div id="filterStateCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       <div class="filter-section">
-        <label>Source</label>
-        <select id="filterSource" onchange="renderDashboard()">
-          <option value="">All</option>
-          <option value="Security CSU Partner Clinic | ANZ">Security CSU Partner Clinic | ANZ</option>
-          <option value="Security CSU Partner Clinic | APAC">Security CSU Partner Clinic | APAC</option>
-          <option value="Security CSU Partner Clinic | EMEA">Security CSU Partner Clinic | EMEA</option>
-          <option value="Security CSU Partner Clinic | FSI">Security CSU Partner Clinic | FSI</option>
-          <option value="Security CSU Partner Clinic | US">Security CSU Partner Clinic | US</option>
-        </select>
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Campaign Source</label>
+        <div id="filterSourceCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       <div class="filter-section">
-        <label>Area</label>
-        <select id="filterArea" onchange="renderDashboard()">
-          <option value="">All</option>
-          <option value="ANZ">ANZ</option>
-          <option value="India">India</option>
-          <option value="US West">US West</option>
-          <option value="US East">US East</option>
-          <option value="EMEA North">EMEA North</option>
-          <option value="APAC">APAC</option>
-        </select>
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Customer Area</label>
+        <div id="filterAreaCheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
-      <div class="filter-actions">
-        <button class="btn btn-primary btn-sm" onclick="toggleFilter()">Apply</button>
-        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Clear All</button>
+      <div class="filter-section">
+        <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">Partner ID (PLA)</label>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #d1d1d1;border-radius:4px;margin-bottom:8px;">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+          <input type="text" id="filterPLASearch" placeholder="Search for Tenant Country/Region" style="border:none;outline:none;font-size:12px;width:100%;" oninput="filterPLACheckboxes()">
+        </div>
+        <div id="filterPLACheckboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      
+      <div class="filter-actions" style="display:flex;gap:8px;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;">
+        <button class="btn btn-primary btn-sm" onclick="applyFilters()">Apply</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleFilter()">Cancel</button>
       </div>
     </div>
   </div>
@@ -963,10 +998,24 @@
     campaigns.forEach(function(c) {
       c.usageData = buildUsageData(c);
     });
+    ['123456','234567','345678','456789','567890','678901','789012','890123','901234','912345','923456','934567'].forEach(function(pla, index) {
+      if (campaigns[index]) campaigns[index].partnerPLA = pla;
+    });
 
     let currentCampaign = null;
     let currentView = 'partner';
     const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
+    const FILTER_STATUS_OPTIONS = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed', 'Blocked'];
+    const FILTER_AREA_OPTIONS = ['US MFM', 'US PRO', 'US OGE', 'ANZ'];
+    const AREA_GROUP_MAP = { 'US West': 'US MFM', 'US East': 'US PRO', 'EMEA North': 'US OGE', 'ANZ': 'ANZ', 'India': 'ANZ', 'APAC': 'ANZ' };
+    const COLOR_PALETTE = ['#0078d4', '#d83b01', '#005a9e', '#c19c00', '#107c10', '#7719aa'];
+    function createEmptyFilterState() {
+      return { statuses: [], sources: [], areas: [], plas: [] };
+    }
+    var filterState = createEmptyFilterState();
+    function getAreaGroup(area) {
+      return AREA_GROUP_MAP[area] || area;
+    }
     function getStatusBadgeText(c) {
       return c.status;
     }
@@ -974,28 +1023,86 @@
       var cls = c.status.toLowerCase().replace(/\s+/g, '-');
       return '<span class="status-badge '+cls+'">'+getStatusBadgeText(c)+'</span>';
     }
+    function renderSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      if (currentView === 'partner') {
+        sidebar.innerHTML =
+          '<nav class="sidebar-nav">' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Overview</span></a>' +
+            '<div class="sidebar-section">Membership</div>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Training</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Microsoft Learn</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Solutions partner</span></a>' +
+            '<div class="sidebar-section">Surface</div>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Summary</span></a>' +
+            '<div class="sidebar-section">Cloud product performance</div>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Summary</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Customers</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Resellers</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Subscriptions</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Azure usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Teams usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Office 365 usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Dynamics usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>EMS usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>PowerBI usage</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Customer opportunities</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Lighthouse (Sales Advisor)</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>GDAP relationship analytics</span></a>' +
+            '<div class="sidebar-section">AI Business Solutions &amp; Security</div>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Growth opportunities</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>MCI performance</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>FastTrack referrals</span></a>' +
+            '<a href="#" class="sidebar-link active" onclick="switchView(\'partner\'); return false" id="partnerCampaignNav"><span>Security CSU Campaigns</span></a>' +
+            '<div class="sidebar-section">Referrals</div>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Referrals</span></a>' +
+            '<div class="sidebar-divider"></div>' +
+            '<div class="sidebar-section">Prototype Views</div>' +
+            '<a href="#" class="sidebar-link" onclick="switchView(\'partner\'); return false" id="viewPartner"><span>Partner View</span></a>' +
+            '<a href="#" class="sidebar-link" onclick="switchView(\'field\'); return false" id="navField"><span>MSFT Field View</span></a>' +
+            '<a href="#" class="sidebar-link" onclick="switchView(\'corp\'); return false" id="navCorp"><span>MSFT Corp View</span></a>' +
+          '</nav>';
+      } else {
+        sidebar.innerHTML =
+          '<nav class="sidebar-nav">' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Growth Opportunities</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>MCI Performance</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>FastTrack Referrals</span></a>' +
+            '<a href="#" class="sidebar-link active" onclick="switchView(\''+currentView+'\'); return false"><span>Security CSU Campaigns</span></a>' +
+            '<div class="sidebar-divider"></div>' +
+            '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'ASPXi Readiness coming soon\'); return false"><span>ASPXi Readiness &#8599;</span></a>' +
+            '<div class="sidebar-divider"></div>' +
+            '<div class="sidebar-section">Prototype Views</div>' +
+            '<a href="#" class="sidebar-link" onclick="switchView(\'partner\'); return false" id="navPartner"><span>Partner View</span></a>' +
+            '<a href="#" class="sidebar-link'+(currentView === 'field' ? ' active' : '')+'" onclick="switchView(\'field\'); return false" id="navField"><span>MSFT Field View</span></a>' +
+            '<a href="#" class="sidebar-link'+(currentView === 'corp' ? ' active' : '')+'" onclick="switchView(\'corp\'); return false" id="navCorp"><span>MSFT Corp View</span></a>' +
+          '</nav>';
+      }
+    }
     // â•â•â•â•â•â•â• VIEW SWITCH â•â•â•â•â•â•â•
     function switchView(view) {
       currentView = view;
-      document.getElementById('navPartner').classList.toggle('active', view === 'partner');
-      document.getElementById('navField').classList.toggle('active', view === 'field');
-      document.getElementById('navCorp').classList.toggle('active', view === 'corp');
+      document.body.classList.toggle('partner-view', view === 'partner');
+      renderSidebar();
+      if (document.getElementById('navPartner')) document.getElementById('navPartner').classList.toggle('active', view === 'partner');
+      if (document.getElementById('navField')) document.getElementById('navField').classList.toggle('active', view === 'field');
+      if (document.getElementById('navCorp')) document.getElementById('navCorp').classList.toggle('active', view === 'corp');
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
-        view === 'partner' ? 'ASPX' : 'ASPXi';
-      document.getElementById('pageTitle').textContent =
-        view === 'partner' ? 'Campaign Builder (Partner View)' :
-        view === 'field' ? 'Campaign Builder (MSFT Field View)' :
-        'Campaign Builder (MSFT Corp View)';
-      document.getElementById('dashboardTitle').textContent =
-        view === 'partner' ? 'Campaigns - Partner View' :
-        view === 'field' ? 'Campaigns - Field View' :
-        'Campaigns - Corp (CSA Manager)';
+        view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi';
+      document.getElementById('dashboardTitle').style.display = '';
+      document.getElementById('dashboardTitle').innerHTML =
+        view === 'partner'
+          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Security CSU Campaigns <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
+          : 'Security CSU Campaigns <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security</span>';
+      document.getElementById('breadcrumb').style.display = view === 'partner' ? '' : 'none';
+      document.getElementById('toolbarSortWrapper').style.display = 'none';
+      document.getElementById('columnPickerWrap').style.order = '1';
+      document.getElementById('filterButton').style.order = '2';
+      document.getElementById('toolbarSearch').style.order = '3';
       activeKpiFilter = null;
       activeChartFilter = null;
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterSource').value = '';
-      document.getElementById('filterArea').value = '';
+      filterState = createEmptyFilterState();
       document.getElementById('searchInput').value = '';
       initColumns();
       showDashboard();
@@ -1012,19 +1119,28 @@
     var allColumns = [
       { key: 'id', label: 'Campaign ID', alwaysOn: true },
       { key: 'customer', label: 'Customer Name' },
+      { key: 'customerArea', label: 'Customer Area', partnerOnly: true },
       { key: 'partner', label: 'Partner Name' },
+      { key: 'partnerPLA', label: 'Partner ID (PLA)', partnerOnly: true },
       { key: 'status', label: 'Status' },
       { key: 'partnerDRI', label: 'Partner DRI' },
       { key: 'microsoftDRI', label: 'Microsoft DRI' },
       { key: 'workloads', label: 'Targeted Workloads' },
       { key: 'unified', label: 'Unified', fieldCorpOnly: true },
       { key: 'opportunityId', label: 'Opportunity ID', fieldCorpOnly: true },
+      { key: 'campaignStatus', label: 'Campaign Status', fieldCorpOnly: true },
       { key: 'source', label: 'Source' }
     ];
     var visibleColumns = {};
+    function getColumnLabel(col) {
+      if (col.key === 'status') return 'State';
+      if (col.key === 'source') return 'Campaign Source';
+      return col.label;
+    }
     function initColumns() {
       allColumns.forEach(function(col) {
         if (col.fieldCorpOnly && currentView === 'partner') visibleColumns[col.key] = false;
+        else if (col.partnerOnly && currentView !== 'partner') visibleColumns[col.key] = false;
         else visibleColumns[col.key] = true;
       });
     }
@@ -1035,9 +1151,10 @@
       if (dropdown.style.display === 'none') {
         var listHtml = allColumns.map(function(col) {
           if (col.fieldCorpOnly && currentView === 'partner') return '';
+          if (col.partnerOnly && currentView !== 'partner') return '';
           var checked = visibleColumns[col.key] ? 'checked' : '';
           var disabled = col.alwaysOn ? 'disabled' : '';
-          return '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" '+checked+' '+disabled+' onchange="toggleColumn(\''+col.key+'\',this.checked)"> '+col.label+'</label>';
+          return '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" '+checked+' '+disabled+' onchange="toggleColumn(\''+col.key+'\',this.checked)"> '+getColumnLabel(col)+'</label>';
         }).join('');
         document.getElementById('columnPickerList').innerHTML = listHtml;
         dropdown.style.display = '';
@@ -1060,10 +1177,7 @@
       }
     });
     function filterByKpi(filter) {
-      const statusEl = document.getElementById('filterStatus');
-      statusEl.value = '';
-      document.getElementById('filterSource').value = '';
-      document.getElementById('filterArea').value = '';
+      filterState = createEmptyFilterState();
       document.getElementById('searchInput').value = '';
       activeChartFilter = null;
 
@@ -1071,16 +1185,16 @@
         activeKpiFilter = null;
       } else {
         activeKpiFilter = filter;
-        if (filter === 'blocked') statusEl.value = 'Blocked';
-        else if (filter === 'committed') statusEl.value = 'Committed';
+        if (filter === 'new') filterState.statuses = ['New'];
+        else if (filter === 'blocked') filterState.statuses = ['Blocked'];
+        else if (filter === 'committed') filterState.statuses = ['Committed'];
       }
+      if (document.getElementById('filterOverlay').classList.contains('show')) renderFilterCheckboxes();
       renderDashboard();
     }
 
     function filterByChart(type, value) {
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterSource').value = '';
-      document.getElementById('filterArea').value = '';
+      filterState = createEmptyFilterState();
       document.getElementById('searchInput').value = '';
       activeKpiFilter = null;
 
@@ -1088,25 +1202,29 @@
         activeChartFilter = null;
       } else {
         activeChartFilter = { type: type, value: value };
-        if (type === 'status') document.getElementById('filterStatus').value = value;
-        else if (type === 'area') document.getElementById('filterArea').value = value;
+        if (type === 'status') filterState.statuses = [value];
+        else if (type === 'area') filterState.areas = [getAreaGroup(value)];
+        else if (type === 'areaGroup') filterState.areas = [value];
       }
+      if (document.getElementById('filterOverlay').classList.contains('show')) renderFilterCheckboxes();
       renderDashboard();
     }
 
     // DASHBOARD
     function renderDashboard() {
       const search = document.getElementById('searchInput').value.toLowerCase();
-      const filterStatus = document.getElementById('filterStatus').value;
-      const filterSource = document.getElementById('filterSource').value;
-      const filterArea = document.getElementById('filterArea').value;
+      const filterStatuses = filterState.statuses;
+      const filterSources = filterState.sources;
+      const filterAreas = filterState.areas;
+      const filterPLAs = filterState.plas;
       const sortBy = document.getElementById('sortSelect').value;
 
       let filtered = campaigns.filter(c => {
         if (search && !c.customer.toLowerCase().includes(search) && !c.id.toLowerCase().includes(search)) return false;
-        if (filterStatus && c.status !== filterStatus) return false;
-        if (filterSource && c.source !== filterSource) return false;
-        if (filterArea && c.area !== filterArea) return false;
+        if (filterStatuses.length > 0 && filterStatuses.indexOf(c.status) === -1) return false;
+        if (filterSources.length > 0 && filterSources.indexOf(c.source) === -1) return false;
+        if (filterAreas.length > 0 && filterAreas.indexOf(getAreaGroup(c.area)) === -1) return false;
+        if (filterPLAs.length > 0 && filterPLAs.indexOf(c.partnerPLA) === -1) return false;
         // KPI-based filters
         if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
         if (activeKpiFilter === 'pending' && (c.status === 'Closed' || c.status === 'Blocked')) return false;
@@ -1116,6 +1234,7 @@
         // Chart-based filters
         if (activeChartFilter && activeChartFilter.type === 'workload' && !c.workloads.includes(activeChartFilter.value)) return false;
         if (activeChartFilter && activeChartFilter.type === 'area' && c.area !== activeChartFilter.value) return false;
+        if (activeChartFilter && activeChartFilter.type === 'areaGroup' && getAreaGroup(c.area) !== activeChartFilter.value) return false;
         if (activeChartFilter && activeChartFilter.type === 'partner' && c.partner !== activeChartFilter.value) return false;
         return true;
       });
@@ -1130,6 +1249,7 @@
 
       // KPIs — differ by view
       const total = campaigns.length;
+      const newCount = campaigns.filter(c => c.status === 'New').length;
       const blocked = campaigns.filter(c => c.status === 'Blocked').length;
       const inProgress = campaigns.filter(c => c.status !== 'Closed').length;
       const partnersEngaged = new Set(campaigns.filter(c => c.status !== 'New').map(c => c.partner)).size;
@@ -1142,19 +1262,15 @@
 
       if (currentView === 'partner') {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')"><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span><span class="kpi-label">In Progress</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span><span class="kpi-label">Blocked (!)</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'pending\')"><span class="kpi-value">'+pendingActions+'</span><span class="kpi-label">Pending Actions</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'new\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">New</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">'+newCount+'</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">In Progress</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')" style="border-bottom:3px solid #d83b01;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;color:#d83b01;">Blocked &#9888;</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span></div>';
       } else {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')"><span class="kpi-value">'+total+'</span><span class="kpi-label">Campaigns</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')"><span class="kpi-value">'+partnersEngaged+'</span><span class="kpi-label">Partners Engaged</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')"><span class="kpi-value" style="color:#d83b01">'+blockedLong+' &#9888;</span><span class="kpi-label">Blocked > 14 Days</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'committed\')"><span class="kpi-value">'+workloadsCommitted+'</span><span class="kpi-label">Workloads Committed</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')"><span class="kpi-value" style="color:#107c10">'+totalSeats.toLocaleString()+'</span><span class="kpi-label">Est. Seat Change</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')"><span class="kpi-value">'+unifiedPct+'%</span><span class="kpi-label">Unified %</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Campaigns</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">15</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Partners Engaged</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">13</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Usage Whitespace</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">246,100</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Unified Percentage</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">75%</span></div>';
       }
 
       renderCharts();
@@ -1164,8 +1280,9 @@
       var headerCells = '';
       allColumns.forEach(function(col) {
         if (col.fieldCorpOnly && currentView === 'partner') return;
+        if (col.partnerOnly && currentView !== 'partner') return;
         if (!visibleColumns[col.key]) return;
-        headerCells += '<th>'+col.label+'</th>';
+        headerCells += '<th>'+getColumnLabel(col)+'</th>';
       });
       thead.innerHTML = '<tr>'+headerCells+'</tr>';
 
@@ -1175,19 +1292,26 @@
         var cells = '';
         allColumns.forEach(function(col) {
           if (col.fieldCorpOnly && currentView === 'partner') return;
+          if (col.partnerOnly && currentView !== 'partner') return;
           if (!visibleColumns[col.key]) return;
           if (col.key === 'id') cells += '<td><a class="campaign-id-link" onclick="openCampaign(\''+c.id+'\')">'+c.id+'</a></td>';
           else if (col.key === 'customer') {
             if (currentView === 'partner') cells += '<td>'+c.customer+'</td>';
             else cells += '<td><a class="campaign-id-link" onclick="openCustomerUsage(\''+c.id+'\')">'+c.customer+'</a></td>';
           }
+          else if (col.key === 'customerArea') cells += '<td>'+c.area+'</td>';
           else if (col.key === 'partner') cells += '<td>'+c.partner+'</td>';
+          else if (col.key === 'partnerPLA') cells += '<td>'+(c.partnerPLA || '')+'</td>';
           else if (col.key === 'status') cells += '<td>'+renderStatusBadge(c)+'</td>';
           else if (col.key === 'partnerDRI') cells += '<td>'+c.partnerDRI+'</td>';
           else if (col.key === 'microsoftDRI') cells += '<td>'+c.microsoftDRI+'</td>';
           else if (col.key === 'workloads') cells += '<td><div class="workload-pills">'+wl+'</div></td>';
           else if (col.key === 'unified') cells += '<td>'+c.unified+'</td>';
           else if (col.key === 'opportunityId') cells += '<td>'+c.opportunityId+'</td>';
+          else if (col.key === 'campaignStatus') {
+            var hasCommitted = c.workloadData.some(function(w){ return w.status === 'Committed'; });
+            cells += '<td>'+(hasCommitted ? 'Committed' : 'Uncommitted')+'</td>';
+          }
           else if (col.key === 'source') cells += '<td>'+c.source+'</td>';
         });
         return '<tr>'+cells+'</tr>';
@@ -1198,32 +1322,50 @@
       const chartsRow = document.getElementById('chartsRow');
       const statusCounts = {};
       campaigns.forEach(c => { statusCounts[c.status] = (statusCounts[c.status] || 0) + 1; });
-      const statusColors = { New: '#0078d4', Outreach: '#005a9e', Engaged: '#6b21a8', Funding: '#c19c00', Committed: '#107c10', Blocked: '#d83b01', Closed: '#605e5c' };
-
-      // Pie: Status distribution
-      var statusChart = buildPieChart(statusCounts, statusColors, 'By Status', 'status');
-
-      // Bar: Workloads
-      var wlCounts = {};
-      campaigns.forEach(c => { c.workloads.forEach(function(w) { wlCounts[w] = (wlCounts[w] || 0) + 1; }); });
-      var workloadChart = buildVBarChart(wlCounts, '#0078d4', 'By Workload', 'workload');
-
-      // Pie: Area distribution
-      var areaCounts = {};
-      campaigns.forEach(c => { areaCounts[c.area] = (areaCounts[c.area] || 0) + 1; });
-      var areaColors = { 'ANZ': '#0078d4', 'India': '#005a9e', 'US West': '#107c10', 'US East': '#8a6d00', 'EMEA North': '#7719aa', 'APAC': '#d83b01' };
-      var areaChart = buildPieChart(areaCounts, areaColors, 'By Area', 'area');
-
-      var partnerCounts = {};
-      campaigns.forEach(c => { partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1; });
-      var partnerChart = buildHBarChart(partnerCounts, '#7719aa', 'By Partner', 'partner');
+      const statusColors = { New: '#0078d4', Outreach: '#d83b01', Engaged: '#6b21a8', Funding: '#005a9e', Committed: '#c19c00', Closed: '#c8c8c8', Blocked: '#d83b01' };
 
       if (currentView === 'partner') {
-        chartsRow.innerHTML = statusChart + workloadChart + areaChart;
+        var statusEntries = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed', 'Blocked'].map(function(key) {
+          return { label: key, value: statusCounts[key] || 0, filterValue: key };
+        }).filter(function(entry) { return entry.value > 0; });
+        var partnerAreaGroups = [
+          { label: 'US MFM', value: campaigns.filter(function(c) { return ['US West'].indexOf(c.area) > -1; }).length, filterValue: 'US MFM' },
+          { label: 'US PRO', value: campaigns.filter(function(c) { return ['US East'].indexOf(c.area) > -1; }).length, filterValue: 'US PRO' },
+          { label: 'US OGE', value: campaigns.filter(function(c) { return ['EMEA North'].indexOf(c.area) > -1; }).length, filterValue: 'US OGE' },
+          { label: 'ANZ', value: campaigns.filter(function(c) { return ['ANZ', 'India', 'APAC'].indexOf(c.area) > -1; }).length, filterValue: 'ANZ' }
+        ].filter(function(entry) { return entry.value > 0; });
+        var partnerAreaColors = { 'US MFM': '#0078d4', 'US PRO': '#005a9e', 'US OGE': '#c19c00', 'ANZ': '#d83b01' };
+        chartsRow.innerHTML =
+          buildDonutChart(statusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
+          buildDonutChart(partnerAreaGroups, partnerAreaColors, 'Customers by Area', 'areaGroup', 'As of 11:00 PM, 6/30/2025');
       } else if (currentView === 'field') {
-        chartsRow.innerHTML = statusChart + areaChart;
+        var fieldPartnerCounts = {};
+        campaigns.forEach(function(c) { fieldPartnerCounts[c.partner] = (fieldPartnerCounts[c.partner] || 0) + 1; });
+        var fieldPartnerEntries = Object.entries(fieldPartnerCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,4).map(function(e){return {label:e[0],value:e[1],filterValue:e[0]};});
+        var fieldPartnerColors = {};
+        fieldPartnerEntries.forEach(function(e,i){fieldPartnerColors[e.label]=COLOR_PALETTE[i%COLOR_PALETTE.length];});
+        var fieldStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
+        chartsRow.innerHTML =
+          buildDonutChart(fieldStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
+          buildDonutChart(fieldPartnerEntries, fieldPartnerColors, 'Campaigns by Partner', 'partner', 'As of 11:00 PM, 6/30/2025');
       } else {
-        chartsRow.innerHTML = statusChart + areaChart + partnerChart;
+        var corpStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
+        var corpAreaEntries = [
+          {label:'US MFM',value:campaigns.filter(function(c){return ['US West'].indexOf(c.area)>-1;}).length,filterValue:'US MFM'},
+          {label:'US PRO',value:campaigns.filter(function(c){return ['US East'].indexOf(c.area)>-1;}).length,filterValue:'US PRO'},
+          {label:'US OGE',value:campaigns.filter(function(c){return ['EMEA North'].indexOf(c.area)>-1;}).length,filterValue:'US OGE'},
+          {label:'ANZ',value:campaigns.filter(function(c){return ['ANZ','India','APAC'].indexOf(c.area)>-1;}).length,filterValue:'ANZ'}
+        ].filter(function(e){return e.value>0;});
+        var corpAreaColors = {'US MFM':'#0078d4','US PRO':'#d83b01','US OGE':'#005a9e','ANZ':'#c19c00'};
+        var corpPartnerCounts = {};
+        campaigns.forEach(function(c){corpPartnerCounts[c.partner]=(corpPartnerCounts[c.partner]||0)+1;});
+        var corpPartnerEntries = Object.entries(corpPartnerCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,4).map(function(e){return {label:e[0],value:e[1],filterValue:e[0]};});
+        var corpPartnerColors = {};
+        corpPartnerEntries.forEach(function(e,i){corpPartnerColors[e.label]=COLOR_PALETTE[i%COLOR_PALETTE.length];});
+        chartsRow.innerHTML =
+          buildDonutChart(corpStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
+          buildDonutChart(corpAreaEntries, corpAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026') +
+          buildDonutChart(corpPartnerEntries, corpPartnerColors, 'Campaigns by Partners', 'partner', 'As of 11:00 PM, 4/30/2026');
       }
     }
 
@@ -1277,6 +1419,80 @@
         return '<div class="pie-legend-item" onclick="filterByChart(\''+filterType+'\',\''+escaped+'\')"><div class="pie-legend-dot" style="background:'+color+'"></div>'+e[0]+' ('+e[1]+')</div>';
       }).join('');
       return '<div class="chart-card"><h3>'+title+'</h3><div class="pie-chart-wrap"><div class="pie-chart" style="background:'+gradient+'"></div><div class="pie-legend">'+legend+'</div></div></div>';
+    }
+    function buildDonutChart(entries, colors, title, filterType, timestamp) {
+      var total = entries.reduce(function(sum, entry) { return sum + entry.value; }, 0);
+      var gradientParts = [];
+      var angle = 0;
+      entries.forEach(function(entry) {
+        var pct = total ? (entry.value / total) * 360 : 0;
+        var color = colors[entry.label] || '#999';
+        gradientParts.push(color + ' ' + angle + 'deg ' + (angle + pct) + 'deg');
+        angle += pct;
+      });
+      var legend = entries.map(function(entry) {
+        var color = colors[entry.label] || '#999';
+        var escapedValue = entry.filterValue.replace(/'/g, "\\'");
+        return '<div class="donut-legend-item" onclick="filterByChart(\''+filterType+'\',\''+escapedValue+'\')"><div class="donut-legend-dot" style="background:'+color+'"></div>'+entry.label+'</div>';
+      }).join('');
+      var labels = '';
+      var labelAngle = 0;
+      entries.forEach(function(entry) {
+        var pct = total ? (entry.value / total) * 360 : 0;
+        if (entry.value > 0) {
+          var midAngle = labelAngle + pct / 2;
+          var rad = midAngle * Math.PI / 180;
+          var x = 50 + Math.sin(rad) * 42;
+          var y = 50 - Math.cos(rad) * 42;
+          labels += '<div class="donut-segment-label" style="left:'+x+'%;top:'+y+'%;">'+entry.value+'</div>';
+        }
+        labelAngle += pct;
+      });
+      var gradient = gradientParts.length ? gradientParts.join(', ') : '#e0e0e0 0deg 360deg';
+      return '<div class="chart-card"><div class="chart-header"><div><div class="chart-title">'+title+'</div><div class="chart-meta">'+timestamp+'</div></div><div class="chart-header-actions"><button class="chart-icon-btn" onclick="toggleFilter(true)" title="Filter"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg></button><button class="chart-icon-btn" onclick="showToast(\'Additional chart actions coming soon\')" title="More">&#8942;</button></div></div><div class="donut-chart-wrap"><div class="donut-chart-shell">'+labels+'<div class="donut-chart" style="background:conic-gradient('+gradient+')"><div class="donut-hole"></div><div class="donut-center">'+total+'</div></div></div><div class="donut-legend">'+legend+'</div></div></div>';
+    }
+
+    function buildFilterCheckboxMarkup(values, selectedValues, groupName) {
+      return values.map(function(value) {
+        var checked = selectedValues.indexOf(value) > -1 ? 'checked' : '';
+        return '<label class="filter-checkbox-item" data-value="'+value.toLowerCase()+'"><input type="checkbox" data-filter-group="'+groupName+'" value="'+value+'" '+checked+'><span>'+value+'</span></label>';
+      }).join('');
+    }
+
+    function renderFilterCheckboxes() {
+      var sources = Array.from(new Set(campaigns.map(function(c) { return c.source; }).filter(Boolean))).sort();
+      var plas = Array.from(new Set(campaigns.map(function(c) { return c.partnerPLA; }).filter(Boolean))).sort();
+      document.getElementById('filterStateCheckboxes').innerHTML = buildFilterCheckboxMarkup(FILTER_STATUS_OPTIONS, filterState.statuses, 'statuses');
+      document.getElementById('filterSourceCheckboxes').innerHTML = buildFilterCheckboxMarkup(sources, filterState.sources, 'sources');
+      document.getElementById('filterAreaCheckboxes').innerHTML = buildFilterCheckboxMarkup(FILTER_AREA_OPTIONS, filterState.areas, 'areas');
+      document.getElementById('filterPLACheckboxes').innerHTML = buildFilterCheckboxMarkup(plas, filterState.plas, 'plas');
+      var plaSearch = document.getElementById('filterPLASearch');
+      if (plaSearch) filterPLACheckboxes();
+    }
+
+    function applyFilters() {
+      function getCheckedValues(containerId) {
+        return Array.from(document.querySelectorAll('#'+containerId+' input[type="checkbox"]:checked')).map(function(input) {
+          return input.value;
+        });
+      }
+      filterState = {
+        statuses: getCheckedValues('filterStateCheckboxes'),
+        sources: getCheckedValues('filterSourceCheckboxes'),
+        areas: getCheckedValues('filterAreaCheckboxes'),
+        plas: getCheckedValues('filterPLACheckboxes')
+      };
+      activeKpiFilter = null;
+      activeChartFilter = null;
+      renderDashboard();
+      toggleFilter(false);
+    }
+
+    function filterPLACheckboxes() {
+      var searchValue = (document.getElementById('filterPLASearch').value || '').toLowerCase();
+      Array.from(document.querySelectorAll('#filterPLACheckboxes .filter-checkbox-item')).forEach(function(item) {
+        item.style.display = item.getAttribute('data-value').indexOf(searchValue) > -1 ? 'flex' : 'none';
+      });
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DETAIL VIEW Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -2070,16 +2286,18 @@
 
     function toggleFilter(forceState) {
       var overlay = document.getElementById('filterOverlay');
-      if (typeof forceState === 'boolean') overlay.classList.toggle('show', forceState);
-      else overlay.classList.toggle('show');
+      var shouldShow = typeof forceState === 'boolean' ? forceState : !overlay.classList.contains('show');
+      if (shouldShow) renderFilterCheckboxes();
+      overlay.classList.toggle('show', shouldShow);
     }
     function resetFilters() {
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterSource').value = '';
-      document.getElementById('filterArea').value = '';
+      filterState = createEmptyFilterState();
       document.getElementById('searchInput').value = '';
       activeKpiFilter = null;
       activeChartFilter = null;
+      var plaSearch = document.getElementById('filterPLASearch');
+      if (plaSearch) plaSearch.value = '';
+      renderFilterCheckboxes();
       renderDashboard();
     }
 
