@@ -1433,6 +1433,9 @@
       });
 
       filtered.sort((a, b) => {
+        // Pin campaign 123456 to top
+        if (a.id === '123456') return -1;
+        if (b.id === '123456') return 1;
         if (sortBy === 'updated') return (b.dates.updated || '').localeCompare(a.dates.updated || '');
         if (sortBy === 'created') return (b.dates.created || '').localeCompare(a.dates.created || '');
         if (sortBy === 'blocked') return (b.status === 'Blocked' ? 1 : 0) - (a.status === 'Blocked' ? 1 : 0);
