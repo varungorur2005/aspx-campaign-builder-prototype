@@ -2916,7 +2916,14 @@
         });
       } else {
         steps.push({
-          target: '#campaignTableBody .campaign-id-link',
+          target: null,
+          targetFinder: function() {
+            var links = document.querySelectorAll('#campaignTableBody .campaign-id-link');
+            for (var i = 0; i < links.length; i++) {
+              if (links[i].textContent.trim() === '123456') return links[i];
+            }
+            return links[0] || null;
+          },
           title: 'Campaign Details',
           text: 'Click on any Campaign ID to open the detailed campaign view with status tracking, workloads, and activity history.',
           arrow: 'left'
@@ -2927,10 +2934,14 @@
         steps.push({
           target: null,
           targetFinder: function() {
+            var links = document.querySelectorAll('#campaignTableBody .campaign-id-link');
+            for (var i = 0; i < links.length; i++) {
+              if (links[i].textContent.trim() === 'DEPARTMENT OF HEALTH') return links[i];
+            }
             var rows = document.querySelectorAll('#campaignTableBody tr');
-            for (var i = 0; i < rows.length; i++) {
-              var links = rows[i].querySelectorAll('.campaign-id-link');
-              if (links.length > 1) return links[1];
+            for (var j = 0; j < rows.length; j++) {
+              var rowLinks = rows[j].querySelectorAll('.campaign-id-link');
+              if (rowLinks.length > 1) return rowLinks[1];
             }
             return null;
           },
