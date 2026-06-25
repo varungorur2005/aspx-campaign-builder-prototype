@@ -2237,7 +2237,7 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td><td><textarea id="workloadNotes_'+i+'" rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;'+(w.status==='Blocked'?'border-color:#d83b01;':'')+'" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+(w.notes || '')+'</textarea>'+(w.status==='Blocked'?'<span style="font-size:10px;color:#d83b01;">Required for blocked workloads</span>':'')+'</td></tr>').join('');
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td><td><textarea id="workloadNotes_'+i+'" rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;'+(w.status==='Blocked'?'border-color:#d83b01;':'')+'" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateWorkload('+i+',\'notes\',this.value);validateWorkloadFields();" onchange="updateWorkload('+i+',\'notes\',this.value);validateWorkloadFields();">'+(w.notes || '')+'</textarea>'+(w.status==='Blocked'?'<span id="workloadNotesHint_'+i+'" style="font-size:10px;color:#d83b01;">Required for blocked workloads</span>':'')+'</td></tr>').join('');
       notesGroup.style.display = '';
       validateWorkloadFields();
     }
@@ -2273,10 +2273,13 @@
         }
         // Notes validation for Blocked
         if (notesInput) {
+          var notesHint = document.getElementById('workloadNotesHint_' + i);
           if (w.status === 'Blocked' && !w.notes) {
             notesInput.style.borderColor = '#d83b01';
+            if (notesHint) notesHint.style.display = '';
           } else {
             notesInput.style.borderColor = '';
+            if (notesHint) notesHint.style.display = 'none';
           }
         }
       });
