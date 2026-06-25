@@ -2237,7 +2237,7 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);highlightBlockedNotes()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;" onchange="updateWorkload('+i+',\'seats\',this.value)"></td><td><textarea id="workloadNotes_'+i+'" rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;'+(w.status==='Blocked'?'border-color:#d83b01;':'')+'" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+(w.notes || '')+'</textarea>'+(w.status==='Blocked'?'<span style="font-size:10px;color:#d83b01;">Required for blocked workloads</span>':'')+'</td></tr>').join('');
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);highlightBlockedNotes()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input type="number" value="'+w.seats+'" style="width:80px;'+((w.status==='Committed'||w.status==='Closed')&&(!w.seats||w.seats<=0)?'border-color:#d83b01;':'')+'" onchange="updateWorkload('+i+',\'seats\',this.value)">'+ ((w.status==='Committed'||w.status==='Closed')&&(!w.seats||w.seats<=0)?'<span style="font-size:10px;color:#d83b01;">Required</span>':'') +'</td><td><textarea id="workloadNotes_'+i+'" rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;'+(w.status==='Blocked'?'border-color:#d83b01;':'')+'" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';" onchange="updateWorkload('+i+',\'notes\',this.value)">'+(w.notes || '')+'</textarea>'+(w.status==='Blocked'?'<span style="font-size:10px;color:#d83b01;">Required for blocked workloads</span>':'')+'</td></tr>').join('');
       notesGroup.style.display = '';
     }
 
@@ -2966,6 +2966,12 @@
     function saveAllWorkloads() {
       var c = currentCampaign;
       if (!c) return;
+      // Validate seats for Committed or Closed workloads
+      var missingSeats = c.workloadData.some(function(w) { return (w.status === 'Committed' || w.status === 'Closed') && (!w.seats || w.seats <= 0); });
+      if (missingSeats) {
+        showToast('Please enter Est. Seat Change (numeric value > 0) for all Committed/Closed workloads', true);
+        return;
+      }
       // Validate notes for blocked workloads
       var missingNotes = c.workloadData.some(function(w) { return w.status === 'Blocked' && !w.notes; });
       if (missingNotes) {
