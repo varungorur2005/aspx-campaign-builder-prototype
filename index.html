@@ -765,6 +765,17 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="workloadBlockedModal">
+    <div class="modal">
+      <h3>Blocked Workload Detected</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">One or more workloads have a Blocked status. Do you want to move this campaign to Blocked?</p>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="confirmWorkloadBlocked()">Yes</button>
+        <button class="btn btn-secondary" onclick="cancelWorkloadBlocked()">No</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="psmWizardModal">
     <div class="modal" style="width:560px;">
       <h3>Create PSM Campaign</h3>
@@ -2197,13 +2208,13 @@
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateEngaged" onchange="checkMoveButtonState()" style="margin-right:6px;"> Engaged Customer? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateEngageDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateSowDrafted" onchange="checkMoveButtonState()" style="margin-right:6px;"> Customer SOW prepared? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><div class="form-grid"><div class="form-group full-width"><label>Customer SOW prepared? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="sowPrepared" id="gateSowYes" value="yes" onchange="onSowPreparedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowPrepared" id="gateSowNo" value="no" onchange="onSowPreparedChange()"> No</label></div></div><div class="form-group" id="sowPreparedDateGroup" style="opacity:0.4;"><label>Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="sowBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateSowBlockReason" placeholder="Explain why the SOW cannot be prepared..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
-          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateFundingRequested" disabled onchange="onFundingRequestedChange()" style="margin-right:6px;"> Funding Requested? <span class="required">*</span></label><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateSowNoFunding" disabled onchange="onSowSignedNoFundingChange()" style="margin-right:6px;"> Customer SOW signed? <span class="required">*</span></label><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label>Funding Requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingRequested" id="gateFundingRequestedYes" value="yes" disabled onchange="onFundingRequestedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingRequested" id="gateFundingRequestedNo" value="no" disabled onchange="onFundingRequestedChange()"> No</label></div></div><div id="fundingRequestedDateGroup" style="opacity:0.4;display:flex;align-items:center;gap:6px;margin-bottom:12px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="fundingRequestedBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateFundingRequestedBlockReason" placeholder="Explain why funding was not requested..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label>Customer SOW signed? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingYes" value="yes" disabled onchange="onSowSignedNoFundingChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingNo" value="no" disabled onchange="onSowSignedNoFundingChange()"> No</label></div></div><div id="sowSignedNoFundingDateGroup" style="opacity:0.4;display:none;align-items:center;gap:6px;margin-bottom:12px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="sowSignedBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateSowSignedBlockReason" placeholder="Explain why SOW was not signed..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         } else if (c.fundingSubState === 'requested') {
-          html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group"><label><input type="checkbox" id="gateFundingSecured" onchange="onFundingSecuredSubChange()" style="margin-right:6px;"> Is Microsoft funding secured? <span class="required">*</span></label></div><div class="form-group"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" onchange="checkMoveButtonState()"></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group full-width"><label>Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingSecured" id="gateFundingSecuredYes" value="yes" onchange="onFundingSecuredSubChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingSecured" id="gateFundingSecuredNo" value="no" onchange="onFundingSecuredSubChange()"> No</label></div></div><div class="form-group" id="fundingSecuredDateGroup" style="opacity:0.4;"><label>Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;width:100%;" disabled onchange="checkMoveButtonState()"></div><div class="form-group full-width" id="fundingSecuredBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateFundingSecuredBlockReason" placeholder="Explain why funding was not secured..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         }
       }
       else if (c.status === 'Blocked') {
@@ -2326,27 +2337,59 @@
           valid = !!comment;
         }
       } else if (c.status === 'Engaged') {
-        var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-        var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
-        valid = sowChecked && sowDate;
+        var sowYes = document.getElementById('gateSowYes');
+        var sowNo = document.getElementById('gateSowNo');
+        if (sowYes && sowYes.checked) {
+          var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+          valid = !!sowDate;
+        } else if (sowNo && sowNo.checked) {
+          var blockReason = document.getElementById('gateSowBlockReason') && document.getElementById('gateSowBlockReason').value;
+          valid = !!blockReason;
+        }
       } else if (c.status === 'Funding') {
         if (c.fundingSubState === 'requested') {
-          var secCb = document.getElementById('gateFundingSecured') && document.getElementById('gateFundingSecured').checked;
-          var secDate = document.getElementById('gateFundingSecuredDate') && document.getElementById('gateFundingSecuredDate').value;
-          valid = secCb && secDate;
+          var secYes = document.getElementById('gateFundingSecuredYes');
+          var secNo = document.getElementById('gateFundingSecuredNo');
+          if (secYes && secYes.checked) {
+            var secDate = document.getElementById('gateFundingSecuredDate') && document.getElementById('gateFundingSecuredDate').value;
+            valid = !!secDate;
+          } else if (secNo && secNo.checked) {
+            var secBlockReason = document.getElementById('gateFundingSecuredBlockReason') && document.getElementById('gateFundingSecuredBlockReason').value;
+            valid = !!secBlockReason;
+          }
         } else {
           var yesRadio = document.getElementById('gateFundingYes');
           var noRadio = document.getElementById('gateFundingNo');
           if (noRadio && noRadio.checked) {
-            var sowNoFunding = document.getElementById('gateSowNoFunding') && document.getElementById('gateSowNoFunding').checked;
-            var sowNoFundingDate = document.getElementById('gateSowNoFundingDate') && document.getElementById('gateSowNoFundingDate').value;
-            valid = sowNoFunding && sowNoFundingDate;
+            var sowNoFundingYes = document.getElementById('gateSowNoFundingYes');
+            var sowNoFundingNo = document.getElementById('gateSowNoFundingNo');
+            if (sowNoFundingYes && sowNoFundingYes.checked) {
+              var sowNoFundingDate = document.getElementById('gateSowNoFundingDate') && document.getElementById('gateSowNoFundingDate').value;
+              valid = !!sowNoFundingDate;
+            } else if (sowNoFundingNo && sowNoFundingNo.checked) {
+              var sowBlockReason = document.getElementById('gateSowSignedBlockReason') && document.getElementById('gateSowSignedBlockReason').value;
+              valid = !!sowBlockReason;
+            }
           } else if (yesRadio && yesRadio.checked) {
-            var reqCb = document.getElementById('gateFundingRequested') && document.getElementById('gateFundingRequested').checked;
-            var reqDate = document.getElementById('gateFundingRequestedDate') && document.getElementById('gateFundingRequestedDate').value;
-            var sowCb = document.getElementById('gateSowNoFunding') && document.getElementById('gateSowNoFunding').checked;
-            var sowDate = document.getElementById('gateSowNoFundingDate') && document.getElementById('gateSowNoFundingDate').value;
-            valid = reqCb && reqDate && sowCb && sowDate;
+            var reqYes = document.getElementById('gateFundingRequestedYes');
+            var reqNo = document.getElementById('gateFundingRequestedNo');
+            if (reqYes && reqYes.checked) {
+              var reqDate = document.getElementById('gateFundingRequestedDate') && document.getElementById('gateFundingRequestedDate').value;
+              var sowCbYes = document.getElementById('gateSowNoFundingYes');
+              var sowCbNo = document.getElementById('gateSowNoFundingNo');
+              if (sowCbYes && sowCbYes.checked) {
+                var sowDate = document.getElementById('gateSowNoFundingDate') && document.getElementById('gateSowNoFundingDate').value;
+                valid = !!reqDate && !!sowDate;
+              } else if (sowCbNo && sowCbNo.checked) {
+                var sowBlkReason = document.getElementById('gateSowSignedBlockReason') && document.getElementById('gateSowSignedBlockReason').value;
+                valid = !!reqDate && !!sowBlkReason;
+              } else {
+                valid = false;
+              }
+            } else if (reqNo && reqNo.checked) {
+              var reqBlockReason = document.getElementById('gateFundingRequestedBlockReason') && document.getElementById('gateFundingRequestedBlockReason').value;
+              valid = !!reqBlockReason;
+            }
           }
         }
       }
@@ -2506,46 +2549,98 @@
     }
 
     function advanceFromEngaged() {
-      var checked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-      var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
-      if (!checked || !sowDate) { showToast('Please confirm SOW has been prepared with date', true); return; }
+      var sowYes = document.getElementById('gateSowYes');
+      var sowNo = document.getElementById('gateSowNo');
+      if (!sowYes && !sowNo) { showToast('Please select Yes or No for SOW prepared', true); return; }
       var c = currentCampaign;
       c.dates.updated = today();
-      c.dates.sowPrepared = sowDate;
-      c.status = 'Funding';
-      c.funding.submitted = false;
-      c.funding.secured = '';
       var comments = document.getElementById('gateSowComments') ? document.getElementById('gateSowComments').value : '';
-      c.history.push({ date: today(), text: 'SOW drafted - advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-      showToast('Advanced to Funding');
+
+      if (sowYes && sowYes.checked) {
+        var sowDate = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+        if (!sowDate) { showToast('Please provide a date', true); return; }
+        c.dates.sowPrepared = sowDate;
+        c.status = 'Funding';
+        c.funding.submitted = false;
+        c.funding.secured = '';
+        c.history.push({ date: today(), text: 'SOW drafted - advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        showToast('Advanced to Funding');
+      } else if (sowNo && sowNo.checked) {
+        var blockReason = document.getElementById('gateSowBlockReason') && document.getElementById('gateSowBlockReason').value;
+        if (!blockReason) { showToast('Please provide a reason for blocking', true); return; }
+        c.previousState = 'Engaged';
+        c.blockReason = blockReason;
+        c.status = 'Blocked';
+        c.history.push({ date: today(), text: 'Blocked - SOW not prepared: ' + blockReason + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+        showToast('Campaign blocked');
+      }
       renderDetail();
       renderDashboard();
+    }
+
+    function onSowPreparedChange() {
+      var sowYes = document.getElementById('gateSowYes');
+      var sowNo = document.getElementById('gateSowNo');
+      var dateGroup = document.getElementById('sowPreparedDateGroup');
+      var dateInput = document.getElementById('gateSowDraftedDate');
+      var blockReasonGroup = document.getElementById('sowBlockReasonGroup');
+      var moveBtn = document.getElementById('moveBtnNext');
+      if (sowYes && sowYes.checked) {
+        if (dateGroup) { dateGroup.style.opacity = '1'; }
+        if (dateInput) dateInput.disabled = false;
+        if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        if (moveBtn) moveBtn.textContent = 'Move to Funding';
+      } else if (sowNo && sowNo.checked) {
+        if (dateGroup) { dateGroup.style.opacity = '0.4'; }
+        if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
+        if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (moveBtn) moveBtn.textContent = 'Move to Blocked';
+      }
+      checkMoveButtonState();
     }
 
     function onFundingNeededChange() {
       var yesRadio = document.getElementById('gateFundingYes');
       var noRadio = document.getElementById('gateFundingNo');
       var reqGroup = document.getElementById('fundingRequestedGroup');
-      var reqCb = document.getElementById('gateFundingRequested');
+      var reqYes = document.getElementById('gateFundingRequestedYes');
+      var reqNo = document.getElementById('gateFundingRequestedNo');
       var reqDate = document.getElementById('gateFundingRequestedDate');
+      var reqDateGroup = document.getElementById('fundingRequestedDateGroup');
+      var reqBlockGroup = document.getElementById('fundingRequestedBlockReasonGroup');
       var sowGroup = document.getElementById('sowSignedNoFundingGroup');
-      var sowCb = document.getElementById('gateSowNoFunding');
+      var sowYes = document.getElementById('gateSowNoFundingYes');
+      var sowNo = document.getElementById('gateSowNoFundingNo');
       var sowDate = document.getElementById('gateSowNoFundingDate');
+      var sowDateGroup = document.getElementById('sowSignedNoFundingDateGroup');
+      var sowBlockGroup = document.getElementById('sowSignedBlockReasonGroup');
       if (yesRadio && yesRadio.checked) {
         // Show both Funding Requested and SOW Signed
         if (reqGroup) { reqGroup.style.opacity = '1'; reqGroup.style.display = 'flex'; }
-        if (reqCb) reqCb.disabled = false;
+        if (reqYes) reqYes.disabled = false;
+        if (reqNo) reqNo.disabled = false;
+        if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = 'flex'; }
         if (reqDate) reqDate.disabled = false;
         if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
-        if (sowCb) sowCb.disabled = false;
+        if (sowYes) sowYes.disabled = false;
+        if (sowNo) sowNo.disabled = false;
+        if (sowDateGroup) { sowDateGroup.style.display = 'flex'; sowDateGroup.style.opacity = '1'; }
         if (sowDate) sowDate.disabled = false;
+        // Reset block reason groups
+        if (reqBlockGroup) reqBlockGroup.style.display = 'none';
+        if (sowBlockGroup) sowBlockGroup.style.display = 'none';
       } else if (noRadio && noRadio.checked) {
         // Hide Funding Requested, show SOW Signed
         if (reqGroup) { reqGroup.style.opacity = '0.4'; reqGroup.style.display = 'flex'; }
-        if (reqCb) { reqCb.disabled = true; reqCb.checked = false; }
+        if (reqYes) { reqYes.disabled = true; reqYes.checked = false; }
+        if (reqNo) { reqNo.disabled = true; reqNo.checked = false; }
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
+        if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
+        if (reqBlockGroup) reqBlockGroup.style.display = 'none';
         if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
-        if (sowCb) sowCb.disabled = false;
+        if (sowYes) sowYes.disabled = false;
+        if (sowNo) sowNo.disabled = false;
+        if (sowDateGroup) { sowDateGroup.style.display = 'flex'; sowDateGroup.style.opacity = '1'; }
         if (sowDate) sowDate.disabled = false;
       }
       var moveBtn = document.getElementById("moveBtnNext");
@@ -2560,34 +2655,72 @@
     }
 
     function onFundingRequestedChange() {
-      var reqCb = document.getElementById('gateFundingRequested');
+      var reqYes = document.getElementById('gateFundingRequestedYes');
+      var reqNo = document.getElementById('gateFundingRequestedNo');
       var reqDate = document.getElementById('gateFundingRequestedDate');
-      if (reqCb && reqCb.checked) {
+      var reqDateGroup = document.getElementById('fundingRequestedDateGroup');
+      var reqBlockGroup = document.getElementById('fundingRequestedBlockReasonGroup');
+      var moveBtn = document.getElementById('moveBtnNext');
+      if (reqYes && reqYes.checked) {
         if (reqDate) reqDate.disabled = false;
-      } else {
+        if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = 'flex'; }
+        if (reqBlockGroup) reqBlockGroup.style.display = 'none';
+        if (moveBtn) moveBtn.textContent = 'Move to Funding Pending';
+      } else if (reqNo && reqNo.checked) {
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
+        if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
+        if (reqBlockGroup) reqBlockGroup.style.display = '';
+        if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
     }
 
     function onFundingSecuredSubChange() {
-      var secCb = document.getElementById('gateFundingSecured');
+      var secYes = document.getElementById('gateFundingSecuredYes');
+      var secNo = document.getElementById('gateFundingSecuredNo');
+      var dateGroup = document.getElementById('fundingSecuredDateGroup');
       var dateInput = document.getElementById('gateFundingSecuredDate');
-      if (secCb && secCb.checked) {
+      var blockReasonGroup = document.getElementById('fundingSecuredBlockReasonGroup');
+      var moveBtn = document.getElementById('moveBtnNext');
+      if (secYes && secYes.checked) {
+        if (dateGroup) dateGroup.style.opacity = '1';
         if (dateInput) dateInput.disabled = false;
-      } else {
+        if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        if (moveBtn) moveBtn.textContent = 'Move to Committed';
+      } else if (secNo && secNo.checked) {
+        if (dateGroup) dateGroup.style.opacity = '0.4';
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
+        if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
     }
     
     function onSowSignedNoFundingChange() {
-      var cb = document.getElementById('gateSowNoFunding');
+      var sowYes = document.getElementById('gateSowNoFundingYes');
+      var sowNo = document.getElementById('gateSowNoFundingNo');
+      var dateGroup = document.getElementById('sowSignedNoFundingDateGroup');
       var dateInput = document.getElementById('gateSowNoFundingDate');
-      if (cb && cb.checked) {
+      var blockReasonGroup = document.getElementById('sowSignedBlockReasonGroup');
+      var moveBtn = document.getElementById('moveBtnNext');
+      if (sowYes && sowYes.checked) {
+        if (dateGroup) { dateGroup.style.opacity = '1'; dateGroup.style.display = 'flex'; }
         if (dateInput) dateInput.disabled = false;
-      } else {
+        if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        // Determine move button text based on funding needed
+        var yesRadio = document.getElementById('gateFundingYes');
+        if (moveBtn) {
+          if (yesRadio && yesRadio.checked) {
+            moveBtn.textContent = 'Move to Funding Pending';
+          } else {
+            moveBtn.textContent = 'Move to Committed';
+          }
+        }
+      } else if (sowNo && sowNo.checked) {
+        if (dateGroup) { dateGroup.style.opacity = '0.4'; }
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
+        if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
     }
@@ -2602,36 +2735,82 @@
         var noRadio = document.getElementById('gateFundingNo');
 
         if (noRadio && noRadio.checked) {
-          // No funding needed - SOW signed, go to Committed
-          c.dates.sowSigned = c.dates.sowSigned || today();
-          c.fundingNeeded = 'no';
-          c.status = 'Committed';
-          c.fundingSubState = null;
-          c.dates.fundingApproval = today();
-          c.history.push({ date: today(), text: 'Funding not needed, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-          showToast('Advanced to Committed');
+          // No funding needed - check SOW signed
+          var sowYes = document.getElementById('gateSowNoFundingYes');
+          var sowNo = document.getElementById('gateSowNoFundingNo');
+          if (sowNo && sowNo.checked) {
+            var blockReason = document.getElementById('gateSowSignedBlockReason') && document.getElementById('gateSowSignedBlockReason').value;
+            c.previousState = 'Funding';
+            c.blockReason = 'Customer SOW not signed: ' + (blockReason || '');
+            c.status = 'Blocked';
+            c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+            showToast('Campaign blocked');
+          } else {
+            c.dates.sowSigned = c.dates.sowSigned || today();
+            c.fundingNeeded = 'no';
+            c.status = 'Committed';
+            c.fundingSubState = null;
+            c.dates.fundingApproval = today();
+            c.history.push({ date: today(), text: 'Funding not needed, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+            showToast('Advanced to Committed');
+          }
         } else if (yesRadio && yesRadio.checked) {
-          // Yes funding needed - move to Funding Requested sub-state
-          c.fundingNeeded = 'yes';
-          c.fundingSubState = 'requested';
-          var reqDate = document.getElementById('gateFundingRequestedDate') ? document.getElementById('gateFundingRequestedDate').value : today();
-          c.dates.fundingRequested = reqDate;
-          c.funding.submitted = true;
-          c.dates.fundingSubmission = reqDate;
-          c.history.push({ date: today(), text: 'Microsoft funding requested' + (comments ? ': ' + comments : ''), type: 'info', actor: c.partnerDRI });
-          showToast('Moved to Funding Pending');
+          // Yes funding needed - check Funding Requested
+          var reqYes = document.getElementById('gateFundingRequestedYes');
+          var reqNo = document.getElementById('gateFundingRequestedNo');
+          if (reqNo && reqNo.checked) {
+            var blockReason = document.getElementById('gateFundingRequestedBlockReason') && document.getElementById('gateFundingRequestedBlockReason').value;
+            c.previousState = 'Funding';
+            c.blockReason = 'Funding not requested: ' + (blockReason || '');
+            c.status = 'Blocked';
+            c.history.push({ date: today(), text: 'Blocked - Funding not requested: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+            showToast('Campaign blocked');
+          } else {
+            // Check SOW signed
+            var sowYes = document.getElementById('gateSowNoFundingYes');
+            var sowNo = document.getElementById('gateSowNoFundingNo');
+            if (sowNo && sowNo.checked) {
+              var blockReason = document.getElementById('gateSowSignedBlockReason') && document.getElementById('gateSowSignedBlockReason').value;
+              c.previousState = 'Funding';
+              c.blockReason = 'Customer SOW not signed: ' + (blockReason || '');
+              c.status = 'Blocked';
+              c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+              showToast('Campaign blocked');
+            } else {
+              // Yes funding needed - move to Funding Requested sub-state
+              c.fundingNeeded = 'yes';
+              c.fundingSubState = 'requested';
+              var reqDate = document.getElementById('gateFundingRequestedDate') ? document.getElementById('gateFundingRequestedDate').value : today();
+              c.dates.fundingRequested = reqDate;
+              c.funding.submitted = true;
+              c.dates.fundingSubmission = reqDate;
+              c.history.push({ date: today(), text: 'Microsoft funding requested' + (comments ? ': ' + comments : ''), type: 'info', actor: c.partnerDRI });
+              showToast('Moved to Funding Pending');
+            }
+          }
         }
       } else if (c.fundingSubState === 'requested') {
-        // In Funding Requested - securing funding and SOW
-        c.funding.secured = true;
-        var secDate = document.getElementById('gateFundingSecuredDate') ? document.getElementById('gateFundingSecuredDate').value : today();
-        c.dates.fundingSecured = secDate;
-        c.dates.fundingApproval = secDate;
-        c.dates.sowSigned = c.dates.sowSigned || today();
-        c.status = 'Committed';
-        c.fundingSubState = null;
-        c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
-        showToast('Advanced to Committed');
+        var secYes = document.getElementById('gateFundingSecuredYes');
+        var secNo = document.getElementById('gateFundingSecuredNo');
+        if (secNo && secNo.checked) {
+          var blockReason = document.getElementById('gateFundingSecuredBlockReason') && document.getElementById('gateFundingSecuredBlockReason').value;
+          c.previousState = 'Funding';
+          c.blockReason = 'Microsoft funding not secured: ' + (blockReason || '');
+          c.status = 'Blocked';
+          c.fundingSubState = null;
+          c.history.push({ date: today(), text: 'Blocked - Microsoft funding not secured: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+          showToast('Campaign blocked');
+        } else {
+          c.funding.secured = true;
+          var secDate = document.getElementById('gateFundingSecuredDate') ? document.getElementById('gateFundingSecuredDate').value : today();
+          c.dates.fundingSecured = secDate;
+          c.dates.fundingApproval = secDate;
+          c.dates.sowSigned = c.dates.sowSigned || today();
+          c.status = 'Committed';
+          c.fundingSubState = null;
+          c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+          showToast('Advanced to Committed');
+        }
       }
       renderDetail();
       renderDashboard();
@@ -2719,19 +2898,8 @@
       if (field === 'seats') c.workloadData[idx].seats = parseInt(value) || 0;
       else c.workloadData[idx][field] = value;
 
-      // Auto-block if all workloads are blocked
-      if (c.workloadData.every(function(w) { return w.status === 'Blocked'; })) {
-        c.previousState = 'Committed';
-        c.blockReason = 'All workloads blocked';
-        c.status = 'Blocked';
-        c.dates.updated = today();
-        c.history.push({ date: today(), text: 'All workloads blocked', type: 'blocked', actor: c.partnerDRI });
-        renderDetail();
-        renderDashboard();
-        showToast('All workloads blocked - campaign blocked');
-      }
       // Auto-close if all workloads closed
-      else if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
+      if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
         c.status = 'Closed';
         c.dates.updated = today();
         c.history.push({ date: today(), text: 'All workloads closed - campaign auto-closed', type: 'closed', actor: c.partnerDRI });
@@ -2754,6 +2922,40 @@
     function saveAllWorkloads() {
       var c = currentCampaign;
       if (!c) return;
+      // Check if any workload is Blocked
+      var hasBlocked = c.workloadData.some(function(w) { return w.status === 'Blocked'; });
+      if (hasBlocked) {
+        showModal('workloadBlockedModal');
+        return;
+      }
+      doSaveAllWorkloads();
+    }
+
+    function confirmWorkloadBlocked() {
+      hideModal('workloadBlockedModal');
+      var c = currentCampaign;
+      c.previousState = 'Committed';
+      c.blockReason = 'One or more workloads blocked';
+      c.status = 'Blocked';
+      c.dates.updated = today();
+      c.workloadData.forEach(function(w) {
+        var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
+        if (w.notes) historyText += ' - ' + w.notes;
+        c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
+      });
+      c.history.push({ date: today(), text: 'Blocked - One or more workloads blocked', type: 'blocked', actor: c.partnerDRI });
+      renderDetail();
+      renderDashboard();
+      showToast('Campaign moved to Blocked');
+    }
+
+    function cancelWorkloadBlocked() {
+      hideModal('workloadBlockedModal');
+      doSaveAllWorkloads();
+    }
+
+    function doSaveAllWorkloads() {
+      var c = currentCampaign;
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
         var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
@@ -2814,26 +3016,54 @@
           if (!comment) { showToast('Notes required for non-success outcomes', true); return; }
         }
       } else if (c.status === 'Engaged') {
-        var sowChecked = document.getElementById('gateSowDrafted') && document.getElementById('gateSowDrafted').checked;
-        var sowDateVal = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
-        if (!sowChecked || !sowDateVal) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        var sowYes = document.getElementById('gateSowYes');
+        var sowNo = document.getElementById('gateSowNo');
+        if (!sowYes || (!sowYes.checked && (!sowNo || !sowNo.checked))) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        if (sowYes.checked) {
+          var sowDateVal = document.getElementById('gateSowDraftedDate') && document.getElementById('gateSowDraftedDate').value;
+          if (!sowDateVal) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+        } else if (sowNo.checked) {
+          var blockReason = document.getElementById('gateSowBlockReason') && document.getElementById('gateSowBlockReason').value;
+          if (!blockReason) { showToast('Please provide a reason for blocking', true); return; }
+        }
       } else if (c.status === 'Funding') {
         if (c.fundingSubState === 'requested') {
-          var secCb = document.getElementById('gateFundingSecured');
-          var secDate = document.getElementById('gateFundingSecuredDate');
-          if (!secCb || !secCb.checked || !secDate || !secDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+          var secYes = document.getElementById('gateFundingSecuredYes');
+          var secNo = document.getElementById('gateFundingSecuredNo');
+          if ((!secYes || !secYes.checked) && (!secNo || !secNo.checked)) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+          if (secYes && secYes.checked) {
+            var secDate = document.getElementById('gateFundingSecuredDate');
+            if (!secDate || !secDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+          } else if (secNo && secNo.checked) {
+            var secBlockReason = document.getElementById('gateFundingSecuredBlockReason') && document.getElementById('gateFundingSecuredBlockReason').value;
+            if (!secBlockReason) { showToast('Please provide a reason for blocking', true); return; }
+          }
         } else {
           var yesRadio = document.getElementById('gateFundingYes');
           var noRadio = document.getElementById('gateFundingNo');
           if (!yesRadio.checked && !noRadio.checked) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
           if (yesRadio.checked) {
-            var reqCb = document.getElementById('gateFundingRequested');
-            var reqDate = document.getElementById('gateFundingRequestedDate');
-            if (!reqCb || !reqCb.checked || !reqDate || !reqDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            var reqYes = document.getElementById('gateFundingRequestedYes');
+            var reqNo = document.getElementById('gateFundingRequestedNo');
+            if ((!reqYes || !reqYes.checked) && (!reqNo || !reqNo.checked)) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            if (reqNo && reqNo.checked) {
+              var reqBlockReason = document.getElementById('gateFundingRequestedBlockReason') && document.getElementById('gateFundingRequestedBlockReason').value;
+              if (!reqBlockReason) { showToast('Please provide a reason for blocking', true); return; }
+            } else if (reqYes && reqYes.checked) {
+              var reqDate = document.getElementById('gateFundingRequestedDate');
+              if (!reqDate || !reqDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            }
           } else if (noRadio.checked) {
-            var sowNoFundCb = document.getElementById('gateSowNoFunding');
-            var sowNoFundDate = document.getElementById('gateSowNoFundingDate');
-            if (!sowNoFundCb || !sowNoFundCb.checked || !sowNoFundDate || !sowNoFundDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            var sowYes = document.getElementById('gateSowNoFundingYes');
+            var sowNo = document.getElementById('gateSowNoFundingNo');
+            if ((!sowYes || !sowYes.checked) && (!sowNo || !sowNo.checked)) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            if (sowNo && sowNo.checked) {
+              var sowBlockReason = document.getElementById('gateSowSignedBlockReason') && document.getElementById('gateSowSignedBlockReason').value;
+              if (!sowBlockReason) { showToast('Please provide a reason for blocking', true); return; }
+            } else if (sowYes && sowYes.checked) {
+              var sowDate = document.getElementById('gateSowNoFundingDate');
+              if (!sowDate || !sowDate.value) { showToast('Please complete all mandatory fields before moving to the next state', true); return; }
+            }
           }
         }
       }
@@ -2841,12 +3071,25 @@
       var nextState = '';
       if (c.status === 'New') nextState = 'Outreach';
       else if (c.status === 'Outreach') nextState = (selectedOutcome && selectedOutcome !== 'agreed') ? 'Blocked' : 'Engaged';
-      else if (c.status === 'Engaged') nextState = 'Funding';
+      else if (c.status === 'Engaged') {
+        var engSowNo = document.getElementById('gateSowNo');
+        nextState = (engSowNo && engSowNo.checked) ? 'Blocked' : 'Funding';
+      }
       else if (c.status === 'Funding') {
-        if ((!c.fundingSubState || c.fundingSubState === 'initial') && document.getElementById('gateFundingYes') && document.getElementById('gateFundingYes').checked) {
-          nextState = 'Funding Pending';
+        if (c.fundingSubState === 'requested') {
+          var fSecNo = document.getElementById('gateFundingSecuredNo');
+          nextState = (fSecNo && fSecNo.checked) ? 'Blocked' : 'Committed';
+        } else if (document.getElementById('gateFundingYes') && document.getElementById('gateFundingYes').checked) {
+          var fReqNo = document.getElementById('gateFundingRequestedNo');
+          if (fReqNo && fReqNo.checked) {
+            nextState = 'Blocked';
+          } else {
+            var fSowNo = document.getElementById('gateSowNoFundingNo');
+            nextState = (fSowNo && fSowNo.checked) ? 'Blocked' : 'Funding Pending';
+          }
         } else {
-          nextState = 'Committed';
+          var fSowNoNf = document.getElementById('gateSowNoFundingNo');
+          nextState = (fSowNoNf && fSowNoNf.checked) ? 'Blocked' : 'Committed';
         }
       }
       document.getElementById('moveStateModalTitle').textContent = 'Move to ' + nextState + '?';
