@@ -2243,8 +2243,12 @@
     }
 
     function validateSeatInput(idx, el) {
-      // Strip non-numeric characters (allow digits only)
-      el.value = el.value.replace(/[^0-9]/g, '');
+      var raw = el.value;
+      var cleaned = raw.replace(/[^0-9]/g, '');
+      if (raw !== cleaned) {
+        el.value = cleaned;
+        showToast('Only numbers are accepted for Est. Seat Change', true);
+      }
       var c = currentCampaign;
       if (c) c.workloadData[idx].seats = parseInt(el.value) || 0;
       validateWorkloadFields();
