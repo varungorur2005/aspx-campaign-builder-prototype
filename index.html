@@ -2208,13 +2208,12 @@
         html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateEngaged" onchange="checkMoveButtonState()" style="margin-right:6px;"> Engaged Customer? <span class="required">*</span></label><div style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateEngageDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Notes <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW prepared? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowPrepared" id="gateSowYes" value="yes" onchange="onSowPreparedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowPrepared" id="gateSowNo" value="no" onchange="onSowPreparedChange()"> No</label></div><div id="sowPreparedDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateSowBlockReason" placeholder="Explain why the SOW cannot be prepared..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Customer SOW</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW prepared? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowPrepared" id="gateSowYes" value="yes" onchange="onSowPreparedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowPrepared" id="gateSowNo" value="no" onchange="onSowPreparedChange()"> No</label></div><div id="sowPreparedDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowBlockReasonGroup" style="display:none;"><label>Explain why the SOW cannot be prepared <span class="required">*</span></label><textarea id="gateSowBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowCommentsGroup"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
-          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Has funding been requested? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingRequested" id="gateFundingRequestedYes" value="yes" disabled onchange="onFundingRequestedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingRequested" id="gateFundingRequestedNo" value="no" disabled onchange="onFundingRequestedChange()"> No</label></div><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingRequestedBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateFundingRequestedBlockReason" placeholder="Explain why funding was not requested..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW signed? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingYes" value="yes" disabled onchange="onSowSignedNoFundingChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingNo" value="no" disabled onchange="onSowSignedNoFundingChange()"> No</label></div><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowSignedBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateSowSignedBlockReason" placeholder="Explain why SOW was not signed..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
-        } else if (c.fundingSubState === 'requested') {
-          html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingSecured" id="gateFundingSecuredYes" value="yes" onchange="onFundingSecuredSubChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingSecured" id="gateFundingSecuredNo" value="no" onchange="onFundingSecuredSubChange()"> No</label></div><div id="fundingSecuredDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingSecuredBlockReasonGroup" style="display:none;"><label>Reason for blocking <span class="required">*</span></label><textarea id="gateFundingSecuredBlockReason" placeholder="Explain why funding was not secured..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Has funding been requested? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingRequested" id="gateFundingRequestedYes" value="yes" disabled onchange="onFundingRequestedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingRequested" id="gateFundingRequestedNo" value="no" disabled onchange="onFundingRequestedChange()"> No</label></div><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingRequestedBlockReasonGroup" style="display:none;"><label>Explain why funding was not requested <span class="required">*</span></label><textarea id="gateFundingRequestedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW signed? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingYes" value="yes" disabled onchange="onSowSignedNoFundingChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingNo" value="no" disabled onchange="onSowSignedNoFundingChange()"> No</label></div><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div>          <div class="form-group full-width" id="sowSignedBlockReasonGroup" style="display:none;"><label>Explain why SOW was not signed <span class="required">*</span></label><textarea id="gateSowSignedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="fundingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div>
+          html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingSecured" id="gateFundingSecuredYes" value="yes" onchange="onFundingSecuredSubChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingSecured" id="gateFundingSecuredNo" value="no" onchange="onFundingSecuredSubChange()"> No</label></div><div id="fundingSecuredDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingSecuredBlockReasonGroup" style="display:none;"><label>Explain why funding was not secured <span class="required">*</span></label><textarea id="gateFundingSecuredBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="fundingPendingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Notes on funding..."></textarea></div></div></div>';
         }
       }
       else if (c.status === 'Blocked') {
@@ -2584,16 +2583,19 @@
       var dateGroup = document.getElementById('sowPreparedDateGroup');
       var dateInput = document.getElementById('gateSowDraftedDate');
       var blockReasonGroup = document.getElementById('sowBlockReasonGroup');
+      var commentsGroup = document.getElementById('sowCommentsGroup');
       var moveBtn = document.getElementById('moveBtnNext');
       if (sowYes && sowYes.checked) {
         if (dateGroup) { dateGroup.style.opacity = '1'; }
         if (dateInput) dateInput.disabled = false;
         if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        if (commentsGroup) commentsGroup.style.display = '';
         if (moveBtn) moveBtn.textContent = 'Move to Funding';
       } else if (sowNo && sowNo.checked) {
         if (dateGroup) { dateGroup.style.opacity = '0.4'; }
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
         if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (commentsGroup) commentsGroup.style.display = 'none';
         if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
@@ -2665,12 +2667,14 @@
       var sowYes = document.getElementById('gateSowNoFundingYes');
       var sowNo = document.getElementById('gateSowNoFundingNo');
       var sowDate = document.getElementById('gateSowNoFundingDate');
+      var commentsGroup = document.getElementById('fundingCommentsGroup');
       var moveBtn = document.getElementById('moveBtnNext');
       if (reqYes && reqYes.checked) {
         if (reqDate) reqDate.disabled = false;
         if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = 'flex'; }
         if (reqBlockGroup) reqBlockGroup.style.display = 'none';
         if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
+        if (commentsGroup) commentsGroup.style.display = '';
         if (moveBtn) moveBtn.textContent = 'Move to Funding Pending';
       } else if (reqNo && reqNo.checked) {
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
@@ -2681,6 +2685,7 @@
         if (sowYes) { sowYes.checked = false; }
         if (sowNo) { sowNo.checked = false; }
         if (sowDate) { sowDate.value = ''; }
+        if (commentsGroup) commentsGroup.style.display = 'none';
         if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
@@ -2692,16 +2697,19 @@
       var dateGroup = document.getElementById('fundingSecuredDateGroup');
       var dateInput = document.getElementById('gateFundingSecuredDate');
       var blockReasonGroup = document.getElementById('fundingSecuredBlockReasonGroup');
+      var commentsGroup = document.getElementById('fundingPendingCommentsGroup');
       var moveBtn = document.getElementById('moveBtnNext');
       if (secYes && secYes.checked) {
         if (dateGroup) dateGroup.style.opacity = '1';
         if (dateInput) dateInput.disabled = false;
         if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        if (commentsGroup) commentsGroup.style.display = '';
         if (moveBtn) moveBtn.textContent = 'Move to Committed';
       } else if (secNo && secNo.checked) {
         if (dateGroup) dateGroup.style.opacity = '0.4';
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
         if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (commentsGroup) commentsGroup.style.display = 'none';
         if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
@@ -2713,11 +2721,13 @@
       var dateGroup = document.getElementById('sowSignedNoFundingDateGroup');
       var dateInput = document.getElementById('gateSowNoFundingDate');
       var blockReasonGroup = document.getElementById('sowSignedBlockReasonGroup');
+      var commentsGroup = document.getElementById('fundingCommentsGroup');
       var moveBtn = document.getElementById('moveBtnNext');
       if (sowYes && sowYes.checked) {
         if (dateGroup) { dateGroup.style.opacity = '1'; dateGroup.style.display = 'flex'; }
         if (dateInput) dateInput.disabled = false;
         if (blockReasonGroup) blockReasonGroup.style.display = 'none';
+        if (commentsGroup) commentsGroup.style.display = '';
         // Determine move button text based on funding needed
         var yesRadio = document.getElementById('gateFundingYes');
         if (moveBtn) {
@@ -2731,6 +2741,7 @@
         if (dateGroup) { dateGroup.style.opacity = '0.4'; }
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
         if (blockReasonGroup) blockReasonGroup.style.display = '';
+        if (commentsGroup) commentsGroup.style.display = 'none';
         if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
