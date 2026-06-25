@@ -2660,16 +2660,27 @@
       var reqDate = document.getElementById('gateFundingRequestedDate');
       var reqDateGroup = document.getElementById('fundingRequestedDateGroup');
       var reqBlockGroup = document.getElementById('fundingRequestedBlockReasonGroup');
+      var sowGroup = document.getElementById('sowSignedNoFundingGroup');
+      var sowBlockGroup = document.getElementById('sowSignedBlockReasonGroup');
+      var sowYes = document.getElementById('gateSowNoFundingYes');
+      var sowNo = document.getElementById('gateSowNoFundingNo');
+      var sowDate = document.getElementById('gateSowNoFundingDate');
       var moveBtn = document.getElementById('moveBtnNext');
       if (reqYes && reqYes.checked) {
         if (reqDate) reqDate.disabled = false;
         if (reqDateGroup) { reqDateGroup.style.opacity = '1'; reqDateGroup.style.display = 'flex'; }
         if (reqBlockGroup) reqBlockGroup.style.display = 'none';
+        if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
         if (moveBtn) moveBtn.textContent = 'Move to Funding Pending';
       } else if (reqNo && reqNo.checked) {
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
         if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
         if (reqBlockGroup) reqBlockGroup.style.display = '';
+        if (sowGroup) { sowGroup.style.display = 'none'; }
+        if (sowBlockGroup) sowBlockGroup.style.display = 'none';
+        if (sowYes) { sowYes.checked = false; }
+        if (sowNo) { sowNo.checked = false; }
+        if (sowDate) { sowDate.value = ''; }
         if (moveBtn) moveBtn.textContent = 'Move to Blocked';
       }
       checkMoveButtonState();
