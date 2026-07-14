@@ -1678,7 +1678,7 @@
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
         '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT PSM View (V2) - Draft</span></h1>' +
-        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model:</strong> A campaign represents a group of tenants sharing the same next best action. Partners commit to engaging these customers individually or in bulk. This differs from CSU engagements which track impact at individual TPID level.</div>' +
+        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model:</strong> One campaign, many tenants. Partners target a system-curated or manually built list, and the two primary outcomes tracked are net paid seats and adoption (MAU). Growth is only attributed once the partner declares activity \u2014 moving a tenant from the master list into the actively-tracked list \u2014 which keeps attribution clean across overlapping (CPOR) partners.</div>' +
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn btn-primary" onclick="psmOpenWizard()">Create Campaign</button>' +
@@ -1702,6 +1702,7 @@
     }
 
     function psmRenderDashboard() {
+      psmCampaigns.forEach(psmEnrich);
       var search = (psmSearchTerm || '').toLowerCase();
       var filtered = psmCampaigns.filter(function(c) {
         if (search) {
@@ -1723,7 +1724,7 @@
       psmRenderFunnel();
 
       document.getElementById('psmCampaignTableHead').innerHTML =
-        '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Status</th><th>Goal</th><th>Execution</th><th>MAU Growth</th><th>Revenue</th></tr>';
+        '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Tracked</th><th>Status</th><th>Goal</th><th>Net Seats</th><th>MAU Growth</th><th>Revenue</th></tr>';
       document.getElementById('psmCampaignTableBody').innerHTML = filtered.length ? filtered.map(function(c) {
         return '<tr class="psm-clickable-row" onclick="psmOpenDetail(\''+c.id+'\')">' +
           '<td><a class="campaign-id-link" onclick="psmOpenDetail(\''+c.id+'\'); return false;">'+c.id+'</a></td>' +
@@ -1732,13 +1733,14 @@
           '<td>'+c.region+'</td>' +
           '<td>'+c.workload+'</td>' +
           '<td>'+c.tenantCount.toLocaleString()+'</td>' +
+          '<td>'+((c.trackedCount || 0).toLocaleString())+'</td>' +
           '<td>'+psmRenderStatusBadge(c.status)+'</td>' +
           '<td>'+c.goal+'</td>' +
-          '<td>'+(c.executionType || psmGetExecutionType(c.tenantCount))+'</td>' +
+          '<td>'+(c.netPaidSeats ? '+'+c.netPaidSeats.toLocaleString() : '—')+'</td>' +
           '<td>'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '—')+'</td>' +
           '<td>'+c.revenueGrowth+'</td>' +
         '</tr>';
-      }).join('') : '<tr><td colspan="11" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or chart selection.</td></tr>';
+      }).join('') : '<tr><td colspan="12" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or chart selection.</td></tr>';
     }
 
     function psmRenderKpis() {
@@ -1752,10 +1754,12 @@
       var pipelineRevenue = psmCampaigns.filter(function(c) { return c.status !== 'Completed' && c.status !== 'Draft'; }).reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
       var partnerCount = new Set(psmCampaigns.filter(function(c) { return partnerStatuses.indexOf(c.status) > -1; }).map(function(c) { return c.partner; })).size;
       var completedCount = psmCampaigns.filter(function(c) { return c.status === 'Completed'; }).length;
+      var netPaidSeats = psmCampaigns.reduce(function(sum, c) { return sum + (c.netPaidSeats || 0); }, 0);
 
       document.getElementById('psmKpiRow').innerHTML =
         '<div class="kpi-tile"><span class="kpi-value">'+psmCampaigns.length+'</span><span class="kpi-label">Campaign Count</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+customersReached.toLocaleString()+'</span><span class="kpi-label">Customers Reached</span></div>' +
+        '<div class="kpi-tile"><span class="kpi-value">+'+netPaidSeats.toLocaleString()+'</span><span class="kpi-label">Net Paid Seats</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+avgMau.toFixed(1)+'%</span><span class="kpi-label">MAU Growth</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(revenueTotal)+'</span><span class="kpi-label">Revenue Growth</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+partnerCount+'</span><span class="kpi-label">Partner Participation</span></div>' +
@@ -1814,8 +1818,11 @@
     function psmRenderDetail() {
       var c = psmCurrentCampaign;
       if (!c) return;
+      psmEnrich(c);
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
+      var chip = 'display:inline-block;background:#eef3fb;border:1px solid #cfe0f5;color:#004578;border-radius:12px;padding:3px 10px;font-size:11px;margin:0 6px 6px 0;';
+      var trackedPct = c.tenantCount ? Math.round((c.trackedCount / c.tenantCount) * 100) : 0;
       detail.innerHTML =
         '<div class="flyout-header">' +
           '<span style="font-size:11px;color:#616161;">PSM Campaign Detail</span>' +
@@ -1832,33 +1839,122 @@
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
         '</div>' +
-        '<div class="panel-card"><h2>Goals</h2><div class="psm-detail-grid"><div><strong>Primary Goal</strong><div style="margin-top:6px;color:#616161;">'+c.goal+'</div></div><div><strong>Execution Model</strong><div style="margin-top:6px;color:#616161;">'+(c.executionType || psmGetExecutionType(c.tenantCount))+' partner execution across campaign-managed tenant cohorts.</div></div></div></div>' +
-        '<div class="panel-card psm-membership"><h2>Customer Membership</h2><details><summary>'+c.tenantCount.toLocaleString()+' tenants in this campaign</summary><div class="psm-membership-copy">Tenant membership is intentionally rolled up in this PSM experience. Individual customers are abstracted so the campaign can focus on partner execution, aggregate outcomes, and campaign-level performance.</div></details></div>' +
-        '<div class="panel-card"><h2>Partner Lead Selection</h2><div style="font-size:13px;color:#424242;margin-bottom:12px;">Partners review assigned tenant lists and confirm which leads they will pursue. This ensures partner buy-in and efficient resource allocation.</div><div style="display:flex;gap:16px;flex-wrap:wrap;"><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Leads Assigned</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.tenantCount+'</div></div><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Leads Accepted</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+Math.round(c.tenantCount * (c.engagement/100))+'</div></div><div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:120px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Acceptance Rate</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.engagement+'%</div></div></div></div>' +
-        '<div class="panel-card"><h2>Performance Metrics</h2><div class="psm-metric-grid"><div class="psm-metric-card"><span class="label">MAU Change</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div><div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div><div class="psm-metric-card"><span class="label">Engagement Score</span><span class="value">'+c.engagement+'</span></div></div></div>' +
+        '<div class="panel-card"><h2>Targeting Rationale</h2>' +
+          '<div style="font-size:13px;color:#242424;margin-bottom:8px;"><strong>Scenario:</strong> '+psmEscapeHtml(c.rationale.scenario)+'</div>' +
+          '<div style="font-size:13px;color:#424242;margin-bottom:12px;">'+psmEscapeHtml(c.rationale.profile)+'</div>' +
+          '<div style="font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">Assumptions / Prereqs</div>' +
+          '<div style="margin-bottom:12px;">'+c.rationale.prereqs.map(function(p){ return '<span style="'+chip+'">'+psmEscapeHtml(p)+'</span>'; }).join('')+'</div>' +
+          '<div style="font-size:12px;color:#616161;">Agreed targeting threshold / list size: <strong style="color:#242424;">'+c.rationale.listSize.toLocaleString()+' tenants</strong></div>' +
+        '</div>' +
+        '<div class="panel-card"><h2>Customer Lists &amp; Accountability</h2>' +
+          '<div style="font-size:13px;color:#424242;margin-bottom:12px;">Growth is only attributed once the partner declares activity, moving a tenant from the master list into the actively-tracked list. This weeds out overlapping-partner (CPOR) growth the partner did not drive.</div>' +
+          '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
+            '<div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Master Customer List</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.tenantCount.toLocaleString()+'</div><div style="font-size:11px;color:#616161;margin-top:2px;">All tenants in the campaign</div></div>' +
+            '<div style="background:#e8f4ec;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Actively Tracked</div><div style="font-size:20px;font-weight:600;margin-top:4px;color:#107c10;">'+c.trackedCount.toLocaleString()+'</div><div style="font-size:11px;color:#616161;margin-top:2px;">Partner-declared &middot; growth counted</div></div>' +
+            '<div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">% Actioned</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+trackedPct+'%</div><div style="font-size:11px;color:#616161;margin-top:2px;">Master \u2192 tracked</div></div>' +
+          '</div>' +
+        '</div>' +
+        psmRenderSignalsPanel(c) +
+        psmRenderLogActivityPanel(c) +
+        '<div class="panel-card"><h2>Performance Metrics</h2><div class="psm-metric-grid">' +
+          '<div class="psm-metric-card"><span class="label">Net Paid Seats</span><span class="value">'+(c.netPaidSeats ? '+'+c.netPaidSeats.toLocaleString() : '0')+'</span></div>' +
+          '<div class="psm-metric-card"><span class="label">MAU Change (Adoption)</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div>' +
+          '<div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div>' +
+          '<div class="psm-metric-card"><span class="label">Engagement Score</span><span class="value">'+c.engagement+'</span></div>' +
+        '</div></div>' +
+        psmRenderOfferImpactPanel() +
         (c.status === 'Completed' ? '<div class="panel-card"><h2>Campaign Outcome Summary</h2><div class="psm-detail-grid"><div><strong>Activities Delivered</strong><div style="margin-top:6px;color:#616161;">Pre-sales consultation, Email outreach, Webinar series, Post-sales enablement</div></div><div><strong>GTM Attach</strong><div style="margin-top:6px;color:#616161;">3 new GTM motions activated</div></div><div><strong>Partner Feedback</strong><div style="margin-top:6px;color:#616161;">Campaign well-structured. Tenant list quality was high. Recommend expanding to adjacent workloads.</div></div><div><strong>Next Steps</strong><div style="margin-top:6px;color:#616161;">Evaluate expansion campaign for upsell opportunities identified during outreach.</div></div></div></div>' : '') +
         '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
         '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance Note:</strong> Campaign data shared with partners is limited to tenant identifiers and recommended actions. Customer usage metrics (MAU, PAU) are visible to Microsoft users only and are not exposed to partner views.</div>';
     }
 
+    function psmRenderSignalsPanel(c) {
+      if (!c.signals || !c.signals.length) return '';
+      var rows = c.signals.map(function(s, idx) {
+        var label = s.type === 'seats' ? '+' + s.delta + ' net paid seats' : '+' + s.delta + ' MAU';
+        var badge = s.type === 'seats' ? 'background:#e8f4ec;color:#107c10;' : 'background:#eef3fb;color:#004578;';
+        var action;
+        if (s.confirmed === true) {
+          action = '<span style="font-size:12px;color:#107c10;font-weight:600;">Confirmed &check;</span>';
+        } else if (s.confirmed === false) {
+          action = '<span style="font-size:12px;color:#a4262c;font-weight:600;">Declined</span>';
+        } else {
+          action = '<button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="psmConfirmSignal(\''+c.id+'\','+idx+',true)">Confirm</button> ' +
+                   '<button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="psmConfirmSignal(\''+c.id+'\','+idx+',false)">Decline</button>';
+        }
+        return '<tr><td style="padding:8px 10px;">'+psmEscapeHtml(s.tenant)+'</td>' +
+          '<td style="padding:8px 10px;"><span style="'+badge+'border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600;">'+label+'</span></td>' +
+          '<td style="padding:8px 10px;text-align:right;">'+action+'</td></tr>';
+      }).join('');
+      var pending = c.signals.filter(function(s){ return s.confirmed === null; }).length;
+      return '<div class="panel-card"><h2>Activity Signals to Confirm <span style="font-size:12px;font-weight:400;color:#616161;">('+pending+' pending)</span></h2>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:12px;">Only tenants with notable movement surface here \u2014 not the full list. Confirm the ones the partner drove to pull them into the tracked list; decline the rest (lightweight, two-way).</div>' +
+        '<table class="campaign-table" style="width:100%;"><thead><tr><th style="text-align:left;">Tenant</th><th style="text-align:left;">Signal</th><th style="text-align:right;">Partner Involvement</th></tr></thead><tbody>'+rows+'</tbody></table>' +
+      '</div>';
+    }
+
+    function psmRenderLogActivityPanel(c) {
+      var offerOptions = PSM_OFFERS.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+      var logRows = (c.activityLog || []).map(function(a) {
+        return '<div class="audit-entry"><div class="audit-dot success"></div><div><div class="audit-text">'+psmEscapeHtml(a.offer)+' \u2014 '+psmEscapeHtml(a.tenant)+' <strong>(+'+a.seats+' net paid seats)</strong></div><div class="audit-date">'+a.date+' &middot; <strong>'+psmEscapeHtml(a.actor)+'</strong></div></div></div>';
+      }).join('');
+      return '<div class="panel-card"><h2>Log Partner Activity</h2>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:12px;">Mark offers sold up front so impact can be tied back later \u2014 e.g. \u201csold 3 Copilot adoption workshops\u201d today, then measure MAU lift over the following months. Works for a single tenant or a batch.</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">' +
+          '<div class="form-group" style="margin:0;flex:2;min-width:180px;"><label>Service / Offer sold</label><select id="psmLogOffer">'+offerOptions+'</select></div>' +
+          '<div class="form-group" style="margin:0;flex:1;min-width:120px;"><label>Net paid seats</label><input type="number" id="psmLogSeats" min="0" placeholder="e.g. 100"></div>' +
+          '<div class="form-group" style="margin:0;flex:2;min-width:180px;"><label>Tenant / batch</label><input type="text" id="psmLogScope" placeholder="e.g. Contoso Retail or batch of 12"></div>' +
+          '<button class="btn btn-primary" onclick="psmLogActivity(\''+c.id+'\')">Log activity</button>' +
+        '</div>' +
+        (logRows ? '<div class="audit-timeline">'+logRows+'</div>' : '<div style="font-size:12px;color:#616161;">No activities logged yet.</div>') +
+      '</div>';
+    }
+
+    function psmRenderOfferImpactPanel() {
+      var data = psmOfferImpact();
+      var max = data.reduce(function(m, d){ return Math.max(m, d.mau); }, 1);
+      var rows = data.map(function(d) {
+        var pct = Math.round((d.mau / max) * 100);
+        return '<tr><td style="padding:8px 10px;">'+d.offer+'</td>' +
+          '<td style="padding:8px 10px;"><div style="background:#eef3fb;border-radius:4px;height:14px;width:100%;position:relative;"><div style="background:#0078d4;height:14px;border-radius:4px;width:'+pct+'%;"></div></div></td>' +
+          '<td style="padding:8px 10px;text-align:right;white-space:nowrap;">+'+d.mau+' avg MAU</td>' +
+          '<td style="padding:8px 10px;text-align:right;white-space:nowrap;">+'+d.seats+' seats</td></tr>';
+      }).join('');
+      return '<div class="panel-card"><h2>Offer Impact <span style="font-size:12px;font-weight:400;color:#616161;">(which offers drive the most measurable growth)</span></h2>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:12px;">Average MAU lift and net paid seats per offer, aggregated across campaigns \u2014 use it to steer partner sellers toward the highest-impact motions.</div>' +
+        '<table class="campaign-table" style="width:100%;"><thead><tr><th style="text-align:left;">Offer</th><th style="text-align:left;">Relative MAU impact</th><th style="text-align:right;">Avg MAU lift</th><th style="text-align:right;">Avg seats</th></tr></thead><tbody>'+rows+'</tbody></table>' +
+      '</div>';
+    }
+
     function psmOpenWizard() {
       var partners = psmGetPartners();
-      psmWizardState = { step: 1, name: '', partner: partners[0] || '', goal: 'MAU Growth', workload: 'Copilot' };
+      var sc = psmScenarioById('amg');
+      psmWizardState = { step: 1, name: '', partner: partners[0] || '', scenarioId: 'amg', listSize: sc.est, goal: 'Net Paid Seats', workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot') };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
 
+    var PSM_WIZARD_STEPS = ['Campaign', 'Partner', 'Targeting', 'Goal', 'Rationale', 'Review'];
+
     function psmRenderWizard() {
       var step = psmWizardState.step;
-      document.getElementById('psmWizardStepLabel').textContent = 'Step ' + step + ' of 5';
-      document.getElementById('psmWizardStepper').innerHTML = ['Campaign', 'Partner', 'Goal', 'Workload', 'Review'].map(function(label, index) {
+      var total = PSM_WIZARD_STEPS.length;
+      document.getElementById('psmWizardStepLabel').textContent = 'Step ' + step + ' of ' + total;
+      document.getElementById('psmWizardStepper').innerHTML = PSM_WIZARD_STEPS.map(function(label, index) {
         var cls = index + 1 < step ? ' done' : (index + 1 === step ? ' active' : '');
         return '<div class="psm-wizard-step'+cls+'">'+label+'</div>';
       }).join('');
       document.getElementById('psmWizardBackBtn').style.visibility = step === 1 ? 'hidden' : 'visible';
-      document.getElementById('psmWizardNextBtn').style.display = step === 5 ? 'none' : '';
-      document.getElementById('psmWizardLaunchBtn').style.display = step === 5 ? '' : 'none';
+      document.getElementById('psmWizardNextBtn').style.display = step === total ? 'none' : '';
+      document.getElementById('psmWizardLaunchBtn').style.display = step === total ? '' : 'none';
       document.getElementById('psmWizardBody').innerHTML = psmBuildWizardStep(step);
+    }
+
+    function psmSelectScenario(id) {
+      psmWizardState.scenarioId = id;
+      psmWizardState.listSize = psmScenarioById(id).est;
+      psmWizardState.rationaleProfile = psmProfileForScenario(id, psmWizardState.workload);
+      psmRenderWizard();
     }
 
     function psmBuildWizardStep(step) {
@@ -1872,17 +1968,36 @@
         return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
       }
       if (step === 3) {
-        return '<div class="form-group"><label>Campaign Goal</label><div class="radio-group" style="flex-direction:column;gap:10px;">'+['MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell', 'Adoption'].map(function(goal) { return '<label><input type="radio" name="psmGoal" value="'+goal+'"'+(psmWizardState.goal === goal ? ' checked' : '')+' onchange="psmWizardState.goal=this.value"> '+goal+'</label>'; }).join('')+'</div></div>';
+        var cards = PSM_SCENARIOS.map(function(s) {
+          var sel = psmWizardState.scenarioId === s.id;
+          var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : '~' + s.est.toLocaleString() + ' matching tenants';
+          return '<div onclick="psmSelectScenario(\''+s.id+'\')" style="cursor:pointer;border:1px solid '+(sel ? '#0078d4' : '#e1dfdd')+';background:'+(sel ? '#eef3fb' : '#fff')+';border-radius:6px;padding:12px 14px;margin-bottom:8px;">' +
+            '<div style="font-weight:600;color:#242424;">'+s.name+'</div>' +
+            '<div style="font-size:12px;color:#616161;margin-top:4px;">'+s.desc+'</div>' +
+            '<div style="font-size:11px;color:#0078d4;margin-top:6px;font-weight:600;">'+estText+'</div>' +
+          '</div>';
+        }).join('');
+        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Pick a system-curated scenario to spin up a list in a couple of clicks, or build it manually. You can still refine the list afterward.</div>'+cards+'</div>';
       }
       if (step === 4) {
-        return '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value">'+['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('')+'</select></div>';
+        var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="radio" name="psmGoal" value="'+goal+'"'+(psmWizardState.goal === goal ? ' checked' : '')+' onchange="psmWizardState.goal=this.value"> '+goal+'</label>'; }).join('');
+        var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
+        return '<div class="form-group"><label>Primary Goal</label><div style="font-size:12px;color:#616161;margin-bottom:8px;">The two primary tracked outcomes are net paid seats and adoption (MAU).</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
+          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
+      }
+      if (step === 5) {
+        return '<div class="form-group"><label>Targeting Threshold / List Size</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" placeholder="e.g. 35 or 500"><div style="font-size:12px;color:#616161;margin-top:6px;">Agreed number of tenants to target with the partner.</div></div>' +
+          '<div class="form-group"><label>Customer Profile / Rationale</label><textarea style="width:100%;min-height:90px;padding:8px;border:1px solid #d1d1d1;border-radius:4px;font-family:inherit;font-size:13px;" oninput="psmWizardState.rationaleProfile=this.value" placeholder="Why these accounts? e.g. >300 seats, Frontier program, Foundry revenue">'+psmEscapeHtml(psmWizardState.rationaleProfile)+'</textarea><div style="font-size:12px;color:#616161;margin-top:6px;">Shown to the partner so they understand who is on the list and why.</div></div>';
       }
       return '<div class="psm-wizard-review">' +
-        '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '—')+'</div>' +
-        '<div>Partner</div><div>'+psmEscapeHtml(psmWizardState.partner || '—')+'</div>' +
+        '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
+        '<div>Partner</div><div>'+psmEscapeHtml(psmWizardState.partner || '\u2014')+'</div>' +
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
+        '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
+        '<div>List Size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
         '<div>Goal</div><div>'+psmWizardState.goal+'</div>' +
         '<div>Workload</div><div>'+psmWizardState.workload+'</div>' +
+        '<div>Rationale</div><div>'+psmEscapeHtml(psmWizardState.rationaleProfile || '\u2014')+'</div>' +
         '<div>Launch Status</div><div>Draft</div>' +
       '</div>';
     }
@@ -1896,7 +2011,7 @@
         showToast('Partner selection is required', true);
         return;
       }
-      if (psmWizardState.step < 5) psmWizardState.step += 1;
+      if (psmWizardState.step < PSM_WIZARD_STEPS.length) psmWizardState.step += 1;
       psmRenderWizard();
     }
 
@@ -1906,20 +2021,34 @@
     }
 
     function psmLaunchCampaign() {
+      var listSize = psmWizardState.listSize || 0;
+      var sc = psmScenarioById(psmWizardState.scenarioId);
       var newCampaign = {
         id: psmNextCampaignId(),
         name: psmWizardState.name.trim(),
         partner: psmWizardState.partner,
         region: psmGetRegionForPartner(psmWizardState.partner),
         workload: psmWizardState.workload,
-        tenantCount: 0,
+        tenantCount: listSize,
         status: 'Draft',
         goal: psmWizardState.goal,
         created: today(),
         mauGrowth: 0,
         revenueGrowth: '$0',
         engagement: 0,
-        executionType: psmGetExecutionType(0)
+        netPaidSeats: 0,
+        trackedCount: 0,
+        signals: [],
+        activityLog: [],
+        scenarioId: psmWizardState.scenarioId,
+        rationale: {
+          scenario: sc.name,
+          profile: psmWizardState.rationaleProfile || psmProfileForScenario(psmWizardState.scenarioId, psmWizardState.workload),
+          prereqs: psmPrereqsForScenario(psmWizardState.scenarioId),
+          listSize: listSize
+        },
+        _enriched: true,
+        executionType: psmGetExecutionType(listSize)
       };
       psmCampaigns.unshift(newCampaign);
       hideModal('psmWizardModal');
@@ -1985,6 +2114,145 @@
       }
       c.timeline = timeline;
       return timeline;
+    }
+
+    var PSM_SCENARIOS = [
+      { id: 'amg', name: 'Acquire \u2192 Monetize \u2192 Grow', desc: 'Monetized accounts where the partner is running a seller spiff; telemetry-fed targeting.', est: 480 },
+      { id: 'f2p', name: 'Free-to-Paid Upsell', desc: 'Tenants on trial / free Copilot with high propensity to convert to net paid seats.', est: 320 },
+      { id: 'copilot-adopt', name: 'Copilot Adoption Acceleration', desc: 'Committed Copilot tenants tracking below the adoption benchmark.', est: 260 },
+      { id: 'purview', name: 'Purview White Space + Copilot', desc: 'Copilot tenants with Purview white space to cross-sell / attach.', est: 140 },
+      { id: 'frontier', name: 'Frontier Signals', desc: '>300 seats, Frontier program, Foundry revenue \u2014 agentic upsell.', est: 60 },
+      { id: 'manual', name: 'Build manually / upload list', desc: 'PSM or partner curates the tenant list directly in ASPX (no Excel). Go as narrow as a handful of tenants.', est: 0 }
+    ];
+    var PSM_OFFERS = ['Copilot Adoption Workshop', 'Agent Factory', 'Free-to-Paid Upsell', 'Purview Cross-sell', 'M365 E5 Upgrade', 'Frontier / Foundry'];
+
+    function psmScenarioById(id) {
+      return PSM_SCENARIOS.filter(function(s) { return s.id === id; })[0] || PSM_SCENARIOS[0];
+    }
+
+    function psmScenarioForCampaign(c) {
+      var map = { 'MAU Growth': 'copilot-adopt', 'Adoption': 'copilot-adopt', 'Net Paid Seats': 'f2p', 'Upsell': 'f2p', 'Revenue Growth': 'amg', 'GTM Attach': 'frontier' };
+      return psmScenarioById(c.scenarioId || map[c.goal] || 'amg');
+    }
+
+    function psmSeed(c) { return (parseInt(String(c.id).replace(/[^0-9]/g, ''), 10) || 7); }
+
+    function psmProfileForScenario(id, workload) {
+      var map = {
+        'amg': 'Monetized ' + workload + ' accounts with an active partner seller spiff and an existing relationship.',
+        'f2p': workload + ' tenants on trial / free licenses showing high propensity to convert to paid seats.',
+        'copilot-adopt': 'Committed ' + workload + ' tenants adopting below the workload benchmark (usage stalled).',
+        'purview': workload + ' tenants with Purview white space \u2014 cross-sell / attach opportunity.',
+        'frontier': 'Enterprise-aligned tenants >300 seats in the Frontier program with Foundry revenue.',
+        'manual': 'Hand-picked tenants curated by the PSM and partner from offline account planning.'
+      };
+      return map[id] || map['amg'];
+    }
+
+    function psmPrereqsForScenario(id) {
+      var map = {
+        'amg': ['Monetized in current FY', 'Partner CPOR association', 'Active seller spiff'],
+        'f2p': ['Trial / free Copilot seats', 'High conversion propensity', '>50 eligible users'],
+        'copilot-adopt': ['Committed Copilot seats', 'Adoption below benchmark', 'MAU trend flat / declining'],
+        'purview': ['Active Copilot usage', 'Purview white space', 'Compliance intent signal'],
+        'frontier': ['>300 seats', 'Frontier program member', 'Foundry revenue'],
+        'manual': ['Curated by PSM + partner', 'Mapped to geography / sales manager']
+      };
+      return map[id] || map['amg'];
+    }
+
+    function psmBuildSignals(c, seed) {
+      var tenants = ['Contoso Retail', 'Fabrikam Health', 'Tailwind Traders', 'Wingtip Toys', 'Adatum Corp', 'Alpine Ski House', 'Bellows College', 'Proseware Media'];
+      var out = [];
+      var n = 3 + (seed % 3);
+      for (var i = 0; i < n; i++) {
+        var isSeats = (seed + i) % 2 === 0;
+        out.push({
+          tenant: tenants[(seed + i) % tenants.length],
+          type: isSeats ? 'seats' : 'mau',
+          delta: isSeats ? (8 + ((seed + i) % 6) * 4) : (60 + ((seed + i) % 5) * 45),
+          confirmed: null
+        });
+      }
+      return out;
+    }
+
+    function psmBuildActivityLog(c, seed) {
+      var out = [];
+      var n = 2 + (seed % 2);
+      for (var i = 0; i < n; i++) {
+        out.push({
+          date: c.created,
+          offer: PSM_OFFERS[(seed + i) % PSM_OFFERS.length],
+          seats: 20 + ((seed + i) % 5) * 15,
+          tenant: 'Batch of ' + (5 + ((seed + i) % 4) * 3) + ' tenants',
+          actor: c.partner
+        });
+      }
+      return out;
+    }
+
+    function psmOfferImpact() {
+      return [
+        { offer: 'Frontier / Foundry', mau: 640, seats: 71 },
+        { offer: 'Agent Factory', mau: 512, seats: 46 },
+        { offer: 'Copilot Adoption Workshop', mau: 180, seats: 12 },
+        { offer: 'Free-to-Paid Upsell', mau: 95, seats: 38 },
+        { offer: 'Purview Cross-sell', mau: 70, seats: 9 }
+      ];
+    }
+
+    function psmEnrich(c) {
+      if (c._enriched) return c;
+      var seed = psmSeed(c);
+      var active = ['Active', 'Measuring', 'Completed'].indexOf(c.status) > -1;
+      if (typeof c.netPaidSeats !== 'number') {
+        c.netPaidSeats = active ? Math.round(c.tenantCount * (0.4 + (seed % 5) * 0.12)) : 0;
+      }
+      if (typeof c.trackedCount !== 'number') {
+        c.trackedCount = active ? Math.min(c.tenantCount, Math.round(c.tenantCount * (0.18 + (seed % 4) * 0.05))) : 0;
+      }
+      var sc = psmScenarioForCampaign(c);
+      c.scenarioId = sc.id;
+      c.rationale = c.rationale || {
+        scenario: sc.name,
+        profile: psmProfileForScenario(sc.id, c.workload),
+        prereqs: psmPrereqsForScenario(sc.id),
+        listSize: c.tenantCount
+      };
+      if (!c.signals) c.signals = active ? psmBuildSignals(c, seed) : [];
+      if (!c.activityLog) c.activityLog = (c.status === 'Completed' || c.status === 'Measuring') ? psmBuildActivityLog(c, seed) : [];
+      c._enriched = true;
+      return c;
+    }
+
+    function psmConfirmSignal(id, idx, confirm) {
+      var c = psmCampaigns.filter(function(x) { return x.id === id; })[0];
+      if (!c || !c.signals || !c.signals[idx]) return;
+      c.signals[idx].confirmed = confirm;
+      if (confirm) {
+        c.trackedCount = Math.min(c.tenantCount, (c.trackedCount || 0) + 1);
+        if (c.signals[idx].type === 'seats') c.netPaidSeats = (c.netPaidSeats || 0) + c.signals[idx].delta;
+        showToast('Activity confirmed \u2014 tenant moved into the tracked list');
+      } else {
+        showToast('Activity declined \u2014 tenant stays in the master list only');
+      }
+      psmRenderDetail();
+    }
+
+    function psmLogActivity(id) {
+      var c = psmCampaigns.filter(function(x) { return x.id === id; })[0];
+      if (!c) return;
+      var offer = document.getElementById('psmLogOffer').value;
+      var seats = parseInt(document.getElementById('psmLogSeats').value, 10);
+      var scope = document.getElementById('psmLogScope').value.trim();
+      if (!scope) { showToast('Enter the tenant or batch this applies to', true); return; }
+      if (isNaN(seats) || seats < 0) { showToast('Enter a valid net paid seats number', true); return; }
+      c.activityLog = c.activityLog || [];
+      c.activityLog.unshift({ date: today(), offer: offer, seats: seats, tenant: scope, actor: c.partner });
+      c.netPaidSeats = (c.netPaidSeats || 0) + seats;
+      showToast('Activity logged and time-stamped');
+      psmRenderDetail();
     }
 
     function psmEscapeHtml(value) {
