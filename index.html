@@ -2505,9 +2505,41 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td><td><input id="workloadCommitDate_'+i+'" type="date" value="'+(w.commitDate || '')+'" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="updateWorkload('+i+',\'commitDate\',this.value);validateWorkloadFields()"><span id="workloadCommitDateHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td></tr>').join('');
+      tbody.innerHTML = c.workloadData.map((w, i) => {
+        var hasNote = w.notes && w.notes.trim();
+        var mainRow = '<tr>'
+          + '<td><strong>'+w.name+'</strong><div style="margin-top:4px;"><a href="#" id="workloadNoteToggle_'+i+'" onclick="toggleWorkloadNote('+i+',event)" style="font-size:11px;color:#0078d4;text-decoration:none;">&#9998; Notes'+(hasNote?' <span style="color:#107c10;">&#9679;</span>':'')+'</a></div></td>'
+          + '<td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td>'
+          + '<td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td>'
+          + '<td><input id="workloadCommitDate_'+i+'" type="date" value="'+(w.commitDate || '')+'" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="updateWorkload('+i+',\'commitDate\',this.value);validateWorkloadFields()"><span id="workloadCommitDateHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td>'
+          + '</tr>';
+        var noteRow = '<tr id="workloadNoteRow_'+i+'" class="workload-note-row" style="display:'+(hasNote?'':'none')+';"><td colspan="4" style="background:#f8f9fa;padding:0 12px 12px 12px;border-bottom:1px solid #f0f0f0;"><label style="font-size:11px;color:#616161;display:block;margin-bottom:4px;">Notes for '+w.name+'</label><textarea id="workloadNote_'+i+'" rows="2" placeholder="Add notes for this workload..." style="width:100%;resize:vertical;padding:6px 8px;border:1px solid #d2d0ce;border-radius:4px;font-family:inherit;" oninput="updateWorkload('+i+',\'notes\',this.value);refreshNoteIndicator('+i+')">'+(w.notes||'')+'</textarea></td></tr>';
+        return mainRow + noteRow;
+      }).join('');
       notesGroup.style.display = '';
       validateWorkloadFields();
+    }
+
+    function toggleWorkloadNote(i, e) {
+      if (e) e.preventDefault();
+      var row = document.getElementById('workloadNoteRow_' + i);
+      if (!row) return;
+      var show = row.style.display === 'none';
+      row.style.display = show ? '' : 'none';
+      if (show) {
+        var ta = document.getElementById('workloadNote_' + i);
+        if (ta) ta.focus();
+      }
+    }
+
+    function refreshNoteIndicator(i) {
+      var c = currentCampaign;
+      if (!c) return;
+      var w = c.workloadData[i];
+      var toggle = document.getElementById('workloadNoteToggle_' + i);
+      if (!toggle) return;
+      var hasNote = w.notes && w.notes.trim();
+      toggle.innerHTML = '&#9998; Notes' + (hasNote ? ' <span style="color:#107c10;">&#9679;</span>' : '');
     }
 
     function validateSeatInput(idx, el) {
@@ -3253,7 +3285,7 @@
       var w = c.workloadData[idx];
       c.dates.updated = today();
       var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-      if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
+      if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
       c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       renderAudit(c);
       showToast('Workload "' + w.name + '" saved');
@@ -3292,7 +3324,7 @@
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
         var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
+        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
         c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       });
       c.history.push({ date: today(), text: 'Blocked - One or more workloads blocked', type: 'blocked', actor: c.partnerDRI });
@@ -3311,7 +3343,7 @@
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
         var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
+        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
         c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       });
       renderAudit(c);
