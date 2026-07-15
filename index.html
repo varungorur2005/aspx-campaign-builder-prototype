@@ -677,7 +677,7 @@
         <div class="panel-card" id="workloadsPanel" style="display:none;">
           <h2>Workloads</h2>
           <table class="workloads-table">
-            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Notes</th></tr></thead>
+            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Customer Commitment Date <span style="color:#d83b01;">*</span></th></tr></thead>
             <tbody id="workloadsBody"></tbody>
           </table>
           <div class="form-group full-width" style="margin-top:14px;">
@@ -861,9 +861,9 @@
         fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
-          { name: 'MDO', status: 'Committed', seats: 120000, notes: 'Full tenant rollout' },
+          { name: 'MDO', status: 'Committed', seats: 120000, notes: 'Full tenant rollout', commitDate: '2026-08-15' },
           { name: 'MDI', status: 'Uncommitted', seats: 0, notes: '' },
-          { name: 'MDE', status: 'Closed', seats: 50000, notes: 'Phase 1 complete' }
+          { name: 'MDE', status: 'Closed', seats: 50000, notes: 'Phase 1 complete', commitDate: '2026-05-30' }
         ],
         history: [
           { date: '2026-05-10', text: 'Campaign created', type: 'info', actor: 'field@microsoft.com' },
@@ -956,8 +956,8 @@
         fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
-          { name: 'MDE', status: 'Closed', seats: 15000, notes: 'Complete' },
-          { name: 'MDA', status: 'Closed', seats: 8000, notes: 'Complete' }
+          { name: 'MDE', status: 'Closed', seats: 15000, notes: 'Complete', commitDate: '2026-04-20' },
+          { name: 'MDA', status: 'Closed', seats: 8000, notes: 'Complete', commitDate: '2026-04-20' }
         ],
         history: [
           { date: '2026-04-15', text: 'Campaign created', type: 'info', actor: 'usfield2@microsoft.com' },
@@ -981,8 +981,8 @@
         fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
-          { name: 'Sentinel', status: 'Committed', seats: 22000, notes: 'SOC expansion' },
-          { name: 'MDE', status: 'Committed', seats: 18000, notes: '' },
+          { name: 'Sentinel', status: 'Committed', seats: 22000, notes: 'SOC expansion', commitDate: '2026-09-10' },
+          { name: 'MDE', status: 'Committed', seats: 18000, notes: '', commitDate: '2026-09-30' },
           { name: 'MDI', status: 'Uncommitted', seats: 0, notes: 'Pending approval' }
         ],
         history: [
@@ -1077,9 +1077,9 @@
         fundingRequired: 'yes',
         engagement: { outcome: 'agreed' },
         workloadData: [
-          { name: 'MDE', status: 'Closed', seats: 5200, notes: 'Complete' },
-          { name: 'MDA', status: 'Closed', seats: 3800, notes: 'Complete' },
-          { name: 'MDO', status: 'Closed', seats: 4100, notes: 'Complete' }
+          { name: 'MDE', status: 'Closed', seats: 5200, notes: 'Complete', commitDate: '2026-03-15' },
+          { name: 'MDA', status: 'Closed', seats: 3800, notes: 'Complete', commitDate: '2026-03-15' },
+          { name: 'MDO', status: 'Closed', seats: 4100, notes: 'Complete', commitDate: '2026-03-15' }
         ],
         history: [
           { date: '2026-03-20', text: 'Campaign created', type: 'info', actor: 'uswestfield@microsoft.com' },
@@ -2505,7 +2505,7 @@
 
       const tbody = document.getElementById('workloadsBody');
       var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td><td><textarea id="workloadNotes_'+i+'" rows="2" style="width:100%;min-height:32px;min-width:140px;resize:vertical;'+(w.status==='Blocked'?'border-color:#d83b01;':'')+'" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateWorkload('+i+',\'notes\',this.value);validateWorkloadFields();" onchange="updateWorkload('+i+',\'notes\',this.value);validateWorkloadFields();">'+(w.notes || '')+'</textarea>'+(w.status==='Blocked'?'<span id="workloadNotesHint_'+i+'" style="font-size:10px;color:#d83b01;">Required for blocked workloads</span>':'')+'</td></tr>').join('');
+      tbody.innerHTML = c.workloadData.map((w, i) => '<tr><td><strong>'+w.name+'</strong></td><td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td><td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td><td><input id="workloadCommitDate_'+i+'" type="date" value="'+(w.commitDate || '')+'" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="updateWorkload('+i+',\'commitDate\',this.value);validateWorkloadFields()"><span id="workloadCommitDateHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td></tr>').join('');
       notesGroup.style.display = '';
       validateWorkloadFields();
     }
@@ -2528,7 +2528,7 @@
       c.workloadData.forEach(function(w, i) {
         var seatsInput = document.getElementById('workloadSeats_' + i);
         var seatsHint = document.getElementById('workloadSeatsHint_' + i);
-        var notesInput = document.getElementById('workloadNotes_' + i);
+        var commitInput = document.getElementById('workloadCommitDate_' + i);
         // Seats validation for Committed/Closed
         if (seatsInput && seatsHint) {
           if ((w.status === 'Committed' || w.status === 'Closed') && (!w.seats || w.seats <= 0)) {
@@ -2539,15 +2539,15 @@
             seatsHint.style.display = 'none';
           }
         }
-        // Notes validation for Blocked
-        if (notesInput) {
-          var notesHint = document.getElementById('workloadNotesHint_' + i);
-          if (w.status === 'Blocked' && !w.notes) {
-            notesInput.style.borderColor = '#d83b01';
-            if (notesHint) notesHint.style.display = '';
+        // Customer Commitment Date validation for Committed/Closed
+        if (commitInput) {
+          var commitHint = document.getElementById('workloadCommitDateHint_' + i);
+          if ((w.status === 'Committed' || w.status === 'Closed') && !w.commitDate) {
+            commitInput.style.borderColor = '#d83b01';
+            if (commitHint) commitHint.style.display = '';
           } else {
-            notesInput.style.borderColor = '';
-            if (notesHint) notesHint.style.display = 'none';
+            commitInput.style.borderColor = '#d2d0ce';
+            if (commitHint) commitHint.style.display = 'none';
           }
         }
       });
@@ -3253,7 +3253,7 @@
       var w = c.workloadData[idx];
       c.dates.updated = today();
       var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-      if (w.notes) historyText += ' - ' + w.notes;
+      if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
       c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       renderAudit(c);
       showToast('Workload "' + w.name + '" saved');
@@ -3268,10 +3268,10 @@
         showToast('Please enter Est. Seat Change (numeric value > 0) for all Committed/Closed workloads', true);
         return;
       }
-      // Validate notes for blocked workloads
-      var missingNotes = c.workloadData.some(function(w) { return w.status === 'Blocked' && !w.notes; });
-      if (missingNotes) {
-        showToast('Please provide notes for all blocked workloads', true);
+      // Validate Customer Commitment Date for Committed or Closed workloads
+      var missingCommitDate = c.workloadData.some(function(w) { return (w.status === 'Committed' || w.status === 'Closed') && !w.commitDate; });
+      if (missingCommitDate) {
+        showToast('Please enter a Customer Commitment Date for all Committed/Closed workloads', true);
         return;
       }
       // Check if any workload is Blocked
@@ -3292,7 +3292,7 @@
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
         var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.notes) historyText += ' - ' + w.notes;
+        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
         c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       });
       c.history.push({ date: today(), text: 'Blocked - One or more workloads blocked', type: 'blocked', actor: c.partnerDRI });
@@ -3311,7 +3311,7 @@
       c.dates.updated = today();
       c.workloadData.forEach(function(w) {
         var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.notes) historyText += ' - ' + w.notes;
+        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate;
         c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
       });
       renderAudit(c);
