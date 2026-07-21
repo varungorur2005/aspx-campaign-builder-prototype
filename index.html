@@ -244,6 +244,7 @@
     .status-badge.engaged { background: #f3e8ff; color: #6b21a8; }
     .status-badge.funding { background: #fff4ce; color: #8a6d00; }
     .status-badge.committed { background: #dff6dd; color: #107c10; }
+    .status-badge.uncommitted { background: #f3f2f1; color: #605e5c; }
     .status-badge.blocked { background: #fed9cc; color: #d83b01; }
     .status-badge.closed { background: #f0f0f0; color: #605e5c; }
     .status-badge.draft { background: #f3f2f1; color: #616161; }
@@ -521,11 +522,11 @@
   <div class="modal-overlay" id="reactivateModal">
     <div class="modal">
       <h3>Reactivate Campaign</h3>
-      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Reactivating will return this campaign to <strong>Committed</strong> state.</p>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Reactivating will return this campaign to the <strong>Committed</strong> State. To move the campaign to an earlier state, contact ASPX Support at <a href="mailto:PXPartnerSupport@microsoft.com" style="color:#0078d4;">PXPartnerSupport@microsoft.com</a>.</p>
       <div class="form-group" style="margin-bottom:12px;">
         <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Reactivation Reason <span style="color:#d83b01;">*</span></label>
         <select id="reactivateReasonSelect" style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;margin-top:4px;">
-          <option value="">Select an option</option>
+          <option value="">Select reason</option>
           <option>Accidentally closed</option>
           <option>Additional workloads targeted</option>
           <option>Changes to existing workloads</option>
@@ -657,11 +658,21 @@
         <!-- Customer Usage (Field/Corp only) -->
         <div class="panel-card" id="usagePanel" style="display:none;">
           <h2>Customer Security Workload Usage</h2>
+          <p style="font-size:12px;color:#424242;margin:0 0 12px;">Metrics provided are for insights only. For additional security usage details, refer to the <a href="https://msxi.microsoft.com/User/Home/report/f79b278b-0dc9-4239-a071-568163c2a077/2681?reportTab=ReportSection9591c67868186e464291" target="_blank" style="color:#0078d4;">Security Usage MSXi report</a>.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;">
+            <button class="toolbar-btn" onclick="showToast('Customer usage export prepared')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Download
+            </button>
+            <div class="toolbar-search">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+              <input type="text" placeholder="Search workloads..." id="usageSearchInput" oninput="renderUsageTable()">
+            </div>
+          </div>
           <table class="workloads-table">
-            <thead><tr><th>Workload</th><th>MAU</th><th>PAU</th><th>Utilization %</th><th>Whitespace</th></tr></thead>
+            <thead><tr><th>Workload</th><th>MAU</th><th>PAU</th><th>Utilization</th><th>Usage Whitespace</th></tr></thead>
             <tbody id="usageBody"></tbody>
           </table>
-          <p style="font-size:11px;color:#616161;margin-top:12px;font-style:italic;">Note: Metrics provided are for insights only; for details regarding DPU please refer to the <a href="https://msxi.microsoft.com/User/Home/report/f79b278b-0dc9-4239-a071-568163c2a077/2681?reportTab=ReportSection9591c67868186e464291" target="_blank" style="color:#0078d4;">Security Usage MSXi Report</a>.</p>
         </div>
 
         <!-- Lifecycle Stepper -->
@@ -675,16 +686,12 @@
 
         <!-- Workloads (only in Committed) -->
         <div class="panel-card" id="workloadsPanel" style="display:none;">
-          <h2>Workloads</h2>
+          <h2>Update Campaign State</h2>
+          <p id="committedInstruction" style="font-size:12px;color:#424242;margin:0 0 12px;">To get started, click the edit icon to complete the details for each Workload. You need at least one Workload Status marked as Closed to close the campaign.</p>
           <table class="workloads-table">
-            <thead><tr><th>Workload</th><th>Status</th><th>Est. Seat Change <span style="color:#d83b01;">*</span></th><th>Customer Commitment Date <span style="color:#d83b01;">*</span></th></tr></thead>
+            <thead><tr><th>Workload</th><th>Status</th><th>Estimated Seat Change</th><th>Customer Commitment Date</th><th style="width:90px;"></th></tr></thead>
             <tbody id="workloadsBody"></tbody>
           </table>
-          <div class="form-group full-width" style="margin-top:14px;">
-            <label>Comments</label>
-            <textarea placeholder="General comments for this campaign..."></textarea>
-          </div>
-          <button class="btn btn-primary" style="margin-top:12px;" onclick="saveAllWorkloads()">Update Workloads</button>
         </div>
 
         <!-- Comments / Audit History -->
@@ -741,14 +748,14 @@
   <!-- ========== CLOSE MODAL ========== -->
   <div class="modal-overlay" id="closeModal">
     <div class="modal">
-      <h3>Close Campaign</h3>
-      <p>Are you sure you want to close this campaign? You can reactivate it later if needed.</p>
+      <h3>Are you sure you want to close this campaign?</h3>
+      <p>Once a campaign is closed, you can reopen it and return it to the Committed state. To move the campaign to an earlier state, contact ASPX Support at <a href="mailto:PXPartnerSupport@microsoft.com" style="color:#0078d4;">PXPartnerSupport@microsoft.com</a>.</p>
       <div class="form-group" style="margin-bottom:12px;">
-        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Please provide reason for closing <span style="color:#d83b01;">*</span></label>
-        <textarea id="closeReasonText" placeholder="Enter reason for closing..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
+        <label style="font-size:11px;font-weight:600;color:#424242;text-transform:uppercase;letter-spacing:0.2px;">Comments <span style="color:#d83b01;">*</span></label>
+        <textarea id="closeReasonText" placeholder="Add comments..." style="width:100%;padding:8px 12px;font-size:13px;border:1px solid #d1d1d1;border-radius:4px;min-height:72px;margin-top:4px;resize:vertical;"></textarea>
       </div>
       <div class="btn-group">
-        <button class="btn btn-danger" onclick="confirmCloseCampaign()">Yes, Close Campaign</button>
+        <button class="btn btn-danger" onclick="confirmCloseCampaign()">Close Campaign</button>
         <button class="btn btn-secondary" onclick="hideModal('closeModal')">Cancel</button>
       </div>
     </div>
@@ -757,7 +764,7 @@
   <div class="modal-overlay" id="moveStateModal">
     <div class="modal">
       <h3 id="moveStateModalTitle">Move to next state?</h3>
-      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Once you move to the next state, you will not be able to return to the previous state. Are you sure you want to proceed?</p>
+      <p id="moveStateModalBody" style="font-size:13px;color:#616161;margin-bottom:16px;">Once you move to the next state, you will not be able to return to the previous state. Are you sure you want to proceed?</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="executeMoveToNextState()">Confirm</button>
         <button class="btn btn-secondary" onclick="hideModal('moveStateModal')">Cancel</button>
@@ -767,11 +774,11 @@
 
   <div class="modal-overlay" id="workloadBlockedModal">
     <div class="modal">
-      <h3>Blocked Workload Detected</h3>
-      <p style="font-size:13px;color:#616161;margin-bottom:16px;">One or more workloads have a Blocked status. Do you want to move this campaign to Blocked?</p>
+      <h3>Move Campaign to Blocked</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">One or more workloads in this campaign have been marked as Blocked. Moving the campaign to Blocked indicates that the campaign cannot progress until the blocker is resolved. You can unblock the campaign later by providing a reason.</p>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="confirmWorkloadBlocked()">Yes</button>
-        <button class="btn btn-secondary" onclick="cancelWorkloadBlocked()">No</button>
+        <button class="btn btn-primary" onclick="confirmWorkloadBlocked()">Move to Blocked</button>
+        <button class="btn btn-secondary" onclick="cancelWorkloadBlocked()">Keep Current Status</button>
       </div>
     </div>
   </div>
@@ -1193,6 +1200,13 @@
     function getStatusBadgeText(c) {
       return c.status;
     }
+    // TBL-09: Campaign Status is a derived business grouping with exactly four values.
+    function getCampaignStatus(c) {
+      if (c.status === 'Closed') return 'Closed';
+      if (c.status === 'Blocked') return 'Blocked';
+      if (c.status === 'Committed') return 'Committed';
+      return 'Uncommitted';
+    }
     function renderStatusBadge(c) {
       var cls = c.status.toLowerCase().replace(/\s+/g, '-');
       return '<span class="status-badge '+cls+'">'+getStatusBadgeText(c)+'</span>';
@@ -1315,7 +1329,7 @@
       { key: 'workloads', label: 'Targeted Workloads' },
       { key: 'unified', label: 'Unified', fieldCorpOnly: true },
       { key: 'opportunityId', label: 'Opportunity ID', fieldCorpOnly: true },
-      { key: 'campaignStatus', label: 'Campaign Status', fieldCorpOnly: true },
+      { key: 'campaignStatus', label: 'Campaign Status' },
       { key: 'source', label: 'Source' }
     ];
     var visibleColumns = {};
@@ -1425,9 +1439,7 @@
         if (filterPartnerNames.length > 0 && filterPartnerNames.indexOf(c.partner) === -1) return false;
         if (filterUnified.length > 0 && filterUnified.indexOf(c.unified) === -1) return false;
         if (filterCampaignStatus.length > 0) {
-          var hasCommitted = c.workloadData.some(function(w){return w.status === 'Committed';});
-          var cStatus = hasCommitted ? 'Committed' : 'Uncommitted';
-          if (filterCampaignStatus.indexOf(cStatus) === -1) return false;
+          if (filterCampaignStatus.indexOf(getCampaignStatus(c)) === -1) return false;
         }
         // KPI-based filters
         if (activeKpiFilter === 'inprogress' && c.status === 'Closed') return false;
@@ -1469,15 +1481,15 @@
 
       if (currentView === 'partner') {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'new\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">New</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">'+newCount+'</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">In Progress</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')" style="border-bottom:3px solid #d83b01;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;color:#d83b01;">Blocked &#9888;</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'new\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">New</span><span title="Number of assigned campaigns in the New state." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value">'+newCount+'</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'inprogress\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">In Progress</span><span title="Number of assigned campaigns in Outreach, Engaged, Funding, or Committed, including blocked variants." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value" style="color:#005a9e">'+inProgress+'</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'blocked\')" style="border-bottom:3px solid #d83b01;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;color:#d83b01;">Blocked &#9888;</span><span title="Number of assigned campaigns in an Outreach, Engaged, Funding, or Committed blocked sub-state." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value" style="color:#d83b01">'+blocked+' &#9888;</span></div>';
       } else {
         document.getElementById('kpiRow').innerHTML =
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Campaigns</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">15</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Partners Engaged</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">13</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Usage Whitespace</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">246,100</span></div>' +
-          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Unified Percentage</span><span style="color:#999;font-size:14px;cursor:pointer;">&#9432;</span></div><span class="kpi-value">75%</span></div>';
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'all\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Campaigns</span><span title="Total number of campaigns" style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value">15</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'engaged\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Partners Engaged</span><span title="Number of unique partners with at least one assigned campaign." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value">13</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'seats\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Usage Whitespace</span><span title="Total usage whitespace across campaigns in the Committed and Closed states." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value">246,100</span></div>' +
+          '<div class="kpi-tile kpi-clickable" onclick="filterByKpi(\'unified\')" style="border-bottom:3px solid #0078d4;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span class="kpi-label" style="margin-top:0;">Unified Percentage</span><span title="Percentage of campaigns marked as Unified." style="color:#999;font-size:14px;cursor:help;">&#9432;</span></div><span class="kpi-value">75%</span></div>';
       }
 
       renderCharts();
@@ -1516,8 +1528,7 @@
           else if (col.key === 'unified') cells += '<td>'+c.unified+'</td>';
           else if (col.key === 'opportunityId') cells += '<td>'+c.opportunityId+'</td>';
           else if (col.key === 'campaignStatus') {
-            var hasCommitted = c.workloadData.some(function(w){ return w.status === 'Committed'; });
-            cells += '<td>'+(hasCommitted ? 'Committed' : 'Uncommitted')+'</td>';
+            cells += '<td>'+getCampaignStatus(c)+'</td>';
           }
           else if (col.key === 'source') cells += '<td>'+c.source+'</td>';
         });
@@ -1546,15 +1557,18 @@
           buildDonutChart(statusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
           buildDonutChart(partnerAreaGroups, partnerAreaColors, 'Customers by Area', 'areaGroup', 'As of 11:00 PM, 6/30/2025');
       } else if (currentView === 'field') {
-        var fieldPartnerCounts = {};
-        campaigns.forEach(function(c) { fieldPartnerCounts[c.partner] = (fieldPartnerCounts[c.partner] || 0) + 1; });
-        var fieldPartnerEntries = Object.entries(fieldPartnerCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,4).map(function(e){return {label:e[0],value:e[1],filterValue:e[0]};});
-        var fieldPartnerColors = {};
-        fieldPartnerEntries.forEach(function(e,i){fieldPartnerColors[e.label]=COLOR_PALETTE[i%COLOR_PALETTE.length];});
+        // ASPXi Field (CHT-01, CHT-03): Campaigns by State + Campaigns by Area
         var fieldStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
+        var fieldAreaEntries = [
+          {label:'US MFM',value:campaigns.filter(function(c){return ['US West'].indexOf(c.area)>-1;}).length,filterValue:'US MFM'},
+          {label:'US PRO',value:campaigns.filter(function(c){return ['US East'].indexOf(c.area)>-1;}).length,filterValue:'US PRO'},
+          {label:'US OGE',value:campaigns.filter(function(c){return ['EMEA North'].indexOf(c.area)>-1;}).length,filterValue:'US OGE'},
+          {label:'ANZ',value:campaigns.filter(function(c){return ['ANZ','India','APAC'].indexOf(c.area)>-1;}).length,filterValue:'ANZ'}
+        ].filter(function(e){return e.value>0;});
+        var fieldAreaColors = {'US MFM':'#0078d4','US PRO':'#d83b01','US OGE':'#005a9e','ANZ':'#c19c00'};
         chartsRow.innerHTML =
           buildDonutChart(fieldStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
-          buildDonutChart(fieldPartnerEntries, fieldPartnerColors, 'Campaigns by Partner', 'partner', 'As of 11:00 PM, 6/30/2025');
+          buildDonutChart(fieldAreaEntries, fieldAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026');
       } else {
         var corpStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
         var corpAreaEntries = [
@@ -2270,7 +2284,7 @@
       var sources = Array.from(new Set(campaigns.map(function(c) { return c.source; }).filter(Boolean))).sort();
       var partnerNames = Array.from(new Set(campaigns.map(function(c) { return c.partner; }).filter(Boolean))).sort();
       var unifiedOptions = ['Unified', 'Non-Unified'];
-      var campaignStatusOptions = ['Uncommitted', 'Committed'];
+      var campaignStatusOptions = ['Uncommitted', 'Committed', 'Blocked', 'Closed'];
 
       document.getElementById('filterStateCheckboxes').innerHTML = buildFilterCheckboxMarkup(FILTER_STATUS_OPTIONS, filterState.statuses, 'statuses');
       document.getElementById('filterSourceCheckboxes').innerHTML = buildFilterCheckboxMarkup(sources, filterState.sources, 'sources');
@@ -2282,8 +2296,10 @@
       var isPartner = currentView === 'partner';
       var isCorp = currentView === 'corp';
 
-      // Show/hide per view
-      document.getElementById('filterSectionArea').style.display = (isPartner || isCorp) ? '' : 'none';
+      // Show/hide per view (TLB-03)
+      // ASPX: Customer Area, State, Campaign Source
+      // ASPXi (Field & Corp): Partner Name, State, Unified, Campaign Status, Campaign Source
+      document.getElementById('filterSectionArea').style.display = isPartner ? '' : 'none';
       document.getElementById('filterSectionSource').style.display = '';
       document.getElementById('filterSectionPartnerName').style.display = isPartner ? 'none' : '';
       document.getElementById('filterSectionUnified').style.display = isPartner ? 'none' : '';
@@ -2291,15 +2307,12 @@
 
       // Reorder to match table columns (left-to-right -> top-to-bottom)
       // Partner: Customer Area, State, Campaign Source
-      // Field: Partner Name, State, Unified, Campaign Status, Campaign Source
-      // Corp: Partner Name, State, Unified, Campaign Status, Campaign Source, Customer Area
+      // Field & Corp: Partner Name, State, Unified, Campaign Status, Campaign Source
       var filterActions = document.querySelector('.filter-actions');
       var panel = filterActions.parentNode;
       var sectionOrder;
       if (isPartner) {
         sectionOrder = ['filterSectionArea', 'filterSectionState', 'filterSectionSource'];
-      } else if (isCorp) {
-        sectionOrder = ['filterSectionPartnerName', 'filterSectionState', 'filterSectionUnified', 'filterSectionCampaignStatus', 'filterSectionSource', 'filterSectionArea'];
       } else {
         sectionOrder = ['filterSectionPartnerName', 'filterSectionState', 'filterSectionUnified', 'filterSectionCampaignStatus', 'filterSectionSource'];
       }
@@ -2373,9 +2386,9 @@
       if (detailMode === 'usage') {
         // Usage mode: show only usage table, hide everything else
         document.getElementById('usagePanel').style.display = '';
-        document.getElementById('usageBody').innerHTML = c.usageData.map(function(u) {
-          return '<tr><td><strong>'+u.workload+'</strong></td><td>'+u.mau.toLocaleString()+'</td><td>'+u.pau.toLocaleString()+'</td><td>'+u.utilization+'%</td><td>'+u.whitespace.toLocaleString()+'</td></tr>';
-        }).join('');
+        var usageSearch = document.getElementById('usageSearchInput');
+        if (usageSearch) usageSearch.value = '';
+        renderUsageTable();
         document.getElementById('lifecycleStepper').innerHTML = '';
         document.getElementById('stateBanner').style.display = 'none';
         document.getElementById('actionPanel').innerHTML = '';
@@ -2470,23 +2483,23 @@
       let html = '';
 
       if (c.status === 'New') {
-        html = '<div class="panel-card"><h2>Advance to Outreach</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateOutreach" onchange="checkMoveButtonState()" style="margin-right:6px;"> Customer Outreach Initiated? <span class="required">*</span></label><div style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateOutreachDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateOutreachComment" placeholder="Optional comments..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Update Campaign State</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateOutreach" onchange="checkMoveButtonState()" style="margin-right:6px;"> Customer outreach initiated <span class="required">*</span></label><div style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Outreach Date <span class="required">*</span></label><input type="date" id="gateOutreachDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Comments</label><textarea id="gateOutreachComment" placeholder="Add comments..."></textarea></div></div></div>';
       }
       else if (c.status === 'Outreach') {
-        html = '<div class="panel-card"><h2>Customer Engagement</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateEngaged" onchange="checkMoveButtonState()" style="margin-right:6px;"> Engaged Customer? <span class="required">*</span></label><div style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateEngageDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select an option</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &rarr; Blocked</option><option value="declined">Customer no longer requires assistance &rarr; Blocked</option><option value="external">Customer cannot engage at this time &rarr; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Comments <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Required for non-success outcomes..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Update Campaign State</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="display:flex;align-items:center;white-space:nowrap;"><input type="checkbox" id="gateEngaged" onchange="checkMoveButtonState()" style="margin-right:6px;"> Customer engagement initiated <span class="required">*</span></label><div style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Engagement Date <span class="required">*</span></label><input type="date" id="gateEngageDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="checkMoveButtonState()"></div></div><div class="form-group full-width"><label>Engagement Outcome <span class="required">*</span></label><select id="gateEngagementOutcome" onchange="onOutcomeChange()"><option value="">Select outcome</option><option value="agreed">Customer has agreed to work on campaign</option><option value="preference">Customer prefers to work with another partner &ndash; Blocked</option><option value="declined">Customer no longer requires assistance &ndash; Blocked</option><option value="external">Customer cannot engage at this time &ndash; Blocked</option></select></div><div class="form-group full-width" id="engageCommentGroup" style="display:none;"><label>Comments <span class="required">*</span></label><textarea id="gateEngageComment" placeholder="Add comments..."></textarea></div></div></div>';
       }
       else if (c.status === 'Engaged') {
-        html = '<div class="panel-card"><h2>Customer SOW</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW prepared? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowPrepared" id="gateSowYes" value="yes" onchange="onSowPreparedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowPrepared" id="gateSowNo" value="no" onchange="onSowPreparedChange()"> No</label></div><div id="sowPreparedDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowBlockReasonGroup" style="display:none;"><label>Explain why the SOW cannot be prepared <span class="required">*</span></label><textarea id="gateSowBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowCommentsGroup"><label>Comments</label><textarea id="gateSowComments" placeholder="Additional context..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Update Campaign State</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Is the Customer SOW prepared? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowPrepared" id="gateSowYes" value="yes" onchange="onSowPreparedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowPrepared" id="gateSowNo" value="no" onchange="onSowPreparedChange()"> No</label></div><div id="sowPreparedDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">SOW Date <span class="required">*</span></label><input type="date" id="gateSowDraftedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowBlockReasonGroup" style="display:none;"><label>Explain why the SOW cannot be prepared <span class="required">*</span></label><textarea id="gateSowBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowCommentsGroup"><label>Comments</label><textarea id="gateSowComments" placeholder="Add comments..."></textarea></div></div></div>';
       }
       else if (c.status === 'Funding') {
         if (!c.fundingSubState || c.fundingSubState === 'initial') {
-          html = '<div class="panel-card"><h2>Funding</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Has funding been requested? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingRequested" id="gateFundingRequestedYes" value="yes" disabled onchange="onFundingRequestedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingRequested" id="gateFundingRequestedNo" value="no" disabled onchange="onFundingRequestedChange()"> No</label></div><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingRequestedBlockReasonGroup" style="display:none;"><label>Explain why funding was not requested <span class="required">*</span></label><textarea id="gateFundingRequestedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Customer SOW signed? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingYes" value="yes" disabled onchange="onSowSignedNoFundingChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingNo" value="no" disabled onchange="onSowSignedNoFundingChange()"> No</label></div><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowSignedBlockReasonGroup" style="display:none;"><label>Explain why SOW was not signed <span class="required">*</span></label><textarea id="gateSowSignedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="fundingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Comments on funding..."></textarea></div></div></div>';
+          html = '<div class="panel-card"><h2>Update Campaign State</h2><div class="form-grid"><div class="form-group full-width"><label>Will Microsoft funding be requested? <span class="required">*</span></label><div class="radio-group"><label><input type="radio" name="fundingNeeded" id="gateFundingYes" value="yes" onchange="onFundingNeededChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingNeeded" id="gateFundingNo" value="no" onchange="onFundingNeededChange()"> No</label></div></div><div class="form-group full-width" id="fundingRequestedGroup" style="opacity:0.4;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Has funding been requested? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingRequested" id="gateFundingRequestedYes" value="yes" disabled onchange="onFundingRequestedChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingRequested" id="gateFundingRequestedNo" value="no" disabled onchange="onFundingRequestedChange()"> No</label></div><div id="fundingRequestedDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">Funding Request Date <span class="required">*</span></label><input type="date" id="gateFundingRequestedDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingRequestedBlockReasonGroup" style="display:none;"><label>Explain why funding was not requested <span class="required">*</span></label><textarea id="gateFundingRequestedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="sowSignedNoFundingGroup" style="opacity:0.4;display:none;flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Has the SOW been signed? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingYes" value="yes" disabled onchange="onSowSignedNoFundingChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="sowSignedNoFunding" id="gateSowNoFundingNo" value="no" disabled onchange="onSowSignedNoFundingChange()"> No</label></div><div id="sowSignedNoFundingDateGroup" style="display:flex;align-items:center;gap:6px;"><label style="white-space:nowrap;">SOW Signed Date <span class="required">*</span></label><input type="date" id="gateSowNoFundingDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="sowSignedBlockReasonGroup" style="display:none;"><label>Explain why SOW was not signed <span class="required">*</span></label><textarea id="gateSowSignedBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div>          <div class="form-group full-width" id="fundingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Add comments..."></textarea></div></div></div>';
         } else if (c.fundingSubState === 'requested') {
-          html = '<div class="panel-card"><h2>Funding Pending</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingSecured" id="gateFundingSecuredYes" value="yes" onchange="onFundingSecuredSubChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingSecured" id="gateFundingSecuredNo" value="no" onchange="onFundingSecuredSubChange()"> No</label></div><div id="fundingSecuredDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingSecuredBlockReasonGroup" style="display:none;"><label>Explain why funding was not secured <span class="required">*</span></label><textarea id="gateFundingSecuredBlockReason" placeholder="Provide details..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="fundingPendingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Comments on funding..."></textarea></div></div></div>';
+                    html = '<div class="panel-card"><h2>Update Campaign State</h2><div class="form-grid"><div class="form-group full-width" style="flex-direction:row;align-items:center;gap:16px;"><label style="white-space:nowrap;">Is Microsoft funding secured? <span class="required">*</span></label><div class="radio-group" style="display:flex;align-items:center;gap:0;"><label><input type="radio" name="fundingSecured" id="gateFundingSecuredYes" value="yes" onchange="onFundingSecuredSubChange()"> Yes</label><label style="margin-left:16px;"><input type="radio" name="fundingSecured" id="gateFundingSecuredNo" value="no" onchange="onFundingSecuredSubChange()"> No</label></div><div id="fundingSecuredDateGroup" style="display:flex;align-items:center;gap:6px;opacity:0.4;"><label style="white-space:nowrap;">Microsoft Funding Date <span class="required">*</span></label><input type="date" id="gateFundingSecuredDate" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" disabled onchange="checkMoveButtonState()"></div></div><div class="form-group full-width" id="fundingSecuredBlockReasonGroup" style="display:none;"><label>Explain why funding was not secured <span class="required">*</span></label><textarea id="gateFundingSecuredBlockReason" placeholder="Add comments..." oninput="checkMoveButtonState()"></textarea></div><div class="form-group full-width" id="fundingPendingCommentsGroup"><label>Comments</label><textarea id="gateFundingComment" placeholder="Add comments..."></textarea></div></div></div>';
         }
       }
       else if (c.status === 'Blocked') {
-        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Comments</label><textarea placeholder="Additional comments..."></textarea></div></div></div>';
+        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Comments</label><textarea placeholder="Add comments..."></textarea></div></div></div>';
       }
       else if (c.status === 'Closed') {
         html = '';
@@ -2498,91 +2511,155 @@
       panel.addEventListener('input', checkMoveButtonState);
     }
 
+    var editingWorkloadIdx = -1;
+    var workloadBackup = null;
+
+    function escapeHtmlWl(s) {
+      return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function currentActor() {
+      var c = currentCampaign;
+      if (!c) return '';
+      return (currentView === 'partner') ? c.partnerDRI : c.microsoftDRI;
+    }
+    function isWorkloadSaved(w) {
+      if (w.saved !== undefined) return w.saved;
+      return (w.status && w.status !== 'Uncommitted') || (w.seats && w.seats > 0) || !!w.commitDate;
+    }
+    function isWorkloadRowValid(w) {
+      if (!w.status) return false;
+      if (!(w.seats && parseInt(w.seats) > 0)) return false;
+      if (!w.commitDate) return false;
+      if (w.status === 'Blocked' && !(w.blockExplanation && w.blockExplanation.trim())) return false;
+      return true;
+    }
+
     function renderWorkloads(c) {
       const panel = document.getElementById('workloadsPanel');
-      if (c.status !== 'Committed') { panel.style.display = 'none'; return; }
+      var isCommittedBlocked = c.status === 'Blocked' && c.previousState === 'Committed';
+      if (c.status !== 'Committed' && !isCommittedBlocked) { panel.style.display = 'none'; return; }
       panel.style.display = '';
+      if (isCommittedBlocked) editingWorkloadIdx = -1; // CMT-23: read-only when blocked
 
       const tbody = document.getElementById('workloadsBody');
-      var notesGroup = panel.querySelector('.form-group.full-width');
-      tbody.innerHTML = c.workloadData.map((w, i) => {
-        var hasNote = w.notes && w.notes.trim();
-        var mainRow = '<tr>'
-          + '<td><strong>'+w.name+'</strong><div style="margin-top:4px;"><a href="#" id="workloadNoteToggle_'+i+'" onclick="toggleWorkloadNote('+i+',event)" style="font-size:11px;color:#0078d4;text-decoration:none;">&#9998; Notes'+(hasNote?' <span style="color:#107c10;">&#9679;</span>':'')+'</a></div></td>'
-          + '<td><select onchange="updateWorkload('+i+',\'status\',this.value);validateWorkloadFields()" style="width:100px;"><option value="Uncommitted"'+(w.status==='Uncommitted'?' selected':'')+'>Uncommitted</option><option value="Committed"'+(w.status==='Committed'?' selected':'')+'>Committed</option><option value="Blocked"'+(w.status==='Blocked'?' selected':'')+'>Blocked</option><option value="Closed"'+(w.status==='Closed'?' selected':'')+'>Closed</option></select></td>'
-          + '<td><input id="workloadSeats_'+i+'" type="text" value="'+(w.seats||'')+'" style="width:80px;padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" oninput="validateSeatInput('+i+',this)" onchange="updateWorkload('+i+',\'seats\',this.value)"><span id="workloadSeatsHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td>'
-          + '<td><input id="workloadCommitDate_'+i+'" type="date" value="'+(w.commitDate || '')+'" style="padding:4px 8px;border:1px solid #d2d0ce;border-radius:4px;" onchange="updateWorkload('+i+',\'commitDate\',this.value);validateWorkloadFields()"><span id="workloadCommitDateHint_'+i+'" style="font-size:10px;color:#d83b01;display:none;">Required</span></td>'
-          + '</tr>';
-        var noteRow = '<tr id="workloadNoteRow_'+i+'" class="workload-note-row" style="display:'+(hasNote?'':'none')+';"><td colspan="4" style="background:#f8f9fa;padding:0 12px 12px 12px;border-bottom:1px solid #f0f0f0;"><label style="font-size:11px;color:#616161;display:block;margin-bottom:4px;">Notes for '+w.name+'</label><textarea id="workloadNote_'+i+'" rows="2" placeholder="Add notes for this workload..." style="width:100%;resize:vertical;padding:6px 8px;border:1px solid #d2d0ce;border-radius:4px;font-family:inherit;" oninput="updateWorkload('+i+',\'notes\',this.value);refreshNoteIndicator('+i+')">'+(w.notes||'')+'</textarea></td></tr>';
-        return mainRow + noteRow;
+      tbody.innerHTML = c.workloadData.map(function(w, i) {
+        return (i === editingWorkloadIdx) ? workloadEditRow(c, w, i) : workloadReadRow(c, w, i, isCommittedBlocked);
       }).join('');
-      notesGroup.style.display = '';
-      validateWorkloadFields();
+      if (editingWorkloadIdx > -1) validateWorkloadRow(editingWorkloadIdx);
     }
 
-    function toggleWorkloadNote(i, e) {
+    function workloadReadRow(c, w, i, readOnlyAll) {
+      var saved = isWorkloadSaved(w);
+      var pending = '<span style="color:#a19f9d;font-style:italic;">Pending...</span>';
+      var statusCell = saved ? renderStatusBadge({ status: w.status }) : pending;
+      var seatsCell = saved ? ((w.seats && w.seats > 0 ? '+' : '') + (parseInt(w.seats) || 0).toLocaleString()) : pending;
+      var dateCell = saved ? (w.commitDate || '—') : pending;
+      var extra = '';
+      if (saved && w.status === 'Blocked' && w.blockExplanation) extra += '<div style="font-size:11px;color:#d83b01;margin-top:4px;">Blocked: '+escapeHtmlWl(w.blockExplanation)+'</div>';
+      else if (saved && w.notes && w.notes.trim()) extra += '<div style="font-size:11px;color:#616161;margin-top:4px;">'+escapeHtmlWl(w.notes)+'</div>';
+      var action = readOnlyAll ? '' : '<a href="#" onclick="editWorkloadRow('+i+',event)" title="Edit workload" style="color:#0078d4;text-decoration:none;font-size:15px;">&#9998;</a>';
+      return '<tr><td><strong>'+w.name+'</strong>'+extra+'</td><td>'+statusCell+'</td><td>'+seatsCell+'</td><td>'+dateCell+'</td><td style="text-align:right;">'+action+'</td></tr>';
+    }
+
+    function workloadEditRow(c, w, i) {
+      var isBlocked = w.status === 'Blocked';
+      var statusOpts = ['Uncommitted','Committed','Blocked','Closed'].map(function(s){ return '<option value="'+s+'"'+(w.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
+      var commentField = isBlocked
+        ? '<div class="form-group full-width" style="margin-top:10px;"><label>Block Explanation <span class="required">*</span></label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'blockExplanation\',this.value)">'+escapeHtmlWl(w.blockExplanation||'')+'</textarea></div>'
+        : '<div class="form-group full-width" style="margin-top:10px;"><label>Comments</label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'notes\',this.value)">'+escapeHtmlWl(w.notes||'')+'</textarea></div>';
+      return '<tr><td colspan="5" style="background:#f8f9fa;padding:12px;">'
+        + '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">'
+        +   '<div style="font-weight:600;min-width:70px;padding-bottom:6px;">'+w.name+'</div>'
+        +   '<div class="form-group" style="margin:0;"><label>Status <span class="required">*</span></label><select id="wlStatus_'+i+'" onchange="changeWorkloadStatus('+i+',this.value)" style="width:130px;">'+statusOpts+'</select></div>'
+        +   '<div class="form-group" style="margin:0;"><label>Estimated Seat Change <span class="required">*</span></label><input id="wlSeats_'+i+'" type="text" value="'+(w.seats||'')+'" placeholder="Input seats..." oninput="onWorkloadSeatInput('+i+',this)" style="width:120px;padding:6px 8px;border:1px solid #d2d0ce;border-radius:4px;"></div>'
+        +   '<div class="form-group" style="margin:0;"><label>Customer Commitment Date <span class="required">*</span></label><input id="wlDate_'+i+'" type="date" value="'+(w.commitDate||'')+'" onchange="updateWorkloadField('+i+',\'commitDate\',this.value)" style="padding:6px 8px;border:1px solid #d2d0ce;border-radius:4px;"></div>'
+        + '</div>'
+        + commentField
+        + '<div style="margin-top:12px;display:flex;gap:8px;">'
+        +   '<button class="btn btn-primary btn-sm" id="workloadSaveBtn" onclick="saveWorkloadRow('+i+')" disabled style="opacity:0.5;cursor:not-allowed;">Save</button>'
+        +   '<button class="btn btn-secondary btn-sm" onclick="cancelWorkloadRow()">Cancel</button>'
+        + '</div>'
+        + '</td></tr>';
+    }
+
+    function editWorkloadRow(i, e) {
       if (e) e.preventDefault();
-      var row = document.getElementById('workloadNoteRow_' + i);
-      if (!row) return;
-      var show = row.style.display === 'none';
-      row.style.display = show ? '' : 'none';
-      if (show) {
-        var ta = document.getElementById('workloadNote_' + i);
-        if (ta) ta.focus();
-      }
+      var c = currentCampaign;
+      if (editingWorkloadIdx > -1 && editingWorkloadIdx !== i) cancelWorkloadRow(true);
+      editingWorkloadIdx = i;
+      workloadBackup = JSON.parse(JSON.stringify(c.workloadData[i]));
+      renderWorkloads(c);
     }
 
-    function refreshNoteIndicator(i) {
+    function cancelWorkloadRow(silent) {
       var c = currentCampaign;
-      if (!c) return;
+      if (workloadBackup && editingWorkloadIdx > -1) {
+        c.workloadData[editingWorkloadIdx] = workloadBackup;
+      }
+      editingWorkloadIdx = -1;
+      workloadBackup = null;
+      if (!silent) renderWorkloads(c);
+    }
+
+    function changeWorkloadStatus(i, val) {
+      currentCampaign.workloadData[i].status = val;
+      renderWorkloads(currentCampaign);
+    }
+
+    function onWorkloadSeatInput(i, el) {
+      var cleaned = el.value.replace(/[^0-9]/g, '');
+      if (cleaned !== el.value) el.value = cleaned;
+      currentCampaign.workloadData[i].seats = cleaned === '' ? 0 : parseInt(cleaned);
+      validateWorkloadRow(i);
+    }
+
+    function updateWorkloadField(i, field, value) {
+      currentCampaign.workloadData[i][field] = value;
+      validateWorkloadRow(i);
+    }
+
+    function validateWorkloadRow(i) {
+      var btn = document.getElementById('workloadSaveBtn');
+      if (!btn) return;
+      var valid = isWorkloadRowValid(currentCampaign.workloadData[i]);
+      btn.disabled = !valid;
+      btn.style.opacity = valid ? '1' : '0.5';
+      btn.style.cursor = valid ? 'pointer' : 'not-allowed';
+    }
+
+    function saveWorkloadRow(i) {
+      var c = currentCampaign;
       var w = c.workloadData[i];
-      var toggle = document.getElementById('workloadNoteToggle_' + i);
-      if (!toggle) return;
-      var hasNote = w.notes && w.notes.trim();
-      toggle.innerHTML = '&#9998; Notes' + (hasNote ? ' <span style="color:#107c10;">&#9679;</span>' : '');
+      if (!isWorkloadRowValid(w)) { showToast('Please complete Status, Estimated Seat Change, and Customer Commitment Date', true); return; }
+      w.seats = parseInt(w.seats) || 0;
+      w.saved = true;
+      c.dates.updated = today();
+      var histText = 'Workload "'+w.name+'" updated - Status: '+w.status+', Estimated Seat Change: '+w.seats+', Customer Commitment Date: '+w.commitDate;
+      if (w.status === 'Blocked' && w.blockExplanation) histText += ' - Block explanation: '+w.blockExplanation;
+      else if (w.notes && w.notes.trim()) histText += ' - '+w.notes;
+      c.history.push({ date: today(), text: histText, type: 'update', actor: currentActor() });
+      editingWorkloadIdx = -1;
+      workloadBackup = null;
+      renderWorkloads(c);
+      renderAudit(c);
+      renderActionBar(c); // CMT-10: recalculate available campaign actions
+      renderDashboard();
+      showToast('Workload "'+w.name+'" saved');
     }
 
-    function validateSeatInput(idx, el) {
-      var raw = el.value;
-      var cleaned = raw.replace(/[^0-9]/g, '');
-      if (raw !== cleaned) {
-        el.value = cleaned;
-        showToast('Only numbers are accepted for Est. Seat Change', true);
-      }
+    // USG-03: filter Customer Usage table by Workload in real time
+    function renderUsageTable() {
       var c = currentCampaign;
-      if (c) c.workloadData[idx].seats = parseInt(el.value) || 0;
-      validateWorkloadFields();
-    }
-
-    function validateWorkloadFields() {
-      var c = currentCampaign;
-      if (!c) return;
-      c.workloadData.forEach(function(w, i) {
-        var seatsInput = document.getElementById('workloadSeats_' + i);
-        var seatsHint = document.getElementById('workloadSeatsHint_' + i);
-        var commitInput = document.getElementById('workloadCommitDate_' + i);
-        // Seats validation for Committed/Closed
-        if (seatsInput && seatsHint) {
-          if ((w.status === 'Committed' || w.status === 'Closed') && (!w.seats || w.seats <= 0)) {
-            seatsInput.style.borderColor = '#d83b01';
-            seatsHint.style.display = '';
-          } else {
-            seatsInput.style.borderColor = '#d2d0ce';
-            seatsHint.style.display = 'none';
-          }
-        }
-        // Customer Commitment Date validation for Committed/Closed
-        if (commitInput) {
-          var commitHint = document.getElementById('workloadCommitDateHint_' + i);
-          if ((w.status === 'Committed' || w.status === 'Closed') && !w.commitDate) {
-            commitInput.style.borderColor = '#d83b01';
-            if (commitHint) commitHint.style.display = '';
-          } else {
-            commitInput.style.borderColor = '#d2d0ce';
-            if (commitHint) commitHint.style.display = 'none';
-          }
-        }
+      var body = document.getElementById('usageBody');
+      if (!c || !body) return;
+      var searchEl = document.getElementById('usageSearchInput');
+      var search = searchEl ? searchEl.value.trim().toLowerCase() : '';
+      var rows = (c.usageData || []).filter(function(u) {
+        return !search || u.workload.toLowerCase().indexOf(search) > -1;
       });
+      body.innerHTML = rows.length ? rows.map(function(u) {
+        return '<tr><td><strong>'+u.workload+'</strong></td><td>'+u.mau.toLocaleString()+'</td><td>'+u.pau.toLocaleString()+'</td><td>'+u.utilization+'%</td><td>'+u.whitespace.toLocaleString()+'</td></tr>';
+      }).join('') : '<tr><td colspan="5" style="text-align:center;color:#616161;padding:16px;">No workloads match your search.</td></tr>';
     }
 
     function renderUsage(c) {
@@ -2643,17 +2720,31 @@
     function renderActionBar(c) {
       const bar = document.getElementById('detailActionBar');
       let moveBtn = '';
-      if (c.status === 'New') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Outreach</button>';
-      else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Engaged</button>';
-      else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Funding</button>';
+      if (c.status === 'New') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Continue to Outreach</button>';
+      else if (c.status === 'Outreach') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Continue to Engaged</button>';
+      else if (c.status === 'Engaged') moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Continue to Funding</button>';
       else if (c.status === 'Funding') {
         if (c.fundingSubState === 'requested') {
-          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
+          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Continue to Committed</button>';
         } else {
-          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Move to Committed</button>';
+          moveBtn = '<button class="btn btn-primary" id="moveBtnNext" onclick="moveToNextState()" disabled style="opacity:0.5;cursor:not-allowed;">Continue to Committed</button>';
         }
       }
-      else if (c.status === 'Committed') moveBtn = '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
+      else if (c.status === 'Committed') {
+        var savedWl = c.workloadData.filter(function(w){ return isWorkloadSaved(w); });
+        var hasClosed = savedWl.some(function(w){ return w.status === 'Closed'; });
+        var hasBlocked = savedWl.some(function(w){ return w.status === 'Blocked'; });
+        moveBtn = '';
+        if (hasBlocked) { // CMT-12
+          moveBtn += '<button class="btn btn-danger" onclick="showModal(\'workloadBlockedModal\')">Move Campaign to Blocked</button> ';
+        }
+        // CMT-11: Close Campaign enabled only when at least one workload is Closed
+        if (hasClosed) {
+          moveBtn += '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
+        } else {
+          moveBtn += '<button class="btn btn-primary" disabled style="opacity:0.5;cursor:not-allowed;" title="Mark at least one workload as Closed to enable">Close Campaign</button>';
+        }
+      }
       else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
       else if (c.status === 'Closed') moveBtn = '';
 
@@ -2842,7 +2933,7 @@
         if (selectedOutcome && selectedOutcome !== 'agreed') {
           moveBtn.textContent = 'Move to Blocked';
         } else {
-          moveBtn.textContent = 'Move to Engaged';
+          moveBtn.textContent = 'Continue to Engaged';
         }
       }
       checkMoveButtonState();
@@ -2935,7 +3026,7 @@
         if (dateInput) dateInput.disabled = false;
         if (blockReasonGroup) blockReasonGroup.style.display = 'none';
         if (commentsGroup) commentsGroup.style.display = '';
-        if (moveBtn) moveBtn.textContent = 'Move to Funding';
+        if (moveBtn) moveBtn.textContent = 'Continue to Funding';
       } else if (sowNo && sowNo.checked) {
         if (dateGroup) { dateGroup.style.opacity = '0.4'; }
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
@@ -2993,9 +3084,9 @@
       var moveBtn = document.getElementById("moveBtnNext");
       if (moveBtn) {
         if (yesRadio && yesRadio.checked) {
-          moveBtn.textContent = "Move to Funding Pending";
+          moveBtn.textContent = "Continue to Funding (Pending)";
         } else {
-          moveBtn.textContent = "Move to Committed";
+          moveBtn.textContent = "Continue to Committed";
         }
       }
       checkMoveButtonState();
@@ -3020,7 +3111,7 @@
         if (reqBlockGroup) reqBlockGroup.style.display = 'none';
         if (sowGroup) { sowGroup.style.display = 'flex'; sowGroup.style.opacity = '1'; }
         if (commentsGroup) commentsGroup.style.display = '';
-        if (moveBtn) moveBtn.textContent = 'Move to Funding Pending';
+        if (moveBtn) moveBtn.textContent = 'Continue to Funding (Pending)';
       } else if (reqNo && reqNo.checked) {
         if (reqDate) { reqDate.disabled = true; reqDate.value = ''; }
         if (reqDateGroup) { reqDateGroup.style.opacity = '0.4'; }
@@ -3049,7 +3140,7 @@
         if (dateInput) dateInput.disabled = false;
         if (blockReasonGroup) blockReasonGroup.style.display = 'none';
         if (commentsGroup) commentsGroup.style.display = '';
-        if (moveBtn) moveBtn.textContent = 'Move to Committed';
+        if (moveBtn) moveBtn.textContent = 'Continue to Committed';
       } else if (secNo && secNo.checked) {
         if (dateGroup) dateGroup.style.opacity = '0.4';
         if (dateInput) { dateInput.disabled = true; dateInput.value = ''; }
@@ -3077,9 +3168,9 @@
         var yesRadio = document.getElementById('gateFundingYes');
         if (moveBtn) {
           if (yesRadio && yesRadio.checked) {
-            moveBtn.textContent = 'Move to Funding Pending';
+            moveBtn.textContent = 'Continue to Funding (Pending)';
           } else {
-            moveBtn.textContent = 'Move to Committed';
+            moveBtn.textContent = 'Continue to Committed';
           }
         }
       } else if (sowNo && sowNo.checked) {
@@ -3232,19 +3323,10 @@
     function closeCampaignCheck() {
       var c = currentCampaign;
       if (c.status === 'Committed') {
-        // Check if all workloads have valid status
-        var hasUncommitted = c.workloadData.some(function(w) {
-          return w.status === 'Uncommitted';
-        });
-        if (hasUncommitted) {
-          showToast('All workloads must have a status (Committed, Blocked, or Closed) before closing', true);
-          return;
-        }
-        var missingSeatValues = c.workloadData.some(function(w) {
-          return (w.status === 'Committed' || w.status === 'Closed') && w.seats === 0;
-        });
-        if (missingSeatValues) {
-          showToast('Please enter seat values for all Committed/Closed workloads', true);
+        // CMT-11: Close requires at least one saved workload with Status = Closed
+        var hasClosed = c.workloadData.some(function(w) { return isWorkloadSaved(w) && w.status === 'Closed'; });
+        if (!hasClosed) {
+          showToast('Mark at least one workload as Closed before closing the campaign', true);
           return;
         }
       }
@@ -3258,63 +3340,14 @@
       c.previousState = c.status;
       c.status = 'Closed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Campaign manually closed - ' + reason, type: 'closed', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Campaign manually closed - ' + reason, type: 'closed', actor: currentActor() });
       hideModal('closeModal');
       document.getElementById('closeReasonText').value = '';
       renderDetail();
       showToast('Campaign closed');
     }
 
-    function updateWorkload(idx, field, value) {
-      var c = currentCampaign;
-      if (field === 'seats') c.workloadData[idx].seats = parseInt(value) || 0;
-      else c.workloadData[idx][field] = value;
-
-      // Auto-close if all workloads closed
-      if (c.workloadData.every(function(w) { return w.status === 'Closed'; })) {
-        c.status = 'Closed';
-        c.dates.updated = today();
-        c.history.push({ date: today(), text: 'All workloads closed - campaign auto-closed', type: 'closed', actor: c.partnerDRI });
-        renderDetail();
-        showToast('All workloads closed - campaign auto-closed');
-      }
-    }
-
-    function saveWorkloadRow(idx) {
-      var c = currentCampaign;
-      var w = c.workloadData[idx];
-      c.dates.updated = today();
-      var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-      if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
-      c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
-      renderAudit(c);
-      showToast('Workload "' + w.name + '" saved');
-    }
-
-    function saveAllWorkloads() {
-      var c = currentCampaign;
-      if (!c) return;
-      // Validate seats for Committed or Closed workloads
-      var missingSeats = c.workloadData.some(function(w) { return (w.status === 'Committed' || w.status === 'Closed') && (!w.seats || w.seats <= 0); });
-      if (missingSeats) {
-        showToast('Please enter Est. Seat Change (numeric value > 0) for all Committed/Closed workloads', true);
-        return;
-      }
-      // Validate Customer Commitment Date for Committed or Closed workloads
-      var missingCommitDate = c.workloadData.some(function(w) { return (w.status === 'Committed' || w.status === 'Closed') && !w.commitDate; });
-      if (missingCommitDate) {
-        showToast('Please enter a Customer Commitment Date for all Committed/Closed workloads', true);
-        return;
-      }
-      // Check if any workload is Blocked
-      var hasBlocked = c.workloadData.some(function(w) { return w.status === 'Blocked'; });
-      if (hasBlocked) {
-        showModal('workloadBlockedModal');
-        return;
-      }
-      doSaveAllWorkloads();
-    }
-
+    // CMT-18/19: confirm moving campaign to Blocked (workloads already saved individually)
     function confirmWorkloadBlocked() {
       hideModal('workloadBlockedModal');
       var c = currentCampaign;
@@ -3322,12 +3355,7 @@
       c.blockReason = 'One or more workloads blocked';
       c.status = 'Blocked';
       c.dates.updated = today();
-      c.workloadData.forEach(function(w) {
-        var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
-        c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
-      });
-      c.history.push({ date: today(), text: 'Blocked - One or more workloads blocked', type: 'blocked', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Blocked - One or more workloads marked as Blocked', type: 'blocked', actor: currentActor() });
       renderDetail();
       renderDashboard();
       showToast('Campaign moved to Blocked');
@@ -3335,20 +3363,6 @@
 
     function cancelWorkloadBlocked() {
       hideModal('workloadBlockedModal');
-      doSaveAllWorkloads();
-    }
-
-    function doSaveAllWorkloads() {
-      var c = currentCampaign;
-      c.dates.updated = today();
-      c.workloadData.forEach(function(w) {
-        var historyText = 'Workload "' + w.name + '" updated - Status: ' + w.status + ', Seats: ' + w.seats;
-        if (w.commitDate) historyText += ', Commitment Date: ' + w.commitDate; if (w.notes && w.notes.trim()) historyText += ' - ' + w.notes;
-        c.history.push({ date: today(), text: historyText, type: 'update', actor: c.partnerDRI });
-      });
-      renderAudit(c);
-      renderDashboard();
-      showToast('All workloads updated');
     }
 
     function saveDraft() {
@@ -3469,14 +3483,22 @@
             nextState = 'Blocked';
           } else {
             var fSowNo = document.getElementById('gateSowNoFundingNo');
-            nextState = (fSowNo && fSowNo.checked) ? 'Blocked' : 'Funding Pending';
+            nextState = (fSowNo && fSowNo.checked) ? 'Blocked' : 'Funding (Pending)';
           }
         } else {
           var fSowNoNf = document.getElementById('gateSowNoFundingNo');
           nextState = (fSowNoNf && fSowNoNf.checked) ? 'Blocked' : 'Committed';
         }
       }
-      document.getElementById('moveStateModalTitle').textContent = 'Move to ' + nextState + '?';
+      var moveTitle = document.getElementById('moveStateModalTitle');
+      var moveBody = document.getElementById('moveStateModalBody');
+      if (nextState === 'Blocked') {
+        moveTitle.textContent = 'Move to Blocked';
+        if (moveBody) moveBody.textContent = 'You will be able to move back to unblocked if the status of the campaign changes.';
+      } else {
+        moveTitle.textContent = 'Move to ' + nextState;
+        if (moveBody) moveBody.textContent = 'Once you move to the next state, you will not be able to return to the previous state. Are you sure you want to proceed?';
+      }
       showModal('moveStateModal');
     }
 
