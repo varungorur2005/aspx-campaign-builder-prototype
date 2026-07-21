@@ -1586,7 +1586,7 @@
         chartsRow.innerHTML =
           buildDonutChart(corpStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
           buildDonutChart(corpAreaEntries, corpAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026') +
-          buildDonutChart(corpPartnerEntries, corpPartnerColors, 'Campaigns by Partners', 'partner', 'As of 11:00 PM, 4/30/2026');
+          buildHBarChart(corpPartnerCounts, '#0078d4', 'Campaigns by Partner', 'partner');
       }
     }
 
@@ -2436,9 +2436,9 @@
         else if (state === 'Closed' && isClosed) dateStr = c.dates.updated;
 
         var closeLink = '';
-        if (currentView === 'partner' && state === 'Closed' && c.status === 'Closed') {
+        if (state === 'Closed' && c.status === 'Closed') {
           closeLink = '<div style="margin-top:6px;"><button onclick="showReactivateModal()" class="btn btn-success" style="font-size:10px;padding:4px 10px;">Reactivate</button></div>';
-        } else if (currentView === 'partner' && state === 'Closed' && c.status !== 'Closed') {
+        } else if (state === 'Closed' && c.status !== 'Closed') {
           closeLink = '<div style="margin-top:4px;"><a onclick="closeCampaignCheck()" style="font-size:10px;color:#d83b01;cursor:pointer;font-weight:600;white-space:nowrap;">Close now</a></div>';
         }
 
@@ -2677,44 +2677,35 @@
     }
 
     function renderAudit(c) {
-      if (c.status === 'Closed') {
-        // Group history by state phases
-        var phases = [
-          { name: 'New', entries: [] },
-          { name: 'Outreach', entries: [] },
-          { name: 'Engaged', entries: [] },
-          { name: 'Funding', entries: [] },
-          { name: 'Committed', entries: [] },
-          { name: 'Closed', entries: [] }
-        ];
-        var currentPhase = 0;
-        c.history.forEach(function(h) {
-          var text = h.text.toLowerCase();
-          if (text.indexOf('outreach') > -1 && currentPhase < 1) currentPhase = 1;
-          else if ((text.indexOf('engaged') > -1 || text.indexOf('sow drafted') > -1) && currentPhase < 2) currentPhase = 2;
-          else if ((text.indexOf('funding') > -1 || text.indexOf('sow signed') > -1) && currentPhase < 3) currentPhase = 3;
-          else if ((text.indexOf('committed') > -1 || text.indexOf('workload') > -1) && currentPhase < 4) currentPhase = 4;
-          else if ((text.indexOf('closed') > -1 || text.indexOf('close') > -1) && currentPhase < 5) currentPhase = 5;
-          phases[currentPhase].entries.push(h);
+      // AUD-02: group Activity History by lifecycle phase for all campaigns,
+      // with the latest reached phase shown on top and latest entries first within each phase.
+      var phaseNames = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
+      var phases = phaseNames.map(function(n) { return { name: n, entries: [] }; });
+      var currentPhase = 0;
+      c.history.forEach(function(h) {
+        var text = (h.text || '').toLowerCase();
+        if ((text.indexOf('closed') > -1 || text.indexOf('close') > -1) && h.type === 'closed') currentPhase = 5;
+        else if ((text.indexOf('committed') > -1 || text.indexOf('workload') > -1) && currentPhase < 4) currentPhase = 4;
+        else if ((text.indexOf('funding') > -1 || text.indexOf('sow signed') > -1) && currentPhase < 3) currentPhase = 3;
+        else if ((text.indexOf('engaged') > -1 || text.indexOf('sow drafted') > -1 || text.indexOf('sow prepared') > -1) && currentPhase < 2) currentPhase = 2;
+        else if (text.indexOf('outreach') > -1 && currentPhase < 1) currentPhase = 1;
+        phases[currentPhase].entries.push(h);
+      });
+      var auditHtml = '';
+      phases.slice().reverse().forEach(function(phase) {
+        if (phase.entries.length === 0) return;
+        auditHtml += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:13px;color:#0078d4;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;">'+phase.name+'</div>';
+        phase.entries.slice().reverse().forEach(function(h) {
+          var parts = h.text.split(' - ');
+          var action = parts[0];
+          var comment = parts.length > 1 ? parts.slice(1).join(' - ') : '';
+          auditHtml += '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+action+'</div>';
+          if (comment) auditHtml += '<div style="font-size:11px;color:#424242;font-style:italic;margin-top:2px;">Comment: '+comment+'</div>';
+          auditHtml += '<div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>';
         });
-        var auditHtml = '';
-        phases.forEach(function(phase) {
-          if (phase.entries.length === 0) return;
-          auditHtml += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:13px;color:#0078d4;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;">'+phase.name+'</div>';
-          phase.entries.forEach(function(h) {
-            var parts = h.text.split(' - ');
-            var action = parts[0];
-            var comment = parts.length > 1 ? parts[1] : '';
-            auditHtml += '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+action+'</div>';
-            if (comment) auditHtml += '<div style="font-size:11px;color:#424242;font-style:italic;margin-top:2px;">Comment: '+comment+'</div>';
-            auditHtml += '<div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>';
-          });
-          auditHtml += '</div>';
-        });
-        document.getElementById('auditTimeline').innerHTML = auditHtml;
-      } else {
-        document.getElementById('auditTimeline').innerHTML = c.history.slice().reverse().map(h => '<div class="audit-entry"><div class="audit-dot '+h.type+'"></div><div><div class="audit-text">'+h.text+'</div><div class="audit-date">'+h.date+(h.actor ? ' &middot; <strong>'+h.actor+'</strong>' : '')+'</div></div></div>').join('');
-      }
+        auditHtml += '</div>';
+      });
+      document.getElementById('auditTimeline').innerHTML = auditHtml;
     }
 
     function renderActionBar(c) {
@@ -2859,7 +2850,7 @@
       c.blockReason = 'Customer declined engagement';
       c.status = 'Blocked';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Blocked - Customer declined engagement', type: 'blocked', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Blocked - Customer declined engagement', type: 'blocked', actor: currentActor() });
       showToast('Campaign blocked');
       renderDetail();
       renderDashboard();
@@ -2871,7 +2862,7 @@
       c.blockReason = 'Funding blocked';
       c.status = 'Blocked';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Blocked - Funding blocked', type: 'blocked', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Blocked - Funding blocked', type: 'blocked', actor: currentActor() });
       showToast('Campaign blocked');
       renderDetail();
       renderDashboard();
@@ -2899,7 +2890,7 @@
       c.status = 'Outreach';
       c.dates.outreach = date;
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Outreach confirmed', type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Outreach confirmed', type: 'success', actor: currentActor() });
       renderDetail();
       showToast('Advanced to Outreach');
     }
@@ -2954,14 +2945,14 @@
 
       if (selectedOutcome === 'agreed') {
         c.status = 'Engaged';
-        c.history.push({ date: today(), text: 'Customer engaged - advanced to Engaged', type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Customer engaged - advanced to Engaged', type: 'success', actor: currentActor() });
         showToast('Advanced to Engaged');
       } else {
         var reasons = { preference: 'Customer prefers another partner', declined: 'Customer no longer requires assistance', external: 'Customer cannot engage at this time' };
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome], type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome], type: 'blocked', actor: currentActor() });
         showToast('Campaign blocked');
       }
       selectedOutcome = '';
@@ -2998,7 +2989,7 @@
         c.status = 'Funding';
         c.funding.submitted = false;
         c.funding.secured = '';
-        c.history.push({ date: today(), text: 'SOW drafted - advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'SOW drafted - advanced to Funding' + (comments ? ': ' + comments : ''), type: 'success', actor: currentActor() });
         showToast('Advanced to Funding');
       } else if (sowNo && sowNo.checked) {
         var blockReason = document.getElementById('gateSowBlockReason') && document.getElementById('gateSowBlockReason').value;
@@ -3006,7 +2997,7 @@
         c.previousState = 'Engaged';
         c.blockReason = blockReason;
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked - SOW not prepared: ' + blockReason + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked - SOW not prepared: ' + blockReason + (comments ? ' | ' + comments : ''), type: 'blocked', actor: currentActor() });
         showToast('Campaign blocked');
       }
       renderDetail();
@@ -3201,7 +3192,7 @@
             c.previousState = 'Funding';
             c.blockReason = 'Customer SOW not signed: ' + (blockReason || '');
             c.status = 'Blocked';
-            c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+            c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: currentActor() });
             showToast('Campaign blocked');
           } else {
             c.dates.sowSigned = c.dates.sowSigned || today();
@@ -3209,7 +3200,7 @@
             c.status = 'Committed';
             c.fundingSubState = null;
             c.dates.fundingApproval = today();
-            c.history.push({ date: today(), text: 'Funding not needed, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+            c.history.push({ date: today(), text: 'Funding not needed, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: currentActor() });
             showToast('Advanced to Committed');
           }
         } else if (yesRadio && yesRadio.checked) {
@@ -3221,7 +3212,7 @@
             c.previousState = 'Funding';
             c.blockReason = 'Funding not requested: ' + (blockReason || '');
             c.status = 'Blocked';
-            c.history.push({ date: today(), text: 'Blocked - Funding not requested: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+            c.history.push({ date: today(), text: 'Blocked - Funding not requested: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: currentActor() });
             showToast('Campaign blocked');
           } else {
             // Check SOW signed
@@ -3232,7 +3223,7 @@
               c.previousState = 'Funding';
               c.blockReason = 'Customer SOW not signed: ' + (blockReason || '');
               c.status = 'Blocked';
-              c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+              c.history.push({ date: today(), text: 'Blocked - Customer SOW not signed: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: currentActor() });
               showToast('Campaign blocked');
             } else {
               // Yes funding needed - move to Funding Requested sub-state
@@ -3242,7 +3233,7 @@
               c.dates.fundingRequested = reqDate;
               c.funding.submitted = true;
               c.dates.fundingSubmission = reqDate;
-              c.history.push({ date: today(), text: 'Microsoft funding requested' + (comments ? ': ' + comments : ''), type: 'info', actor: c.partnerDRI });
+              c.history.push({ date: today(), text: 'Microsoft funding requested' + (comments ? ': ' + comments : ''), type: 'info', actor: currentActor() });
               showToast('Moved to Funding Pending');
             }
           }
@@ -3256,7 +3247,7 @@
           c.previousFundingSubState = 'requested';
           c.blockReason = 'Microsoft funding not secured: ' + (blockReason || '');
           c.status = 'Blocked';
-          c.history.push({ date: today(), text: 'Blocked - Microsoft funding not secured: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: c.partnerDRI });
+          c.history.push({ date: today(), text: 'Blocked - Microsoft funding not secured: ' + (blockReason || '') + (comments ? ' | ' + comments : ''), type: 'blocked', actor: currentActor() });
           showToast('Campaign blocked');
         } else {
           c.funding.secured = true;
@@ -3266,7 +3257,7 @@
           c.dates.sowSigned = c.dates.sowSigned || today();
           c.status = 'Committed';
           c.fundingSubState = null;
-          c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: c.partnerDRI });
+          c.history.push({ date: today(), text: 'Microsoft funding secured, SOW signed - advanced to Committed' + (comments ? ': ' + comments : ''), type: 'success', actor: currentActor() });
           showToast('Advanced to Committed');
         }
       }
@@ -3287,7 +3278,7 @@
       c.blockReason = '';
       c.dates.updated = today();
       var returnLabel = c.status === 'Funding' && c.fundingSubState === 'requested' ? 'Funding Pending' : c.status;
-      c.history.push({ date: today(), text: 'Unblocked - returned to ' + returnLabel, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Unblocked - returned to ' + returnLabel, type: 'success', actor: currentActor() });
       renderDetail();
       showToast('Campaign unblocked - returned to ' + returnLabel);
     }
@@ -3303,7 +3294,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: currentActor() });
       renderDetail();
       renderDashboard();
       showToast('Campaign reactivated to Committed');
@@ -3315,7 +3306,7 @@
       var c = currentCampaign;
       c.status = 'Committed';
       c.dates.updated = today();
-      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: c.partnerDRI });
+      c.history.push({ date: today(), text: 'Reactivated - ' + reason, type: 'success', actor: currentActor() });
       renderDetail();
       showToast('Campaign reactivated to Committed');
     }
@@ -3376,7 +3367,7 @@
         c.previousState = 'Outreach';
         c.blockReason = reasons[selectedOutcome];
         c.status = 'Blocked';
-        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome] + (comment ? ': ' + comment : ''), type: 'blocked', actor: c.partnerDRI });
+        c.history.push({ date: today(), text: 'Blocked - ' + reasons[selectedOutcome] + (comment ? ': ' + comment : ''), type: 'blocked', actor: currentActor() });
         selectedOutcome = '';
         renderDetail();
         renderDashboard();
