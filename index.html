@@ -70,6 +70,22 @@
     .dashboard-view { padding: 20px 24px 40px; }
     .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
+    /* Referrals and Deal Clinics tabs */
+    .sdc-tabs { display: flex; gap: 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
+    .sdc-tab {
+      background: none; border: none; padding: 10px 16px 12px; font-size: 14px; color: #424242;
+      border-bottom: 2px solid transparent; margin-bottom: -1px; position: relative;
+    }
+    .sdc-tab:hover { color: #0078d4; }
+    .sdc-tab.active { color: #0078d4; font-weight: 600; border-bottom-color: #0078d4; }
+    .sdc-empty-panel {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 48px 32px; text-align: center; max-width: 640px; margin: 24px auto;
+    }
+    .sdc-empty-panel .sdc-empty-icon { font-size: 34px; color: #0078d4; margin-bottom: 12px; }
+    .sdc-empty-panel h2 { font-size: 18px; font-weight: 700; color: #242424; margin-bottom: 10px; }
+    .sdc-empty-panel p { font-size: 13px; color: #616161; line-height: 1.6; margin: 0 auto 8px; max-width: 520px; }
+
     /* KPI Row */
     .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
     body.partner-view .kpi-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -577,7 +593,7 @@
         <span style="color:#0078d4;cursor:pointer;">Home</span> &gt;
         <span style="color:#0078d4;cursor:pointer;">Insights</span> &gt;
         <span style="color:#0078d4;cursor:pointer;">AI Business Solutions &amp; Security</span> &gt;
-        <span style="font-weight:600;color:#242424;">Security Deal Clinic</span>
+        <span style="font-weight:600;color:#242424;">FastTrack Referrals</span>
       </div>
 
       <!-- ==========
@@ -585,6 +601,20 @@
            ========== -->
       <div class="dashboard-view content-view active" id="dashboardView">
         <h1 class="page-title" id="dashboardTitle" style="display:none;"></h1>
+
+        <!-- Referrals and Deal Clinics tabs (Partner/ASPX only) -->
+        <div class="sdc-tabs" id="sdcTabs" style="display:none;">
+          <button class="sdc-tab" id="sdcTabFastTrack" onclick="switchSdcTab('fasttrack')">FastTrack Referrals</button>
+          <button class="sdc-tab active" id="sdcTabClinic" onclick="switchSdcTab('clinic')">Security Deal Clinic</button>
+        </div>
+
+        <!-- FastTrack Referrals tab content (empty / not-onboarded state) -->
+        <div id="fastTrackPanel" style="display:none;"></div>
+
+        <!-- Security Deal Clinic tab content -->
+        <div id="sdcTabContent">
+        <!-- No-campaigns-assigned empty state -->
+        <div id="sdcEmptyPanel" style="display:none;"></div>
 
         <!-- KPIs -->
         <div class="kpi-row" id="kpiRow"></div>
@@ -637,6 +667,7 @@
             <tbody id="campaignTableBody"></tbody>
           </table>
         </div>
+        </div><!-- /sdcTabContent -->
       </div>
 
     </main>
@@ -687,7 +718,7 @@
         <!-- Workloads (only in Committed) -->
         <div class="panel-card" id="workloadsPanel" style="display:none;">
           <h2>Update Campaign State</h2>
-          <p id="committedInstruction" style="font-size:12px;color:#424242;margin:0 0 12px;">To get started, click the edit icon to complete the details for each Workload. You need at least one Workload Status marked as Closed to close the campaign.</p>
+          <p id="committedInstruction" style="font-size:12px;color:#424242;margin:0 0 12px;">Use the edit icon to update workload details. The campaign can only be closed after at least one workload is marked Closed. If any workload is Blocked, the campaign enters Blocked state and you can continue updating other workloads.</p>
           <table class="workloads-table">
             <thead><tr><th>Workload</th><th>Status</th><th>Estimated Seat Change</th><th>Customer Commitment Date</th><th style="width:90px;"></th></tr></thead>
             <tbody id="workloadsBody"></tbody>
@@ -1296,9 +1327,14 @@
       document.getElementById('dashboardTitle').style.display = '';
       document.getElementById('dashboardTitle').innerHTML =
         view === 'partner'
-          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Security Deal Clinic <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
+          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Referrals and Deal Clinics <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
           : 'Security Deal Clinic <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security</span>';
       document.getElementById('breadcrumb').style.display = view === 'partner' ? '' : 'none';
+      // Referrals and Deal Clinics tabs are shown only in the Partner (ASPX) experience
+      renderNavPanels();
+      document.getElementById('sdcTabs').style.display = view === 'partner' ? 'flex' : 'none';
+      sdcActiveTab = 'clinic';
+      applySdcTab();
       document.getElementById('toolbarSortWrapper').style.display = 'none';
       document.getElementById('columnPickerWrap').style.order = '1';
       document.getElementById('filterButton').style.order = '2';
@@ -1311,6 +1347,39 @@
       scheduleFreStart(500);
     }
 
+    // Referrals and Deal Clinics tab state (Partner/ASPX experience)
+    var sdcActiveTab = 'clinic';
+    function renderNavPanels() {
+      // NAV-04: FastTrack Referrals tab, partner not onboarded to FastTrack Partner program
+      document.getElementById('fastTrackPanel').innerHTML =
+        '<div class="sdc-empty-panel"><div class="sdc-empty-icon">&#128101;</div>' +
+        '<h2>Organization not onboarded</h2>' +
+        '<p>Access to this dashboard requires active membership in the FastTrack Partner program. ' +
+        'If you\u2019re interested in joining, please contact your Partner Development Manager. ' +
+        '<a href="https://learn.microsoft.com/en-us/partner-center/" target="_blank" style="color:#0078d4;">Learn more</a>.</p></div>';
+      // NAV-05: Security Deal Clinic tab, partner without any assigned campaigns
+      document.getElementById('sdcEmptyPanel').innerHTML =
+        '<div class="sdc-empty-panel"><div class="sdc-empty-icon">&#128203;</div>' +
+        '<h2>No campaigns assigned</h2>' +
+        '<p>You don\u2019t currently have any Security Deal Clinic campaigns assigned to your organization. ' +
+        'Once a campaign is assigned, you\u2019ll be able to view and manage it here.</p>' +
+        '<p>If you believe you should have access, please contact your Microsoft representative for assistance.</p></div>';
+    }
+    function switchSdcTab(tab) {
+      sdcActiveTab = tab;
+      applySdcTab();
+    }
+    function applySdcTab() {
+      var isPartner = currentView === 'partner';
+      var showFastTrack = isPartner && sdcActiveTab === 'fasttrack';
+      document.getElementById('sdcTabFastTrack').classList.toggle('active', showFastTrack);
+      document.getElementById('sdcTabClinic').classList.toggle('active', !showFastTrack);
+      document.getElementById('fastTrackPanel').style.display = showFastTrack ? '' : 'none';
+      document.getElementById('sdcTabContent').style.display = showFastTrack ? 'none' : '';
+      // NAV-05: within the Security Deal Clinic tab, show empty state when no campaigns are assigned
+      var hasCampaigns = campaigns.length > 0;
+      document.getElementById('sdcEmptyPanel').style.display = (!showFastTrack && !hasCampaigns) ? '' : 'none';
+    }
 
     // KPI FILTER
     let activeKpiFilter = null;
@@ -1557,18 +1626,16 @@
           buildDonutChart(statusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
           buildDonutChart(partnerAreaGroups, partnerAreaColors, 'Customers by Area', 'areaGroup', 'As of 11:00 PM, 6/30/2025');
       } else if (currentView === 'field') {
-        // ASPXi Field (CHT-01, CHT-03): Campaigns by State + Campaigns by Area
+        // ASPXi Field (CHT-01 + CHT-04): Campaigns by State + Campaigns by Partner
         var fieldStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
-        var fieldAreaEntries = [
-          {label:'US MFM',value:campaigns.filter(function(c){return ['US West'].indexOf(c.area)>-1;}).length,filterValue:'US MFM'},
-          {label:'US PRO',value:campaigns.filter(function(c){return ['US East'].indexOf(c.area)>-1;}).length,filterValue:'US PRO'},
-          {label:'US OGE',value:campaigns.filter(function(c){return ['EMEA North'].indexOf(c.area)>-1;}).length,filterValue:'US OGE'},
-          {label:'ANZ',value:campaigns.filter(function(c){return ['ANZ','India','APAC'].indexOf(c.area)>-1;}).length,filterValue:'ANZ'}
-        ].filter(function(e){return e.value>0;});
-        var fieldAreaColors = {'US MFM':'#0078d4','US PRO':'#d83b01','US OGE':'#005a9e','ANZ':'#c19c00'};
+        var fieldPartnerCounts = {};
+        campaigns.forEach(function(c){fieldPartnerCounts[c.partner]=(fieldPartnerCounts[c.partner]||0)+1;});
+        var fieldPartnerEntries = Object.entries(fieldPartnerCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,6).map(function(e){return {label:e[0],value:e[1],filterValue:e[0]};});
+        var fieldPartnerColors = {};
+        fieldPartnerEntries.forEach(function(e,i){fieldPartnerColors[e.label]=COLOR_PALETTE[i%COLOR_PALETTE.length];});
         chartsRow.innerHTML =
           buildDonutChart(fieldStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
-          buildDonutChart(fieldAreaEntries, fieldAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026');
+          buildDonutChart(fieldPartnerEntries, fieldPartnerColors, 'Campaigns by Partner', 'partner', 'As of 11:00 PM, 4/30/2026');
       } else {
         var corpStatusEntries = ['New','Outreach','Engaged','Funding','Committed','Closed','Blocked'].map(function(key){return {label:key,value:statusCounts[key]||0,filterValue:key};}).filter(function(e){return e.value>0;});
         var corpAreaEntries = [
@@ -1585,8 +1652,8 @@
         corpPartnerEntries.forEach(function(e,i){corpPartnerColors[e.label]=COLOR_PALETTE[i%COLOR_PALETTE.length];});
         chartsRow.innerHTML =
           buildDonutChart(corpStatusEntries, statusColors, 'Campaigns by State', 'status', 'As of 11:00 PM, 4/30/2026') +
-          buildDonutChart(corpAreaEntries, corpAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026') +
-          buildHBarChart(corpPartnerCounts, '#0078d4', 'Campaigns by Partner', 'partner');
+          buildDonutChart(corpPartnerEntries, corpPartnerColors, 'Campaigns by Partner', 'partner', 'As of 11:00 PM, 4/30/2026') +
+          buildDonutChart(corpAreaEntries, corpAreaColors, 'Campaigns by Area', 'areaGroup', 'As of 11:00 PM, 4/30/2026');
       }
     }
 
@@ -2499,7 +2566,12 @@
         }
       }
       else if (c.status === 'Blocked') {
-        html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Comments</label><textarea placeholder="Add comments..."></textarea></div></div></div>';
+        // Committed (Blocked) is managed inline via the workload table (CMT-13/14), not the generic panel
+        if (c.previousState === 'Committed') {
+          html = '';
+        } else {
+          html = '<div class="panel-card"><h2>Unblock Campaign</h2><div class="form-grid"><div class="form-group full-width"><label>Unblock Explanation <span class="required">*</span></label><textarea id="gateUnblockReason" placeholder="Explain why this campaign should be unblocked..."></textarea></div><div class="form-group full-width"><label>Comments</label><textarea placeholder="Add comments..."></textarea></div></div></div>';
+        }
       }
       else if (c.status === 'Closed') {
         html = '';
@@ -2531,6 +2603,8 @@
       if (!(w.seats && parseInt(w.seats) > 0)) return false;
       if (!w.commitDate) return false;
       if (w.status === 'Blocked' && !(w.blockExplanation && w.blockExplanation.trim())) return false;
+      // CMT-14: unblocking a previously blocked workload requires an Unblock Explanation
+      if (w.status !== 'Blocked' && w._wasBlocked && !(w.unblockExplanation && w.unblockExplanation.trim())) return false;
       return true;
     }
 
@@ -2539,11 +2613,10 @@
       var isCommittedBlocked = c.status === 'Blocked' && c.previousState === 'Committed';
       if (c.status !== 'Committed' && !isCommittedBlocked) { panel.style.display = 'none'; return; }
       panel.style.display = '';
-      if (isCommittedBlocked) editingWorkloadIdx = -1; // CMT-23: read-only when blocked
-
+      // CMT-13: workloads remain editable in Committed (Blocked) so the user can update or unblock them
       const tbody = document.getElementById('workloadsBody');
       tbody.innerHTML = c.workloadData.map(function(w, i) {
-        return (i === editingWorkloadIdx) ? workloadEditRow(c, w, i) : workloadReadRow(c, w, i, isCommittedBlocked);
+        return (i === editingWorkloadIdx) ? workloadEditRow(c, w, i) : workloadReadRow(c, w, i, false);
       }).join('');
       if (editingWorkloadIdx > -1) validateWorkloadRow(editingWorkloadIdx);
     }
@@ -2563,10 +2636,20 @@
 
     function workloadEditRow(c, w, i) {
       var isBlocked = w.status === 'Blocked';
-      var statusOpts = ['Uncommitted','Committed','Blocked','Closed'].map(function(s){ return '<option value="'+s+'"'+(w.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
-      var commentField = isBlocked
-        ? '<div class="form-group full-width" style="margin-top:10px;"><label>Block Explanation <span class="required">*</span></label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'blockExplanation\',this.value)">'+escapeHtmlWl(w.blockExplanation||'')+'</textarea></div>'
-        : '<div class="form-group full-width" style="margin-top:10px;"><label>Comments</label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'notes\',this.value)">'+escapeHtmlWl(w.notes||'')+'</textarea></div>';
+      var wasBlocked = !!w._wasBlocked;
+      var needPlaceholder = !w.status;
+      var statusOpts = (needPlaceholder ? '<option value="" disabled selected>Select Status</option>' : '')
+        + ['Uncommitted','Committed','Blocked','Closed'].map(function(s){ return '<option value="'+s+'"'+(w.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
+      var commentField;
+      if (isBlocked) {
+        // CMT-12: required block reason
+        commentField = '<div class="form-group full-width" style="margin-top:10px;"><label>Explain why the workload is blocked <span class="required">*</span></label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'blockExplanation\',this.value)">'+escapeHtmlWl(w.blockExplanation||'')+'</textarea></div>';
+      } else if (wasBlocked) {
+        // CMT-14: unblock explanation when changing a blocked workload to a non-blocked status
+        commentField = '<div class="form-group full-width" style="margin-top:10px;"><label>Unblock Explanation <span class="required">*</span></label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'unblockExplanation\',this.value)">'+escapeHtmlWl(w.unblockExplanation||'')+'</textarea></div>';
+      } else {
+        commentField = '<div class="form-group full-width" style="margin-top:10px;"><label>Comments</label><textarea id="wlComment_'+i+'" placeholder="Add comments..." oninput="updateWorkloadField('+i+',\'notes\',this.value)">'+escapeHtmlWl(w.notes||'')+'</textarea></div>';
+      }
       return '<tr><td colspan="5" style="background:#f8f9fa;padding:12px;">'
         + '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">'
         +   '<div style="font-weight:600;min-width:70px;padding-bottom:6px;">'+w.name+'</div>'
@@ -2588,6 +2671,8 @@
       if (editingWorkloadIdx > -1 && editingWorkloadIdx !== i) cancelWorkloadRow(true);
       editingWorkloadIdx = i;
       workloadBackup = JSON.parse(JSON.stringify(c.workloadData[i]));
+      // Remember if this workload was blocked when edit started (drives the Unblock Explanation field)
+      c.workloadData[i]._wasBlocked = isWorkloadSaved(c.workloadData[i]) && c.workloadData[i].status === 'Blocked';
       renderWorkloads(c);
     }
 
@@ -2596,6 +2681,7 @@
       if (workloadBackup && editingWorkloadIdx > -1) {
         c.workloadData[editingWorkloadIdx] = workloadBackup;
       }
+      if (editingWorkloadIdx > -1 && c.workloadData[editingWorkloadIdx]) c.workloadData[editingWorkloadIdx]._wasBlocked = false;
       editingWorkloadIdx = -1;
       workloadBackup = null;
       if (!silent) renderWorkloads(c);
@@ -2631,18 +2717,43 @@
       var c = currentCampaign;
       var w = c.workloadData[i];
       if (!isWorkloadRowValid(w)) { showToast('Please complete Status, Estimated Seat Change, and Customer Commitment Date', true); return; }
+      var wasBlocked = !!w._wasBlocked;
       w.seats = parseInt(w.seats) || 0;
       w.saved = true;
       c.dates.updated = today();
       var histText = 'Workload "'+w.name+'" updated - Status: '+w.status+', Estimated Seat Change: '+w.seats+', Customer Commitment Date: '+w.commitDate;
       if (w.status === 'Blocked' && w.blockExplanation) histText += ' - Block explanation: '+w.blockExplanation;
+      else if (wasBlocked && w.unblockExplanation) histText += ' - Unblock explanation: '+w.unblockExplanation;
       else if (w.notes && w.notes.trim()) histText += ' - '+w.notes;
-      c.history.push({ date: today(), text: histText, type: 'update', actor: currentActor() });
+      c.history.push({ date: today(), text: histText, type: (w.status === 'Blocked' ? 'blocked' : (wasBlocked ? 'success' : 'update')), actor: currentActor() });
+      w._wasBlocked = false;
       editingWorkloadIdx = -1;
       workloadBackup = null;
-      renderWorkloads(c);
-      renderAudit(c);
-      renderActionBar(c); // CMT-10: recalculate available campaign actions
+
+      // CMT-13/15: recompute campaign blocked state from saved workload statuses
+      var anyBlocked = c.workloadData.some(function(x){ return isWorkloadSaved(x) && x.status === 'Blocked'; });
+      var stateChanged = false;
+      if (c.status === 'Committed' && anyBlocked) {
+        c.previousState = 'Committed';
+        c.status = 'Blocked';
+        c.blockReason = 'Workload "'+w.name+'" marked as Blocked';
+        c.history.push({ date: today(), text: 'Blocked - Workload "'+w.name+'" marked as Blocked', type: 'blocked', actor: currentActor() });
+        stateChanged = true;
+      } else if (c.status === 'Blocked' && c.previousState === 'Committed' && !anyBlocked) {
+        c.status = 'Committed';
+        c.previousState = null;
+        c.blockReason = '';
+        c.history.push({ date: today(), text: 'Unblocked - returned to Committed' + (w.unblockExplanation ? ' - ' + w.unblockExplanation : ''), type: 'success', actor: currentActor() });
+        stateChanged = true;
+      }
+
+      if (stateChanged) {
+        renderDetail();
+      } else {
+        renderWorkloads(c);
+        renderAudit(c);
+        renderActionBar(c); // CMT-10: recalculate available campaign actions
+      }
       renderDashboard();
       showToast('Workload "'+w.name+'" saved');
     }
@@ -2724,11 +2835,7 @@
       else if (c.status === 'Committed') {
         var savedWl = c.workloadData.filter(function(w){ return isWorkloadSaved(w); });
         var hasClosed = savedWl.some(function(w){ return w.status === 'Closed'; });
-        var hasBlocked = savedWl.some(function(w){ return w.status === 'Blocked'; });
         moveBtn = '';
-        if (hasBlocked) { // CMT-12
-          moveBtn += '<button class="btn btn-danger" onclick="showModal(\'workloadBlockedModal\')">Move Campaign to Blocked</button> ';
-        }
         // CMT-11: Close Campaign enabled only when at least one workload is Closed
         if (hasClosed) {
           moveBtn += '<button class="btn btn-primary" onclick="closeCampaignCheck()">Close Campaign</button>';
@@ -2736,7 +2843,14 @@
           moveBtn += '<button class="btn btn-primary" disabled style="opacity:0.5;cursor:not-allowed;" title="Mark at least one workload as Closed to enable">Close Campaign</button>';
         }
       }
-      else if (c.status === 'Blocked') moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
+      else if (c.status === 'Blocked') {
+        if (c.previousState === 'Committed') {
+          // Committed (Blocked): Close Campaign stays disabled until the campaign is unblocked (matrix)
+          moveBtn = '<button class="btn btn-primary" disabled style="opacity:0.5;cursor:not-allowed;" title="Unblock the campaign to continue">Close Campaign</button>';
+        } else {
+          moveBtn = '<button class="btn btn-success" onclick="unblockCampaign()">Unblock Campaign</button>';
+        }
+      }
       else if (c.status === 'Closed') moveBtn = '';
 
       bar.innerHTML = '<div class="action-bar-left">' + moveBtn + '</div><div></div>';
