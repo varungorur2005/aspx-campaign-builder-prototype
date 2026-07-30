@@ -542,6 +542,42 @@
       display: grid; grid-template-columns: 160px 1fr; gap: 10px 14px; font-size: 13px;
     }
     .psm-wizard-review div:nth-child(odd) { color: #616161; font-weight: 600; }
+    /* PSM Getting-started guide */
+    .psm-guide {
+      border: 1px solid #cfe0f5; border-radius: 10px; background: linear-gradient(180deg,#f7fbff,#eef4fc);
+      padding: 18px 20px; margin-bottom: 18px;
+    }
+    .psm-guide-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .psm-guide-head h2 { font-size: 15px; font-weight: 600; color: #103a63; margin: 0; }
+    .psm-guide-head .psm-guide-actions { display: flex; align-items: center; gap: 8px; }
+    .psm-guide-sub { font-size: 12px; color: #4a5b6b; margin: 0 0 14px; }
+    .psm-guide-steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 14px; }
+    .psm-guide-step {
+      background: #fff; border: 1px solid #e3ecf6; border-radius: 8px; padding: 12px 14px; position: relative;
+    }
+    .psm-guide-step .num {
+      display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px;
+      border-radius: 50%; background: #0078d4; color: #fff; font-size: 12px; font-weight: 700; margin-bottom: 8px;
+    }
+    .psm-guide-step .step-title { display: block; font-size: 13px; font-weight: 600; color: #242424; margin-bottom: 4px; }
+    .psm-guide-step .step-copy { display: block; font-size: 12px; color: #5a6672; line-height: 1.45; }
+    .psm-guide-rules { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .psm-guide-rules .rules-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #616161; margin-right: 2px; }
+    .psm-guide-rule {
+      display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #d6e3f2;
+      color: #103a63; border-radius: 14px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+    }
+    .psm-guide-rule svg { flex: 0 0 auto; }
+    .psm-guide-link {
+      background: none; border: none; color: #0078d4; font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px 6px;
+    }
+    .psm-guide-link:hover { text-decoration: underline; }
+    .psm-guide-toggle {
+      background: none; border: 1px solid #d6e3f2; color: #0078d4; font-size: 12px; font-weight: 600;
+      cursor: pointer; padding: 6px 12px; border-radius: 6px; margin-bottom: 18px;
+    }
+    .psm-guide-toggle:hover { background: #eef4fc; }
+    @media (max-width: 900px) { .psm-guide-steps { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -1770,10 +1806,11 @@
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
         '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT PSM View (V2) - Draft</span></h1>' +
-        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model:</strong> One campaign, many tenants. Partners target a system-curated or manually built list, and the two primary outcomes tracked are net paid seats and adoption (MAU). Growth is only attributed once the partner declares activity \u2014 moving a tenant from the master list into the actively-tracked list \u2014 which keeps attribution clean across overlapping (CPOR) partners.</div>' +
+        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model (FY27):</strong> One campaign = one partner + one targeting motion, across many tenants. Partners target a system-curated or manually built list, and the two primary outcomes tracked are net paid seats and adoption (MAU). Growth is only attributed once the partner declares activity \u2014 moving a tenant from the master list into the actively-tracked list \u2014 which keeps attribution clean across overlapping (CPOR) partners.</div>' +
+        psmGuideCardHtml() +
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
-            '<button class="btn btn-primary" onclick="psmOpenWizard()">Create Campaign</button>' +
+            '<button class="btn btn-primary" id="psmCreateBtn" onclick="psmOpenWizard()">Create Campaign</button>' +
             '<button class="toolbar-btn" onclick="showToast(\'PSM campaign export prepared\')">' +
               '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
               'Download' +
@@ -1791,6 +1828,57 @@
         '<div class="panel-card"><h2>Campaign Funnel</h2><div class="psm-funnel" id="psmFunnel"></div></div>' +
         '<div class="campaign-table-wrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
+    }
+
+    function psmGuideIsHidden() {
+      try { return localStorage.getItem('psmGuideHidden') === '1'; } catch (e) { return false; }
+    }
+
+    function psmToggleGuide(hide) {
+      try { localStorage.setItem('psmGuideHidden', hide ? '1' : '0'); } catch (e) {}
+      renderPsmView();
+    }
+
+    function psmReplayTour() {
+      freCompleted = false;
+      freCurrentStep = 0;
+      scheduleFreStart(150);
+    }
+
+    function psmGuideCardHtml() {
+      if (psmGuideIsHidden()) {
+        return '<button class="psm-guide-toggle" onclick="psmToggleGuide(false)">? Show getting-started guide</button>';
+      }
+      var check = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7.5" stroke="#107c10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      var steps = [
+        { n: 1, t: 'Create a campaign', c: 'Pick <strong>one partner</strong> and <strong>one targeting motion</strong> (one audience, one solution play). Use a system-curated scenario or build the tenant list manually \u2014 no Excel.' },
+        { n: 2, t: 'Partner accepts &amp; executes', c: 'The partner\u2019s Alliance Manager reviews and accepts; their Sales and Marketing leads run the agreed outreach against the tenant list.' },
+        { n: 3, t: 'Confirm signals &amp; log offers', c: 'Confirm partner-driven movement to pull tenants into the tracked list, and log offers sold. Growth is attributed and flows into Power BI reporting.' }
+      ];
+      var stepHtml = steps.map(function(s) {
+        return '<div class="psm-guide-step"><span class="num">'+s.n+'</span><span class="step-title">'+s.t+'</span><span class="step-copy">'+s.c+'</span></div>';
+      }).join('');
+      var rules = [
+        'One campaign = one partner',
+        'One campaign = one targeting motion',
+        'New partner outreach = new campaign',
+        'Keep PRM notes accurate \u2192 Copilot Cowork builds your exec deck'
+      ];
+      var ruleHtml = '<span class="rules-label">FY27 ground rules</span>' + rules.map(function(r) {
+        return '<span class="psm-guide-rule">'+check+r+'</span>';
+      }).join('');
+      return '<div class="psm-guide">' +
+        '<div class="psm-guide-head">' +
+          '<h2>Getting started with PSM Campaigns</h2>' +
+          '<div class="psm-guide-actions">' +
+            '<button class="psm-guide-link" onclick="psmReplayTour()">Take a tour</button>' +
+            '<button class="psm-guide-link" onclick="psmToggleGuide(true)" title="Hide guide">Dismiss</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="psm-guide-sub">A PSM campaign drives MAU growth and net paid seats for a partner\u2019s targeted tenants, and attributes that growth to partner actions. Three steps from create to measured impact:</p>' +
+        '<div class="psm-guide-steps">'+stepHtml+'</div>' +
+        '<div class="psm-guide-rules">'+ruleHtml+'</div>' +
+      '</div>';
     }
 
     function psmRenderDashboard() {
@@ -1955,6 +2043,7 @@
           '<div class="psm-metric-card"><span class="label">Engagement Score</span><span class="value">'+c.engagement+'</span></div>' +
         '</div></div>' +
         psmRenderOfferImpactPanel() +
+        psmRenderExecSummaryPanel(c) +
         (c.status === 'Completed' ? '<div class="panel-card"><h2>Campaign Outcome Summary</h2><div class="psm-detail-grid"><div><strong>Activities Delivered</strong><div style="margin-top:6px;color:#616161;">Pre-sales consultation, Email outreach, Webinar series, Post-sales enablement</div></div><div><strong>GTM Attach</strong><div style="margin-top:6px;color:#616161;">3 new GTM motions activated</div></div><div><strong>Partner Feedback</strong><div style="margin-top:6px;color:#616161;">Campaign well-structured. Tenant list quality was high. Recommend expanding to adjacent workloads.</div></div><div><strong>Next Steps</strong><div style="margin-top:6px;color:#616161;">Evaluate expansion campaign for upsell opportunities identified during outreach.</div></div></div></div>' : '') +
         '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
         '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance Note:</strong> Campaign data shared with partners is limited to tenant identifiers and recommended actions. Customer usage metrics (MAU, PAU) are visible to Microsoft users only and are not exposed to partner views.</div>';
@@ -2018,6 +2107,28 @@
       '</div>';
     }
 
+    function psmRenderExecSummaryPanel(c) {
+      var notes = psmEscapeHtml(c.prmNotes || '');
+      return '<div class="panel-card"><h2>Notes &amp; Executive Summary</h2>' +
+        '<div style="background:#eef3fb;border:1px solid #cfe0f5;border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#004578;"><strong>Notes + Power BI = superpower.</strong> Copilot Cowork turns your PRM notes plus Power BI data into an executive summary deck in minutes. The quality of the deck depends on the quality of your notes \u2014 keep them relevant and accurate.</div>' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>PRM Campaign Notes</label><textarea id="psmPrmNotes" style="width:100%;min-height:90px;padding:8px;border:1px solid #d1d1d1;border-radius:4px;font-family:inherit;font-size:13px;" oninput="psmSaveNotes(\''+c.id+'\', this.value)" placeholder="Capture partner engagement, offers sold, objections, and next steps. These notes feed the exec summary deck.">'+notes+'</textarea></div>' +
+        '<button class="btn btn-primary" onclick="psmGenerateDeck(\''+c.id+'\')">' +
+          '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:6px;"><path d="M8 1.5l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 12.6 4.6 12.5l.8-3.8L2.5 5.9l3.9-.4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
+          'Generate executive summary deck' +
+        '</button>' +
+        '<span style="font-size:12px;color:#616161;margin-left:10px;">Built with Copilot Cowork</span>' +
+      '</div>';
+    }
+
+    function psmSaveNotes(id, value) {
+      var c = psmCampaigns.find(function(x){ return x.id === id; });
+      if (c) c.prmNotes = value;
+    }
+
+    function psmGenerateDeck(id) {
+      showToast('Executive summary deck generated with Copilot Cowork \u2014 check your downloads');
+    }
+
     function psmOpenWizard() {
       var partners = psmGetPartners();
       var sc = psmScenarioById('amg');
@@ -2057,7 +2168,7 @@
         var options = psmGetPartners().map(function(partner) {
           return '<option value="'+partner+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+partner+'</option>';
         }).join('');
-        return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
+        return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#0f5132;margin-top:12px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one partner.</strong> Keeping a single partner per campaign makes reporting and accountability clean. Running a different outreach motion with this partner later? Create a new campaign for it.</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
       }
       if (step === 3) {
         var cards = PSM_SCENARIOS.map(function(s) {
@@ -2069,13 +2180,13 @@
             '<div style="font-size:11px;color:#0078d4;margin-top:6px;font-weight:600;">'+estText+'</div>' +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Pick a system-curated scenario to spin up a list in a couple of clicks, or build it manually. You can still refine the list afterward.</div>'+cards+'</div>';
+        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#0f5132;margin-bottom:10px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one targeting motion.</strong> Focus on one target audience and one solution play. Avoid bundling 5+ workloads \u2014 generic M365 targeting is out of scope for PSM referrals.</div><div style="font-size:12px;color:#616161;margin-bottom:10px;">Pick a system-curated scenario to spin up a list in a couple of clicks, or build it manually. You can still refine the list afterward.</div>'+cards+'</div>';
       }
       if (step === 4) {
         var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="radio" name="psmGoal" value="'+goal+'"'+(psmWizardState.goal === goal ? ' checked' : '')+' onchange="psmWizardState.goal=this.value"> '+goal+'</label>'; }).join('');
         var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
         return '<div class="form-group"><label>Primary Goal</label><div style="font-size:12px;color:#616161;margin-bottom:8px;">The two primary tracked outcomes are net paid seats and adoption (MAU).</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
-          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
+          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select><div style="font-size:12px;color:#616161;margin-top:6px;">Pick the single solution play for this campaign. Need to run a different workload with this partner? Create a separate campaign.</div></div>';
       }
       if (step === 5) {
         return '<div class="form-group"><label>Targeting Threshold / List Size</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" placeholder="e.g. 35 or 500"><div style="font-size:12px;color:#616161;margin-top:6px;">Agreed number of tenants to target with the partner.</div></div>' +
@@ -3676,10 +3787,30 @@
       });
 
       if (currentView === 'psm') {
+        if (document.querySelector('.psm-guide')) {
+          steps.push({
+            target: '.psm-guide',
+            title: 'Start here',
+            text: 'This getting-started guide shows the 3-step campaign flow and the FY27 ground rules. You can dismiss it and reopen it any time with \u201cShow getting-started guide\u201d.',
+            arrow: 'top'
+          });
+        }
+        steps.push({
+          target: '#psmCreateBtn',
+          title: 'Create a Campaign',
+          text: 'Start here. The wizard walks you through picking one partner, one targeting motion, a goal, and the tenant list \u2014 then launches the campaign as a Draft.',
+          arrow: 'top'
+        });
+        steps.push({
+          target: '#psmFunnel',
+          title: 'Track the Campaign Funnel',
+          text: 'Follow each campaign from Draft \u2192 Submitted \u2192 Accepted \u2192 Active \u2192 Measuring \u2192 Completed. Click any stage to filter the table to campaigns in that state.',
+          arrow: 'top'
+        });
         steps.push({
           target: '#psmCampaignTableBody .campaign-id-link',
-          title: 'Campaign Details',
-          text: 'Click on any Campaign ID to open the PSM campaign detail view with partner lead selection, performance metrics, and activity timeline.',
+          title: 'Open Campaign Details',
+          text: 'Click any Campaign ID to confirm activity signals, log partner offers, review performance, and generate an executive summary deck.',
           arrow: 'left'
         });
       } else {
