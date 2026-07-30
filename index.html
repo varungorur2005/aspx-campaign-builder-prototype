@@ -530,8 +530,9 @@
     .psm-membership details summary { cursor: pointer; font-weight: 600; color: #242424; }
     .psm-membership-copy { margin-top: 10px; font-size: 12px; color: #616161; line-height: 1.5; }
     .psm-wizard-stepper {
-      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px;
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
     }
+    .psm-wizard-stepper .psm-wizard-step { flex: 1; min-width: 84px; }
     .psm-wizard-step {
       padding: 10px 8px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;
       font-size: 11px; font-weight: 600; color: #616161; text-align: center;
@@ -578,6 +579,49 @@
     }
     .psm-guide-toggle:hover { background: #eef4fc; }
     @media (max-width: 900px) { .psm-guide-steps { grid-template-columns: 1fr; } }
+
+    /* PSM Customer conversion funnel */
+    .psm-conv-funnel { display: flex; flex-direction: column; gap: 8px; }
+    .psm-conv-stage { display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 12px; }
+    .psm-conv-stage .conv-head { display: flex; flex-direction: column; }
+    .psm-conv-stage .conv-name { font-size: 12px; font-weight: 600; color: #242424; }
+    .psm-conv-stage .conv-sub { font-size: 11px; color: #616161; }
+    .psm-conv-bar-wrap { position: relative; background: #f3f2f1; border-radius: 6px; height: 30px; overflow: hidden; }
+    .psm-conv-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; color: #fff; font-size: 12px; font-weight: 700; min-width: 42px; transition: width 0.3s; }
+    .psm-conv-drop { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #616161; margin-left: 8px; }
+    .psm-conv-drop.bottleneck { color: #a4262c; }
+    .psm-bottleneck-note {
+      margin-top: 10px; font-size: 12px; color: #7a2f00;
+      background: #fff4ce; border: 1px solid #f0e5a1; border-radius: 6px; padding: 8px 12px;
+    }
+    /* PSM approach cards */
+    .psm-approach-card {
+      cursor: pointer; border: 1px solid #e1dfdd; background: #fff; border-radius: 6px;
+      padding: 12px 14px; margin-bottom: 8px; transition: border-color 0.15s, background 0.15s;
+    }
+    .psm-approach-card:hover { border-color: #0078d4; }
+    .psm-approach-card.selected { border-color: #0078d4; background: #eef3fb; }
+    .psm-approach-card .ap-name { font-weight: 600; color: #242424; }
+    .psm-approach-card .ap-desc { font-size: 12px; color: #616161; margin-top: 4px; }
+    .psm-approach-card .ap-detail { font-size: 11px; color: #0f5132; margin-top: 6px; }
+    /* PSM PRM badge + AI box */
+    .psm-prm-badge {
+      display: inline-block; background: #ede7f6; color: #5b2a86; border: 1px solid #d6c7ee;
+      border-radius: 10px; padding: 1px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.3px; margin-left: 6px; vertical-align: 1px;
+    }
+    .psm-ai-box {
+      border: 1px solid #cfe0f5; background: linear-gradient(180deg,#f7fbff,#eef4fc);
+      border-radius: 8px; padding: 12px 14px; margin-top: 10px;
+    }
+    .psm-ai-box textarea, .psm-ai-box select {
+      width: 100%; padding: 8px; border: 1px solid #d1d1d1; border-radius: 4px;
+      font-family: inherit; font-size: 13px;
+    }
+    .psm-ai-preview { margin-top: 10px; border: 1px solid #e3ecf6; border-radius: 6px; overflow: hidden; }
+    .psm-ai-preview-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; padding: 7px 10px; font-size: 12px; border-top: 1px solid #eef2f7; }
+    .psm-ai-preview-row.head { background: #f7fbff; font-weight: 600; color: #103a63; border-top: none; }
+    .psm-ai-score { color: #0078d4; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -1250,6 +1294,18 @@
     const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
     const PSM_STATUS_ORDER = ['Draft', 'Submitted', 'Accepted', 'Active', 'Measuring', 'Completed'];
     const PSM_STATUS_COLORS = { Draft: '#616161', Submitted: '#0078d4', Accepted: '#038387', Active: '#107c10', Measuring: '#c19c00', Completed: '#7719aa' };
+    const PSM_PROGRESSION_STAGES = [
+      { key: 'targetList', label: 'Target List', sub: 'Tenants selected to pursue', color: '#0078d4' },
+      { key: 'contacted', label: 'Customer Contacted', sub: 'Partner made first touch', color: '#038387' },
+      { key: 'intentSecured', label: 'Intent Secured', sub: 'Buying intent confirmed', color: '#8661c5' },
+      { key: 'saleClosed', label: 'Sale Closed', sub: 'Deal won', color: '#107c10' },
+      { key: 'servicesRegistered', label: 'Services Registered', sub: 'Deployment / services logged', color: '#c19c00' }
+    ];
+    const PSM_CREATION_MODES = [
+      { id: 'field', name: 'Field-driven', desc: 'The Microsoft field team selects the tenants and shares the curated list with the partner to execute.', detail: 'Best when the field holds the account context. Partner reviews and runs the outreach.' },
+      { id: 'partner', name: 'Partner-driven', desc: 'A mature partner builds their own target list; the field reviews and approves it.', detail: 'Best for high-maturity partners who know their book of business.' },
+      { id: 'collaborative', name: 'Collaborative', desc: 'Field and partner build and refine the target list together.', detail: 'Best when both sides hold context and want to co-plan the motion.' }
+    ];
     const PSM_PARTNER_REGIONS = {
       'Contoso Ltd': 'Americas',
       'Fabrikam Inc': 'EMEA',
@@ -1825,7 +1881,8 @@
         '</div>' +
         '<div class="kpi-row" id="psmKpiRow"></div>' +
         '<div class="charts-row" id="psmChartsRow"></div>' +
-        '<div class="panel-card"><h2>Campaign Funnel</h2><div class="psm-funnel" id="psmFunnel"></div></div>' +
+        '<div class="panel-card"><h2>Customer Conversion Funnel <span style="font-size:12px;font-weight:400;color:#616161;">(rolled up across all campaigns)</span></h2><div style="font-size:12px;color:#616161;margin-bottom:12px;">Tenants moving from target list to services registered \u2014 spot where deals stall across the portfolio.</div><div id="psmConvFunnel"></div></div>' +
+        '<div class="panel-card"><h2>Campaigns by Status</h2><div class="psm-funnel" id="psmFunnel"></div></div>' +
         '<div class="campaign-table-wrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
     }
@@ -1902,6 +1959,7 @@
       psmRenderKpis();
       psmRenderCharts();
       psmRenderFunnel();
+      psmRenderConvFunnel();
 
       document.getElementById('psmCampaignTableHead').innerHTML =
         '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Tracked</th><th>Status</th><th>Goal</th><th>Net Seats</th><th>MAU Growth</th><th>Revenue</th></tr>';
@@ -1984,6 +2042,12 @@
       document.getElementById('psmFunnel').innerHTML = html;
     }
 
+    function psmRenderConvFunnel() {
+      var el = document.getElementById('psmConvFunnel');
+      if (!el) return;
+      el.innerHTML = psmRenderConversionFunnel(psmAggregateProgression(), { hint: 'Prioritize partner enablement and offers at this stage to lift portfolio conversion.' });
+    }
+
     function psmRenderStatusBadge(status) {
       return '<span class="status-badge '+status.toLowerCase()+'">'+status+'</span>';
     }
@@ -2015,6 +2079,7 @@
             '<div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div>' +
             '<div class="detail-meta-item"><strong>Region:</strong> '+c.region+'</div>' +
             '<div class="detail-meta-item"><strong>Workload:</strong> '+c.workload+'</div>' +
+            '<div class="detail-meta-item"><strong>Creation Approach:</strong> '+psmCreationModeById(c.creationMode).name+'</div>' +
             '<div class="detail-meta-item"><strong>Created:</strong> '+c.created+'</div>' +
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
@@ -2035,6 +2100,7 @@
           '</div>' +
         '</div>' +
         psmRenderSignalsPanel(c) +
+        psmRenderProgressionPanel(c) +
         psmRenderLogActivityPanel(c) +
         '<div class="panel-card"><h2>Performance Metrics</h2><div class="psm-metric-grid">' +
           '<div class="psm-metric-card"><span class="label">Net Paid Seats</span><span class="value">'+(c.netPaidSeats ? '+'+c.netPaidSeats.toLocaleString() : '0')+'</span></div>' +
@@ -2107,6 +2173,61 @@
       '</div>';
     }
 
+    function psmCreationModeById(id) {
+      return PSM_CREATION_MODES.filter(function(m){ return m.id === id; })[0] || PSM_CREATION_MODES[0];
+    }
+
+    function psmRenderConversionFunnel(data, opts) {
+      opts = opts || {};
+      var target = data.targetList || 0;
+      var stages = PSM_PROGRESSION_STAGES;
+      var bottleneckIdx = -1, worstDrop = -1;
+      for (var i = 1; i < stages.length; i++) {
+        var prev = data[stages[i-1].key] || 0;
+        var cur = data[stages[i].key] || 0;
+        var drop = prev - cur;
+        if (prev > 0 && drop > worstDrop) { worstDrop = drop; bottleneckIdx = i; }
+      }
+      var rows = stages.map(function(s, idx) {
+        var count = data[s.key] || 0;
+        var pctOfTarget = target ? Math.round((count / target) * 100) : 0;
+        var width = target ? Math.max(count ? 6 : 0, Math.round((count / target) * 100)) : 0;
+        var stepConv = '';
+        if (idx > 0) {
+          var prev = data[stages[idx-1].key] || 0;
+          var conv = prev ? Math.round((count / prev) * 100) : 0;
+          var isBottleneck = idx === bottleneckIdx;
+          stepConv = '<span class="psm-conv-drop'+(isBottleneck ? ' bottleneck' : '')+'">'+(isBottleneck ? '\u26a0 ' : '')+conv+'% step conversion</span>';
+        }
+        return '<div class="psm-conv-stage">' +
+            '<div class="conv-head"><span class="conv-name">'+s.label+'</span><span class="conv-sub">'+s.sub+'</span></div>' +
+            '<div><div class="psm-conv-bar-wrap"><div class="psm-conv-bar" style="width:'+width+'%;background:'+s.color+';">'+count.toLocaleString()+'</div></div>'+stepConv+' <span class="psm-conv-drop">'+pctOfTarget+'% of target</span></div>' +
+          '</div>';
+      }).join('');
+      var overall = target ? Math.round(((data.saleClosed || 0) / target) * 100) : 0;
+      var note = bottleneckIdx > -1
+        ? '<div class="psm-bottleneck-note"><strong>Bottleneck:</strong> biggest drop-off is at <strong>'+stages[bottleneckIdx].label+'</strong>. '+(opts.hint || 'Focus partner enablement here to lift conversion.')+'</div>'
+        : '';
+      return '<div class="psm-conv-funnel">'+rows+'</div>' +
+        '<div style="margin-top:10px;font-size:12px;color:#616161;">Target list \u2192 sale closed conversion: <strong style="color:#242424;">'+overall+'%</strong></div>' +
+        note;
+    }
+
+    function psmRenderProgressionPanel(c) {
+      psmEnrich(c);
+      if (!c.progression) return '';
+      return '<div class="panel-card"><h2>Customer Conversion Funnel</h2>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:14px;">Track each tenant from target list through to services registered to measure conversion and surface where deals stall.</div>' +
+        psmRenderConversionFunnel(c.progression, { hint: 'Consider a partner check-in or offer refresh for tenants stuck at this stage.' }) +
+        '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+          '<span style="font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.3px;">Update progress</span>' +
+          '<button class="btn btn-secondary" style="padding:5px 12px;font-size:12px;" onclick="showToast(\'Bulk stage editor opened \u2014 update many tenants at once\')">Bulk edit stages</button>' +
+          '<button class="btn btn-secondary" style="padding:5px 12px;font-size:12px;" onclick="showToast(\'CRM sync requested \u2014 stages will refresh from partner CRM\')">Sync from CRM</button>' +
+          '<button class="btn btn-secondary" style="padding:5px 12px;font-size:12px;" onclick="showToast(\'Excel review exported \u2014 send to partner for periodic update\')">Export for Excel review</button>' +
+        '</div>' +
+      '</div>';
+    }
+
     function psmRenderExecSummaryPanel(c) {
       var notes = psmEscapeHtml(c.prmNotes || '');
       return '<div class="panel-card"><h2>Notes &amp; Executive Summary</h2>' +
@@ -2132,12 +2253,12 @@
     function psmOpenWizard() {
       var partners = psmGetPartners();
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, name: '', partner: partners[0] || '', scenarioId: 'amg', listSize: sc.est, goal: 'Net Paid Seats', workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot') };
+      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: partners[0] || '', scenarioId: 'amg', listSize: sc.est, goal: 'Net Paid Seats', workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
 
-    var PSM_WIZARD_STEPS = ['Campaign', 'Partner', 'Targeting', 'Goal', 'Rationale', 'Review'];
+    var PSM_WIZARD_STEPS = ['Approach', 'Campaign', 'Partner', 'Targeting', 'Goal', 'Rationale', 'Review'];
 
     function psmRenderWizard() {
       var step = psmWizardState.step;
@@ -2160,39 +2281,85 @@
       psmRenderWizard();
     }
 
+    function psmSelectApproach(id) {
+      psmWizardState.creationMode = id;
+      psmRenderWizard();
+    }
+
+    function psmAiGenerate() {
+      var outcome = (psmWizardState.aiOutcome || '').trim();
+      if (!outcome) { showToast('Describe the outcome you want first', true); return; }
+      var seed = outcome.length + (psmWizardState.aiRegion || '').length;
+      psmWizardState.listSize = 40 + (seed % 12) * 15;
+      psmWizardState.rationaleProfile = 'AI-ranked tenants for "' + outcome + '" in ' + psmWizardState.aiRegion + ', prioritized by propensity and recent signal movement.';
+      psmWizardState.aiGenerated = true;
+      psmRenderWizard();
+      showToast('Agent built a prioritized list of ' + psmWizardState.listSize + ' tenants \u2014 tweak before you commit');
+    }
+
     function psmBuildWizardStep(step) {
-      if (step === 1) {
+      var label = PSM_WIZARD_STEPS[step - 1];
+      if (label === 'Approach') {
+        var cards = PSM_CREATION_MODES.map(function(m) {
+          var sel = psmWizardState.creationMode === m.id;
+          return '<div class="psm-approach-card'+(sel ? ' selected' : '')+'" onclick="psmSelectApproach(\''+m.id+'\')">' +
+            '<div class="ap-name">'+m.name+'</div>' +
+            '<div class="ap-desc">'+m.desc+'</div>' +
+            '<div class="ap-detail">'+m.detail+'</div>' +
+          '</div>';
+        }).join('');
+        return '<div class="form-group"><label>Who is building this campaign?</label>' +
+          '<div style="font-size:12px;color:#616161;margin-bottom:10px;">Campaigns are created in ASPXI. Choose how the target list gets built \u2014 this reflects partner maturity and who holds the account context.</div>' +
+          cards + '</div>';
+      }
+      if (label === 'Campaign') {
         return '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="Enter campaign name"></div>';
       }
-      if (step === 2) {
+      if (label === 'Partner') {
         var options = psmGetPartners().map(function(partner) {
           return '<option value="'+partner+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+partner+'</option>';
         }).join('');
         return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#0f5132;margin-top:12px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one partner.</strong> Keeping a single partner per campaign makes reporting and accountability clean. Running a different outreach motion with this partner later? Create a new campaign for it.</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
       }
-      if (step === 3) {
+      if (label === 'Targeting') {
         var cards = PSM_SCENARIOS.map(function(s) {
           var sel = psmWizardState.scenarioId === s.id;
-          var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : '~' + s.est.toLocaleString() + ' matching tenants';
+          var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : (s.ai ? 'Agent assembles a ranked list' : '~' + s.est.toLocaleString() + ' matching tenants');
+          var prmBadge = s.fromPRM ? '<span class="psm-prm-badge">From PRM</span>' : '';
+          var aiExtra = '';
+          if (s.ai && sel) {
+            var regions = ['Americas', 'EMEA', 'APAC'].map(function(r){ return '<option value="'+r+'"'+(psmWizardState.aiRegion === r ? ' selected' : '')+'>'+r+'</option>'; }).join('');
+            aiExtra = '<div class="psm-ai-box" onclick="event.stopPropagation();">' +
+              '<div style="font-size:12px;font-weight:600;color:#103a63;margin-bottom:6px;">Describe the outcome you want</div>' +
+              '<textarea id="psmAiOutcome" placeholder="e.g. Grow net paid Copilot seats in mid-market accounts with stalled adoption" oninput="psmWizardState.aiOutcome=this.value">'+psmEscapeHtml(psmWizardState.aiOutcome || '')+'</textarea>' +
+              '<div style="display:flex;gap:8px;margin-top:8px;align-items:flex-end;">' +
+                '<div style="flex:1;"><label style="font-size:11px;color:#616161;">Region</label><select onchange="psmWizardState.aiRegion=this.value">'+regions+'</select></div>' +
+                '<button class="btn btn-primary" style="padding:7px 14px;" onclick="psmAiGenerate()">Generate list</button>' +
+              '</div>' +
+              (psmWizardState.aiGenerated ? psmAiPreviewHtml() : '') +
+            '</div>';
+          }
           return '<div onclick="psmSelectScenario(\''+s.id+'\')" style="cursor:pointer;border:1px solid '+(sel ? '#0078d4' : '#e1dfdd')+';background:'+(sel ? '#eef3fb' : '#fff')+';border-radius:6px;padding:12px 14px;margin-bottom:8px;">' +
-            '<div style="font-weight:600;color:#242424;">'+s.name+'</div>' +
+            '<div style="font-weight:600;color:#242424;">'+s.name+prmBadge+'</div>' +
             '<div style="font-size:12px;color:#616161;margin-top:4px;">'+s.desc+'</div>' +
             '<div style="font-size:11px;color:#0078d4;margin-top:6px;font-weight:600;">'+estText+'</div>' +
+            aiExtra +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#0f5132;margin-bottom:10px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one targeting motion.</strong> Focus on one target audience and one solution play. Avoid bundling 5+ workloads \u2014 generic M365 targeting is out of scope for PSM referrals.</div><div style="font-size:12px;color:#616161;margin-bottom:10px;">Pick a system-curated scenario to spin up a list in a couple of clicks, or build it manually. You can still refine the list afterward.</div>'+cards+'</div>';
+        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#0f5132;margin-bottom:10px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one targeting motion.</strong> Focus on one target audience and one solution play. Avoid bundling 5+ workloads \u2014 generic M365 targeting is out of scope for PSM referrals.</div><div style="font-size:12px;color:#616161;margin-bottom:10px;"><strong>Recommended starting points</strong> are pre-filtered from lists already created in PRM \u2014 tweak them rather than building from scratch. Or let the AI agent assemble a ranked list, or build manually. You can refine the list afterward.</div>'+cards+'</div>';
       }
-      if (step === 4) {
+      if (label === 'Goal') {
         var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="radio" name="psmGoal" value="'+goal+'"'+(psmWizardState.goal === goal ? ' checked' : '')+' onchange="psmWizardState.goal=this.value"> '+goal+'</label>'; }).join('');
         var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
         return '<div class="form-group"><label>Primary Goal</label><div style="font-size:12px;color:#616161;margin-bottom:8px;">The two primary tracked outcomes are net paid seats and adoption (MAU).</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
           '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select><div style="font-size:12px;color:#616161;margin-top:6px;">Pick the single solution play for this campaign. Need to run a different workload with this partner? Create a separate campaign.</div></div>';
       }
-      if (step === 5) {
+      if (label === 'Rationale') {
         return '<div class="form-group"><label>Targeting Threshold / List Size</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" placeholder="e.g. 35 or 500"><div style="font-size:12px;color:#616161;margin-top:6px;">Agreed number of tenants to target with the partner.</div></div>' +
           '<div class="form-group"><label>Customer Profile / Rationale</label><textarea style="width:100%;min-height:90px;padding:8px;border:1px solid #d1d1d1;border-radius:4px;font-family:inherit;font-size:13px;" oninput="psmWizardState.rationaleProfile=this.value" placeholder="Why these accounts? e.g. >300 seats, Frontier program, Foundry revenue">'+psmEscapeHtml(psmWizardState.rationaleProfile)+'</textarea><div style="font-size:12px;color:#616161;margin-top:6px;">Shown to the partner so they understand who is on the list and why.</div></div>';
       }
       return '<div class="psm-wizard-review">' +
+        '<div>Creation Approach</div><div>'+psmCreationModeById(psmWizardState.creationMode).name+'</div>' +
         '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
         '<div>Partner</div><div>'+psmEscapeHtml(psmWizardState.partner || '\u2014')+'</div>' +
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
@@ -2205,12 +2372,24 @@
       '</div>';
     }
 
+    function psmAiPreviewHtml() {
+      var tenants = ['Contoso Retail', 'Fabrikam Health', 'Tailwind Traders', 'Adatum Corp', 'Alpine Ski House'];
+      var rows = tenants.map(function(t, i) {
+        var score = 96 - i * 7;
+        var signal = i % 2 === 0 ? '+' + (12 + i * 4) + ' MAU trend' : '+' + (8 + i * 3) + ' seat propensity';
+        return '<div class="psm-ai-preview-row"><span>'+t+'</span><span style="color:#616161;">'+signal+'</span><span class="psm-ai-score">'+score+'</span></div>';
+      }).join('');
+      return '<div class="psm-ai-preview"><div class="psm-ai-preview-row head"><span>Top-ranked tenants</span><span>Signal</span><span>Score</span></div>'+rows+'</div>' +
+        '<div style="font-size:11px;color:#616161;margin-top:6px;">Preview of the highest-priority tenants. Full list of '+(psmWizardState.listSize || 0)+' is editable after creation.</div>';
+    }
+
     function psmNextWizardStep() {
-      if (psmWizardState.step === 1 && !psmWizardState.name.trim()) {
+      var label = PSM_WIZARD_STEPS[psmWizardState.step - 1];
+      if (label === 'Campaign' && !psmWizardState.name.trim()) {
         showToast('Campaign name is required', true);
         return;
       }
-      if (psmWizardState.step === 2 && !psmWizardState.partner) {
+      if (label === 'Partner' && !psmWizardState.partner) {
         showToast('Partner selection is required', true);
         return;
       }
@@ -2243,6 +2422,7 @@
         trackedCount: 0,
         signals: [],
         activityLog: [],
+        creationMode: psmWizardState.creationMode,
         scenarioId: psmWizardState.scenarioId,
         rationale: {
           scenario: sc.name,
@@ -2253,6 +2433,7 @@
         _enriched: true,
         executionType: psmGetExecutionType(listSize)
       };
+      newCampaign.progression = psmBuildProgression(newCampaign, psmSeed(newCampaign));
       psmCampaigns.unshift(newCampaign);
       hideModal('psmWizardModal');
       psmSearchTerm = '';
@@ -2320,9 +2501,10 @@
     }
 
     var PSM_SCENARIOS = [
-      { id: 'amg', name: 'Acquire \u2192 Monetize \u2192 Grow', desc: 'Monetized accounts where the partner is running a seller spiff; telemetry-fed targeting.', est: 480 },
-      { id: 'f2p', name: 'Free-to-Paid Upsell', desc: 'Tenants on trial / free Copilot with high propensity to convert to net paid seats.', est: 320 },
-      { id: 'copilot-adopt', name: 'Copilot Adoption Acceleration', desc: 'Committed Copilot tenants tracking below the adoption benchmark.', est: 260 },
+      { id: 'ai', name: 'AI-guided target list', desc: 'Describe the outcome you want and the agent assembles a prioritized, ranked list. Tweak before you commit.', est: 0, ai: true },
+      { id: 'amg', name: 'Acquire \u2192 Monetize \u2192 Grow', desc: 'Monetized accounts where the partner is running a seller spiff; telemetry-fed targeting.', est: 480, fromPRM: true },
+      { id: 'f2p', name: 'Free-to-Paid Upsell', desc: 'Tenants on trial / free Copilot with high propensity to convert to net paid seats.', est: 320, fromPRM: true },
+      { id: 'copilot-adopt', name: 'Copilot Adoption Acceleration', desc: 'Committed Copilot tenants tracking below the adoption benchmark.', est: 260, fromPRM: true },
       { id: 'purview', name: 'Purview White Space + Copilot', desc: 'Copilot tenants with Purview white space to cross-sell / attach.', est: 140 },
       { id: 'frontier', name: 'Frontier Signals', desc: '>300 seats, Frontier program, Foundry revenue \u2014 agentic upsell.', est: 60 },
       { id: 'manual', name: 'Build manually / upload list', desc: 'PSM or partner curates the tenant list directly in ASPX (no Excel). Go as narrow as a handful of tenants.', est: 0 }
@@ -2347,7 +2529,8 @@
         'copilot-adopt': 'Committed ' + workload + ' tenants adopting below the workload benchmark (usage stalled).',
         'purview': workload + ' tenants with Purview white space \u2014 cross-sell / attach opportunity.',
         'frontier': 'Enterprise-aligned tenants >300 seats in the Frontier program with Foundry revenue.',
-        'manual': 'Hand-picked tenants curated by the PSM and partner from offline account planning.'
+        'manual': 'Hand-picked tenants curated by the PSM and partner from offline account planning.',
+        'ai': 'AI-ranked ' + workload + ' tenants prioritized by propensity signals for the requested outcome.'
       };
       return map[id] || map['amg'];
     }
@@ -2359,7 +2542,8 @@
         'copilot-adopt': ['Committed Copilot seats', 'Adoption below benchmark', 'MAU trend flat / declining'],
         'purview': ['Active Copilot usage', 'Purview white space', 'Compliance intent signal'],
         'frontier': ['>300 seats', 'Frontier program member', 'Foundry revenue'],
-        'manual': ['Curated by PSM + partner', 'Mapped to geography / sales manager']
+        'manual': ['Curated by PSM + partner', 'Mapped to geography / sales manager'],
+        'ai': ['Ranked by propensity signals', 'Outcome-aligned', 'Tweakable before commit']
       };
       return map[id] || map['amg'];
     }
@@ -2395,6 +2579,32 @@
       return out;
     }
 
+    function psmBuildProgression(c, seed) {
+      var n = c.tenantCount || 0;
+      var statusFactor = { Draft: 0, Submitted: 0.05, Accepted: 0.2, Active: 0.6, Measuring: 0.85, Completed: 1 }[c.status];
+      if (typeof statusFactor !== 'number') statusFactor = 0.4;
+      var contactRate = 0.55 + (seed % 3) * 0.08;
+      var intentRate = 0.45 + (seed % 4) * 0.05;
+      var saleRate = 0.48 + (seed % 3) * 0.07;
+      var svcRate = 0.68 + (seed % 2) * 0.12;
+      var targetList = n;
+      var contacted = Math.round(n * contactRate * Math.min(1, statusFactor * 1.4));
+      var intentSecured = Math.round(contacted * intentRate);
+      var saleClosed = Math.round(intentSecured * saleRate);
+      var servicesRegistered = Math.round(saleClosed * svcRate);
+      return { targetList: targetList, contacted: contacted, intentSecured: intentSecured, saleClosed: saleClosed, servicesRegistered: servicesRegistered };
+    }
+
+    function psmAggregateProgression() {
+      var totals = { targetList: 0, contacted: 0, intentSecured: 0, saleClosed: 0, servicesRegistered: 0 };
+      psmCampaigns.forEach(function(c) {
+        psmEnrich(c);
+        if (!c.progression) return;
+        PSM_PROGRESSION_STAGES.forEach(function(s) { totals[s.key] += (c.progression[s.key] || 0); });
+      });
+      return totals;
+    }
+
     function psmOfferImpact() {
       return [
         { offer: 'Frontier / Foundry', mau: 640, seats: 71 },
@@ -2425,6 +2635,8 @@
       };
       if (!c.signals) c.signals = active ? psmBuildSignals(c, seed) : [];
       if (!c.activityLog) c.activityLog = (c.status === 'Completed' || c.status === 'Measuring') ? psmBuildActivityLog(c, seed) : [];
+      if (!c.creationMode) c.creationMode = ['field', 'partner', 'collaborative'][seed % 3];
+      if (!c.progression) c.progression = psmBuildProgression(c, seed);
       c._enriched = true;
       return c;
     }
