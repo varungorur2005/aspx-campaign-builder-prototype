@@ -614,6 +614,23 @@
       border: 1px solid #cfe0f5; background: linear-gradient(180deg,#f7fbff,#eef4fc);
       border-radius: 8px; padding: 12px 14px; margin-top: 10px;
     }
+    .psm-modified-badge {
+      display: inline-block; background: #fff4ce; color: #8a6d00; border: 1px solid #f0e5a1;
+      border-radius: 10px; padding: 1px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.3px; margin-left: 6px; vertical-align: 1px;
+    }
+    .psm-scn-edit-btn {
+      flex-shrink: 0; background: #fff; border: 1px solid #d1d1d1; border-radius: 4px; color: #0078d4;
+      width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .psm-scn-edit-btn:hover { background: #eef3fb; border-color: #0078d4; }
+    .psm-scn-edit {
+      border: 1px solid #cfe0f5; background: #f7fbff; border-radius: 8px; padding: 12px 14px; margin-top: 10px;
+    }
+    .psm-scn-edit textarea, .psm-scn-edit input {
+      width: 100%; padding: 8px; border: 1px solid #d1d1d1; border-radius: 4px; font-family: inherit; font-size: 13px; box-sizing: border-box;
+    }
+    .psm-scn-edit textarea { min-height: 70px; }
     .psm-ai-box textarea, .psm-ai-box select {
       width: 100%; padding: 8px; border: 1px solid #d1d1d1; border-radius: 4px;
       font-family: inherit; font-size: 13px;
@@ -2422,7 +2439,7 @@
     function psmOpenWizard() {
       var partners = psmGetPartners();
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: partners[0] || '', scenarioId: 'amg', listSize: sc.est, goals: ['Net Paid Seats'], workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false };
+      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: '', partnerIdType: 'PartnerOneID', partnerQuery: '', scenarioId: 'amg', listSize: sc.est, goals: ['Net Paid Seats'], workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
@@ -2445,9 +2462,34 @@
 
     function psmSelectScenario(id) {
       psmWizardState.scenarioId = id;
-      psmWizardState.listSize = psmScenarioById(id).est;
-      psmWizardState.rationaleProfile = psmProfileForScenario(id, psmWizardState.workload);
+      var edit = psmWizardState.scenarioEdits && psmWizardState.scenarioEdits[id];
+      psmWizardState.listSize = edit ? edit.listSize : psmScenarioById(id).est;
+      psmWizardState.rationaleProfile = (edit && edit.criteria) ? edit.criteria : psmProfileForScenario(id, psmWizardState.workload);
       psmRenderWizard();
+    }
+
+    function psmEditScenario(id) {
+      psmWizardState.scenarioId = id;
+      psmWizardState.editingScenario = id;
+      psmRenderWizard();
+    }
+
+    function psmCancelScenarioEdit() {
+      psmWizardState.editingScenario = null;
+      psmRenderWizard();
+    }
+
+    function psmSaveScenarioEdit(id) {
+      var criteria = (document.getElementById('psmScnCriteria') || {}).value || '';
+      var size = parseInt((document.getElementById('psmScnListSize') || {}).value, 10) || 0;
+      psmWizardState.scenarioEdits = psmWizardState.scenarioEdits || {};
+      psmWizardState.scenarioEdits[id] = { criteria: criteria.trim(), listSize: size, modified: true };
+      psmWizardState.editingScenario = null;
+      psmWizardState.scenarioId = id;
+      psmWizardState.listSize = size;
+      if (criteria.trim()) psmWizardState.rationaleProfile = criteria.trim();
+      psmRenderWizard();
+      showToast('Recommendation criteria and target list updated');
     }
 
     function psmSelectApproach(id) {
@@ -2476,23 +2518,37 @@
     function psmBuildWizardStep(step) {
       var label = PSM_WIZARD_STEPS[step - 1];
       if (label === 'Partner') {
-        var options = psmGetPartners().map(function(partner) {
-          return '<option value="'+partner+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+partner+'</option>';
-        }).join('');
-        return '<div class="form-group"><label>Partner</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:6px;">Region: '+psmGetRegionForPartner(psmWizardState.partner)+'. You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner.</div></div>' +
+        var idType = psmWizardState.partnerIdType || 'PartnerOneID';
+        var watermark = idType === 'MPNID' ? 'Enter one or more MPNIDs (comma separated)' : 'Enter a single PartnerOneID';
+        return '<div class="form-group"><label>Partner Picker</label>' +
+          '<div style="display:flex;gap:8px;align-items:stretch;">' +
+            '<select style="max-width:170px;" onchange="psmWizardState.partnerIdType=this.value; psmRenderWizard()">' +
+              '<option value="PartnerOneID"'+(idType === 'PartnerOneID' ? ' selected' : '')+'>PartnerOneID</option>' +
+              '<option value="MPNID"'+(idType === 'MPNID' ? ' selected' : '')+'>MPNID</option>' +
+            '</select>' +
+            '<div class="toolbar-search" style="flex:1;margin:0;">' +
+              '<svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>' +
+              '<input type="text" value="'+psmEscapeHtml(psmWizardState.partnerQuery || '')+'" placeholder="'+watermark+'" oninput="psmWizardState.partnerQuery=this.value; psmWizardState.partner=this.value">' +
+            '</div>' +
+          '</div>' +
+          '<div style="font-size:12px;color:#616161;margin-top:6px;">You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner.</div></div>' +
           '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 Copilot Free-to-Paid"></div>';
       }
       if (label === 'Goal') {
         var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
         var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
         return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div style="font-size:12px;color:#616161;margin-bottom:8px;">Primary tracked outcomes are net paid seats and adoption (MAU). The first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
-          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
+          '<div class="form-group" style="margin-top:20px;"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
       }
       if (label === 'Targeting') {
         var cards = PSM_SCENARIOS.map(function(s) {
           var sel = psmWizardState.scenarioId === s.id;
-          var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : (s.ai ? 'Agent assembles a ranked list' : '~' + s.est.toLocaleString() + ' matching tenants');
-          var prmBadge = s.fromPRM ? '<span class="psm-prm-badge">From PRM</span>' : '';
+          var editable = !s.ai && s.id !== 'manual';
+          var edit = psmWizardState.scenarioEdits && psmWizardState.scenarioEdits[s.id];
+          var curSize = edit ? edit.listSize : s.est;
+          var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : (s.ai ? 'Agent assembles a ranked list' : '~' + curSize.toLocaleString() + ' matching tenants');
+          var modifiedBadge = (edit && edit.modified) ? '<span class="psm-modified-badge">Modified</span>' : '';
+          var editIcon = editable ? '<button class="psm-scn-edit-btn" title="Edit criteria &amp; target list" onclick="event.stopPropagation(); psmEditScenario(\''+s.id+'\')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2L6 12l-2.5.5L4 10l7.5-7.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>' : '';
           var aiExtra = '';
           if (s.ai && sel) {
             var regions = ['Americas', 'EMEA', 'APAC'].map(function(r){ return '<option value="'+r+'"'+(psmWizardState.aiRegion === r ? ' selected' : '')+'>'+r+'</option>'; }).join('');
@@ -2506,14 +2562,29 @@
               (psmWizardState.aiGenerated ? psmAiPreviewHtml() : '') +
             '</div>';
           }
+          var editBox = '';
+          if (editable && psmWizardState.editingScenario === s.id) {
+            var critVal = edit ? edit.criteria : psmProfileForScenario(s.id, psmWizardState.workload);
+            editBox = '<div class="psm-scn-edit" onclick="event.stopPropagation();">' +
+              '<label style="font-size:11px;color:#616161;">Targeting criteria</label>' +
+              '<textarea id="psmScnCriteria">'+psmEscapeHtml(critVal)+'</textarea>' +
+              '<label style="font-size:11px;color:#616161;margin-top:8px;display:block;">Target tenant list size</label>' +
+              '<input type="number" min="0" id="psmScnListSize" value="'+curSize+'" style="max-width:160px;">' +
+              '<div style="margin-top:10px;display:flex;gap:8px;">' +
+                '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmSaveScenarioEdit(\''+s.id+'\')">Save changes</button>' +
+                '<button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="psmCancelScenarioEdit()">Cancel</button>' +
+              '</div>' +
+            '</div>';
+          }
           return '<div onclick="psmSelectScenario(\''+s.id+'\')" style="cursor:pointer;border:1px solid '+(sel ? '#0078d4' : '#e1dfdd')+';background:'+(sel ? '#eef3fb' : '#fff')+';border-radius:6px;padding:12px 14px;margin-bottom:8px;">' +
-            '<div style="font-weight:600;color:#242424;">'+s.name+prmBadge+'</div>' +
+            '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;"><div style="font-weight:600;color:#242424;">'+s.name+modifiedBadge+'</div>'+editIcon+'</div>' +
             '<div style="font-size:12px;color:#616161;margin-top:4px;">'+s.desc+'</div>' +
             '<div style="font-size:11px;color:#0078d4;margin-top:6px;font-weight:600;">'+estText+'</div>' +
+            editBox +
             aiExtra +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Build the target list</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Start from a PRM pre-filtered list (recommended), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
+        return '<div class="form-group"><label>Build the target list</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Start from a recommended list (edit the criteria and tenant list with the pencil icon), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
           '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
       }
       return '<div class="psm-wizard-review">' +
