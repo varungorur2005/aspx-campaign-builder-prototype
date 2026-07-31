@@ -240,6 +240,12 @@
       font-weight: 600; cursor: pointer;
     }
     .fre-tooltip-next:hover { background: #005a9e; }
+    .fre-tooltip-nav { display: inline-flex; align-items: center; gap: 8px; }
+    .fre-tooltip-back {
+      background: none; border: none; color: #616161;
+      font-size: 12px; font-weight: 600; cursor: pointer; padding: 6px 4px;
+    }
+    .fre-tooltip-back:hover { color: #242424; text-decoration: underline; }
     .fre-highlight {
       position: relative; z-index: 9001;
       box-shadow: 0 0 0 4px rgba(0,120,212,0.4);
@@ -1948,6 +1954,10 @@
               '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
               'Download' +
             '</button>' +
+            '<button class="toolbar-btn" id="psmTourBtn" onclick="psmReplayTour()" title="Take a guided tour of this page">' +
+              '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>' +
+              'Take a tour' +
+            '</button>' +
           '</div>' +
           '<div class="toolbar-right">' +
             '<div class="toolbar-search">' +
@@ -1958,7 +1968,7 @@
         '</div>' +
         '<div class="kpi-row" id="psmKpiRow"></div>' +
         '<div class="charts-row" id="psmChartsRow"></div>' +
-        '<div class="campaign-table-wrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
+        '<div class="campaign-table-wrap" id="psmTableWrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
     }
 
@@ -4376,30 +4386,46 @@
       });
 
       if (currentView === 'psm') {
-        if (document.querySelector('.psm-guide')) {
-          steps.push({
-            target: '.psm-guide',
-            title: 'Start here',
-            text: 'This getting-started guide shows the 3-step campaign flow and the FY27 ground rules. You can dismiss it and reopen it any time with \u201cShow getting-started guide\u201d.',
-            arrow: 'top'
-          });
-        }
         steps.push({
-          target: '#psmCreateBtn',
-          title: 'Create a Campaign',
-          text: 'Start here. The wizard walks you through picking one partner, one targeting motion, a goal, and the tenant list \u2014 then launches the campaign as a Draft.',
+          target: '.page-title',
+          title: 'Welcome to Campaign Builder',
+          text: 'This is your MSFT Field workspace in ASPXi. From here you create campaigns on behalf of your partners and track every tenant from target list to closed. Here\u2019s a quick tour of where everything is.',
           arrow: 'top'
         });
         steps.push({
-          target: '#psmFunnel',
-          title: 'Track the Campaign Funnel',
-          text: 'Follow each campaign from Draft \u2192 Submitted \u2192 Accepted \u2192 Active \u2192 Measuring \u2192 Completed. Click any stage to filter the table to campaigns in that state.',
+          target: '#psmCreateBtn',
+          title: '1. Create a campaign',
+          text: 'Start here. The wizard walks you through picking one partner, a goal and workloads, and the target tenant list \u2014 using ASPX signals to focus on the right customers. It launches as a Draft you can refine.',
+          arrow: 'top'
+        });
+        steps.push({
+          target: '#psmKpiRow',
+          title: '2. Portfolio KPIs',
+          text: 'Your whole book of business at a glance: total campaigns, active partners, customers reached, net paid seats, MAU growth, and revenue growth across every campaign.',
+          arrow: 'top'
+        });
+        steps.push({
+          target: '#psmChartsRow',
+          title: '3. Performance charts',
+          text: 'Visual breakdowns by partner, region, and workload. Click any bar or segment to filter the table below to just those campaigns \u2014 click it again to clear the filter.',
+          arrow: 'top'
+        });
+        steps.push({
+          target: '#psmSearchInput',
+          title: '4. Find a campaign',
+          text: 'Search by campaign ID, name, partner, region, or workload to jump straight to what you need.',
+          arrow: 'top'
+        });
+        steps.push({
+          target: '#psmTableWrap',
+          title: '5. Campaign list',
+          text: 'Every campaign with its key metrics \u2014 Tenants and Tracked counts, Status, Net Seats, MAU Growth, and Revenue. This is your at-a-glance progress board.',
           arrow: 'top'
         });
         steps.push({
           target: '#psmCampaignTableBody .campaign-id-link',
-          title: 'Open Campaign Details',
-          text: 'Click any Campaign ID to confirm activity signals, log partner offers, review performance, and generate an executive summary deck.',
+          title: '6. Open a campaign',
+          text: 'Click any Campaign ID to open the full workspace, where you can bulk-update or individually update tenants, confirm ASPX signals, log offers, and review performance.',
           arrow: 'left'
         });
       } else {
@@ -4475,12 +4501,17 @@
 
       targetEl.classList.add('fre-highlight');
 
+      try { targetEl.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch (e) {}
+
       var rect = targetEl.getBoundingClientRect();
       var tooltip = document.createElement('div');
       tooltip.className = 'fre-tooltip arrow-' + step.arrow;
 
       var isLast = freCurrentStep === freSteps.length - 1;
       var buttonText = isLast ? 'Got it' : 'Next';
+      var backBtn = freCurrentStep > 0
+        ? '<button class="fre-tooltip-back" onclick="prevFreStep()">Back</button>'
+        : '';
 
       tooltip.innerHTML =
         '<div class="fre-tooltip-header">' +
@@ -4490,7 +4521,9 @@
         '<div class="fre-tooltip-body">' + step.text + '</div>' +
         '<div class="fre-tooltip-footer">' +
           '<span class="fre-tooltip-step">' + (freCurrentStep + 1) + ' of ' + freSteps.length + '</span>' +
-          '<button class="fre-tooltip-next" onclick="nextFreStep()">' + buttonText + '</button>' +
+          '<span class="fre-tooltip-nav">' + backBtn +
+            '<button class="fre-tooltip-next" onclick="nextFreStep()">' + buttonText + '</button>' +
+          '</span>' +
         '</div>';
 
       document.body.appendChild(tooltip);
@@ -4527,6 +4560,13 @@
       if (freCurrentStep >= freSteps.length) {
         dismissFre();
       } else {
+        showFreStep();
+      }
+    }
+
+    function prevFreStep() {
+      if (freCurrentStep > 0) {
+        freCurrentStep--;
         showFreStep();
       }
     }
