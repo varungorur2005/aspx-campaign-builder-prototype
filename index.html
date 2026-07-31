@@ -636,6 +636,17 @@
     .psm-track-toggle { display: inline-flex; border: 1px solid #d6e3f2; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
     .psm-track-toggle button { background: #fff; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #0078d4; cursor: pointer; }
     .psm-track-toggle button.active { background: #0078d4; color: #fff; }
+    /* PSM tenant workspace + bulk update */
+    .psm-th-sub { display:block; font-weight:400; text-transform:none; letter-spacing:0; font-size:10px; color:#8a8886; }
+    .psm-workspace-table th { vertical-align: bottom; }
+    .psm-workspace-table tbody tr:hover { background:#f7fbff; }
+    .psm-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:#f3f7fb; border:1px solid #d6e3f2; border-radius:6px; padding:8px 12px; margin-bottom:12px; }
+    .psm-bulk-label { font-size:12px; font-weight:600; color:#004578; }
+    .psm-bulk-bar select { padding:5px 8px; font-size:12px; border:1px solid #d1d1d1; border-radius:4px; }
+    .psm-pri { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; }
+    .psm-pri-high { background:#fde7e9; color:#a4262c; }
+    .psm-pri-medium { background:#fff4ce; color:#8a6d00; }
+    .psm-pri-low { background:#eff6ec; color:#0f7b0f; }
     /* PSM partner benchmarking */
     .psm-bench-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .psm-bench-table th { text-align: left; padding: 8px 10px; color: #616161; font-weight: 600; border-bottom: 1px solid #e0e0e0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
@@ -1884,14 +1895,12 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
-        '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT PSM View (V2) - Draft</span></h1>' +
-        '<div style="background:#e8f4fd;border:1px solid #b3d7f2;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#004578;"><strong>PSM Campaign Model (FY27):</strong> One campaign = one partner + one targeting motion, across many tenants. Partners target a system-curated or manually built list, and the two primary outcomes tracked are net paid seats and adoption (MAU). Growth is only attributed once the partner declares activity \u2014 moving a tenant from the master list into the actively-tracked list \u2014 which keeps attribution clean across overlapping (CPOR) partners.</div>' +
-        '<div style="background:#f3f0fb;border:1px solid #d6c7ee;border-radius:6px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#4a2c73;"><strong>Internal PSM tool.</strong> This is an internal-facing tool for PSMs \u2014 the immediate priority given partner tool-adoption uncertainty. A partner-facing path (e.g. TPP integration) is being explored in parallel and is out of scope for this view.</div>' +
-        psmGuideCardHtml() +
+        '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT Field View &middot; ASPXi</span></h1>' +
+        '<div style="font-size:13px;color:#616161;margin-bottom:16px;">Create campaigns on behalf of your partners, then track each tenant from target list to closed \u2014 with ASPX signals to focus the partner on the right customers.</div>' +
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
-            '<button class="btn btn-primary" id="psmCreateBtn" onclick="psmOpenWizard()">Create Campaign</button>' +
-            '<button class="toolbar-btn" onclick="showToast(\'PSM campaign export prepared\')">' +
+            '<button class="btn btn-primary" id="psmCreateBtn" onclick="psmOpenWizard()">Create campaign for a partner</button>' +
+            '<button class="toolbar-btn" onclick="showToast(\'Campaign export prepared\')">' +
               '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
               'Download' +
             '</button>' +
@@ -1899,15 +1908,12 @@
           '<div class="toolbar-right">' +
             '<div class="toolbar-search">' +
               '<svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>' +
-              '<input type="text" placeholder="Search PSM campaigns..." id="psmSearchInput" oninput="psmSearchTerm=this.value; psmRenderDashboard()">' +
+              '<input type="text" placeholder="Search campaigns..." id="psmSearchInput" oninput="psmSearchTerm=this.value; psmRenderDashboard()">' +
             '</div>' +
           '</div>' +
         '</div>' +
         '<div class="kpi-row" id="psmKpiRow"></div>' +
         '<div class="charts-row" id="psmChartsRow"></div>' +
-        '<div class="panel-card"><h2>Customer Conversion Funnel <span style="font-size:12px;font-weight:400;color:#616161;">(rolled up across all campaigns)</span></h2><div style="font-size:12px;color:#616161;margin-bottom:12px;">Tenants moving from target list through to measured outcome \u2014 spot where deals stall across the portfolio.</div><div id="psmConvFunnel"></div></div>' +
-        '<div class="panel-card"><h2>Partner Benchmarking <span style="font-size:12px;font-weight:400;color:#616161;">(contact &amp; close rates across the funnel)</span></h2><div style="font-size:12px;color:#616161;margin-bottom:12px;">Compare partners on how effectively they move customers through the funnel \u2014 use it to spot best practices and coaching opportunities.</div><div id="psmBenchmark"></div></div>' +
-        '<div class="panel-card"><h2>Campaigns by Status</h2><div class="psm-funnel" id="psmFunnel"></div></div>' +
         '<div class="campaign-table-wrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
     }
@@ -1983,9 +1989,6 @@
       document.getElementById('psmSearchInput').value = psmSearchTerm;
       psmRenderKpis();
       psmRenderCharts();
-      psmRenderFunnel();
-      psmRenderConvFunnel();
-      psmRenderBenchmark();
 
       document.getElementById('psmCampaignTableHead').innerHTML =
         '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Tracked</th><th>Status</th><th>Goal</th><th>Net Seats</th><th>MAU Growth</th><th>Revenue</th></tr>';
@@ -2021,15 +2024,12 @@
       var netPaidSeats = psmCampaigns.reduce(function(sum, c) { return sum + (c.netPaidSeats || 0); }, 0);
 
       document.getElementById('psmKpiRow').innerHTML =
-        '<div class="kpi-tile"><span class="kpi-value">'+psmCampaigns.length+'</span><span class="kpi-label">Campaign Count</span></div>' +
+        '<div class="kpi-tile"><span class="kpi-value">'+psmCampaigns.length+'</span><span class="kpi-label">Campaigns</span></div>' +
+        '<div class="kpi-tile"><span class="kpi-value">'+partnerCount+'</span><span class="kpi-label">Active Partners</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+customersReached.toLocaleString()+'</span><span class="kpi-label">Customers Reached</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">+'+netPaidSeats.toLocaleString()+'</span><span class="kpi-label">Net Paid Seats</span></div>' +
         '<div class="kpi-tile"><span class="kpi-value">'+avgMau.toFixed(1)+'%</span><span class="kpi-label">MAU Growth</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(revenueTotal)+'</span><span class="kpi-label">Revenue Growth</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+partnerCount+'</span><span class="kpi-label">Partner Participation</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+completedCount+'</span><span class="kpi-label">Campaigns Completed</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(pipelineRevenue)+'</span><span class="kpi-label">Pipeline Value</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">62%</span><span class="kpi-label">Target Attainment</span></div>';
+        '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(revenueTotal)+'</span><span class="kpi-label">Revenue Growth</span></div>';
     }
 
     function psmRenderCharts() {
@@ -2126,11 +2126,10 @@
       psmEnrich(c);
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
-      var chip = 'display:inline-block;background:#eef3fb;border:1px solid #cfe0f5;color:#004578;border-radius:12px;padding:3px 10px;font-size:11px;margin:0 6px 6px 0;';
       var trackedPct = c.tenantCount ? Math.round((c.trackedCount / c.tenantCount) * 100) : 0;
       detail.innerHTML =
         '<div class="flyout-header">' +
-          '<span style="font-size:11px;color:#616161;">PSM Campaign Detail</span>' +
+          '<span style="font-size:11px;color:#616161;">Campaign Detail</span>' +
           '<button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button>' +
         '</div>' +
         '<div class="detail-header">' +
@@ -2140,41 +2139,92 @@
             '<div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div>' +
             '<div class="detail-meta-item"><strong>Region:</strong> '+c.region+'</div>' +
             '<div class="detail-meta-item"><strong>Workload:</strong> '+c.workload+'</div>' +
-            '<div class="detail-meta-item"><strong>Creation Approach:</strong> '+psmCreationModeById(c.creationMode).name+'</div>' +
             '<div class="detail-meta-item"><strong>Goals:</strong> '+psmEscapeHtml((c.goals && c.goals.length ? c.goals : [c.goal]).join(', '))+'</div>' +
             '<div class="detail-meta-item"><strong>Created:</strong> '+c.created+'</div>' +
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
         '</div>' +
-        '<div class="panel-card"><h2>Targeting Rationale</h2>' +
-          '<div style="font-size:13px;color:#242424;margin-bottom:8px;"><strong>Scenario:</strong> '+psmEscapeHtml(c.rationale.scenario)+'</div>' +
-          '<div style="font-size:13px;color:#424242;margin-bottom:12px;">'+psmEscapeHtml(c.rationale.profile)+'</div>' +
-          '<div style="font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">Assumptions / Prereqs</div>' +
-          '<div style="margin-bottom:12px;">'+c.rationale.prereqs.map(function(p){ return '<span style="'+chip+'">'+psmEscapeHtml(p)+'</span>'; }).join('')+'</div>' +
-          '<div style="font-size:12px;color:#616161;">Agreed targeting threshold / list size: <strong style="color:#242424;">'+c.rationale.listSize.toLocaleString()+' tenants</strong></div>' +
-        '</div>' +
-        '<div class="panel-card"><h2>Customer Lists &amp; Accountability</h2>' +
-          '<div style="font-size:13px;color:#424242;margin-bottom:12px;">Growth is only attributed once the partner declares activity, moving a tenant from the master list into the actively-tracked list. This weeds out overlapping-partner (CPOR) growth the partner did not drive.</div>' +
-          '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
-            '<div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Master Customer List</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+c.tenantCount.toLocaleString()+'</div><div style="font-size:11px;color:#616161;margin-top:2px;">All tenants in the campaign</div></div>' +
-            '<div style="background:#e8f4ec;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">Actively Tracked</div><div style="font-size:20px;font-weight:600;margin-top:4px;color:#107c10;">'+c.trackedCount.toLocaleString()+'</div><div style="font-size:11px;color:#616161;margin-top:2px;">Partner-declared &middot; growth counted</div></div>' +
-            '<div style="background:#f3f2f1;padding:12px 16px;border-radius:6px;flex:1;min-width:140px;"><div style="font-size:11px;color:#616161;text-transform:uppercase;">% Actioned</div><div style="font-size:20px;font-weight:600;margin-top:4px;">'+trackedPct+'%</div><div style="font-size:11px;color:#616161;margin-top:2px;">Master \u2192 tracked</div></div>' +
-          '</div>' +
-        '</div>' +
-        psmRenderSignalsPanel(c) +
-        psmRenderProgressionPanel(c) +
-        psmRenderLogActivityPanel(c) +
-        '<div class="panel-card"><h2>Performance Metrics</h2><div class="psm-metric-grid">' +
+        '<div class="panel-card"><h2>Performance</h2><div class="psm-metric-grid">' +
           '<div class="psm-metric-card"><span class="label">Net Paid Seats</span><span class="value">'+(c.netPaidSeats ? '+'+c.netPaidSeats.toLocaleString() : '0')+'</span></div>' +
-          '<div class="psm-metric-card"><span class="label">MAU Change (Adoption)</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div>' +
+          '<div class="psm-metric-card"><span class="label">MAU Change</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div>' +
-          '<div class="psm-metric-card"><span class="label">Engagement Score</span><span class="value">'+c.engagement+'</span></div>' +
+          '<div class="psm-metric-card"><span class="label">Tenants Actioned</span><span class="value">'+(c.trackedCount||0).toLocaleString()+' <span style="font-size:12px;color:#616161;">/ '+c.tenantCount.toLocaleString()+' ('+trackedPct+'%)</span></span></div>' +
         '</div></div>' +
-        psmRenderOfferImpactPanel() +
-        psmRenderExecSummaryPanel(c) +
-        (c.status === 'Completed' ? '<div class="panel-card"><h2>Campaign Outcome Summary</h2><div class="psm-detail-grid"><div><strong>Activities Delivered</strong><div style="margin-top:6px;color:#616161;">Pre-sales consultation, Email outreach, Webinar series, Post-sales enablement</div></div><div><strong>GTM Attach</strong><div style="margin-top:6px;color:#616161;">3 new GTM motions activated</div></div><div><strong>Partner Feedback</strong><div style="margin-top:6px;color:#616161;">Campaign well-structured. Tenant list quality was high. Recommend expanding to adjacent workloads.</div></div><div><strong>Next Steps</strong><div style="margin-top:6px;color:#616161;">Evaluate expansion campaign for upsell opportunities identified during outreach.</div></div></div></div>' : '') +
+        psmRenderTenantWorkspace(c) +
         '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
-        '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance Note:</strong> Campaign data shared with partners is limited to tenant identifiers and recommended actions. Customer usage metrics (MAU, PAU) are visible to Microsoft users only and are not exposed to partner views.</div>';
+        '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:10px 14px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance:</strong> Customer usage signals (MAU, PAU, seat penetration) are visible to Microsoft field users only and are not exposed to partner views.</div>';
+    }
+
+    function psmRenderTenantWorkspace(c) {
+      psmEnrich(c);
+      var sc = psmScenarioForCampaign(c);
+      var stageOptions = function(sel) {
+        return PSM_PROGRESSION_STAGES.map(function(s){ return '<option value="'+s.key+'"'+(s.key === sel ? ' selected' : '')+'>'+s.label+'</option>'; }).join('');
+      };
+      var stageBulkOptions = PSM_PROGRESSION_STAGES.map(function(s){ return '<option value="'+s.key+'">'+s.label+'</option>'; }).join('');
+      var rows = (c.customers || []).map(function(cust, idx) {
+        var pr = cust.priority || 'Medium';
+        var util = cust.paidUtil != null ? cust.paidUtil : 0;
+        var utilColor = util < 55 ? '#a4262c' : (util > 80 ? '#0f7b0f' : '#8a6d00');
+        return '<tr>' +
+          '<td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+idx+'"></td>' +
+          '<td><strong>'+psmEscapeHtml(cust.name)+'</strong></td>' +
+          '<td style="text-align:right;">'+(cust.seatPen != null ? cust.seatPen+'%' : '\u2014')+'</td>' +
+          '<td style="text-align:right;color:'+utilColor+';font-weight:600;">'+util+'%</td>' +
+          '<td style="text-align:right;">'+(cust.whitespace != null ? cust.whitespace.toLocaleString()+' seats' : '\u2014')+'</td>' +
+          '<td style="text-align:center;"><span class="psm-pri psm-pri-'+pr.toLowerCase()+'">'+pr+'</span></td>' +
+          '<td><select onchange="psmSetCustomerStage(\''+c.id+'\','+idx+',this.value)">'+stageOptions(cust.stage)+'</select></td>' +
+          '<td style="text-align:center;"><input type="checkbox" '+(cust.license ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'license\',this.checked)"></td>' +
+          '<td style="text-align:center;"><input type="checkbox" '+(cust.services ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'services\',this.checked)"></td>' +
+        '</tr>';
+      }).join('');
+      return '<div class="panel-card"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:12px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Use the <strong>ASPX signals</strong> (seat penetration, paid utilization, whitespace) to focus the partner on the highest-opportunity tenants \u2014 low utilization or large whitespace = highest priority.</div>' +
+        '<div class="psm-bulk-bar">' +
+          '<span class="psm-bulk-label">Bulk update selected tenants:</span>' +
+          '<select id="psmBulkStage">'+stageBulkOptions+'</select>' +
+          '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmBulkApplyStage(\''+c.id+'\')">Apply stage</button>' +
+          '<span style="flex:1;"></span>' +
+          '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'CRM sync requested \u2014 stages refresh from partner CRM\')">Sync from CRM</button>' +
+          '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'Exported \u2014 send to partner for periodic review\')">Export for Excel review</button>' +
+        '</div>' +
+        '<table class="psm-cust-table psm-workspace-table"><thead><tr>' +
+          '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
+          '<th>Customer</th>' +
+          '<th style="text-align:right;">Seat Pen.<br><span class="psm-th-sub">PAU / eligible</span></th>' +
+          '<th style="text-align:right;">Paid Util.<br><span class="psm-th-sub">MAU / PAU</span></th>' +
+          '<th style="text-align:right;">Whitespace<br><span class="psm-th-sub">unsold seats</span></th>' +
+          '<th style="text-align:center;">Priority</th>' +
+          '<th>Stage</th>' +
+          '<th style="text-align:center;">License</th>' +
+          '<th style="text-align:center;">Services</th>' +
+        '</tr></thead><tbody>'+rows+'</tbody></table>' +
+        '<div style="margin-top:10px;font-size:11px;color:#616161;">Update tenants individually inline, or select rows and apply a stage in bulk. Signals are illustrative ASPX data (seat penetration, paid utilization, whitespace).</div>' +
+      '</div>';
+    }
+
+    function psmToggleSelectAll(checked) {
+      var boxes = document.querySelectorAll('.psm-cust-check');
+      for (var i = 0; i < boxes.length; i++) boxes[i].checked = checked;
+    }
+
+    function psmBulkApplyStage(id) {
+      var c = psmCampaigns.filter(function(x){ return x.id === id; })[0];
+      if (!c) return;
+      var stage = document.getElementById('psmBulkStage').value;
+      var boxes = document.querySelectorAll('.psm-cust-check:checked');
+      if (!boxes.length) { showToast('Select at least one tenant first', true); return; }
+      var stageLabel = (PSM_PROGRESSION_STAGES.filter(function(s){return s.key===stage;})[0] || {}).label;
+      var atSale = ['saleClosed', 'outcomeMeasured'].indexOf(stage) > -1;
+      for (var i = 0; i < boxes.length; i++) {
+        var idx = parseInt(boxes[i].getAttribute('data-idx'), 10);
+        if (c.customers && c.customers[idx]) {
+          c.customers[idx].stage = stage;
+          if (atSale && !c.customers[idx].license) c.customers[idx].license = true;
+        }
+      }
+      showToast('Updated ' + boxes.length + ' tenant' + (boxes.length === 1 ? '' : 's') + ' \u2192 ' + stageLabel);
+      psmRenderDetail();
     }
 
     function psmRenderSignalsPanel(c) {
@@ -2377,7 +2427,7 @@
       showModal('psmWizardModal');
     }
 
-    var PSM_WIZARD_STEPS = ['Approach', 'Campaign', 'Partner', 'Targeting', 'Goal', 'Rationale', 'Review'];
+    var PSM_WIZARD_STEPS = ['Partner', 'Goal', 'Targeting', 'Review'];
 
     function psmRenderWizard() {
       var step = psmWizardState.step;
@@ -2425,27 +2475,18 @@
 
     function psmBuildWizardStep(step) {
       var label = PSM_WIZARD_STEPS[step - 1];
-      if (label === 'Approach') {
-        var cards = PSM_CREATION_MODES.map(function(m) {
-          var sel = psmWizardState.creationMode === m.id;
-          return '<div class="psm-approach-card'+(sel ? ' selected' : '')+'" onclick="psmSelectApproach(\''+m.id+'\')">' +
-            '<div class="ap-name">'+m.name+'</div>' +
-            '<div class="ap-desc">'+m.desc+'</div>' +
-            '<div class="ap-detail">'+m.detail+'</div>' +
-          '</div>';
-        }).join('');
-        return '<div class="form-group"><label>Who is building this campaign?</label>' +
-          '<div style="font-size:12px;color:#616161;margin-bottom:10px;">Campaigns are created in ASPXI. Choose how the target list gets built \u2014 this reflects partner maturity and who holds the account context.</div>' +
-          cards + '</div>';
-      }
-      if (label === 'Campaign') {
-        return '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="Enter campaign name"></div>';
-      }
       if (label === 'Partner') {
         var options = psmGetPartners().map(function(partner) {
           return '<option value="'+partner+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+partner+'</option>';
         }).join('');
-        return '<div class="form-group"><label>Partner Selection</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:8px;">Default region: '+psmGetRegionForPartner(psmWizardState.partner)+'</div><div style="font-size:12px;color:#0f5132;margin-top:12px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one partner.</strong> Keeping a single partner per campaign makes reporting and accountability clean. Running a different outreach motion with this partner later? Create a new campaign for it.</div><div style="font-size:12px;color:#616161;margin-top:12px;padding:10px;background:#f9f9f9;border-radius:4px;"><strong>Partner Personas:</strong> Alliance Manager (reviews and accepts), Sales Lead (executes outreach), Marketing Lead (runs campaigns/webinars). All will have visibility once campaign is assigned.</div></div>';
+        return '<div class="form-group"><label>Partner</label><select onchange="psmWizardState.partner=this.value; psmRenderWizard()">'+options+'</select><div style="font-size:12px;color:#616161;margin-top:6px;">Region: '+psmGetRegionForPartner(psmWizardState.partner)+'. You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner.</div></div>' +
+          '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 Copilot Free-to-Paid"></div>';
+      }
+      if (label === 'Goal') {
+        var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
+        var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
+        return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div style="font-size:12px;color:#616161;margin-bottom:8px;">Primary tracked outcomes are net paid seats and adoption (MAU). The first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
+          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
       }
       if (label === 'Targeting') {
         var cards = PSM_SCENARIOS.map(function(s) {
@@ -2472,28 +2513,17 @@
             aiExtra +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Targeting Approach</label><div style="font-size:12px;color:#0f5132;margin-bottom:10px;padding:10px;background:#e8f4ec;border:1px solid #cfe7d8;border-radius:4px;"><strong>One campaign = one targeting motion.</strong> Focus on one target audience and one solution play. Avoid bundling 5+ workloads \u2014 generic M365 targeting is out of scope for PSM referrals.</div><div style="font-size:12px;color:#616161;margin-bottom:10px;"><strong>Recommended starting points</strong> are pre-filtered from lists already created in PRM \u2014 tweak them rather than building from scratch. Or let the AI agent assemble a ranked list, or build manually. You can refine the list afterward.</div>'+cards+'</div>';
-      }
-      if (label === 'Goal') {
-        var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
-        var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
-        return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div style="font-size:12px;color:#616161;margin-bottom:8px;">The two primary tracked outcomes are net paid seats and adoption (MAU). A campaign can pursue multiple goals \u2014 the first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
-          '<div class="form-group"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select><div style="font-size:12px;color:#616161;margin-top:6px;">Pick the single solution play for this campaign. Need to run a different workload with this partner? Create a separate campaign.</div></div>';
-      }
-      if (label === 'Rationale') {
-        return '<div class="form-group"><label>Targeting Threshold / List Size</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" placeholder="e.g. 35 or 500"><div style="font-size:12px;color:#616161;margin-top:6px;">Agreed number of tenants to target with the partner.</div></div>' +
-          '<div class="form-group"><label>Customer Profile / Rationale</label><textarea style="width:100%;min-height:90px;padding:8px;border:1px solid #d1d1d1;border-radius:4px;font-family:inherit;font-size:13px;" oninput="psmWizardState.rationaleProfile=this.value" placeholder="Why these accounts? e.g. >300 seats, Frontier program, Foundry revenue">'+psmEscapeHtml(psmWizardState.rationaleProfile)+'</textarea><div style="font-size:12px;color:#616161;margin-top:6px;">Shown to the partner so they understand who is on the list and why.</div></div>';
+        return '<div class="form-group"><label>Build the target list</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Start from a PRM pre-filtered list (recommended), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
+          '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
       }
       return '<div class="psm-wizard-review">' +
-        '<div>Creation Approach</div><div>'+psmCreationModeById(psmWizardState.creationMode).name+'</div>' +
-        '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
         '<div>Partner</div><div>'+psmEscapeHtml(psmWizardState.partner || '\u2014')+'</div>' +
+        '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
-        '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
-        '<div>List Size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
         '<div>Goal</div><div>'+((psmWizardState.goals && psmWizardState.goals.length) ? psmEscapeHtml(psmWizardState.goals.join(', ')) : '\u2014')+'</div>' +
         '<div>Workload</div><div>'+psmWizardState.workload+'</div>' +
-        '<div>Rationale</div><div>'+psmEscapeHtml(psmWizardState.rationaleProfile || '\u2014')+'</div>' +
+        '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
+        '<div>List Size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
         '<div>Launch Status</div><div>Draft</div>' +
       '</div>';
     }
@@ -2511,13 +2541,9 @@
 
     function psmNextWizardStep() {
       var label = PSM_WIZARD_STEPS[psmWizardState.step - 1];
-      if (label === 'Campaign' && !psmWizardState.name.trim()) {
-        showToast('Campaign name is required', true);
-        return;
-      }
-      if (label === 'Partner' && !psmWizardState.partner) {
-        showToast('Partner selection is required', true);
-        return;
+      if (label === 'Partner') {
+        if (!psmWizardState.partner) { showToast('Partner selection is required', true); return; }
+        if (!psmWizardState.name.trim()) { showToast('Campaign name is required', true); return; }
       }
       if (psmWizardState.step < PSM_WIZARD_STEPS.length) psmWizardState.step += 1;
       psmRenderWizard();
@@ -2561,6 +2587,7 @@
         executionType: psmGetExecutionType(listSize)
       };
       newCampaign.progression = psmBuildProgression(newCampaign, psmSeed(newCampaign));
+      newCampaign.customers = psmBuildCustomers(newCampaign, psmSeed(newCampaign));
       psmCampaigns.unshift(newCampaign);
       hideModal('psmWizardModal');
       psmSearchTerm = '';
@@ -2786,7 +2813,11 @@
         else if (c.status === 'Accepted') stageIdx = r < 7 ? 0 : 1;
         else stageIdx = Math.min(stageKeys.length - 1, Math.floor(r / 2));
         var atSale = stageIdx >= 3;
-        out.push({ name: names[(seed + i) % names.length], stage: stageKeys[stageIdx], license: atSale, services: atSale && ((seed + i) % 2 === 0) });
+        var seatPen = 20 + ((seed + i * 7) % 70);
+        var paidUtil = 30 + ((seed + i * 5) % 65);
+        var whitespace = 15 + ((seed + i * 11) % 24) * 10;
+        var priority = (paidUtil < 55 || whitespace > 150) ? 'High' : ((paidUtil > 80 && whitespace < 60) ? 'Low' : 'Medium');
+        out.push({ name: names[(seed + i) % names.length], stage: stageKeys[stageIdx], license: atSale, services: atSale && ((seed + i) % 2 === 0), seatPen: seatPen, paidUtil: paidUtil, whitespace: whitespace, priority: priority });
       }
       return out;
     }
