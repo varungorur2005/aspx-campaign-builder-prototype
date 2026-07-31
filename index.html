@@ -199,7 +199,7 @@
       position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 9000;
     }
     .fre-tooltip {
-      position: absolute; z-index: 9001;
+      position: absolute; z-index: 9020;
       background: #fff; border-radius: 8px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.25);
       padding: 20px; max-width: 320px; min-width: 260px;
@@ -327,6 +327,7 @@
       overflow-y: auto; padding: 20px 24px 80px; z-index: 301;
     }
     .detail-view.show { transform: translateX(0); }
+    .detail-view.fre-active { z-index: 9001; }
     .flyout-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px;
@@ -2198,7 +2199,7 @@
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
         '</div>' +
-        '<div class="panel-card"><h2>Performance</h2><div class="psm-metric-grid">' +
+        '<div class="panel-card" id="psmPerfPanel"><h2>Performance</h2><div class="psm-metric-grid">' +
           '<div class="psm-metric-card"><span class="label">Net Paid Seats</span><span class="value">'+(c.netPaidSeats ? '+'+c.netPaidSeats.toLocaleString() : '0')+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">MAU Change</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div>' +
@@ -2206,7 +2207,7 @@
         '</div>' +
         '</div>' +
         psmRenderTenantWorkspace(c) +
-        '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
+        '<div class="panel-card" id="psmTimelinePanel"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
         '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:10px 14px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance:</strong> Customer usage signals (MAU, PAU, seat penetration) are visible to Microsoft field users only and are not exposed to partner views.</div>';
     }
 
@@ -2241,9 +2242,9 @@
           '<td><input type="text" class="psm-cust-comment" value="'+psmEscapeHtml(cust.comments || '')+'" oninput="psmSaveCustomerComment(\''+c.id+'\','+idx+',this.value)" placeholder="Partner comment\u2026"></td>' +
         '</tr>';
       }).join('');
-      return '<div class="panel-card"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
+      return '<div class="panel-card" id="psmWorkspacePanel"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
         '<div style="font-size:13px;color:#424242;margin-bottom:12px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Use the <strong>ASPX signals</strong> (Copilot MAU whitespace, free\u2192paid whitespace, agents MAU, tenant health) to focus the partner on the highest-opportunity tenants. Columns mirror the offline PSM tracking sheet so partners see a familiar view.</div>' +
-        '<div class="psm-bulk-bar">' +
+        '<div class="psm-bulk-bar" id="psmBulkBar">' +
           '<span class="psm-bulk-label">Bulk update selected tenants:</span>' +
           '<select id="psmBulkStage">'+stageBulkOptions+'</select>' +
           '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmBulkApplyStage(\''+c.id+'\')">Apply stage</button>' +
@@ -4359,8 +4360,27 @@
     var freCurrentStep = 0;
     var freSteps = [];
     var freStartTimer = null;
+    var freStepTimer = null;
+
+    function psmTourOpenFlyout() {
+      var dv = document.getElementById('detailView');
+      if (!dv) return;
+      if (!dv.classList.contains('show')) {
+        var first = (typeof psmCampaigns !== 'undefined' && psmCampaigns[0]) ? psmCampaigns[0].id : null;
+        if (first) psmOpenDetail(first);
+      }
+      dv.classList.add('fre-active');
+    }
+
+    function psmTourCloseFlyout() {
+      var dv = document.getElementById('detailView');
+      if (!dv) return;
+      dv.classList.remove('fre-active');
+      dv.classList.remove('show');
+    }
 
     function clearFreElements() {
+      if (freStepTimer) { clearTimeout(freStepTimer); freStepTimer = null; }
       var existing = document.querySelectorAll('.fre-overlay, .fre-tooltip');
       existing.forEach(function(el) { el.remove(); });
       var highlighted = document.querySelectorAll('.fre-highlight');
@@ -4425,8 +4445,52 @@
         steps.push({
           target: '#psmCampaignTableBody .campaign-id-link',
           title: '6. Open a campaign',
-          text: 'Click any Campaign ID to open the full workspace, where you can bulk-update or individually update tenants, confirm ASPX signals, log offers, and review performance.',
-          arrow: 'left'
+          text: 'Click any Campaign ID to open the full workspace. Let\u2019s take a look inside \u2014 there\u2019s a lot here.',
+          arrow: 'left',
+          before: psmTourCloseFlyout
+        });
+        steps.push({
+          target: '.detail-header',
+          title: 'Campaign overview',
+          text: 'The top of the flyout summarizes the campaign: partner, region, workloads, goals, created date, and current status.',
+          arrow: 'right',
+          before: psmTourOpenFlyout,
+          settle: 360
+        });
+        steps.push({
+          target: '#psmPerfPanel',
+          title: 'Performance at a glance',
+          text: 'Headline results for this campaign \u2014 net paid seats, MAU change, revenue change, and how many tenants have been actioned out of the total.',
+          arrow: 'right',
+          before: psmTourOpenFlyout
+        });
+        steps.push({
+          target: '#psmWorkspacePanel',
+          title: 'Tenant Workspace + ASPX signals',
+          text: 'The heart of the flyout. Each targeted tenant with ASPX signals \u2014 Copilot opportunity, tenant health, Copilot MAU whitespace, free\u2192paid whitespace, agents MAU \u2014 plus the recommended MCI, so you can focus the partner on the highest-opportunity customers.',
+          arrow: 'right',
+          before: psmTourOpenFlyout
+        });
+        steps.push({
+          target: '#psmBulkBar',
+          title: 'Bulk vs. individual updates',
+          text: 'Select tenants and apply a stage or mark agreement in bulk, or sync from CRM / export for Excel review. You can also update any single tenant inline \u2014 change its Stage, toggle Agreement, or add a comment right in the row.',
+          arrow: 'right',
+          before: psmTourOpenFlyout
+        });
+        steps.push({
+          target: '#psmTimelinePanel',
+          title: 'Activity timeline',
+          text: 'A running history of everything that\u2019s happened on the campaign \u2014 stage changes, offers logged, and signal confirmations, with who did what and when.',
+          arrow: 'right',
+          before: psmTourOpenFlyout
+        });
+        steps.push({
+          target: '.detail-view .flyout-close',
+          title: 'Close when you\u2019re done',
+          text: 'Close the flyout to return to your campaign list. You can reopen this tour anytime with the \u201cTake a tour\u201d button.',
+          arrow: 'right',
+          before: psmTourOpenFlyout
         });
       } else {
         steps.push({
@@ -4470,6 +4534,7 @@
 
     function startFre() {
       if (freCompleted) return;
+      psmTourCloseFlyout();
       freSteps = getFreSteps();
       if (!freSteps.length) return;
       freCurrentStep = 0;
@@ -4483,6 +4548,22 @@
         freCompleted = true;
         return;
       }
+
+      var step = freSteps[freCurrentStep];
+      if (typeof step.before === 'function') {
+        try { step.before(); } catch (e) {}
+      }
+
+      if (step.settle) {
+        if (freStepTimer) clearTimeout(freStepTimer);
+        freStepTimer = setTimeout(function() { freStepTimer = null; renderFreStep(); }, step.settle);
+      } else {
+        renderFreStep();
+      }
+    }
+
+    function renderFreStep() {
+      if (freCurrentStep >= freSteps.length) { freCompleted = true; return; }
 
       var step = freSteps[freCurrentStep];
       var targetEl = step.targetFinder ? step.targetFinder() : document.querySelector(step.target);
@@ -4574,6 +4655,8 @@
     function dismissFre() {
       freCompleted = true;
       clearFreElements();
+      var dv = document.getElementById('detailView');
+      if (dv) dv.classList.remove('fre-active');
     }
 
     //  INIT 
