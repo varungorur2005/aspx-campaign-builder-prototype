@@ -314,7 +314,7 @@
        ============================================================ */
     .detail-view {
       position: fixed; top: 48px; right: 0; bottom: 0;
-      width: 620px; max-width: 50vw; background: #fff;
+      width: 1180px; max-width: 94vw; background: #fff;
       box-shadow: -4px 0 24px rgba(0,0,0,0.15);
       border-left: 1px solid #e0e0e0;
       transform: translateX(100%); transition: transform 0.25s ease;
@@ -543,6 +543,20 @@
       display: grid; grid-template-columns: 160px 1fr; gap: 10px 14px; font-size: 13px;
     }
     .psm-wizard-review div:nth-child(odd) { color: #616161; font-weight: 600; }
+    /* PSM wizard layout */
+    #psmWizardModal .modal { display: flex; flex-direction: column; max-height: 90vh; }
+    #psmWizardModal h3 { margin-bottom: 4px; }
+    #psmWizardModal > .modal > p { margin-bottom: 14px; }
+    #psmWizardBody { flex: 1 1 auto; overflow-y: auto; padding-right: 6px; margin-bottom: 4px; }
+    #psmWizardBody .form-group { margin-bottom: 22px; }
+    #psmWizardBody .form-group:last-child { margin-bottom: 4px; }
+    #psmWizardBody label { display: block; font-size: 13px; font-weight: 600; color: #242424; margin-bottom: 6px; }
+    #psmWizardModal .btn-group { margin-top: 18px; padding-top: 16px; border-top: 1px solid #edebe9; }
+    .psm-wiz-hint { font-size: 12px; color: #616161; margin-bottom: 10px; line-height: 1.45; }
+    .psm-wiz-note { font-size: 12px; color: #004578; background: #eef3fb; border: 1px solid #cfe0f5; border-radius: 6px; padding: 9px 12px; margin-top: 8px; line-height: 1.45; }
+    .psm-wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 18px; max-height: 220px; overflow-y: auto; border: 1px solid #edebe9; border-radius: 6px; padding: 12px 14px; }
+    .psm-wl-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 400; margin-bottom: 0; color: #242424; }
+    #psmWizardBody .radio-group label { display: flex; align-items: center; gap: 8px; font-weight: 400; margin-bottom: 0; }
     /* PSM Getting-started guide */
     .psm-guide {
       border: 1px solid #cfe0f5; border-radius: 10px; background: linear-gradient(180deg,#f7fbff,#eef4fc);
@@ -960,8 +974,8 @@
   </div>
 
   <div class="modal-overlay" id="psmWizardModal">
-    <div class="modal" style="width:560px;">
-      <h3>Create PSM Campaign</h3>
+    <div class="modal" style="width:600px;">
+      <h3>Create campaign for a partner</h3>
       <p id="psmWizardStepLabel">Step 1 of 5</p>
       <div class="psm-wizard-stepper" id="psmWizardStepper"></div>
       <div id="psmWizardBody"></div>
@@ -2604,9 +2618,10 @@
       if (label === 'Partner') {
         var idType = psmWizardState.partnerIdType || 'PartnerOneID';
         var watermark = idType === 'MPNID' ? 'Enter one or more MPNIDs (comma separated)' : 'Enter a single PartnerOneID';
-        return '<div class="form-group"><label>Partner Picker</label>' +
+        return '<div class="form-group"><label>Partner</label>' +
+          '<div class="psm-wiz-hint">You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner.</div>' +
           '<div style="display:flex;gap:8px;align-items:stretch;">' +
-            '<select style="max-width:170px;" onchange="psmWizardState.partnerIdType=this.value; psmRenderWizard()">' +
+            '<select style="max-width:160px;" onchange="psmWizardState.partnerIdType=this.value; psmRenderWizard()">' +
               '<option value="PartnerOneID"'+(idType === 'PartnerOneID' ? ' selected' : '')+'>PartnerOneID</option>' +
               '<option value="MPNID"'+(idType === 'MPNID' ? ' selected' : '')+'>MPNID</option>' +
             '</select>' +
@@ -2615,17 +2630,17 @@
               '<input type="text" value="'+psmEscapeHtml(psmWizardState.partnerQuery || '')+'" placeholder="'+watermark+'" oninput="psmWizardState.partnerQuery=this.value; psmWizardState.partner=this.value">' +
             '</div>' +
           '</div>' +
-          '<div style="font-size:12px;color:#616161;margin-top:6px;">You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner. Only MPN IDs linked to an active PRM record (FastTrack / Partner Community) can be referred.</div></div>' +
-          '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 M365 Copilot Growth FY26"><div style="font-size:12px;color:#616161;margin-top:6px;">Tip: match the name to your <strong>PRM engagement</strong> so Referral Ops can reconcile it quickly.</div></div>';
+          '<div class="psm-wiz-note">Only MPN IDs linked to an active PRM record (FastTrack / Partner Community) can be referred.</div></div>' +
+          '<div class="form-group"><label>Campaign name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 M365 Copilot Growth FY26"><div class="psm-wiz-hint" style="margin-top:6px;margin-bottom:0;">Tip: match the name to your <strong>PRM engagement</strong> so Referral Ops can reconcile it quickly.</div></div>';
       }
       if (label === 'Goal') {
         var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
         var selWorkloads = psmWizardState.workloads || [];
-        var workloadBoxes = PSM_FTOP_WORKLOADS.map(function(w) { return '<label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" value="'+psmEscapeHtml(w)+'"'+(selWorkloads.indexOf(w) > -1 ? ' checked' : '')+' onchange="psmToggleWorkload(this.value, this.checked)"> '+psmEscapeHtml(w)+'</label>'; }).join('');
-        return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div style="font-size:12px;color:#616161;margin-bottom:8px;">Primary tracked outcomes are net paid seats and adoption (MAU). The first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
-          '<div class="form-group" style="margin-top:20px;"><label>Workloads <span style="font-weight:400;color:#616161;">(select one or more \u2014 use exact FTOP names)</span></label>' +
-          '<div style="font-size:12px;color:#616161;margin-bottom:8px;">Referrals are created in <strong>FTOP</strong>, so workloads must use FTOP names (e.g. ASPX \u201CCopilot (Licensed)\u201D \u2192 \u201CMicrosoft 365 Copilot\u201D; \u201CEXO\u201D \u2192 \u201CExchange\u201D). Keep the workload count focused for clean partner attribution.</div>' +
-          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;max-height:230px;overflow:auto;border:1px solid #edebe9;border-radius:6px;padding:12px;">'+workloadBoxes+'</div></div>';
+        var workloadBoxes = PSM_FTOP_WORKLOADS.map(function(w) { return '<label><input type="checkbox" value="'+psmEscapeHtml(w)+'"'+(selWorkloads.indexOf(w) > -1 ? ' checked' : '')+' onchange="psmToggleWorkload(this.value, this.checked)"> '+psmEscapeHtml(w)+'</label>'; }).join('');
+        return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div class="psm-wiz-hint">Primary tracked outcomes are net paid seats and adoption (MAU). The first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
+          '<div class="form-group"><label>Workloads <span style="font-weight:400;color:#616161;">(select one or more \u2014 use exact FTOP names)</span></label>' +
+          '<div class="psm-wl-grid">'+workloadBoxes+'</div>' +
+          '<div class="psm-wiz-note">Referrals are created in <strong>FTOP</strong>, so workloads use FTOP names (e.g. ASPX \u201CCopilot (Licensed)\u201D \u2192 \u201CMicrosoft 365 Copilot\u201D; \u201CEXO\u201D \u2192 \u201CExchange\u201D). Keep the count focused for clean attribution.</div></div>';
       }
       if (label === 'Targeting') {
         var cards = PSM_SCENARIOS.map(function(s) {
@@ -2671,20 +2686,20 @@
             aiExtra +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Build the target list</label><div style="font-size:12px;color:#616161;margin-bottom:10px;">Start from a recommended list (edit the criteria and tenant list with the pencil icon), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
-          '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
+        return '<div class="form-group"><label>Build the target list</label><div class="psm-wiz-hint">Start from a recommended list (edit the criteria and tenant list with the pencil icon), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
+          '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;font-weight:400;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
       }
       return '<div class="psm-wizard-review">' +
         '<div>Partner</div><div>'+psmEscapeHtml(psmWizardState.partner || '\u2014')+'</div>' +
-        '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
+        '<div>Campaign name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
         '<div>Goal</div><div>'+((psmWizardState.goals && psmWizardState.goals.length) ? psmEscapeHtml(psmWizardState.goals.join(', ')) : '\u2014')+'</div>' +
         '<div>Workloads (FTOP)</div><div>'+((psmWizardState.workloads && psmWizardState.workloads.length) ? psmEscapeHtml(psmWizardState.workloads.join(', ')) : '\u2014')+'</div>' +
         '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
-        '<div>List Size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
-        '<div>Launch Status</div><div>Submitted to Referral Ops</div>' +
+        '<div>List size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
+        '<div>Launch status</div><div>Submitted to Referral Ops</div>' +
         '</div>' +
-        '<div style="margin-top:14px;background:#eef3fb;border:1px solid #cfe0f5;border-radius:6px;padding:10px 14px;font-size:11px;color:#004578;"><strong>What happens next:</strong> Submitting sends a request to the Referral Ops team, who create the campaign in FTOP (system of record) \u2014 typically within <strong>3 business days</strong> (up to 10 calendar days if new tenants must be created). A tenant + workload pair can\u2019t be added to a new referral until <strong>14 days</strong> after its first campaign, to protect attribution.</div>';
+        '<div class="psm-wiz-note" style="margin-top:16px;"><strong>What happens next:</strong> Submitting sends a request to the Referral Ops team, who create the campaign in FTOP (system of record) \u2014 typically within <strong>3 business days</strong> (up to 10 calendar days if new tenants must be created). A tenant + workload pair can\u2019t be added to a new referral until <strong>14 days</strong> after its first campaign, to protect attribution.</div>';
     }
 
     function psmAiPreviewHtml() {
