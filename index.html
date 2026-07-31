@@ -657,6 +657,10 @@
     .psm-th-sub { display:block; font-weight:400; text-transform:none; letter-spacing:0; font-size:10px; color:#8a8886; }
     .psm-workspace-table th { vertical-align: bottom; }
     .psm-workspace-table tbody tr:hover { background:#f7fbff; }
+    .psm-workspace-scroll { overflow-x:auto; border:1px solid #f0f0f0; border-radius:6px; }
+    .psm-workspace-table { min-width:1500px; }
+    .psm-workspace-table th, .psm-workspace-table td { white-space:nowrap; }
+    .psm-cust-comment { width:150px; padding:4px 6px; font-size:12px; border:1px solid #d1d1d1; border-radius:4px; font-family:inherit; }
     .psm-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:#f3f7fb; border:1px solid #d6e3f2; border-radius:6px; padding:8px 12px; margin-bottom:12px; }
     .psm-bulk-label { font-size:12px; font-weight:600; color:#004578; }
     .psm-bulk-bar select { padding:5px 8px; font-size:12px; border:1px solid #d1d1d1; border-radius:4px; }
@@ -966,7 +970,7 @@
         <div style="display:flex;gap:8px;">
           <button class="btn btn-secondary" onclick="hideModal('psmWizardModal')">Cancel</button>
           <button class="btn btn-primary" id="psmWizardNextBtn" onclick="psmNextWizardStep()">Next</button>
-          <button class="btn btn-primary" id="psmWizardLaunchBtn" onclick="psmLaunchCampaign()" style="display:none;">Launch</button>
+          <button class="btn btn-primary" id="psmWizardLaunchBtn" onclick="psmLaunchCampaign()" style="display:none;">Submit to Referral Ops</button>
         </div>
       </div>
     </div>
@@ -1293,14 +1297,14 @@
     ];
 
     const psmCampaigns = [
-      { id: 'PSM-001', name: 'Copilot Growth - West US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 245, status: 'Active', goal: 'MAU Growth', created: '2026-05-15', mauGrowth: 12.4, revenueGrowth: '$45K', engagement: 78, executionType: 'Bulk' },
-      { id: 'PSM-002', name: 'SharePoint Adoption - EMEA', partner: 'Fabrikam Inc', region: 'EMEA', workload: 'SharePoint', tenantCount: 180, status: 'Measuring', goal: 'Adoption', created: '2026-04-22', mauGrowth: 8.7, revenueGrowth: '$32K', engagement: 65, executionType: 'Hybrid', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
-      { id: 'PSM-003', name: 'Teams Phone Upsell - ANZ', partner: 'Woodgrove Bank', region: 'APAC', workload: 'Teams', tenantCount: 92, status: 'Active', goal: 'Upsell', created: '2026-05-01', mauGrowth: 15.2, revenueGrowth: '$78K', engagement: 82, executionType: 'Hybrid' },
-      { id: 'PSM-004', name: 'M365 E5 Upgrade - Central', partner: 'Adventure Works', region: 'Americas', workload: 'M365', tenantCount: 520, status: 'Accepted', goal: 'Revenue Growth', created: '2026-06-01', mauGrowth: 0, revenueGrowth: '$0', engagement: 25, executionType: 'Bulk' },
-      { id: 'PSM-005', name: 'Security Posture - India', partner: 'Litware Inc', region: 'APAC', workload: 'Security', tenantCount: 310, status: 'Completed', goal: 'GTM Attach', created: '2026-03-10', mauGrowth: 22.1, revenueGrowth: '$120K', engagement: 95, executionType: 'Bulk', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
-      { id: 'PSM-006', name: 'Viva Engage Rollout - UK', partner: 'Proseware Ltd', region: 'EMEA', workload: 'Viva', tenantCount: 24, status: 'Draft', goal: 'Adoption', created: '2026-06-18', mauGrowth: 0, revenueGrowth: '$0', engagement: 0, executionType: 'Targeted' },
-      { id: 'PSM-007', name: 'Copilot Expansion - East US', partner: 'Contoso Ltd', region: 'Americas', workload: 'Copilot', tenantCount: 415, status: 'Submitted', goal: 'MAU Growth', created: '2026-06-10', mauGrowth: 0, revenueGrowth: '$0', engagement: 10, executionType: 'Bulk' },
-      { id: 'PSM-008', name: 'Security Compliance - APAC', partner: 'Northwind Traders', region: 'APAC', workload: 'Security', tenantCount: 156, status: 'Active', goal: 'GTM Attach', created: '2026-04-15', mauGrowth: 9.8, revenueGrowth: '$55K', engagement: 71, executionType: 'Hybrid' },
+      { id: 'PSM-001', name: 'Copilot Growth - West US', partner: 'Contoso', mpn: '596949', prmEngagement: 'Contoso - M365 Copilot Growth FY26', region: 'Americas', workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat'], tenantCount: 245, status: 'Active', goal: 'MAU Growth', created: '2026-05-15', mauGrowth: 12.4, revenueGrowth: '$45K', engagement: 78, executionType: 'Bulk' },
+      { id: 'PSM-002', name: 'SharePoint Adoption - EMEA', partner: 'Contoso Digital', mpn: '550342', prmEngagement: 'Contoso Digital - SharePoint Adoption FY26', region: 'EMEA', workload: 'SharePoint', workloads: ['SharePoint', 'Exchange'], tenantCount: 180, status: 'Measuring', goal: 'Adoption', created: '2026-04-22', mauGrowth: 8.7, revenueGrowth: '$32K', engagement: 65, executionType: 'Hybrid', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
+      { id: 'PSM-003', name: 'Teams Phone Upsell - ANZ', partner: 'Contoso Consulting', mpn: '1722483', prmEngagement: 'Contoso Consulting - Teams Phone Upsell FY26', region: 'APAC', workload: 'Teams', workloads: ['Teams Phone', 'Teams'], tenantCount: 92, status: 'Active', goal: 'Upsell', created: '2026-05-01', mauGrowth: 15.2, revenueGrowth: '$78K', engagement: 82, executionType: 'Hybrid' },
+      { id: 'PSM-004', name: 'M365 E5 Upgrade - Central', partner: 'Contoso Retail', mpn: '1088231', prmEngagement: 'Contoso Retail - M365 E5 Upgrade FY26', region: 'Americas', workload: 'M365', workloads: ['Microsoft Defender for Endpoint', 'Microsoft Entra ID P2'], tenantCount: 520, status: 'Accepted', goal: 'Revenue Growth', created: '2026-06-01', mauGrowth: 0, revenueGrowth: '$0', engagement: 25, executionType: 'Bulk' },
+      { id: 'PSM-005', name: 'Security Posture - India', partner: 'Contoso Systems', mpn: '734512', prmEngagement: 'Contoso Systems - Security Posture FY26', region: 'APAC', workload: 'Security', workloads: ['Microsoft Defender for Endpoint', 'Microsoft Defender for Identity', 'Microsoft Defender for Office 365'], tenantCount: 310, status: 'Completed', goal: 'GTM Attach', created: '2026-03-10', mauGrowth: 22.1, revenueGrowth: '$120K', engagement: 95, executionType: 'Bulk', activitiesDelivered: ['Email outreach', 'Webinar', 'Pre-sales consultation'] },
+      { id: 'PSM-006', name: 'Viva Engage Rollout - UK', partner: 'Contoso Cloud', mpn: '901655', prmEngagement: 'Contoso Cloud - Viva Engage Rollout FY26', region: 'EMEA', workload: 'Viva', workloads: ['Teams', 'SharePoint'], tenantCount: 24, status: 'Draft', goal: 'Adoption', created: '2026-06-18', mauGrowth: 0, revenueGrowth: '$0', engagement: 0, executionType: 'Targeted' },
+      { id: 'PSM-007', name: 'Copilot Expansion - East US', partner: 'Contoso', mpn: '596949', prmEngagement: 'Contoso - M365 Copilot Expansion FY26', region: 'Americas', workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Agents'], tenantCount: 415, status: 'Submitted', goal: 'MAU Growth', created: '2026-06-10', mauGrowth: 0, revenueGrowth: '$0', engagement: 10, executionType: 'Bulk' },
+      { id: 'PSM-008', name: 'Security Compliance - APAC', partner: 'Contoso Consulting', mpn: '1722483', prmEngagement: 'Contoso Consulting - Security Compliance FY26', region: 'APAC', workload: 'Security', workloads: ['Purview Information Protection', 'Purview Data Lifecycle and Records Management'], tenantCount: 156, status: 'Active', goal: 'GTM Attach', created: '2026-04-15', mauGrowth: 9.8, revenueGrowth: '$55K', engagement: 71, executionType: 'Hybrid' },
     ];
 
     const usageBenchmarks = {
@@ -1357,14 +1361,38 @@
       { id: 'collaborative', name: 'Collaborative', desc: 'Field and partner build and refine the target list together.', detail: 'Best when both sides hold context and want to co-plan the motion.' }
     ];
     const PSM_PARTNER_REGIONS = {
-      'Contoso Ltd': 'Americas',
-      'Fabrikam Inc': 'EMEA',
-      'Woodgrove Bank': 'APAC',
-      'Adventure Works': 'Americas',
-      'Litware Inc': 'APAC',
-      'Proseware Ltd': 'EMEA',
-      'Northwind Traders': 'APAC'
+      'Contoso': 'Americas',
+      'Contoso Digital': 'EMEA',
+      'Contoso Consulting': 'APAC',
+      'Contoso Retail': 'Americas',
+      'Contoso Systems': 'APAC',
+      'Contoso Cloud': 'EMEA'
     };
+    const PSM_PARTNER_MPN = {
+      'Contoso': '596949',
+      'Contoso Digital': '550342',
+      'Contoso Consulting': '1722483',
+      'Contoso Retail': '1088231',
+      'Contoso Systems': '734512',
+      'Contoso Cloud': '901655'
+    };
+    // FTOP is the system of record for Propensity Referrals; workloads must use exact FTOP names (not ASPX names).
+    const PSM_FTOP_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Extensibility', 'Microsoft 365 Copilot Agents', 'Exchange', 'SharePoint', 'Teams', 'Teams Phone', 'Teams Meeting', 'Microsoft Entra ID P1', 'Microsoft Entra ID P2', 'Microsoft Defender for Endpoint', 'Microsoft Defender for Endpoint P2', 'Microsoft Defender for Identity', 'Microsoft Defender for Office 365', 'Microsoft Defender for Cloud Apps', 'Purview Information Protection', 'Purview Data Lifecycle and Records Management', 'Intune'];
+    const PSM_ASPX_FTOP_MAP = [
+      { aspx: 'Copilot (Licensed)', ftop: 'Microsoft 365 Copilot' },
+      { aspx: 'Free Copilot Chat (Unlicensed)', ftop: 'Microsoft 365 Copilot Chat' },
+      { aspx: 'EXO', ftop: 'Exchange' },
+      { aspx: 'SPO', ftop: 'SharePoint' },
+      { aspx: 'TEAMS', ftop: 'Teams' },
+      { aspx: 'MDE P1', ftop: 'Microsoft Defender for Endpoint' },
+      { aspx: 'MDI', ftop: 'Microsoft Defender for Identity' }
+    ];
+    const PSM_MCI_OFFERS = ['Copilot + Power Deployment Accelerator (XS)', 'Copilot + Power Deployment Accelerator (M)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (XS)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (M)', 'Data Security Envisioning workshop', 'Threat Protection Envisioning', 'N/A'];
+    const PSM_OPPORTUNITY = ['Acquire', 'Monetize', 'Grow', 'Other'];
+    const PSM_TENANT_HEALTH = ['Healthy', 'E5 Upsell-Ready', 'E5 Unhealthy', 'E5 Exp Upsell-Ready', 'E5 Exp Unhealthy'];
+    const PSM_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
+    const PSM_CTAS = ['Land Copilot Chat', 'Drive Copilot Chat', 'Upsell free Copilot Chat to paid', 'Drive Agents & E7 upsell', 'Drive E5 Upsell', 'Drive usage on at-risk workloads'];
+    const PSM_CUSTOMER_NAMES = ['Fabrikam', 'Fabrikam Health', 'Fabrikam Retail', 'Fabrikam Digital', 'Fabrikam Financial', 'Fabrikam Energy', 'Fabrikam Manufacturing', 'Fabrikam Logistics', 'Fabrikam Media', 'Fabrikam Public Sector'];
     const FILTER_STATUS_OPTIONS = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed', 'Blocked'];
     const FILTER_AREA_OPTIONS = ['US MFM', 'US PRO', 'US OGE', 'ANZ'];
     const AREA_GROUP_MAP = { 'US West': 'US MFM', 'US East': 'US PRO', 'EMEA North': 'US OGE', 'ANZ': 'ANZ', 'India': 'ANZ', 'APAC': 'ANZ' };
@@ -2153,10 +2181,11 @@
           '<h1>'+c.name+'</h1>' +
           '<div class="detail-meta">' +
             '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
-            '<div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+'</div>' +
+            '<div class="detail-meta-item"><strong>Partner:</strong> '+c.partner+(c.mpn ? ' <span style="color:#616161;">(MPN '+c.mpn+')</span>' : '')+'</div>' +
             '<div class="detail-meta-item"><strong>Region:</strong> '+c.region+'</div>' +
-            '<div class="detail-meta-item"><strong>Workload:</strong> '+c.workload+'</div>' +
+            '<div class="detail-meta-item"><strong>Workloads (FTOP):</strong> '+psmEscapeHtml((c.workloads && c.workloads.length ? c.workloads : [c.workload]).join(', '))+'</div>' +
             '<div class="detail-meta-item"><strong>Goals:</strong> '+psmEscapeHtml((c.goals && c.goals.length ? c.goals : [c.goal]).join(', '))+'</div>' +
+            (c.prmEngagement ? '<div class="detail-meta-item"><strong>PRM engagement:</strong> '+psmEscapeHtml(c.prmEngagement)+'</div>' : '') +
             '<div class="detail-meta-item"><strong>Created:</strong> '+c.created+'</div>' +
             '<div class="detail-meta-item"><strong>Status:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
           '</div>' +
@@ -2166,7 +2195,9 @@
           '<div class="psm-metric-card"><span class="label">MAU Change</span><span class="value">'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '0.0%')+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Revenue Change</span><span class="value">'+c.revenueGrowth+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Tenants Actioned</span><span class="value">'+(c.trackedCount||0).toLocaleString()+' <span style="font-size:12px;color:#616161;">/ '+c.tenantCount.toLocaleString()+' ('+trackedPct+'%)</span></span></div>' +
-        '</div></div>' +
+        '</div>' +
+        '<div style="margin-top:12px;background:#eef3fb;border:1px solid #cfe0f5;border-radius:6px;padding:10px 14px;font-size:11px;color:#004578;"><strong>Referral reports:</strong> Validate campaign creation in the <strong>MG+I FPC Referral Report</strong> (available immediately). Track usage impact in the <strong>M365 G+I FY26 MAU Growth from Accepted Referrals Report</strong> \u2014 MAU growth refreshes monthly, after the 15th, so recent campaigns may show 0 until the next refresh.</div>' +
+        '</div>' +
         psmRenderTenantWorkspace(c) +
         '<div class="panel-card"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
         '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:10px 14px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance:</strong> Customer usage signals (MAU, PAU, seat penetration) are visible to Microsoft field users only and are not exposed to partner views.</div>';
@@ -2181,42 +2212,56 @@
       var stageBulkOptions = PSM_PROGRESSION_STAGES.map(function(s){ return '<option value="'+s.key+'">'+s.label+'</option>'; }).join('');
       var rows = (c.customers || []).map(function(cust, idx) {
         var pr = cust.priority || 'Medium';
-        var util = cust.paidUtil != null ? cust.paidUtil : 0;
-        var utilColor = util < 55 ? '#a4262c' : (util > 80 ? '#0f7b0f' : '#8a6d00');
+        var health = cust.tenantHealth || '\u2014';
+        var healthColor = health.indexOf('Unhealthy') > -1 ? '#a4262c' : (health.indexOf('Upsell') > -1 ? '#8a6d00' : '#0f7b0f');
+        var opp = cust.opportunity || '\u2014';
+        var oppColor = opp === 'Acquire' ? '#004578' : (opp === 'Monetize' ? '#7719aa' : (opp === 'Grow' ? '#0f7b0f' : '#616161'));
+        var tw = (cust.targetedWorkloads || []).join(', ') || '\u2014';
         return '<tr>' +
           '<td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+idx+'"></td>' +
-          '<td><strong>'+psmEscapeHtml(cust.name)+'</strong></td>' +
-          '<td style="text-align:right;">'+(cust.seatPen != null ? cust.seatPen+'%' : '\u2014')+'</td>' +
-          '<td style="text-align:right;color:'+utilColor+';font-weight:600;">'+util+'%</td>' +
-          '<td style="text-align:right;">'+(cust.whitespace != null ? cust.whitespace.toLocaleString()+' seats' : '\u2014')+'</td>' +
+          '<td><strong>'+psmEscapeHtml(cust.name)+'</strong><br><span class="psm-th-sub" title="'+psmEscapeHtml(cust.tenantId)+'">'+psmEscapeHtml(cust.tenantId)+'</span></td>' +
+          '<td>'+psmEscapeHtml(cust.segment || '\u2014')+'</td>' +
           '<td style="text-align:center;"><span class="psm-pri psm-pri-'+pr.toLowerCase()+'">'+pr+'</span></td>' +
+          '<td style="color:'+oppColor+';font-weight:600;">'+psmEscapeHtml(opp)+'</td>' +
+          '<td style="color:'+healthColor+';font-weight:600;">'+psmEscapeHtml(health)+'</td>' +
+          '<td style="text-align:right;">'+(cust.copilotMauWhitespace != null ? cust.copilotMauWhitespace.toLocaleString() : '\u2014')+'</td>' +
+          '<td style="text-align:right;">'+(cust.freeToPaidWhitespace != null ? cust.freeToPaidWhitespace.toLocaleString() : '\u2014')+'</td>' +
+          '<td style="text-align:right;">'+(cust.e7AgentsMau != null ? cust.e7AgentsMau.toLocaleString() : '\u2014')+'</td>' +
+          '<td>'+psmEscapeHtml(cust.recommendedMci || 'N/A')+(cust.mciEligible ? '' : ' <span class="psm-th-sub">(not eligible)</span>')+'</td>' +
+          '<td>'+psmEscapeHtml(tw)+'</td>' +
           '<td><select onchange="psmSetCustomerStage(\''+c.id+'\','+idx+',this.value)">'+stageOptions(cust.stage)+'</select></td>' +
-          '<td style="text-align:center;"><input type="checkbox" '+(cust.license ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'license\',this.checked)"></td>' +
-          '<td style="text-align:center;"><input type="checkbox" '+(cust.services ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'services\',this.checked)"></td>' +
+          '<td style="text-align:center;"><input type="checkbox" '+(cust.agreement ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'agreement\',this.checked)" title="Agreement / qualified lead"></td>' +
+          '<td><input type="text" class="psm-cust-comment" value="'+psmEscapeHtml(cust.comments || '')+'" oninput="psmSaveCustomerComment(\''+c.id+'\','+idx+',this.value)" placeholder="Partner comment\u2026"></td>' +
         '</tr>';
       }).join('');
       return '<div class="panel-card"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
-        '<div style="font-size:13px;color:#424242;margin-bottom:12px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Use the <strong>ASPX signals</strong> (seat penetration, paid utilization, whitespace) to focus the partner on the highest-opportunity tenants \u2014 low utilization or large whitespace = highest priority.</div>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:12px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Use the <strong>ASPX signals</strong> (Copilot MAU whitespace, free\u2192paid whitespace, agents MAU, tenant health) to focus the partner on the highest-opportunity tenants. Columns mirror the offline PSM tracking sheet so partners see a familiar view.</div>' +
         '<div class="psm-bulk-bar">' +
           '<span class="psm-bulk-label">Bulk update selected tenants:</span>' +
           '<select id="psmBulkStage">'+stageBulkOptions+'</select>' +
           '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmBulkApplyStage(\''+c.id+'\')">Apply stage</button>' +
+          '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="psmBulkSetAgreement(\''+c.id+'\')">Mark agreement</button>' +
           '<span style="flex:1;"></span>' +
           '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'CRM sync requested \u2014 stages refresh from partner CRM\')">Sync from CRM</button>' +
           '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'Exported \u2014 send to partner for periodic review\')">Export for Excel review</button>' +
         '</div>' +
-        '<table class="psm-cust-table psm-workspace-table"><thead><tr>' +
+        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr>' +
           '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
-          '<th>Customer</th>' +
-          '<th style="text-align:right;">Seat Pen.<br><span class="psm-th-sub">PAU / eligible</span></th>' +
-          '<th style="text-align:right;">Paid Util.<br><span class="psm-th-sub">MAU / PAU</span></th>' +
-          '<th style="text-align:right;">Whitespace<br><span class="psm-th-sub">unsold seats</span></th>' +
+          '<th>Customer<br><span class="psm-th-sub">Tenant ID</span></th>' +
+          '<th>Segment</th>' +
           '<th style="text-align:center;">Priority</th>' +
+          '<th>Copilot Opp.<br><span class="psm-th-sub">Acquire/Monetize/Grow</span></th>' +
+          '<th>Tenant Health</th>' +
+          '<th style="text-align:right;">Copilot MAU<br><span class="psm-th-sub">whitespace</span></th>' +
+          '<th style="text-align:right;">Free\u2192Paid<br><span class="psm-th-sub">whitespace</span></th>' +
+          '<th style="text-align:right;">Agents MAU<br><span class="psm-th-sub">E7 signals</span></th>' +
+          '<th>Recommended MCI</th>' +
+          '<th>Targeted Workloads<br><span class="psm-th-sub">FTOP names</span></th>' +
           '<th>Stage</th>' +
-          '<th style="text-align:center;">License</th>' +
-          '<th style="text-align:center;">Services</th>' +
-        '</tr></thead><tbody>'+rows+'</tbody></table>' +
-        '<div style="margin-top:10px;font-size:11px;color:#616161;">Update tenants individually inline, or select rows and apply a stage in bulk. Signals are illustrative ASPX data (seat penetration, paid utilization, whitespace).</div>' +
+          '<th style="text-align:center;">Agreement<br><span class="psm-th-sub">qualified lead</span></th>' +
+          '<th>Partner Comments</th>' +
+        '</tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div style="margin-top:10px;font-size:11px;color:#616161;">Update tenants individually inline, or select rows and apply a stage / agreement in bulk. Signals, whitespace and MCI values are illustrative ASPX data pending telemetry sign-off.</div>' +
       '</div>';
     }
 
@@ -2242,6 +2287,25 @@
       }
       showToast('Updated ' + boxes.length + ' tenant' + (boxes.length === 1 ? '' : 's') + ' \u2192 ' + stageLabel);
       psmRenderDetail();
+    }
+
+    function psmBulkSetAgreement(id) {
+      var c = psmCampaigns.filter(function(x){ return x.id === id; })[0];
+      if (!c) return;
+      var boxes = document.querySelectorAll('.psm-cust-check:checked');
+      if (!boxes.length) { showToast('Select at least one tenant first', true); return; }
+      for (var i = 0; i < boxes.length; i++) {
+        var idx = parseInt(boxes[i].getAttribute('data-idx'), 10);
+        if (c.customers && c.customers[idx]) c.customers[idx].agreement = true;
+      }
+      showToast('Marked agreement on ' + boxes.length + ' tenant' + (boxes.length === 1 ? '' : 's'));
+      psmRenderDetail();
+    }
+
+    function psmSaveCustomerComment(id, idx, value) {
+      var c = psmCampaigns.filter(function(x){ return x.id === id; })[0];
+      if (!c || !c.customers || !c.customers[idx]) return;
+      c.customers[idx].comments = value;
     }
 
     function psmRenderSignalsPanel(c) {
@@ -2439,7 +2503,7 @@
     function psmOpenWizard() {
       var partners = psmGetPartners();
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: '', partnerIdType: 'PartnerOneID', partnerQuery: '', scenarioId: 'amg', listSize: sc.est, goals: ['Net Paid Seats'], workload: 'Copilot', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
+      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: '', partnerIdType: 'PartnerOneID', partnerQuery: '', scenarioId: 'amg', listSize: sc.est, goals: ['Net Paid Seats'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
@@ -2504,6 +2568,26 @@
       else if (!checked && i > -1) psmWizardState.goals.splice(i, 1);
     }
 
+    function psmFtopToCategory(ftop) {
+      var f = String(ftop || '');
+      if (f.indexOf('Copilot') > -1) return 'Copilot';
+      if (f.indexOf('SharePoint') > -1) return 'SharePoint';
+      if (f.indexOf('Teams') > -1) return 'Teams';
+      if (f.indexOf('Defender') > -1 || f.indexOf('Entra') > -1 || f.indexOf('Purview') > -1 || f.indexOf('Intune') > -1) return 'Security';
+      if (f.indexOf('Viva') > -1) return 'Viva';
+      return 'M365';
+    }
+
+    function psmToggleWorkload(name, checked) {
+      psmWizardState.workloads = psmWizardState.workloads || [];
+      var i = psmWizardState.workloads.indexOf(name);
+      if (checked && i === -1) psmWizardState.workloads.push(name);
+      else if (!checked && i > -1) psmWizardState.workloads.splice(i, 1);
+      var first = psmWizardState.workloads[0];
+      psmWizardState.workload = first ? psmFtopToCategory(first) : 'Copilot';
+      psmWizardState.rationaleProfile = psmProfileForScenario(psmWizardState.scenarioId, psmWizardState.workload);
+    }
+
     function psmAiGenerate() {
       var outcome = (psmWizardState.aiOutcome || '').trim();
       if (!outcome) { showToast('Describe the outcome you want first', true); return; }
@@ -2531,14 +2615,17 @@
               '<input type="text" value="'+psmEscapeHtml(psmWizardState.partnerQuery || '')+'" placeholder="'+watermark+'" oninput="psmWizardState.partnerQuery=this.value; psmWizardState.partner=this.value">' +
             '</div>' +
           '</div>' +
-          '<div style="font-size:12px;color:#616161;margin-top:6px;">You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner.</div></div>' +
-          '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 Copilot Free-to-Paid"></div>';
+          '<div style="font-size:12px;color:#616161;margin-top:6px;">You\u2019re creating this campaign on the partner\u2019s behalf \u2014 one campaign = one partner. Only MPN IDs linked to an active PRM record (FastTrack / Partner Community) can be referred.</div></div>' +
+          '<div class="form-group"><label>Campaign Name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 M365 Copilot Growth FY26"><div style="font-size:12px;color:#616161;margin-top:6px;">Tip: match the name to your <strong>PRM engagement</strong> so Referral Ops can reconcile it quickly.</div></div>';
       }
       if (label === 'Goal') {
         var goals = ['Net Paid Seats', 'Adoption', 'MAU Growth', 'Revenue Growth', 'GTM Attach', 'Upsell'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
-        var workloads = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) { return '<option value="'+workload+'"'+(psmWizardState.workload === workload ? ' selected' : '')+'>'+workload+'</option>'; }).join('');
+        var selWorkloads = psmWizardState.workloads || [];
+        var workloadBoxes = PSM_FTOP_WORKLOADS.map(function(w) { return '<label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" value="'+psmEscapeHtml(w)+'"'+(selWorkloads.indexOf(w) > -1 ? ' checked' : '')+' onchange="psmToggleWorkload(this.value, this.checked)"> '+psmEscapeHtml(w)+'</label>'; }).join('');
         return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div style="font-size:12px;color:#616161;margin-bottom:8px;">Primary tracked outcomes are net paid seats and adoption (MAU). The first selected is treated as primary for roll-up reporting.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
-          '<div class="form-group" style="margin-top:20px;"><label>Workload</label><select onchange="psmWizardState.workload=this.value; psmWizardState.rationaleProfile=psmProfileForScenario(psmWizardState.scenarioId, this.value)">'+workloads+'</select></div>';
+          '<div class="form-group" style="margin-top:20px;"><label>Workloads <span style="font-weight:400;color:#616161;">(select one or more \u2014 use exact FTOP names)</span></label>' +
+          '<div style="font-size:12px;color:#616161;margin-bottom:8px;">Referrals are created in <strong>FTOP</strong>, so workloads must use FTOP names (e.g. ASPX \u201CCopilot (Licensed)\u201D \u2192 \u201CMicrosoft 365 Copilot\u201D; \u201CEXO\u201D \u2192 \u201CExchange\u201D). Keep the workload count focused for clean partner attribution.</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;max-height:230px;overflow:auto;border:1px solid #edebe9;border-radius:6px;padding:12px;">'+workloadBoxes+'</div></div>';
       }
       if (label === 'Targeting') {
         var cards = PSM_SCENARIOS.map(function(s) {
@@ -2592,15 +2679,16 @@
         '<div>Campaign Name</div><div>'+psmEscapeHtml(psmWizardState.name || '\u2014')+'</div>' +
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
         '<div>Goal</div><div>'+((psmWizardState.goals && psmWizardState.goals.length) ? psmEscapeHtml(psmWizardState.goals.join(', ')) : '\u2014')+'</div>' +
-        '<div>Workload</div><div>'+psmWizardState.workload+'</div>' +
+        '<div>Workloads (FTOP)</div><div>'+((psmWizardState.workloads && psmWizardState.workloads.length) ? psmEscapeHtml(psmWizardState.workloads.join(', ')) : '\u2014')+'</div>' +
         '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
         '<div>List Size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
-        '<div>Launch Status</div><div>Draft</div>' +
-      '</div>';
+        '<div>Launch Status</div><div>Submitted to Referral Ops</div>' +
+        '</div>' +
+        '<div style="margin-top:14px;background:#eef3fb;border:1px solid #cfe0f5;border-radius:6px;padding:10px 14px;font-size:11px;color:#004578;"><strong>What happens next:</strong> Submitting sends a request to the Referral Ops team, who create the campaign in FTOP (system of record) \u2014 typically within <strong>3 business days</strong> (up to 10 calendar days if new tenants must be created). A tenant + workload pair can\u2019t be added to a new referral until <strong>14 days</strong> after its first campaign, to protect attribution.</div>';
     }
 
     function psmAiPreviewHtml() {
-      var tenants = ['Contoso Retail', 'Fabrikam Health', 'Tailwind Traders', 'Adatum Corp', 'Alpine Ski House'];
+      var tenants = ['Fabrikam', 'Fabrikam Health', 'Fabrikam Retail', 'Fabrikam Digital', 'Fabrikam Financial'];
       var rows = tenants.map(function(t, i) {
         var score = 96 - i * 7;
         var signal = i % 2 === 0 ? '+' + (12 + i * 4) + ' MAU trend' : '+' + (8 + i * 3) + ' seat propensity';
@@ -2615,6 +2703,10 @@
       if (label === 'Partner') {
         if (!psmWizardState.partner) { showToast('Partner selection is required', true); return; }
         if (!psmWizardState.name.trim()) { showToast('Campaign name is required', true); return; }
+      }
+      if (label === 'Goal') {
+        if (!psmWizardState.goals || !psmWizardState.goals.length) { showToast('Select at least one goal', true); return; }
+        if (!psmWizardState.workloads || !psmWizardState.workloads.length) { showToast('Select at least one FTOP workload', true); return; }
       }
       if (psmWizardState.step < PSM_WIZARD_STEPS.length) psmWizardState.step += 1;
       psmRenderWizard();
@@ -2632,10 +2724,13 @@
         id: psmNextCampaignId(),
         name: psmWizardState.name.trim(),
         partner: psmWizardState.partner,
+        mpn: PSM_PARTNER_MPN[psmWizardState.partner] || (psmWizardState.partnerIdType === 'MPNID' ? String(psmWizardState.partnerQuery || '').split(',')[0].trim() : ''),
+        prmEngagement: psmWizardState.name.trim(),
         region: psmGetRegionForPartner(psmWizardState.partner),
         workload: psmWizardState.workload,
+        workloads: (psmWizardState.workloads && psmWizardState.workloads.length) ? psmWizardState.workloads.slice() : [],
         tenantCount: listSize,
-        status: 'Draft',
+        status: 'Submitted',
         goal: (psmWizardState.goals && psmWizardState.goals[0]) || 'Net Paid Seats',
         goals: (psmWizardState.goals && psmWizardState.goals.length) ? psmWizardState.goals.slice() : ['Net Paid Seats'],
         created: today(),
@@ -2664,7 +2759,7 @@
       psmSearchTerm = '';
       psmActiveChartFilter = null;
       psmRenderDashboard();
-      showToast('PSM campaign created as Draft');
+      showToast('Campaign submitted to Referral Ops \u2014 created in FTOP within ~3 business days');
     }
 
     function psmNextCampaignId() {
@@ -2774,7 +2869,7 @@
     }
 
     function psmBuildSignals(c, seed) {
-      var tenants = ['Contoso Retail', 'Fabrikam Health', 'Tailwind Traders', 'Wingtip Toys', 'Adatum Corp', 'Alpine Ski House', 'Bellows College', 'Proseware Media'];
+      var tenants = PSM_CUSTOMER_NAMES;
       var out = [];
       var n = 3 + (seed % 3);
       for (var i = 0; i < n; i++) {
@@ -2873,9 +2968,10 @@
     }
 
     function psmBuildCustomers(c, seed) {
-      var names = ['Contoso Retail', 'Fabrikam Health', 'Tailwind Traders', 'Wingtip Toys', 'Adatum Corp', 'Alpine Ski House', 'Bellows College', 'Proseware Media'];
+      var names = PSM_CUSTOMER_NAMES;
       var stageKeys = PSM_PROGRESSION_STAGES.map(function(s){ return s.key; });
-      var count = Math.min(names.length, Math.max(3, Math.min(8, c.tenantCount || 0)));
+      var count = Math.min(names.length, Math.max(3, Math.min(10, c.tenantCount || 0)));
+      var cw = (c.workloads && c.workloads.length) ? c.workloads : [c.workload];
       var out = [];
       for (var i = 0; i < count; i++) {
         var r = (seed + i * 3) % 10;
@@ -2887,8 +2983,42 @@
         var seatPen = 20 + ((seed + i * 7) % 70);
         var paidUtil = 30 + ((seed + i * 5) % 65);
         var whitespace = 15 + ((seed + i * 11) % 24) * 10;
-        var priority = (paidUtil < 55 || whitespace > 150) ? 'High' : ((paidUtil > 80 && whitespace < 60) ? 'Low' : 'Medium');
-        out.push({ name: names[(seed + i) % names.length], stage: stageKeys[stageIdx], license: atSale, services: atSale && ((seed + i) % 2 === 0), seatPen: seatPen, paidUtil: paidUtil, whitespace: whitespace, priority: priority });
+        var copilotMauWhitespace = 40 + ((seed + i * 13) % 40) * 12;
+        var freeToPaidWhitespace = 10 + ((seed + i * 9) % 30) * 8;
+        var e7AgentsMau = ((seed + i * 5) % 4 === 0) ? 0 : 5 + ((seed + i * 6) % 20) * 4;
+        var opportunity = PSM_OPPORTUNITY[(seed + i) % 3];
+        var tenantHealth = PSM_TENANT_HEALTH[(seed + i * 2) % PSM_TENANT_HEALTH.length];
+        var segment = PSM_SEGMENTS[(seed + i) % PSM_SEGMENTS.length];
+        var mciEligible = (seed + i) % 3 !== 0;
+        var recommendedMci = mciEligible ? PSM_MCI_OFFERS[(seed + i) % (PSM_MCI_OFFERS.length - 1)] : 'N/A';
+        var cta = PSM_CTAS[(seed + i) % PSM_CTAS.length];
+        var priority = (copilotMauWhitespace > 350 || freeToPaidWhitespace > 150 || tenantHealth.indexOf('Unhealthy') > -1) ? 'High'
+          : ((copilotMauWhitespace < 150 && freeToPaidWhitespace < 60) ? 'Low' : 'Medium');
+        var tw = [cw[0]];
+        if (cw[1] && (seed + i) % 2 === 0) tw.push(cw[1]);
+        out.push({
+          name: names[(seed + i) % names.length],
+          tenantId: 'ten-' + (10000 + ((seed * 131 + i * 977) % 89999)),
+          segment: segment,
+          stage: stageKeys[stageIdx],
+          license: atSale,
+          services: atSale && ((seed + i) % 2 === 0),
+          seatPen: seatPen,
+          paidUtil: paidUtil,
+          whitespace: whitespace,
+          copilotMauWhitespace: copilotMauWhitespace,
+          freeToPaidWhitespace: freeToPaidWhitespace,
+          e7AgentsMau: e7AgentsMau,
+          opportunity: opportunity,
+          tenantHealth: tenantHealth,
+          mciEligible: mciEligible,
+          recommendedMci: recommendedMci,
+          targetedWorkloads: tw,
+          cta: cta,
+          comments: '',
+          agreement: atSale ? true : ((seed + i) % 4 === 0),
+          priority: priority
+        });
       }
       return out;
     }
