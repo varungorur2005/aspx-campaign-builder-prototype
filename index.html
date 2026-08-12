@@ -1558,11 +1558,6 @@
       { key: 'saleClosed', label: 'Sale Closed', sub: 'License and / or services sold', color: '#107c10', source: 'Auto', sourceNote: 'From billing / CRM close' },
       { key: 'outcomeMeasured', label: 'Outcome Measured', sub: 'MAU / net seats impact measured', color: '#c19c00', source: 'Auto', sourceNote: 'From usage telemetry / Power BI' }
     ];
-    const PSM_CREATION_MODES = [
-      { id: 'field', name: 'Field-driven', desc: 'The Microsoft field team selects the tenants and shares the curated list with the partner to execute.', detail: 'Best when the field holds the account context. Partner reviews and runs the outreach.' },
-      { id: 'partner', name: 'Partner-driven', desc: 'A mature partner builds their own target list; the field reviews and approves it.', detail: 'Best for high-maturity partners who know their book of business.' },
-      { id: 'collaborative', name: 'Collaborative', desc: 'Field and partner build and refine the target list together.', detail: 'Best when both sides hold context and want to co-plan the motion.' }
-    ];
     const PSM_PARTNER_REGIONS = {
       'Contoso': 'Americas',
       'Contoso Digital': 'EMEA',
@@ -2567,7 +2562,6 @@
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
       var trackedPct = c.tenantCount ? Math.round((c.trackedCount / c.tenantCount) * 100) : 0;
-      var ownership = psmCreationModeById(c.creationMode);
       detail.innerHTML =
         '<div class="flyout-header">' +
           '<div class="psm-detail-actions">' +
@@ -2591,10 +2585,8 @@
             '<div class="detail-meta-item"><strong>Created:</strong> '+c.created+'</div>' +
             '<div class="detail-meta-item"><strong>Campaign status:</strong> '+psmRenderStatusBadge(c.campaignStatus)+'</div>' +
             '<div class="detail-meta-item"><strong>Execution phase:</strong> '+psmRenderStatusBadge(c.status)+'</div>' +
-            '<div class="detail-meta-item"><strong>Audience ownership:</strong> '+psmEscapeHtml(ownership.name)+'</div>' +
           '</div>' +
         '</div>' +
-        '<div class="psm-context-note" style="margin-bottom:16px;"><strong>'+psmEscapeHtml(ownership.name)+':</strong> '+psmEscapeHtml(ownership.desc)+' This shared workspace supports live partner reviews; presentation mode removes PSM editing controls.</div>' +
         '<div class="panel-card" id="psmPerfPanel"><h2>FY27 Performance, Usage &amp; MCI</h2><div class="psm-metric-grid compact-eleven">' +
           '<div class="psm-metric-card"><span class="label">Consumption</span><span class="value">'+c.consumption.toLocaleString()+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Copilot PRU</span><span class="value">'+c.copilotPru.toLocaleString()+'</span></div>' +
@@ -2867,10 +2859,6 @@
       '</div>';
     }
 
-    function psmCreationModeById(id) {
-      return PSM_CREATION_MODES.filter(function(m){ return m.id === id; })[0] || PSM_CREATION_MODES[0];
-    }
-
     function psmRenderConversionFunnel(data, opts) {
       opts = opts || {};
       var target = data.targetList || 0;
@@ -3003,7 +2991,7 @@
 
     function psmOpenWizard() {
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: psmPartnerContext, scenarioId: 'amg', listSize: sc.est, goals: ['Consumption'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
+      psmWizardState = { step: 1, name: '', partner: psmPartnerContext, scenarioId: 'amg', listSize: sc.est, goals: ['Consumption'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
@@ -3054,11 +3042,6 @@
       if (criteria.trim()) psmWizardState.rationaleProfile = criteria.trim();
       psmRenderWizard();
       showToast('Recommendation criteria and target list updated');
-    }
-
-    function psmSelectApproach(id) {
-      psmWizardState.creationMode = id;
-      psmRenderWizard();
     }
 
     function psmToggleGoal(goal, checked) {
@@ -3118,9 +3101,6 @@
           '<div class="psm-wiz-hint" style="margin-top:8px;margin-bottom:0;">Pick the workloads this campaign will drive. Keep the count focused for clean attribution.</div></div>';
       }
       if (label === 'Targeting') {
-        var ownershipCards = PSM_CREATION_MODES.map(function(mode) {
-          return '<div class="psm-approach-card'+(psmWizardState.creationMode === mode.id ? ' selected' : '')+'" onclick="psmSelectApproach(\''+mode.id+'\')"><div class="ap-name">'+mode.name+'</div><div class="ap-desc">'+mode.desc+'</div><div class="ap-detail">'+mode.detail+'</div></div>';
-        }).join('');
         var cards = PSM_SCENARIOS.map(function(s) {
           var sel = psmWizardState.scenarioId === s.id;
           var editable = !s.ai && s.id !== 'manual';
@@ -3164,8 +3144,7 @@
             aiExtra +
           '</div>';
         }).join('');
-        return '<div class="form-group"><label>Audience ownership</label><div class="psm-wiz-hint">Partner-led means the partner owns list selection and reviews the same campaign workspace with the PSM; it does not require a separate offline experience.</div>'+ownershipCards+'</div>' +
-          '<div class="form-group"><label>Build the target list</label><div class="psm-wiz-hint">Start from a recommended list (edit the criteria and tenant list with the pencil icon), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
+        return '<div class="form-group"><label>Build the target list</label><div class="psm-wiz-hint">Start from a recommended list (edit the criteria and tenant list with the pencil icon), let the AI agent rank tenants by ASPX signals, or build manually. You can refine the list afterward in the tenant workspace.</div>'+cards+
           '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;font-weight:400;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
       }
       return '<div class="psm-wizard-review">' +
@@ -3174,7 +3153,6 @@
         '<div>Region</div><div>'+psmGetRegionForPartner(psmWizardState.partner)+'</div>' +
         '<div>Goal</div><div>'+((psmWizardState.goals && psmWizardState.goals.length) ? psmEscapeHtml(psmWizardState.goals.join(', ')) : '\u2014')+'</div>' +
         '<div>Workloads</div><div>'+((psmWizardState.workloads && psmWizardState.workloads.length) ? psmEscapeHtml(psmWizardState.workloads.join(', ')) : '\u2014')+'</div>' +
-        '<div>Audience ownership</div><div>'+psmEscapeHtml(psmCreationModeById(psmWizardState.creationMode).name)+'</div>' +
         '<div>Targeting</div><div>'+psmEscapeHtml(psmScenarioById(psmWizardState.scenarioId).name)+'</div>' +
         '<div>List size</div><div>'+(psmWizardState.listSize || 0).toLocaleString()+' tenants</div>' +
         '</div>';
@@ -3241,7 +3219,6 @@
         trackedCount: 0,
         signals: [],
         activityLog: [],
-        creationMode: psmWizardState.creationMode,
         scenarioId: psmWizardState.scenarioId,
         rationale: {
           scenario: sc.name,
@@ -3469,7 +3446,6 @@
       };
       if (!c.signals) c.signals = active ? psmBuildSignals(c, seed) : [];
       if (!c.activityLog) c.activityLog = (c.status === 'Completed' || c.status === 'Measuring') ? psmBuildActivityLog(c, seed) : [];
-      if (!c.creationMode) c.creationMode = ['field', 'partner', 'collaborative'][seed % 3];
       if (!c.progression) c.progression = psmBuildProgression(c, seed);
       if (!c.goals || !c.goals.length) c.goals = c.goal ? [c.goal] : [];
       if (!c.customers) c.customers = psmBuildCustomers(c, seed);
