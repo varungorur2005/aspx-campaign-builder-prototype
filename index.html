@@ -86,7 +86,7 @@
       background: #201f1e; position: sticky; top: 0; z-index: 500;
     }
     .nav-left { display: flex; align-items: center; gap: 10px; }
-    .nav-center { display: flex; align-items: center; }
+    .nav-center { display: flex; align-items: center; position:absolute; left:50%; transform:translateX(-50%); }
     .nav-title { font-size: 14px; color: #fff; font-weight: 400; }
     .nav-platform-name { font-weight: 700; }
     .nav-separator { color: rgba(255,255,255,0.4); font-weight: 300; }
@@ -99,7 +99,6 @@
     }
     .psm-partner-picker {
       display:none; align-items:center; gap:6px; color:#fff; font-size:11px; white-space:nowrap;
-      order:10;
     }
     .psm-partner-picker select, .psm-partner-picker input {
       height:28px; background:#fff; color:#242424; border:1px solid #d1d1d1; border-radius:3px;
@@ -845,19 +844,7 @@
       <span class="nav-title nav-platform-name" style="font-weight:600;">Microsoft Partner Center</span>
     </div>
     <div class="nav-center">
-      <div style="display:flex;align-items:center;background:rgba(255,255,255,0.15);border-radius:4px;padding:5px 12px;min-width:280px;">
-        <svg width="14" height="14" viewBox="0 0 20 20" fill="rgba(255,255,255,0.7)"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-        <input type="text" placeholder="Search" style="background:none;border:none;outline:none;color:#fff;font-size:13px;margin-left:8px;width:200px;" />
-      </div>
-    </div>
-    <div class="nav-right">
-      <div class="psm-partner-picker" id="psmPartnerPicker">
-        <span>Enter PartnerOne ID or MPN ID</span>
-        <select id="psmPartnerIdType" onchange="psmUpdatePartnerSearchPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select>
-        <input id="psmPartnerIdSearch" type="text" placeholder="Enter PartnerOne ID" onkeydown="if(event.key==='Enter')psmFindPartner()">
-        <button onclick="psmFindPartner()" title="Search partner">&#128269;</button>
-      </div>
-      <div id="prototypeViewSwitcher" style="display:flex;align-items:center;gap:8px;background:#0078d4;border-radius:4px;padding:5px 12px;margin-right:12px;">
+      <div id="prototypeViewSwitcher" style="display:flex;align-items:center;gap:8px;background:#0078d4;border-radius:4px;padding:5px 12px;">
         <span style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;">Prototype Views</span>
         <select id="viewSwitcherSelect" onchange="switchView(this.value)" style="background:#fff;color:#242424;border:1px solid #d1d1d1;border-radius:3px;padding:3px 8px;font-size:12px;font-weight:500;cursor:pointer;outline:none;">
           <option value="partner">Partner View</option>
@@ -865,6 +852,13 @@
           <option value="corp">MSFT Corp View</option>
           <option value="psm">MSFT PSM View (V2) - Draft</option>
         </select>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="psm-partner-picker" id="psmPartnerPicker">
+        <span>Enter PartnerOne ID or MPN ID</span>
+        <select id="psmPartnerIdType" onchange="psmUpdatePartnerSearchPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select>
+        <input id="psmPartnerIdSearch" type="text" placeholder="Enter PartnerOne ID" onkeydown="if(event.key==='Enter')psmFindPartner()">
       </div>
       <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#128276;</button>
       <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#9881;</button>
