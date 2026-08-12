@@ -577,6 +577,24 @@
     .psm-toolbar { margin-bottom: 18px; border-bottom: none; padding: 0; }
     .psm-toolbar .toolbar-left, .psm-toolbar .toolbar-right { gap: 10px; }
     .psm-toolbar .toolbar-search input { width: 220px; }
+    #psmKpiRow .kpi-tile { cursor:pointer; transition:border-color 0.15s, box-shadow 0.15s; }
+    #psmKpiRow .kpi-tile:hover, #psmKpiRow .kpi-tile.active {
+      border-color:#0078d4; box-shadow:0 2px 8px rgba(0,120,212,0.12);
+    }
+    #psmKpiRow .kpi-value { text-decoration:underline; text-underline-offset:3px; }
+    #psmChartsRow {
+      grid-template-columns:repeat(5, minmax(0, 1fr));
+      align-items:stretch; overflow-x:auto;
+    }
+    #psmChartsRow .chart-card { min-width:190px; }
+    #psmChartsRow .chart-title { font-size:12px; line-height:1.25; min-height:30px; }
+    #psmChartsRow .chart-meta { min-height:26px; line-height:1.2; }
+    #psmChartsRow .donut-chart-shell { width:150px; height:150px; }
+    #psmChartsRow .donut-chart { width:112px; height:112px; }
+    #psmChartsRow .donut-hole { width:66px; height:66px; }
+    #psmChartsRow .donut-center { font-size:24px; }
+    #psmChartsRow .donut-legend { gap:6px 10px; margin-top:8px; }
+    #psmChartsRow .donut-segment-label { font-size:10px; }
     .psm-funnel {
       display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px;
     }
@@ -1010,6 +1028,21 @@
       <div class="filter-actions" style="display:flex;gap:8px;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;">
         <button class="btn btn-primary btn-sm" onclick="applyFilters()">Apply</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleFilter()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-overlay" id="psmTableFlyout" onclick="psmCloseTableFlyout()">
+    <div class="filter-panel" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 id="psmTableFlyoutTitle" style="font-size:18px;font-weight:700;margin:0;">Filter</h3>
+        <button style="background:none;border:none;font-size:20px;color:#616161;cursor:pointer;" onclick="psmCloseTableFlyout()">&times;</button>
+      </div>
+      <p id="psmTableFlyoutDescription" style="font-size:13px;color:#616161;margin-bottom:20px;"></p>
+      <div id="psmTableFlyoutBody"></div>
+      <div class="filter-actions" style="display:flex;gap:8px;margin-top:20px;padding-top:12px;border-top:1px solid #e0e0e0;">
+        <button class="btn btn-primary btn-sm" id="psmTableFlyoutApply">Apply</button>
+        <button class="btn btn-secondary btn-sm" onclick="psmCloseTableFlyout()">Cancel</button>
       </div>
     </div>
   </div>
@@ -1510,6 +1543,26 @@
     const defaultDashboardTemplate = document.getElementById('dashboardView').innerHTML;
     const defaultDetailTemplate = document.getElementById('detailView').innerHTML;
     let psmActiveChartFilter = null;
+    let psmActiveKpiFilter = null;
+    let psmTableFilters = { campaignStatus: '', status: '', region: '', workload: '', goal: '' };
+    const PSM_TABLE_COLUMNS = [
+      { key: 'id', label: 'Campaign ID', required: true },
+      { key: 'name', label: 'Campaign Name' },
+      { key: 'partner', label: 'Partner' },
+      { key: 'region', label: 'Region' },
+      { key: 'workload', label: 'Workload' },
+      { key: 'tenantCount', label: 'Tenants' },
+      { key: 'trackedCount', label: 'Tracked' },
+      { key: 'campaignStatus', label: 'Campaign Status' },
+      { key: 'status', label: 'Execution Phase' },
+      { key: 'goal', label: 'Goal' },
+      { key: 'consumption', label: 'Consumption' },
+      { key: 'mauGrowth', label: 'MAU Growth' }
+    ];
+    let psmVisibleColumns = PSM_TABLE_COLUMNS.reduce(function(result, column) {
+      result[column.key] = true;
+      return result;
+    }, {});
     let psmSearchTerm = '';
     let psmTrackMode = 'rollup';
     let psmWizardState = { step: 1, name: '', partner: 'Contoso', goal: 'Consumption', workload: 'Copilot' };
@@ -1605,6 +1658,7 @@
       activeKpiFilter = null;
       activeChartFilter = null;
       psmActiveChartFilter = null;
+      psmActiveKpiFilter = null;
       filterState = createEmptyFilterState();
       showDashboard();
       toggleFilter(false);
@@ -1762,6 +1816,8 @@
         } else {
           psmActiveChartFilter = { type: type, value: value };
         }
+        psmActiveKpiFilter = null;
+        Object.keys(psmTableFilters).forEach(function(key) { psmTableFilters[key] = ''; });
         psmRenderDashboard();
         return;
       }
@@ -2055,24 +2111,22 @@
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn btn-primary" id="psmCreateBtn" onclick="psmOpenWizard()">Create campaign for a partner</button>' +
-            '<button class="toolbar-btn" onclick="showToast(\'Campaign export prepared\')">' +
-              '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
-              'Download' +
-            '</button>' +
             '<button class="toolbar-btn" id="psmTourBtn" onclick="psmReplayTour()" title="Take a guided tour of this page">' +
               '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>' +
               'Take a tour' +
             '</button>' +
           '</div>' +
-          '<div class="toolbar-right">' +
-            '<div class="toolbar-search">' +
-              '<svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>' +
-              '<input type="text" placeholder="Search campaigns..." id="psmSearchInput" oninput="psmSearchTerm=this.value; psmRenderDashboard()">' +
-            '</div>' +
-          '</div>' +
         '</div>' +
         '<div class="kpi-row" id="psmKpiRow"></div>' +
         '<div class="charts-row" id="psmChartsRow"></div>' +
+        '<div class="table-toolbar" id="psmTableToolbar">' +
+          '<div class="toolbar-left"><button class="toolbar-btn" onclick="showToast(\'Campaign export prepared\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Download</button></div>' +
+          '<div class="toolbar-right">' +
+            '<div class="toolbar-search"><svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="text" placeholder="Search campaigns..." id="psmSearchInput" oninput="psmSearchTerm=this.value; psmRenderDashboard()"></div>' +
+            '<button class="toolbar-btn" onclick="psmOpenFilterFlyout()"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm2 5A.75.75 0 0 1 4.75 9h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 9.75Zm3 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"/></svg> Filter</button>' +
+            '<button class="toolbar-btn" onclick="psmOpenColumnsFlyout()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 2v12M6 2v12M10 2v12M14 2v12"/></svg> Change columns</button>' +
+          '</div>' +
+        '</div>' +
         '<div class="campaign-table-wrap" id="psmTableWrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
     }
@@ -2137,11 +2191,24 @@
           if (haystack.indexOf(search) === -1) return false;
         }
         if (psmActiveChartFilter) {
-          if (psmActiveChartFilter.type === 'partner' && c.partner !== psmActiveChartFilter.value) return false;
           if ((psmActiveChartFilter.type === 'area' || psmActiveChartFilter.type === 'region') && c.region !== psmActiveChartFilter.value) return false;
           if (psmActiveChartFilter.type === 'workload' && c.workload !== psmActiveChartFilter.value) return false;
           if (psmActiveChartFilter.type === 'status' && c.status !== psmActiveChartFilter.value) return false;
+          if (psmActiveChartFilter.type === 'campaignStatus' && c.campaignStatus !== psmActiveChartFilter.value) return false;
+          if (psmActiveChartFilter.type === 'goal' && c.goal !== psmActiveChartFilter.value) return false;
         }
+        if (psmActiveKpiFilter) {
+          if (psmActiveKpiFilter === 'activePartners' && ['Active', 'Measuring', 'Completed'].indexOf(c.status) === -1) return false;
+          if (psmActiveKpiFilter === 'customersReached' && ['Active', 'Measuring', 'Completed'].indexOf(c.status) === -1) return false;
+          if (psmActiveKpiFilter === 'netPaidSeats' && !(c.netPaidSeats > 0)) return false;
+          if (psmActiveKpiFilter === 'mauGrowth' && !(c.mauGrowth > 0)) return false;
+          if (psmActiveKpiFilter === 'revenueGrowth' && !(psmRevenueToNumber(c.revenueGrowth) > 0)) return false;
+        }
+        if (psmTableFilters.campaignStatus && c.campaignStatus !== psmTableFilters.campaignStatus) return false;
+        if (psmTableFilters.status && c.status !== psmTableFilters.status) return false;
+        if (psmTableFilters.region && c.region !== psmTableFilters.region) return false;
+        if (psmTableFilters.workload && c.workload !== psmTableFilters.workload) return false;
+        if (psmTableFilters.goal && c.goal !== psmTableFilters.goal) return false;
         return true;
       });
 
@@ -2149,24 +2216,24 @@
       psmRenderKpis();
       psmRenderCharts();
 
+      var visibleColumns = PSM_TABLE_COLUMNS.filter(function(column) { return psmVisibleColumns[column.key]; });
       document.getElementById('psmCampaignTableHead').innerHTML =
-        '<tr><th>Campaign ID</th><th>Campaign Name</th><th>Partner</th><th>Region</th><th>Workload</th><th>Tenants</th><th>Tracked</th><th>Campaign Status</th><th>Execution Phase</th><th>Goal</th><th>Consumption</th><th>MAU Growth</th></tr>';
+        '<tr>'+visibleColumns.map(function(column) { return '<th>'+column.label+'</th>'; }).join('')+'</tr>';
       document.getElementById('psmCampaignTableBody').innerHTML = filtered.length ? filtered.map(function(c) {
         return '<tr class="psm-clickable-row" onclick="psmOpenDetail(\''+c.id+'\')">' +
-          '<td><a class="campaign-id-link" onclick="psmOpenDetail(\''+c.id+'\'); return false;">'+c.id+'</a></td>' +
-          '<td>'+c.name+'</td>' +
-          '<td>'+c.partner+'</td>' +
-          '<td>'+c.region+'</td>' +
-          '<td>'+c.workload+'</td>' +
-          '<td>'+c.tenantCount.toLocaleString()+'</td>' +
-          '<td>'+((c.trackedCount || 0).toLocaleString())+'</td>' +
-          '<td>'+psmRenderStatusBadge(c.campaignStatus)+'</td>' +
-          '<td>'+psmRenderStatusBadge(c.status)+'</td>' +
-          '<td>'+c.goal+'</td>' +
-          '<td>'+(c.consumption ? c.consumption.toLocaleString() : 'â€”')+'</td>' +
-          '<td>'+(c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : 'â€”')+'</td>' +
+          visibleColumns.map(function(column) { return '<td>'+psmCampaignCell(c, column.key)+'</td>'; }).join('') +
         '</tr>';
-      }).join('') : '<tr><td colspan="12" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or chart selection.</td></tr>';
+      }).join('') : '<tr><td colspan="'+visibleColumns.length+'" style="text-align:center;color:#616161;padding:24px;">No campaigns match the current search or filters.</td></tr>';
+    }
+
+    function psmCampaignCell(c, key) {
+      if (key === 'id') return '<a class="campaign-id-link" onclick="psmOpenDetail(\''+c.id+'\'); return false;">'+c.id+'</a>';
+      if (key === 'tenantCount') return c.tenantCount.toLocaleString();
+      if (key === 'trackedCount') return (c.trackedCount || 0).toLocaleString();
+      if (key === 'campaignStatus' || key === 'status') return psmRenderStatusBadge(c[key]);
+      if (key === 'consumption') return c.consumption ? c.consumption.toLocaleString() : '\u2014';
+      if (key === 'mauGrowth') return c.mauGrowth ? c.mauGrowth.toFixed(1)+'%' : '\u2014';
+      return psmEscapeHtml(c[key] || '\u2014');
     }
 
     function psmRenderKpis() {
@@ -2183,35 +2250,125 @@
       var netPaidSeats = psmCampaigns.reduce(function(sum, c) { return sum + (c.netPaidSeats || 0); }, 0);
 
       document.getElementById('psmKpiRow').innerHTML =
-        '<div class="kpi-tile"><span class="kpi-value">'+psmCampaigns.length+'</span><span class="kpi-label">Campaigns</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+partnerCount+'</span><span class="kpi-label">Active Partners</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+customersReached.toLocaleString()+'</span><span class="kpi-label">Customers Reached</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">+'+netPaidSeats.toLocaleString()+'</span><span class="kpi-label">Net Paid Seats</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+avgMau.toFixed(1)+'%</span><span class="kpi-label">MAU Growth</span></div>' +
-        '<div class="kpi-tile"><span class="kpi-value">'+psmFormatRevenue(revenueTotal)+'</span><span class="kpi-label">Revenue Growth</span></div>';
+        psmKpiTile('all', psmCampaigns.length, 'Campaigns') +
+        psmKpiTile('activePartners', partnerCount, 'Active Partners') +
+        psmKpiTile('customersReached', customersReached.toLocaleString(), 'Customers Reached') +
+        psmKpiTile('netPaidSeats', '+'+netPaidSeats.toLocaleString(), 'Net Paid Seats') +
+        psmKpiTile('mauGrowth', avgMau.toFixed(1)+'%', 'MAU Growth') +
+        psmKpiTile('revenueGrowth', psmFormatRevenue(revenueTotal), 'Revenue Growth');
+    }
+
+    function psmKpiTile(filter, value, label) {
+      var active = (filter === 'all' && !psmActiveKpiFilter && !psmActiveChartFilter) || psmActiveKpiFilter === filter;
+      return '<div class="kpi-tile'+(active ? ' active' : '')+'" role="button" tabindex="0" onclick="psmFilterByKpi(\''+filter+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();psmFilterByKpi(\''+filter+'\')}"><span class="kpi-value">'+value+'</span><span class="kpi-label">'+label+'</span></div>';
+    }
+
+    function psmFilterByKpi(filter) {
+      psmActiveChartFilter = null;
+      Object.keys(psmTableFilters).forEach(function(key) { psmTableFilters[key] = ''; });
+      psmActiveKpiFilter = filter === 'all' || psmActiveKpiFilter === filter ? null : filter;
+      psmRenderDashboard();
+    }
+
+    function psmOpenFilterFlyout() {
+      var fields = [
+        { key: 'campaignStatus', label: 'Campaign Status', values: ['Defining', 'Executing', 'Closed'] },
+        { key: 'status', label: 'Execution Phase', values: PSM_STATUS_ORDER },
+        { key: 'region', label: 'Region', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.region; }))).sort() },
+        { key: 'workload', label: 'Workload', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.workload; }))).sort() },
+        { key: 'goal', label: 'Primary Goal', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.goal; }))).sort() }
+      ];
+      document.getElementById('psmTableFlyoutTitle').textContent = 'Filter';
+      document.getElementById('psmTableFlyoutDescription').textContent = 'Filter the campaign table by one or more campaign attributes.';
+      document.getElementById('psmTableFlyoutBody').innerHTML = fields.map(function(field) {
+        var options = '<option value="">All</option>' + field.values.map(function(value) {
+          return '<option value="'+psmEscapeHtml(value)+'"'+(psmTableFilters[field.key] === value ? ' selected' : '')+'>'+psmEscapeHtml(value)+'</option>';
+        }).join('');
+        return '<div class="filter-section"><label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block;">'+field.label+'</label><select id="psmFilter-'+field.key+'">'+options+'</select></div>';
+      }).join('') + '<button class="btn btn-secondary btn-sm" onclick="psmClearTableFilters()">Clear all</button>';
+      document.getElementById('psmTableFlyoutApply').onclick = psmApplyTableFilters;
+      document.getElementById('psmTableFlyout').classList.add('show');
+    }
+
+    function psmApplyTableFilters() {
+      Object.keys(psmTableFilters).forEach(function(key) {
+        psmTableFilters[key] = document.getElementById('psmFilter-'+key).value;
+      });
+      psmActiveChartFilter = null;
+      psmActiveKpiFilter = null;
+      psmCloseTableFlyout();
+      psmRenderDashboard();
+    }
+
+    function psmClearTableFilters() {
+      Object.keys(psmTableFilters).forEach(function(key) {
+        var field = document.getElementById('psmFilter-'+key);
+        if (field) field.value = '';
+      });
+    }
+
+    function psmOpenColumnsFlyout() {
+      document.getElementById('psmTableFlyoutTitle').textContent = 'Change columns';
+      document.getElementById('psmTableFlyoutDescription').textContent = 'Choose which columns appear in the campaign table. Campaign ID is always shown.';
+      document.getElementById('psmTableFlyoutBody').innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'+PSM_TABLE_COLUMNS.map(function(column) {
+        return '<label class="filter-checkbox-item" style="font-size:13px;"><input type="checkbox" data-psm-column="'+column.key+'" '+(psmVisibleColumns[column.key] ? 'checked' : '')+' '+(column.required ? 'disabled' : '')+'> <span>'+column.label+'</span></label>';
+      }).join('')+'</div>';
+      document.getElementById('psmTableFlyoutApply').onclick = psmApplyVisibleColumns;
+      document.getElementById('psmTableFlyout').classList.add('show');
+    }
+
+    function psmApplyVisibleColumns() {
+      var checkboxes = document.querySelectorAll('[data-psm-column]');
+      for (var i = 0; i < checkboxes.length; i++) {
+        psmVisibleColumns[checkboxes[i].getAttribute('data-psm-column')] = checkboxes[i].checked;
+      }
+      psmVisibleColumns.id = true;
+      psmCloseTableFlyout();
+      psmRenderDashboard();
+    }
+
+    function psmCloseTableFlyout() {
+      document.getElementById('psmTableFlyout').classList.remove('show');
     }
 
     function psmRenderCharts() {
-      var partnerCounts = {};
+      var campaignStatusCounts = {};
+      var executionCounts = {};
+      var goalCounts = {};
       var regionCounts = {};
       var workloadCounts = {};
 
       psmCampaigns.forEach(function(c) {
-        partnerCounts[c.partner] = (partnerCounts[c.partner] || 0) + 1;
+        campaignStatusCounts[c.campaignStatus] = (campaignStatusCounts[c.campaignStatus] || 0) + 1;
+        executionCounts[c.status] = (executionCounts[c.status] || 0) + 1;
+        goalCounts[c.goal] = (goalCounts[c.goal] || 0) + 1;
         regionCounts[c.region] = (regionCounts[c.region] || 0) + 1;
         workloadCounts[c.workload] = (workloadCounts[c.workload] || 0) + 1;
       });
 
+      var campaignStatusEntries = ['Defining', 'Executing', 'Closed'].map(function(status) {
+        return { label: status, value: campaignStatusCounts[status] || 0, filterValue: status };
+      }).filter(function(entry) { return entry.value > 0; });
+      var executionEntries = PSM_STATUS_ORDER.map(function(status) {
+        return { label: status, value: executionCounts[status] || 0, filterValue: status };
+      }).filter(function(entry) { return entry.value > 0; });
+      var goalEntries = Object.keys(goalCounts).sort().map(function(goal) {
+        return { label: goal, value: goalCounts[goal], filterValue: goal };
+      });
       var regionEntries = ['Americas', 'EMEA', 'APAC'].map(function(region) {
         return { label: region, value: regionCounts[region] || 0, filterValue: region };
       }).filter(function(entry) { return entry.value > 0; });
       var workloadEntries = ['Copilot', 'SharePoint', 'Teams', 'M365', 'Security', 'Viva'].map(function(workload) {
         return { label: workload, value: workloadCounts[workload] || 0, filterValue: workload };
       }).filter(function(entry) { return entry.value > 0; });
+      var goalColors = {};
+      goalEntries.forEach(function(entry, index) { goalColors[entry.label] = COLOR_PALETTE[index % COLOR_PALETTE.length]; });
 
       document.getElementById('psmChartsRow').innerHTML =
-        buildHBarChart(partnerCounts, '#0078d4', 'Campaign Performance by Partner', 'partner') +
-        buildDonutChart(regionEntries, { Americas: '#0078d4', EMEA: '#038387', APAC: '#7719aa' }, 'Campaign Performance by Region', 'region', 'Rolled up across all PSM campaigns') +
+        buildDonutChart(campaignStatusEntries, { Defining: '#0078d4', Executing: '#107c10', Closed: '#616161' }, 'Campaign Performance by Status', 'campaignStatus', 'Defining, executing, or closed') +
+        buildDonutChart(executionEntries, PSM_STATUS_COLORS, 'Campaign Performance by Execution Phase', 'status', 'Operational campaign phase') +
+        buildDonutChart(goalEntries, goalColors, 'Campaign Performance by Goal', 'goal', 'Primary campaign goal') +
+        buildDonutChart(regionEntries, { Americas: '#0078d4', EMEA: '#038387', APAC: '#7719aa' }, 'Campaign Performance by Region', 'region', 'Campaign mix by region') +
         buildDonutChart(workloadEntries, { Copilot: '#0078d4', SharePoint: '#005a9e', Teams: '#038387', M365: '#7719aa', Security: '#c19c00', Viva: '#d83b01' }, 'Campaign Performance by Workload', 'workload', 'Campaign mix by workload');
     }
 
