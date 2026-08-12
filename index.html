@@ -97,6 +97,34 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 600; cursor: pointer;
     }
+    .psm-partner-picker {
+      display:none; align-items:center; gap:6px; color:#fff; font-size:11px; white-space:nowrap;
+      order:10;
+    }
+    .psm-partner-picker select, .psm-partner-picker input {
+      height:28px; background:#fff; color:#242424; border:1px solid #d1d1d1; border-radius:3px;
+      padding:3px 8px; font-size:11px;
+    }
+    .psm-partner-picker input { width:190px; }
+    .psm-partner-picker button {
+      height:28px; width:30px; border:1px solid #d1d1d1; background:#fff; color:#0078d4; border-radius:3px;
+    }
+    .psm-partner-banner {
+      display:none; padding:8px 16px; background:#deecf9; border-bottom:1px solid #c7d9ec;
+      color:#424242; font-size:11px; line-height:1.45;
+    }
+    .psm-partner-banner strong { color:#242424; }
+    .psm-aspx-title { display:flex; align-items:baseline; gap:8px; margin-bottom:18px; }
+    .psm-aspx-title .insights { font-size:22px; font-weight:700; }
+    .psm-aspx-title .divider { font-size:22px; color:#616161; }
+    .psm-aspx-title .section { font-size:20px; font-weight:400; }
+    .psm-aspx-title .suite { font-size:11px; margin-left:4px; }
+    .psm-aspx-tabs { display:flex; border-bottom:1px solid #d1d1d1; margin-bottom:20px; }
+    .psm-aspx-tab {
+      border:none; background:none; padding:10px 14px; font-size:12px; color:#424242;
+      border-bottom:2px solid transparent; margin-bottom:-1px;
+    }
+    .psm-aspx-tab.active { color:#0078d4; border-bottom-color:#0078d4; font-weight:600; }
 
     /* ============================================================
        APP LAYOUT
@@ -390,7 +418,7 @@
     .detail-view.fre-active { z-index: 9001; }
     .detail-view.psm-full-page {
       left: 200px; right: 0; width: auto; max-width: none;
-      border-left: none; box-shadow: none; padding: 24px 32px 80px;
+      top:86px; border-left: none; box-shadow: none; padding: 24px 32px 80px;
     }
     body.psm-presenting .top-nav, body.psm-presenting .sidebar { display: none; }
     body.psm-presenting .detail-view.psm-full-page { top: 0; left: 0; }
@@ -823,6 +851,12 @@
       </div>
     </div>
     <div class="nav-right">
+      <div class="psm-partner-picker" id="psmPartnerPicker">
+        <span>Enter PartnerOne ID or MPN ID</span>
+        <select id="psmPartnerIdType" onchange="psmUpdatePartnerSearchPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select>
+        <input id="psmPartnerIdSearch" type="text" placeholder="Enter PartnerOne ID" onkeydown="if(event.key==='Enter')psmFindPartner()">
+        <button onclick="psmFindPartner()" title="Search partner">&#128269;</button>
+      </div>
       <div id="prototypeViewSwitcher" style="display:flex;align-items:center;gap:8px;background:#0078d4;border-radius:4px;padding:5px 12px;margin-right:12px;">
         <span style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;">Prototype Views</span>
         <select id="viewSwitcherSelect" onchange="switchView(this.value)" style="background:#fff;color:#242424;border:1px solid #d1d1d1;border-radius:3px;padding:3px 8px;font-size:12px;font-weight:500;cursor:pointer;outline:none;">
@@ -837,6 +871,8 @@
       <div class="nav-avatar" title="Varun Gorur">VG</div>
     </div>
   </nav>
+
+  <div class="psm-partner-banner" id="psmPartnerBanner"></div>
 
   <div class="app-layout">
     <!-- ========== SIDEBAR ========== -->
@@ -1529,6 +1565,22 @@
       'Contoso Systems': '734512',
       'Contoso Cloud': '901655'
     };
+    const PSM_PARTNER_ONE = {
+      'Contoso': '1129016',
+      'Contoso Digital': '1129042',
+      'Contoso Consulting': '1129088',
+      'Contoso Retail': '1129125',
+      'Contoso Systems': '1129183',
+      'Contoso Cloud': '1129230'
+    };
+    const PSM_PARTNER_ASSOCIATED_MPN = {
+      'Contoso': ['596949', '596950', '596951'],
+      'Contoso Digital': ['550342', '550343'],
+      'Contoso Consulting': ['1722483', '1722484', '1722485'],
+      'Contoso Retail': ['1088231', '1088232'],
+      'Contoso Systems': ['734512', '734513'],
+      'Contoso Cloud': ['901655', '901656']
+    };
     const PSM_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Microsoft 365 Copilot Cowork', 'Copilot Extensibility', 'Microsoft 365 Copilot Agents', 'Exchange', 'SharePoint', 'Teams', 'Teams Phone', 'Teams Meeting', 'Microsoft Entra ID P1', 'Microsoft Entra ID P2', 'Microsoft Defender for Endpoint', 'Microsoft Defender for Endpoint P2', 'Microsoft Defender for Identity', 'Microsoft Defender for Office 365', 'Microsoft Defender for Cloud Apps', 'Purview Information Protection', 'Purview Data Lifecycle and Records Management', 'Intune'];
     const PSM_MCI_OFFERS = ['Copilot + Power Deployment Accelerator (XS)', 'Copilot + Power Deployment Accelerator (M)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (XS)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (M)', 'Data Security Envisioning workshop', 'Threat Protection Envisioning', 'N/A'];
     const PSM_OPPORTUNITY = ['Acquire', 'Monetize', 'Grow', 'Other'];
@@ -1544,6 +1596,7 @@
     const defaultDetailTemplate = document.getElementById('detailView').innerHTML;
     let psmActiveChartFilter = null;
     let psmActiveKpiFilter = null;
+    let psmPartnerContext = 'Contoso';
     let psmTableFilters = { campaignStatus: '', status: '', region: '', workload: '', goal: '' };
     const PSM_TABLE_COLUMNS = [
       { key: 'id', label: 'Campaign ID', required: true },
@@ -1623,13 +1676,9 @@
       } else if (currentView === 'psm') {
         sidebar.innerHTML =
           '<nav class="sidebar-nav">' +
-            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>ASPXi Insights</span></a>' +
-            '<a href="#" class="sidebar-link active" onclick="return false;"><span>Campaign Builder</span></a>' +
-            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Partner Performance</span></a>' +
-            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Analytics &amp; Reporting</span></a>' +
-            '<div class="sidebar-divider"></div>' +
-            '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'Executive Dashboard coming soon\'); return false"><span>Executive Dashboard &#8599;</span></a>' +
-            '<a href="#" class="sidebar-link" style="color:#0078d4;" onclick="showToast(\'API Integration portal coming soon\'); return false"><span>API Integration &#8599;</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'Growth Opportunities selected\'); return false;"><span>Growth Opportunities</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'MCI Performance selected\'); return false;"><span>MCI Performance</span></a>' +
+            '<a href="#" class="sidebar-link active" onclick="return false;"><span>Campaigns</span></a>' +
           '</nav>';
       } else {
         sidebar.innerHTML =
@@ -1655,6 +1704,8 @@
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
         view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi';
+      document.getElementById('psmPartnerPicker').style.display = view === 'psm' ? 'flex' : 'none';
+      document.getElementById('psmPartnerBanner').style.display = view === 'psm' ? 'block' : 'none';
       activeKpiFilter = null;
       activeChartFilter = null;
       psmActiveChartFilter = null;
@@ -1664,6 +1715,7 @@
       toggleFilter(false);
       if (view === 'psm') {
         document.getElementById('breadcrumb').style.display = 'none';
+        psmRenderPartnerContext();
         renderPsmView();
         freCompleted = false;
         freCurrentStep = 0;
@@ -2106,8 +2158,9 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
-        '<h1 class="page-title">Campaign Builder <span style="font-size:13px;color:#616161;font-weight:400;">| MSFT Field View &middot; ASPXi</span></h1>' +
-        '<div style="font-size:13px;color:#616161;margin-bottom:16px;">Create campaigns on behalf of your partners, then track each tenant from target list to closed \u2014 with ASPX signals to focus the partner on the right customers.</div>' +
+        '<div class="psm-aspx-title"><span class="insights">Insights</span><span class="divider">|</span><span class="section">Campaigns</span><span class="suite">AI Business Solutions &amp; Security &#9432;</span></div>' +
+        '<div class="psm-aspx-tabs"><button class="psm-aspx-tab active">PSM Campaign Builder</button><button class="psm-aspx-tab" onclick="switchView(\'field\')">Security Deal Clinic</button></div>' +
+        '<div style="font-size:13px;color:#616161;margin-bottom:16px;">Create and manage campaigns for <strong>'+psmEscapeHtml(psmPartnerContext)+'</strong>, then track each tenant from target list to closed with ASPX signals.</div>' +
         '<div class="table-toolbar psm-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn btn-primary" id="psmCreateBtn" onclick="psmOpenWizard()">Create campaign for a partner</button>' +
@@ -2144,6 +2197,46 @@
       freCompleted = false;
       freCurrentStep = 0;
       scheduleFreStart(150);
+    }
+
+    function psmScopedCampaigns() {
+      return psmCampaigns.filter(function(c) { return c.partner === psmPartnerContext; });
+    }
+
+    function psmRenderPartnerContext() {
+      var partnerOneId = PSM_PARTNER_ONE[psmPartnerContext] || '\u2014';
+      var mpnIds = PSM_PARTNER_ASSOCIATED_MPN[psmPartnerContext] || [];
+      document.getElementById('psmPartnerBanner').innerHTML =
+        '&#9432;&nbsp; You are currently viewing <strong>'+psmEscapeHtml(psmPartnerContext)+'</strong> ' +
+        '(PartnerOneID: <strong>'+psmEscapeHtml(partnerOneId)+'</strong>). The following associated MPN IDs are: ' +
+        '<strong>'+psmEscapeHtml(mpnIds.join(', '))+'</strong>.';
+      psmUpdatePartnerSearchPlaceholder();
+    }
+
+    function psmUpdatePartnerSearchPlaceholder() {
+      var type = document.getElementById('psmPartnerIdType').value;
+      document.getElementById('psmPartnerIdSearch').placeholder =
+        type === 'MPNID' ? 'Enter MPN ID' : 'Enter PartnerOne ID';
+    }
+
+    function psmFindPartner() {
+      var type = document.getElementById('psmPartnerIdType').value;
+      var query = document.getElementById('psmPartnerIdSearch').value.trim();
+      if (!query) { showToast('Enter a PartnerOne ID or MPN ID', true); return; }
+      var partner = Object.keys(PSM_PARTNER_ONE).find(function(name) {
+        if (type === 'PartnerOneID') return PSM_PARTNER_ONE[name] === query;
+        return (PSM_PARTNER_ASSOCIATED_MPN[name] || []).indexOf(query) > -1;
+      });
+      if (!partner) { showToast('No partner found for that '+(type === 'MPNID' ? 'MPN ID' : 'PartnerOne ID'), true); return; }
+      psmPartnerContext = partner;
+      psmSearchTerm = '';
+      psmActiveChartFilter = null;
+      psmActiveKpiFilter = null;
+      Object.keys(psmTableFilters).forEach(function(key) { psmTableFilters[key] = ''; });
+      document.getElementById('psmPartnerIdSearch').value = '';
+      psmRenderPartnerContext();
+      renderPsmView();
+      showToast('Now viewing ' + partner);
     }
 
     function psmGuideCardHtml() {
@@ -2184,8 +2277,9 @@
 
     function psmRenderDashboard() {
       psmCampaigns.forEach(psmEnrich);
+      var scopedCampaigns = psmScopedCampaigns();
       var search = (psmSearchTerm || '').toLowerCase();
-      var filtered = psmCampaigns.filter(function(c) {
+      var filtered = scopedCampaigns.filter(function(c) {
         if (search) {
           var haystack = [c.id, c.name, c.partner, c.region, c.workload, c.goal].join(' ').toLowerCase();
           if (haystack.indexOf(search) === -1) return false;
@@ -2213,8 +2307,8 @@
       });
 
       document.getElementById('psmSearchInput').value = psmSearchTerm;
-      psmRenderKpis();
-      psmRenderCharts();
+      psmRenderKpis(scopedCampaigns);
+      psmRenderCharts(scopedCampaigns);
 
       var visibleColumns = PSM_TABLE_COLUMNS.filter(function(column) { return psmVisibleColumns[column.key]; });
       document.getElementById('psmCampaignTableHead').innerHTML =
@@ -2236,21 +2330,19 @@
       return psmEscapeHtml(c[key] || '\u2014');
     }
 
-    function psmRenderKpis() {
+    function psmRenderKpis(scopedCampaigns) {
       var reachedStatuses = ['Active', 'Measuring', 'Completed'];
       var activeStatuses = ['Active'];
       var partnerStatuses = ['Active', 'Measuring', 'Completed'];
-      var customersReached = psmCampaigns.filter(function(c) { return reachedStatuses.indexOf(c.status) > -1; }).reduce(function(sum, c) { return sum + c.tenantCount; }, 0);
-      var activeCampaigns = psmCampaigns.filter(function(c) { return activeStatuses.indexOf(c.status) > -1; });
+      var customersReached = scopedCampaigns.filter(function(c) { return reachedStatuses.indexOf(c.status) > -1; }).reduce(function(sum, c) { return sum + c.tenantCount; }, 0);
+      var activeCampaigns = scopedCampaigns.filter(function(c) { return activeStatuses.indexOf(c.status) > -1; });
       var avgMau = activeCampaigns.length ? activeCampaigns.reduce(function(sum, c) { return sum + c.mauGrowth; }, 0) / activeCampaigns.length : 0;
-      var revenueTotal = psmCampaigns.reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
-      var pipelineRevenue = psmCampaigns.filter(function(c) { return c.status !== 'Completed' && c.status !== 'Draft'; }).reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
-      var partnerCount = new Set(psmCampaigns.filter(function(c) { return partnerStatuses.indexOf(c.status) > -1; }).map(function(c) { return c.partner; })).size;
-      var completedCount = psmCampaigns.filter(function(c) { return c.status === 'Completed'; }).length;
-      var netPaidSeats = psmCampaigns.reduce(function(sum, c) { return sum + (c.netPaidSeats || 0); }, 0);
+      var revenueTotal = scopedCampaigns.reduce(function(sum, c) { return sum + psmRevenueToNumber(c.revenueGrowth); }, 0);
+      var partnerCount = new Set(scopedCampaigns.filter(function(c) { return partnerStatuses.indexOf(c.status) > -1; }).map(function(c) { return c.partner; })).size;
+      var netPaidSeats = scopedCampaigns.reduce(function(sum, c) { return sum + (c.netPaidSeats || 0); }, 0);
 
       document.getElementById('psmKpiRow').innerHTML =
-        psmKpiTile('all', psmCampaigns.length, 'Campaigns') +
+        psmKpiTile('all', scopedCampaigns.length, 'Campaigns') +
         psmKpiTile('activePartners', partnerCount, 'Active Partners') +
         psmKpiTile('customersReached', customersReached.toLocaleString(), 'Customers Reached') +
         psmKpiTile('netPaidSeats', '+'+netPaidSeats.toLocaleString(), 'Net Paid Seats') +
@@ -2271,12 +2363,13 @@
     }
 
     function psmOpenFilterFlyout() {
+      var scopedCampaigns = psmScopedCampaigns();
       var fields = [
         { key: 'campaignStatus', label: 'Campaign Status', values: ['Defining', 'Executing', 'Closed'] },
         { key: 'status', label: 'Execution Phase', values: PSM_STATUS_ORDER },
-        { key: 'region', label: 'Region', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.region; }))).sort() },
-        { key: 'workload', label: 'Workload', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.workload; }))).sort() },
-        { key: 'goal', label: 'Primary Goal', values: Array.from(new Set(psmCampaigns.map(function(c) { return c.goal; }))).sort() }
+        { key: 'region', label: 'Region', values: Array.from(new Set(scopedCampaigns.map(function(c) { return c.region; }))).sort() },
+        { key: 'workload', label: 'Workload', values: Array.from(new Set(scopedCampaigns.map(function(c) { return c.workload; }))).sort() },
+        { key: 'goal', label: 'Primary Goal', values: Array.from(new Set(scopedCampaigns.map(function(c) { return c.goal; }))).sort() }
       ];
       document.getElementById('psmTableFlyoutTitle').textContent = 'Filter';
       document.getElementById('psmTableFlyoutDescription').textContent = 'Filter the campaign table by one or more campaign attributes.';
@@ -2331,14 +2424,14 @@
       document.getElementById('psmTableFlyout').classList.remove('show');
     }
 
-    function psmRenderCharts() {
+    function psmRenderCharts(scopedCampaigns) {
       var campaignStatusCounts = {};
       var executionCounts = {};
       var goalCounts = {};
       var regionCounts = {};
       var workloadCounts = {};
 
-      psmCampaigns.forEach(function(c) {
+      scopedCampaigns.forEach(function(c) {
         campaignStatusCounts[c.campaignStatus] = (campaignStatusCounts[c.campaignStatus] || 0) + 1;
         executionCounts[c.status] = (executionCounts[c.status] || 0) + 1;
         goalCounts[c.goal] = (goalCounts[c.goal] || 0) + 1;
@@ -2892,9 +2985,8 @@
     }
 
     function psmOpenWizard() {
-      var partners = psmGetPartners();
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: partners[0] || 'Contoso', scenarioId: 'amg', listSize: sc.est, goals: ['Consumption'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
+      psmWizardState = { step: 1, creationMode: 'field', name: '', partner: psmPartnerContext, scenarioId: 'amg', listSize: sc.est, goals: ['Consumption'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
@@ -2993,12 +3085,9 @@
     function psmBuildWizardStep(step) {
       var label = PSM_WIZARD_STEPS[step - 1];
       if (label === 'Partner') {
-        var partnerOptions = psmGetPartners().map(function(partner) {
-          return '<option value="'+psmEscapeHtml(partner)+'"'+(psmWizardState.partner === partner ? ' selected' : '')+'>'+psmEscapeHtml(partner)+'</option>';
-        }).join('');
         return '<div class="form-group"><label>Partner</label>' +
-          '<div class="psm-wiz-hint">Choose from the partners assigned to your signed-in ASPXi profile. PartnerOneID is already known from your session and is not requested again.</div>' +
-          '<select onchange="psmWizardState.partner=this.value" style="width:100%;">'+partnerOptions+'</select>' +
+          '<div class="psm-wiz-hint">This campaign will be created inside the partner instance currently selected in ASPXi. Use the partner picker in the top-right navigation to change partners first.</div>' +
+          '<div class="psm-context-note"><strong>'+psmEscapeHtml(psmPartnerContext)+'</strong> &middot; PartnerOneID '+psmEscapeHtml(PSM_PARTNER_ONE[psmPartnerContext])+'</div>' +
           '</div>' +
           '<div class="form-group"><label>Campaign name</label><input type="text" value="'+psmEscapeHtml(psmWizardState.name)+'" oninput="psmWizardState.name=this.value" placeholder="e.g. Contoso \u2013 M365 Copilot Growth FY26"></div>';
       }
