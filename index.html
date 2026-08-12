@@ -796,6 +796,8 @@
     .psm-workspace-scroll { overflow-x:hidden; border:1px solid #f0f0f0; border-radius:6px; }
     .psm-workspace-table { min-width:0; table-layout:fixed; }
     .psm-workspace-table th, .psm-workspace-table td { white-space:normal; padding:6px; vertical-align:top; overflow-wrap:anywhere; }
+    .psm-workspace-table th { font-size:10px; letter-spacing:0; line-height:1.2; }
+    .psm-workspace-table .psm-num-cell { padding-left:3px; padding-right:3px; text-align:right; }
     .psm-workspace-table select { width:100%; max-width:100%; }
     .psm-signal-list { display:flex; flex-direction:column; gap:0; font-size:10px; }
     .psm-signal-item { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px solid #f0f0f0; }
@@ -2653,12 +2655,12 @@
           '<td><strong>'+psmEscapeHtml(cust.name)+'</strong><span class="psm-th-sub" title="'+psmEscapeHtml(cust.tenantId)+'">'+psmEscapeHtml(cust.tenantId)+'</span><span class="psm-th-sub">'+psmEscapeHtml(cust.segment || '\u2014')+'</span></td>' +
           '<td style="text-align:center;" title="High when MAU whitespace is above 350, free-to-paid whitespace is above 150, or tenant health is unhealthy; Low when both whitespace measures are low; otherwise Medium."><span class="psm-pri psm-pri-'+pr.toLowerCase()+'">'+pr+'</span></td>' +
           '<td><div class="psm-cell-stack"><strong style="color:'+oppColor+';">'+psmEscapeHtml(opp)+'</strong><span style="color:'+healthColor+';font-weight:600;">'+psmEscapeHtml(health)+'</span></div></td>' +
-          '<td style="text-align:right;">'+(cust.copilotMauWhitespace != null ? cust.copilotMauWhitespace.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.freeToPaidWhitespace != null ? cust.freeToPaidWhitespace.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.consumedUnits != null ? cust.consumedUnits.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.copilotPru != null ? cust.copilotPru.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.agentMau != null ? cust.agentMau.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.coworkSessions != null ? cust.coworkSessions.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.copilotMauWhitespace != null ? cust.copilotMauWhitespace.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.freeToPaidWhitespace != null ? cust.freeToPaidWhitespace.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.consumedUnits != null ? cust.consumedUnits.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.copilotPru != null ? cust.copilotPru.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.agentMau != null ? cust.agentMau.toLocaleString() : '\u2014')+'</td>' +
+          '<td class="psm-num-cell">'+(cust.coworkSessions != null ? cust.coworkSessions.toLocaleString() : '\u2014')+'</td>' +
           '<td><div class="psm-cell-stack"><strong>'+psmEscapeHtml(cust.recommendedMci || 'N/A')+'</strong><span>'+(cust.mciWorkshops || 0)+' workshop'+((cust.mciWorkshops || 0) === 1 ? '' : 's')+' &middot; '+psmEscapeHtml(cust.mciStatus || 'Not started')+'</span><span>$'+(cust.fundingCommitted || 0).toLocaleString()+' committed</span></div></td>' +
           '<td>'+psmEscapeHtml(tw)+'</td>' +
           '<td><div class="psm-cell-stack"><select onchange="psmSetCustomerStage(\''+c.id+'\','+idx+',this.value)">'+stageOptions(cust.stage)+'</select><label style="display:flex;align-items:center;gap:4px;font-size:10px;"><input type="checkbox" '+(cust.agreement ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'agreement\',this.checked)" title="The customer confirmed interest in progressing this campaign motion."> Customer agreed</label></div></td>' +
@@ -2683,19 +2685,19 @@
         '</div>' +
         '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr>' +
           '<th style="width:2%;text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
-          '<th style="width:9%;">Customer</th>' +
-          '<th style="width:6%;text-align:center;">Priority</th>' +
+          '<th style="width:10%;">Customer</th>' +
+          '<th style="width:5%;text-align:center;">Priority</th>' +
           '<th style="width:8%;">Opportunity<br>&amp; Health</th>' +
-          '<th style="width:7%;text-align:right;">MAU<br><span class="psm-th-sub">whitespace</span></th>' +
-          '<th style="width:7%;text-align:right;">Free\u2192Paid<br><span class="psm-th-sub">whitespace</span></th>' +
-          '<th style="width:6%;text-align:right;">Consumption</th>' +
-          '<th style="width:6%;text-align:right;">Copilot<br>PRU</th>' +
-          '<th style="width:6%;text-align:right;">Agent<br>MAU</th>' +
-          '<th style="width:6%;text-align:right;">Cowork<br><span class="psm-th-sub">sessions</span></th>' +
-          '<th style="width:11%;">MCI Delivery</th>' +
-          '<th style="width:8%;">Workloads</th>' +
-          '<th style="width:8%;">Progress</th>' +
-          '<th style="width:10%;">Partner Notes</th>' +
+          '<th class="psm-num-cell" style="width:6%;">MAU<br><span class="psm-th-sub">whitespace</span></th>' +
+          '<th class="psm-num-cell" style="width:6%;">Free\u2192Paid<br><span class="psm-th-sub">whitespace</span></th>' +
+          '<th class="psm-num-cell" style="width:6.5%;">Consumption</th>' +
+          '<th class="psm-num-cell" style="width:4.5%;">Copilot<br>PRU</th>' +
+          '<th class="psm-num-cell" style="width:5%;">Agent<br>MAU</th>' +
+          '<th class="psm-num-cell" style="width:5.5%;">Cowork<br><span class="psm-th-sub">sessions</span></th>' +
+          '<th style="width:13%;">MCI Delivery</th>' +
+          '<th style="width:9%;">Workloads</th>' +
+          '<th style="width:8.5%;">Progress</th>' +
+          '<th style="width:11%;">Partner Notes</th>' +
         '</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div style="margin-top:10px;font-size:11px;color:#616161;">Customer Agreement means confirmed interest in progressing the campaign motion, not a contract signature. In this prototype, values are illustrative; production telemetry and MCI field mappings require engineering data-contract validation.</div>' +
       '</div>';
