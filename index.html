@@ -1581,6 +1581,22 @@
       'Contoso Systems': ['734512', '734513'],
       'Contoso Cloud': ['901655', '901656']
     };
+    (function expandPsmCampaignsByPartner() {
+      var templates = psmCampaigns.map(function(campaign) {
+        return JSON.parse(JSON.stringify(campaign));
+      });
+      var expanded = [];
+      Object.keys(PSM_PARTNER_MPN).forEach(function(partner, partnerIndex) {
+        templates.forEach(function(template, templateIndex) {
+          var campaign = JSON.parse(JSON.stringify(template));
+          campaign.id = 'PSM-' + String((partnerIndex * 100) + templateIndex + 1).padStart(3, '0');
+          campaign.partner = partner;
+          campaign.mpn = PSM_PARTNER_MPN[partner];
+          expanded.push(campaign);
+        });
+      });
+      psmCampaigns.splice.apply(psmCampaigns, [0, psmCampaigns.length].concat(expanded));
+    })();
     const PSM_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Microsoft 365 Copilot Cowork', 'Copilot Extensibility', 'Microsoft 365 Copilot Agents', 'Exchange', 'SharePoint', 'Teams', 'Teams Phone', 'Teams Meeting', 'Microsoft Entra ID P1', 'Microsoft Entra ID P2', 'Microsoft Defender for Endpoint', 'Microsoft Defender for Endpoint P2', 'Microsoft Defender for Identity', 'Microsoft Defender for Office 365', 'Microsoft Defender for Cloud Apps', 'Purview Information Protection', 'Purview Data Lifecycle and Records Management', 'Intune'];
     const PSM_MCI_OFFERS = ['Copilot + Power Deployment Accelerator (XS)', 'Copilot + Power Deployment Accelerator (M)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (XS)', 'Copilot + Power Envisioning & PoC/Deployment Accelerator (M)', 'Data Security Envisioning workshop', 'Threat Protection Envisioning', 'N/A'];
     const PSM_OPPORTUNITY = ['Acquire', 'Monetize', 'Grow', 'Other'];
