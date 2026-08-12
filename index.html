@@ -2565,8 +2565,7 @@
       detail.innerHTML =
         '<div class="flyout-header">' +
           '<div class="psm-detail-actions">' +
-            '<button class="btn btn-secondary" onclick="showDashboard()">&larr; All campaigns</button>' +
-            '<span style="font-size:11px;color:#616161;">Full-page campaign workspace</span>' +
+            '<button class="btn btn-primary" onclick="showDashboard()">&larr; All Campaigns</button>' +
           '</div>' +
           '<div class="psm-detail-actions">' +
             '<div class="psm-status-control psm-edit-only"><label>Campaign status</label><select onchange="psmSetCampaignStatus(\''+c.id+'\',this.value)"><option'+(c.campaignStatus === 'Defining' ? ' selected' : '')+'>Defining</option><option'+(c.campaignStatus === 'Executing' ? ' selected' : '')+'>Executing</option><option'+(c.campaignStatus === 'Closed' ? ' selected' : '')+'>Closed</option></select></div>' +
