@@ -644,6 +644,12 @@
     }
     .psm-metric-card .label { display: block; font-size: 11px; color: #616161; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; }
     .psm-metric-card .value { display: block; font-size: 24px; font-weight: 700; color: #0078d4; }
+    .psm-metric-grid.compact-eight { grid-template-columns:repeat(8, minmax(0, 1fr)); gap:8px; }
+    .psm-metric-grid.compact-eight .psm-metric-card { padding:9px 8px; min-width:0; }
+    .psm-metric-grid.compact-eight .label { font-size:9px; line-height:1.2; min-height:22px; margin-bottom:3px; }
+    .psm-metric-grid.compact-eight .value { font-size:18px; line-height:1.15; white-space:nowrap; }
+    #psmPerfPanel, #psmMciPanel { padding:14px; margin-bottom:10px; }
+    #psmPerfPanel h2, #psmMciPanel h2 { margin-bottom:9px; padding-bottom:6px; }
     .psm-detail-grid {
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
     }
@@ -786,12 +792,21 @@
     .psm-th-sub { display:block; font-weight:400; text-transform:none; letter-spacing:0; font-size:10px; color:#8a8886; }
     .psm-workspace-table th { vertical-align: bottom; }
     .psm-workspace-table tbody tr:hover { background:#f7fbff; }
-    .psm-workspace-scroll { overflow-x:auto; border:1px solid #f0f0f0; border-radius:6px; }
-    .psm-workspace-table { min-width:2450px; }
-    .psm-workspace-table th, .psm-workspace-table td { white-space:nowrap; }
+    .psm-workspace-scroll { overflow-x:hidden; border:1px solid #f0f0f0; border-radius:6px; }
+    .psm-workspace-table { min-width:0; table-layout:fixed; }
+    .psm-workspace-table th, .psm-workspace-table td { white-space:normal; padding:6px; vertical-align:top; overflow-wrap:anywhere; }
+    .psm-workspace-table select { width:100%; max-width:100%; }
+    .psm-signal-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 7px; font-size:10px; }
+    .psm-signal-grid span { color:#616161; }
+    .psm-signal-grid strong { display:block; color:#242424; font-size:11px; }
+    .psm-cell-stack { display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.25; }
+    .psm-data-badge { display:inline-block; margin-top:3px; padding:1px 5px; border:1px solid #d1d1d1; border-radius:8px; font-size:8px; font-weight:700; color:#616161; text-transform:uppercase; letter-spacing:.2px; }
+    .psm-data-badge.derived { border-color:#c19c00; color:#8a6d00; background:#fff4ce; }
+    .psm-data-badge.manual { border-color:#0078d4; color:#004578; background:#eef3fb; }
+    .psm-priority-explainer { font-size:11px; color:#424242; background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:8px 10px; margin:8px 0 10px; line-height:1.4; }
     .psm-cust-comment { width:150px; padding:4px 6px; font-size:12px; border:1px solid #d1d1d1; border-radius:4px; font-family:inherit; }
-    textarea.psm-cust-comment { width:260px; min-height:64px; resize:both; white-space:normal; }
-    textarea.psm-cust-comment:focus { width:380px; min-height:120px; }
+    textarea.psm-cust-comment { width:100%; min-height:54px; resize:vertical; white-space:normal; }
+    textarea.psm-cust-comment:focus { width:100%; min-height:90px; }
     .psm-detail-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .psm-status-control { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; background:var(--cp-surface-soft); border:1px solid var(--cp-border); border-radius:0.625rem; }
     .psm-status-control label { font-size:11px; font-weight:700; color:var(--cp-text-muted); text-transform:uppercase; }
@@ -2575,7 +2590,7 @@
           '</div>' +
         '</div>' +
         '<div class="psm-context-note" style="margin-bottom:16px;"><strong>'+psmEscapeHtml(ownership.name)+':</strong> '+psmEscapeHtml(ownership.desc)+' This shared workspace supports live partner reviews; presentation mode removes PSM editing controls.</div>' +
-        '<div class="panel-card" id="psmPerfPanel"><h2>FY27 Performance &amp; Usage</h2><div class="psm-metric-grid">' +
+        '<div class="panel-card" id="psmPerfPanel"><h2>FY27 Performance &amp; Usage</h2><div class="psm-metric-grid compact-eight">' +
           '<div class="psm-metric-card"><span class="label">Consumption</span><span class="value">'+c.consumption.toLocaleString()+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Copilot PRU</span><span class="value">'+c.copilotPru.toLocaleString()+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Agent MAU</span><span class="value">'+c.agentMau.toLocaleString()+'</span></div>' +
@@ -2587,7 +2602,7 @@
         '</div>' +
         '<div style="font-size:11px;color:#616161;margin-top:10px;">Revenue change is an illustrative estimate derived from net paid seats multiplied by modeled recurring revenue per seat, plus committed MCI funding. It is not booked revenue.</div>' +
         '</div>' +
-        '<div class="panel-card"><h2>MCI Delivery &amp; Funding</h2><div class="psm-metric-grid">' +
+        '<div class="panel-card" id="psmMciPanel"><h2>MCI Delivery &amp; Funding</h2><div class="psm-metric-grid">' +
           '<div class="psm-metric-card"><span class="label">Workshops Landed</span><span class="value">'+c.mciWorkshops.toLocaleString()+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Delivery Status</span><span class="value" style="font-size:18px;">'+psmEscapeHtml(c.mciStatus)+'</span></div>' +
           '<div class="psm-metric-card"><span class="label">Funding Committed</span><span class="value">$'+c.fundingCommitted.toLocaleString()+'</span></div>' +
@@ -2634,29 +2649,26 @@
         var tw = (cust.targetedWorkloads || []).join(', ') || '\u2014';
         return '<tr>' +
           '<td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+idx+'"></td>' +
-          '<td><strong>'+psmEscapeHtml(cust.name)+'</strong><br><span class="psm-th-sub" title="'+psmEscapeHtml(cust.tenantId)+'">'+psmEscapeHtml(cust.tenantId)+'</span></td>' +
-          '<td>'+psmEscapeHtml(cust.segment || '\u2014')+'</td>' +
-          '<td style="text-align:center;"><span class="psm-pri psm-pri-'+pr.toLowerCase()+'">'+pr+'</span></td>' +
-          '<td style="color:'+oppColor+';font-weight:600;">'+psmEscapeHtml(opp)+'</td>' +
-          '<td style="color:'+healthColor+';font-weight:600;">'+psmEscapeHtml(health)+'</td>' +
-          '<td style="text-align:right;">'+(cust.copilotMauWhitespace != null ? cust.copilotMauWhitespace.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.freeToPaidWhitespace != null ? cust.freeToPaidWhitespace.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.consumedUnits != null ? cust.consumedUnits.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.copilotPru != null ? cust.copilotPru.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.agentMau != null ? cust.agentMau.toLocaleString() : '\u2014')+'</td>' +
-          '<td style="text-align:right;">'+(cust.coworkSessions != null ? cust.coworkSessions.toLocaleString() : '\u2014')+'</td>' +
-          '<td>'+psmEscapeHtml(cust.recommendedMci || 'N/A')+(cust.mciEligible ? '' : ' <span class="psm-th-sub">(not eligible)</span>')+'</td>' +
-          '<td style="text-align:center;">'+(cust.mciWorkshops || 0)+'</td>' +
-          '<td>'+psmEscapeHtml(cust.mciStatus || 'Not started')+'</td>' +
-          '<td style="text-align:right;">$'+(cust.fundingCommitted || 0).toLocaleString()+'</td>' +
+          '<td><strong>'+psmEscapeHtml(cust.name)+'</strong><span class="psm-th-sub" title="'+psmEscapeHtml(cust.tenantId)+'">'+psmEscapeHtml(cust.tenantId)+'</span><span class="psm-th-sub">'+psmEscapeHtml(cust.segment || '\u2014')+'</span></td>' +
+          '<td style="text-align:center;" title="Derived from ASPX opportunity signals: High when MAU whitespace is above 350, free-to-paid whitespace is above 150, or tenant health is unhealthy; Low when both whitespace measures are low; otherwise Medium."><span class="psm-pri psm-pri-'+pr.toLowerCase()+'">'+pr+'</span><span class="psm-data-badge derived">Derived</span></td>' +
+          '<td><div class="psm-cell-stack"><strong style="color:'+oppColor+';">'+psmEscapeHtml(opp)+'</strong><span style="color:'+healthColor+';font-weight:600;">'+psmEscapeHtml(health)+'</span></div></td>' +
+          '<td><div class="psm-signal-grid">' +
+            '<span>MAU whitespace<strong>'+(cust.copilotMauWhitespace != null ? cust.copilotMauWhitespace.toLocaleString() : '\u2014')+'</strong></span>' +
+            '<span>Free\u2192Paid<strong>'+(cust.freeToPaidWhitespace != null ? cust.freeToPaidWhitespace.toLocaleString() : '\u2014')+'</strong></span>' +
+            '<span>Consumption<strong>'+(cust.consumedUnits != null ? cust.consumedUnits.toLocaleString() : '\u2014')+'</strong></span>' +
+            '<span>Copilot PRU<strong>'+(cust.copilotPru != null ? cust.copilotPru.toLocaleString() : '\u2014')+'</strong></span>' +
+            '<span>Agent MAU<strong>'+(cust.agentMau != null ? cust.agentMau.toLocaleString() : '\u2014')+'</strong></span>' +
+            '<span>Cowork<strong>'+(cust.coworkSessions != null ? cust.coworkSessions.toLocaleString() : '\u2014')+'</strong></span>' +
+          '</div></td>' +
+          '<td><div class="psm-cell-stack"><strong>'+psmEscapeHtml(cust.recommendedMci || 'N/A')+'</strong><span>'+(cust.mciWorkshops || 0)+' workshop'+((cust.mciWorkshops || 0) === 1 ? '' : 's')+' &middot; '+psmEscapeHtml(cust.mciStatus || 'Not started')+'</span><span>$'+(cust.fundingCommitted || 0).toLocaleString()+' committed</span></div></td>' +
           '<td>'+psmEscapeHtml(tw)+'</td>' +
-          '<td><select onchange="psmSetCustomerStage(\''+c.id+'\','+idx+',this.value)">'+stageOptions(cust.stage)+'</select></td>' +
-          '<td style="text-align:center;"><input type="checkbox" '+(cust.agreement ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'agreement\',this.checked)" title="The customer confirmed interest in progressing this campaign motion."></td>' +
+          '<td><div class="psm-cell-stack"><select onchange="psmSetCustomerStage(\''+c.id+'\','+idx+',this.value)">'+stageOptions(cust.stage)+'</select><label style="display:flex;align-items:center;gap:4px;font-size:10px;"><input type="checkbox" '+(cust.agreement ? 'checked' : '')+' onchange="psmToggleCustomerFlag(\''+c.id+'\','+idx+',\'agreement\',this.checked)" title="The customer confirmed interest in progressing this campaign motion."> Customer agreed</label></div></td>' +
           '<td><textarea class="psm-cust-comment" oninput="psmSaveCustomerComment(\''+c.id+'\','+idx+',this.value)" placeholder="Add a detailed partner status note\u2026">'+psmEscapeHtml(cust.comments || '')+'</textarea></td>' +
         '</tr>';
       }).join('');
       return '<div class="panel-card" id="psmWorkspacePanel"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
-        '<div style="font-size:13px;color:#424242;margin-bottom:12px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Use the <strong>ASPX signals</strong> (Copilot MAU whitespace, free\u2192paid whitespace, agents MAU, tenant health) to focus the partner on the highest-opportunity tenants. Columns mirror the offline PSM tracking sheet so partners see a familiar view.</div>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:8px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. The workspace keeps ASPX signals visible while limiting manual updates to campaign progress and partner context.</div>' +
+        '<div class="psm-priority-explainer"><strong>Data ownership:</strong> The current ASPX baseline confirms tenant identity, segment, health, Copilot opportunity, MAU / whitespace and Agent MAU as system fields. Consumption, Copilot PRU and Cowork are proposed FY27 telemetry feeds that still require source validation. <span class="psm-data-badge derived">Derived</span> Priority is calculated from ASPX signals, not entered by the user. <span class="psm-data-badge manual">Manual</span> Tenant Status, Customer Agreement and Partner Notes are maintained by the PSM or partner. MCI delivery and funding require MCI Performance integration.</div>' +
         '<div class="psm-bulk-bar" id="psmBulkBar">' +
           '<span class="psm-bulk-label">Bulk update selected tenants:</span>' +
           '<select id="psmBulkStage">'+stageBulkOptions+'</select>' +
@@ -2671,28 +2683,17 @@
           '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'Exported \u2014 send to partner for periodic review\')">Export for Excel review</button>' +
         '</div>' +
         '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr>' +
-          '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
-          '<th>Customer<br><span class="psm-th-sub">Tenant ID</span></th>' +
-          '<th>Segment</th>' +
-          '<th style="text-align:center;">Priority</th>' +
-          '<th>Copilot Opp.<br><span class="psm-th-sub">Acquire/Monetize/Grow</span></th>' +
-          '<th>Tenant Health</th>' +
-          '<th style="text-align:right;">Copilot MAU<br><span class="psm-th-sub">whitespace</span></th>' +
-          '<th style="text-align:right;">Free\u2192Paid<br><span class="psm-th-sub">whitespace</span></th>' +
-          '<th style="text-align:right;">Consumption<br><span class="psm-th-sub">units</span></th>' +
-          '<th style="text-align:right;">Copilot PRU</th>' +
-          '<th style="text-align:right;">Agent MAU</th>' +
-          '<th style="text-align:right;">Cowork<br><span class="psm-th-sub">sessions</span></th>' +
-          '<th>Recommended MCI</th>' +
-          '<th style="text-align:center;">MCI Workshops<br><span class="psm-th-sub">landed</span></th>' +
-          '<th>MCI Status</th>' +
-          '<th style="text-align:right;">Funding<br><span class="psm-th-sub">committed</span></th>' +
-          '<th>Targeted Workloads</th>' +
-          '<th>Tenant Status</th>' +
-          '<th style="text-align:center;">Customer Agreement<br><span class="psm-th-sub">confirmed interest</span></th>' +
-          '<th>Partner Comments</th>' +
+          '<th style="width:3%;text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
+          '<th style="width:12%;">Customer<span class="psm-data-badge">ASPX</span></th>' +
+          '<th style="width:7%;text-align:center;">Priority<span class="psm-data-badge derived">Derived</span></th>' +
+          '<th style="width:10%;">Opportunity &amp; Health<span class="psm-data-badge">ASPX</span></th>' +
+          '<th style="width:20%;">Usage Signals<span class="psm-data-badge">ASPX + FY27</span></th>' +
+          '<th style="width:15%;">MCI Delivery<span class="psm-data-badge">MCI</span></th>' +
+          '<th style="width:10%;">Workloads<span class="psm-data-badge">Campaign</span></th>' +
+          '<th style="width:11%;">Progress<span class="psm-data-badge manual">Manual</span></th>' +
+          '<th style="width:12%;">Partner Notes<span class="psm-data-badge manual">Manual</span></th>' +
         '</tr></thead><tbody>'+rows+'</tbody></table></div>' +
-        '<div style="margin-top:10px;font-size:11px;color:#616161;">Every tenant has its own status. Customer Agreement means the customer has confirmed interest in progressing this campaign motion; it is not a contract signature. Excel uploads sync row updates into this workspace for PSM review. Signals, usage and MCI values are illustrative pending telemetry sign-off.</div>' +
+        '<div style="margin-top:10px;font-size:11px;color:#616161;">Customer Agreement means confirmed interest in progressing the campaign motion, not a contract signature. In this prototype, values are illustrative; production telemetry and MCI field mappings require engineering data-contract validation.</div>' +
       '</div>';
     }
 
