@@ -2919,7 +2919,7 @@
 
     function psmOpenWizard() {
       var sc = psmScenarioById('amg');
-      psmWizardState = { step: 1, name: '', partner: psmPartnerContext, scenarioId: 'amg', listSize: sc.est, goals: ['MAU'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], motions: ['Partner GTM'], mciOffer: 'N/A', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null, quickFilters: { segment: '', industry: '', association: '', seatsMin: '', seatsMax: '', dominantSku: '', mciEligibility: '' } };
+      psmWizardState = { step: 1, name: '', partner: psmPartnerContext, scenarioId: 'amg', listSize: sc.est, goals: ['MAU'], workload: 'Copilot', workloads: ['Microsoft 365 Copilot'], motions: ['Partner GTM'], mciOffer: 'N/A', rationaleProfile: psmProfileForScenario('amg', 'Copilot'), aiOutcome: '', aiRegion: 'Americas', aiGenerated: false, scenarioEdits: {}, editingScenario: null };
       psmRenderWizard();
       showModal('psmWizardModal');
     }
@@ -2960,16 +2960,57 @@
     }
 
     function psmSaveScenarioEdit(id) {
-      var criteria = (document.getElementById('psmScnCriteria') || {}).value || '';
-      var size = parseInt((document.getElementById('psmScnListSize') || {}).value, 10) || 0;
+      var filters = {
+        segment: document.getElementById('psmScnSegment').value,
+        industry: document.getElementById('psmScnIndustry').value.trim(),
+        association: document.getElementById('psmScnAssociation').value,
+        seatsMin: document.getElementById('psmScnSeatsMin').value,
+        seatsMax: document.getElementById('psmScnSeatsMax').value,
+        dominantSku: document.getElementById('psmScnDominantSku').value.trim(),
+        mciEligibility: document.getElementById('psmScnMciEligibility').value
+      };
+      var defaults = psmScenarioDefaultFilters(id);
+      var modified = JSON.stringify(filters) !== JSON.stringify(defaults);
+      var size = psmEstimateScenarioSize(id, filters);
+      var criteria = psmScenarioFilterSummary(filters);
       psmWizardState.scenarioEdits = psmWizardState.scenarioEdits || {};
-      psmWizardState.scenarioEdits[id] = { criteria: criteria.trim(), listSize: size, modified: true };
+      psmWizardState.scenarioEdits[id] = { criteria: criteria, filters: filters, listSize: size, modified: modified };
       psmWizardState.editingScenario = null;
       psmWizardState.scenarioId = id;
       psmWizardState.listSize = size;
-      if (criteria.trim()) psmWizardState.rationaleProfile = criteria.trim();
+      psmWizardState.rationaleProfile = criteria;
       psmRenderWizard();
-      showToast('Recommendation criteria and target list updated');
+      showToast(modified ? 'Recommendation filters and target list updated' : 'Recommendation filters restored to defaults');
+    }
+
+    function psmScenarioDefaultFilters(id) {
+      var defaults = {
+        amg: { segment: 'All', industry: 'All', association: 'CPOR', seatsMin: '', seatsMax: '', dominantSku: 'Monetized account', mciEligibility: 'Any' },
+        f2p: { segment: 'All', industry: 'All', association: 'Any', seatsMin: '50', seatsMax: '', dominantSku: 'Copilot Chat or trial', mciEligibility: 'Any' },
+        'copilot-adopt': { segment: 'All', industry: 'All', association: 'Any', seatsMin: '50', seatsMax: '', dominantSku: 'Microsoft 365 Copilot', mciEligibility: 'Any' },
+        purview: { segment: 'All', industry: 'All', association: 'Any', seatsMin: '', seatsMax: '', dominantSku: 'Microsoft 365 Copilot', mciEligibility: 'Eligible' },
+        frontier: { segment: 'Enterprise', industry: 'All', association: 'Any', seatsMin: '300', seatsMax: '', dominantSku: 'Foundry', mciEligibility: 'Eligible' }
+      };
+      return Object.assign({}, defaults[id] || defaults.amg);
+    }
+
+    function psmEstimateScenarioSize(id, filters) {
+      var scenario = psmScenarioById(id);
+      var defaults = psmScenarioDefaultFilters(id);
+      var changes = Object.keys(filters).filter(function(key) { return filters[key] !== defaults[key]; }).length;
+      return Math.max(10, Math.round(scenario.est * Math.pow(0.82, changes)));
+    }
+
+    function psmScenarioFilterSummary(filters) {
+      return 'Segment: '+filters.segment+'; Industry: '+filters.industry+'; Association: '+filters.association+
+        '; Seats: '+(filters.seatsMin || '0')+' to '+(filters.seatsMax || 'no maximum')+
+        '; Dominant SKU: '+filters.dominantSku+'; MCI eligibility: '+filters.mciEligibility+'.';
+    }
+
+    function psmFilterOptions(values, selected) {
+      return values.map(function(value) {
+        return '<option'+(value === selected ? ' selected' : '')+'>'+psmEscapeHtml(value)+'</option>';
+      }).join('');
     }
 
     function psmToggleGoal(goal, checked) {
@@ -3057,7 +3098,7 @@
           var edit = psmWizardState.scenarioEdits && psmWizardState.scenarioEdits[s.id];
           var curSize = edit ? edit.listSize : s.est;
           var estText = s.id === 'manual' ? 'You choose the tenants (no Excel)' : (s.ai ? 'Optional V1+ pilot — validate recommendation quality before scaling' : '~' + curSize.toLocaleString() + ' matching tenants');
-          var modifiedBadge = (edit && edit.modified) ? '<span class="psm-modified-badge">Modified</span>' : '';
+          var modifiedBadge = (edit && edit.modified) ? '<span class="psm-modified-badge">(Modified)</span>' : '';
           var editIcon = editable ? '<button class="psm-scn-edit-btn" title="Edit criteria &amp; target list" onclick="event.stopPropagation(); psmEditScenario(\''+s.id+'\')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2L6 12l-2.5.5L4 10l7.5-7.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>' : '';
           var aiExtra = '';
           if (s.ai && sel) {
@@ -3074,14 +3115,22 @@
           }
           var editBox = '';
           if (editable && psmWizardState.editingScenario === s.id) {
-            var critVal = edit ? edit.criteria : psmProfileForScenario(s.id, psmWizardState.workload);
+            var filters = edit && edit.filters ? edit.filters : psmScenarioDefaultFilters(s.id);
             editBox = '<div class="psm-scn-edit" onclick="event.stopPropagation();">' +
-              '<label style="font-size:11px;color:#616161;">Targeting criteria</label>' +
-              '<textarea id="psmScnCriteria">'+psmEscapeHtml(critVal)+'</textarea>' +
-              '<label style="font-size:11px;color:#616161;margin-top:8px;display:block;">Target tenant list size</label>' +
-              '<input type="number" min="0" id="psmScnListSize" value="'+curSize+'" style="max-width:160px;">' +
+              '<div style="font-size:12px;font-weight:600;margin-bottom:4px;">Edit the filters used to build this recommendation</div>' +
+              '<div class="psm-wiz-hint">Saving a filter change recalculates this target list and marks this recommendation as modified.</div>' +
+              '<div class="psm-target-filters">' +
+                '<label>Segment<select id="psmScnSegment">'+psmFilterOptions(['All', 'Enterprise', 'SME&C Corporate', 'SME&C SMB'], filters.segment)+'</select></label>' +
+                '<label>Industry<input id="psmScnIndustry" value="'+psmEscapeHtml(filters.industry)+'" placeholder="All"></label>' +
+                '<label>Association<select id="psmScnAssociation">'+psmFilterOptions(['Any', 'CPOR', 'DPOR', 'PAL', 'None'], filters.association)+'</select></label>' +
+                '<label>Dominant SKU<input id="psmScnDominantSku" value="'+psmEscapeHtml(filters.dominantSku)+'"></label>' +
+                '<label>Seats minimum<input id="psmScnSeatsMin" type="number" min="0" value="'+psmEscapeHtml(filters.seatsMin)+'"></label>' +
+                '<label>Seats maximum<input id="psmScnSeatsMax" type="number" min="0" value="'+psmEscapeHtml(filters.seatsMax)+'" placeholder="No maximum"></label>' +
+                '<label>MCI eligibility<select id="psmScnMciEligibility">'+psmFilterOptions(['Any', 'Eligible', 'Not eligible'], filters.mciEligibility)+'</select></label>' +
+              '</div>' +
+              '<div style="font-size:11px;color:#616161;margin-top:10px;">Current result: approximately <strong>'+curSize.toLocaleString()+'</strong> matching tenants</div>' +
               '<div style="margin-top:10px;display:flex;gap:8px;">' +
-                '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmSaveScenarioEdit(\''+s.id+'\')">Save changes</button>' +
+                '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="psmSaveScenarioEdit(\''+s.id+'\')">Apply filters</button>' +
                 '<button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="psmCancelScenarioEdit()">Cancel</button>' +
               '</div>' +
             '</div>';
@@ -3094,17 +3143,7 @@
             aiExtra +
           '</div>';
         }).join('');
-        var qf = psmWizardState.quickFilters || {};
-        var quickFilters = '<div class="psm-how-box"><strong>Customize this quick view</strong><div class="psm-wiz-hint" style="margin-top:4px;">Filters are saved with the campaign so PSMs can reuse precise target definitions.</div><div class="psm-target-filters">' +
-          '<label>Segment<select onchange="psmWizardState.quickFilters.segment=this.value"><option value="">All</option><option>Enterprise</option><option>SME&amp;C Corporate</option><option>SME&amp;C SMB</option></select></label>' +
-          '<label>Industry<input value="'+psmEscapeHtml(qf.industry)+'" placeholder="e.g. Financial Services" oninput="psmWizardState.quickFilters.industry=this.value"></label>' +
-          '<label>Association<select onchange="psmWizardState.quickFilters.association=this.value"><option value="">Any</option><option>CPOR</option><option>DPOR</option><option>PAL</option><option>None</option></select></label>' +
-          '<label>Dominant SKU<input value="'+psmEscapeHtml(qf.dominantSku)+'" placeholder="e.g. Microsoft 365 E3" oninput="psmWizardState.quickFilters.dominantSku=this.value"></label>' +
-          '<label>Seats minimum<input type="number" min="0" value="'+psmEscapeHtml(qf.seatsMin)+'" placeholder="e.g. 300" oninput="psmWizardState.quickFilters.seatsMin=this.value"></label>' +
-          '<label>Seats maximum<input type="number" min="0" value="'+psmEscapeHtml(qf.seatsMax)+'" placeholder="No maximum" oninput="psmWizardState.quickFilters.seatsMax=this.value"></label>' +
-          '<label>MCI eligibility<select onchange="psmWizardState.quickFilters.mciEligibility=this.value"><option value="">Any</option><option>Eligible</option><option>Not eligible</option></select></label>' +
-          '</div></div>';
-        return '<div class="form-group"><label>Build the target list</label><div class="psm-wiz-hint">Start from a configurable quick view or build manually. AI-guided recommendations remain an optional V1 enhancement until recommendation quality is validated.</div>'+cards+quickFilters+
+        return '<div class="form-group"><label>Build the target list</label><div class="psm-wiz-hint">Choose a recommendation and use its pencil icon to adjust the filters that create that list. AI-guided recommendations remain an optional V1 enhancement until recommendation quality is validated.</div>'+cards+
           '<div style="margin-top:10px;"><label style="font-size:11px;color:#616161;font-weight:400;">Target list size (tenants)</label><input type="number" min="0" value="'+psmWizardState.listSize+'" oninput="psmWizardState.listSize=parseInt(this.value,10)||0" style="max-width:160px;"></div></div>';
       }
       return '<div class="psm-wizard-review">' +
@@ -3179,7 +3218,7 @@
         mciStatus: 'Not started',
         motions: ['Partner GTM'],
         mciOffer: psmWizardState.mciOffer,
-        quickFilters: Object.assign({}, psmWizardState.quickFilters),
+        recommendationFilters: ((psmWizardState.scenarioEdits || {})[psmWizardState.scenarioId] || {}).filters || psmScenarioDefaultFilters(psmWizardState.scenarioId),
         fundingCommitted: 0,
         trackedCount: 0,
         signals: [],
