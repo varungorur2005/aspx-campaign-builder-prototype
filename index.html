@@ -622,8 +622,19 @@
     #psmWizardModal .btn-group { margin-top: 18px; padding-top: 16px; border-top: 1px solid #edebe9; }
     .psm-wiz-hint { font-size: 12px; color: #616161; margin-bottom: 10px; line-height: 1.45; }
     .psm-wiz-note { font-size: 12px; color: #004578; background: #eef3fb; border: 1px solid #cfe0f5; border-radius: 6px; padding: 9px 12px; margin-top: 8px; line-height: 1.45; }
-    .psm-wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 18px; max-height: 220px; overflow-y: auto; border: 1px solid #edebe9; border-radius: 6px; padding: 12px 14px; }
+    .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
+    .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
+    .psm-wl-picker summary::-webkit-details-marker { display:none; }
+    .psm-wl-picker summary::after { content:'▾'; color:var(--cp-text-muted); font-size:12px; transition:transform .15s; }
+    .psm-wl-picker[open] summary::after { transform:rotate(180deg); }
+    .psm-wl-picker summary:hover { background:var(--cp-surface-soft); }
+    .psm-wl-picker-title { display:flex; flex-direction:column; gap:2px; }
+    .psm-wl-picker-title strong { font-size:13px; }
+    .psm-wl-picker-title span { font-size:11px; color:var(--cp-text-muted); font-weight:400; }
+    .psm-wl-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px 18px; max-height:210px; overflow-y:auto; border-top:1px solid var(--cp-border); padding:12px 14px; }
     .psm-wl-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 400; margin-bottom: 0; color: #242424; }
+    .psm-wl-selected { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .psm-wl-chip { display:inline-flex; align-items:center; padding:3px 8px; border-radius:0.625rem; background:var(--cp-accent-soft); color:var(--cp-accent); font-size:11px; font-weight:600; }
     .psm-target-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; margin-top:12px; }
     .psm-target-filters label { font-size:11px !important; color:var(--cp-text-muted) !important; }
     .psm-target-filters input, .psm-target-filters select { width:100%; }
@@ -2986,6 +2997,25 @@
       var first = psmWizardState.workloads[0];
       psmWizardState.workload = first ? psmWorkloadToCategory(first) : 'Copilot';
       psmWizardState.rationaleProfile = psmProfileForScenario(psmWizardState.scenarioId, psmWizardState.workload);
+      psmUpdateWorkloadSummary();
+    }
+
+    function psmUpdateWorkloadSummary() {
+      var workloads = psmWizardState.workloads || [];
+      var count = document.getElementById('psmWorkloadCount');
+      var selected = document.getElementById('psmSelectedWorkloads');
+      if (count) count.textContent = workloads.length ? workloads.length + ' selected' : 'None selected';
+      if (selected) {
+        selected.innerHTML = psmWorkloadChipsHtml(workloads);
+      }
+    }
+
+    function psmWorkloadChipsHtml(workloads) {
+      if (!workloads.length) return '<span style="font-size:11px;color:var(--cp-text-muted);">No workloads selected</span>';
+      var visible = workloads.slice(0, 3).map(function(workload) {
+        return '<span class="psm-wl-chip">'+psmEscapeHtml(workload)+'</span>';
+      }).join('');
+      return visible + (workloads.length > 3 ? '<span class="psm-wl-chip">+'+(workloads.length - 3)+' more</span>' : '');
     }
 
     function psmAiGenerate() {
@@ -3012,11 +3042,12 @@
         var goals = ['MAU', 'PRU', 'NPSA', 'Revenue'].map(function(goal) { return '<label><input type="checkbox" name="psmGoal" value="'+goal+'"'+(psmWizardState.goals.indexOf(goal) > -1 ? ' checked' : '')+' onchange="psmToggleGoal(this.value, this.checked)"> '+goal+'</label>'; }).join('');
         var selWorkloads = psmWizardState.workloads || [];
         var workloadBoxes = PSM_WORKLOADS.map(function(w) { return '<label><input type="checkbox" value="'+psmEscapeHtml(w)+'"'+(selWorkloads.indexOf(w) > -1 ? ' checked' : '')+' onchange="psmToggleWorkload(this.value, this.checked)"> '+psmEscapeHtml(w)+'</label>'; }).join('');
+        var workloadChips = psmWorkloadChipsHtml(selWorkloads);
         var mciOptions = PSM_MCI_OFFERS.map(function(offer){ return '<option'+(psmWizardState.mciOffer === offer ? ' selected' : '')+'>'+psmEscapeHtml(offer)+'</option>'; }).join('');
         return '<div class="form-group"><label>Goals <span style="font-weight:400;color:#616161;">(select one or more)</span></label><div class="psm-wiz-hint">Select only measurable campaign outcomes. Adoption rolls up through MAU or PRU; upsell rolls up through NPSA or Revenue.</div><div class="radio-group" style="flex-direction:column;gap:10px;">'+goals+'</div></div>' +
           '<div class="form-group"><label>Workloads <span style="font-weight:400;color:#616161;">(select one or more)</span></label>' +
-          '<div class="psm-wl-grid">'+workloadBoxes+'</div>' +
-          '<div class="psm-wiz-hint" style="margin-top:8px;margin-bottom:0;">All ASPX workloads are available here, including Copilot, Copilot Agents and Copilot Cowork.</div>' +
+          '<details class="psm-wl-picker"><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="psmWorkloadCount">'+selWorkloads.length+' selected</span></span></summary><div class="psm-wl-grid">'+workloadBoxes+'</div></details>' +
+          '<div class="psm-wl-selected" id="psmSelectedWorkloads">'+workloadChips+'</div>' +
           '<div class="psm-how-box"><strong>How will the campaign drive the outcome?</strong><label style="margin-top:10px;"><input type="checkbox" checked disabled> Partner GTM motion</label><label style="margin-top:10px;">MCI offer<select onchange="psmWizardState.mciOffer=this.value">'+mciOptions+'</select></label></div></div>';
       }
       if (label === 'Targeting') {
