@@ -2612,22 +2612,25 @@
       };
       var stageBulkOptions = PSM_PROGRESSION_STAGES.map(function(s){ return '<option value="'+s.key+'">'+s.label+'</option>'; }).join('');
       var selectedGoals = c.goals && c.goals.length ? c.goals : [c.goal];
-      var goalCount = selectedGoals.length;
+      var workspaceMetrics = ['MAU', 'NPSA'].concat(selectedGoals.filter(function(goal) {
+        return goal !== 'MAU' && goal !== 'NPSA';
+      }));
+      var goalCount = workspaceMetrics.length;
       var customerWidth = 19 - goalCount;
       var priorityWidth = goalCount >= 4 ? 6 : 7;
       var metricWidth = goalCount === 1 ? 9 : (goalCount === 2 ? 8 : 7);
       var workloadsWidth = 22 - goalCount;
       var progressWidth = 19 - goalCount;
       var notesWidth = 100 - 3 - customerWidth - priorityWidth - (metricWidth * goalCount) - workloadsWidth - progressWidth;
-      var metricCols = selectedGoals.map(function() { return '<col style="width:'+metricWidth+'%;">'; }).join('');
+      var metricCols = workspaceMetrics.map(function() { return '<col style="width:'+metricWidth+'%;">'; }).join('');
       var workspaceCols = '<colgroup><col style="width:3%;"><col style="width:'+customerWidth+'%;"><col style="width:'+priorityWidth+'%;">'+metricCols+'<col style="width:'+workloadsWidth+'%;"><col style="width:'+progressWidth+'%;"><col style="width:'+notesWidth+'%;"></colgroup>';
-      var metricHeaders = selectedGoals.map(function(goal) {
+      var metricHeaders = workspaceMetrics.map(function(goal) {
         return '<th class="psm-num-cell">'+psmEscapeHtml(goal)+'</th>';
       }).join('');
       var rows = (c.customers || []).map(function(cust, idx) {
         var pr = cust.priority || 'Medium';
         var tw = (cust.targetedWorkloads || []).join(', ') || '\u2014';
-        var metricCells = selectedGoals.map(function(goal) {
+        var metricCells = workspaceMetrics.map(function(goal) {
           if (goal === 'MAU') return '<td class="psm-num-cell">'+(cust.mau || 0).toLocaleString()+'</td>';
           if (goal === 'PRU') return '<td class="psm-num-cell">'+(cust.copilotPru || 0).toLocaleString()+'</td>';
           if (goal === 'NPSA') return '<td class="psm-num-cell">+'+(cust.npsa || 0).toLocaleString()+'</td>';
@@ -2645,7 +2648,7 @@
         '</tr>';
       }).join('');
       return '<div class="panel-card" id="psmWorkspacePanel"><h2>Tenant Workspace <span style="font-size:12px;font-weight:400;color:#616161;">('+(c.customers||[]).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
-        '<div style="font-size:13px;color:#424242;margin-bottom:8px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. Showing only selected workloads and campaign goals: <strong>'+psmEscapeHtml(selectedGoals.join(', '))+'</strong>.</div>' +
+        '<div style="font-size:13px;color:#424242;margin-bottom:8px;"><strong>Targeting:</strong> '+psmEscapeHtml(sc.name)+'. MAU and NPSA are always shown at tenant level, with any additional selected campaign goals: <strong>'+psmEscapeHtml(selectedGoals.join(', '))+'</strong>.</div>' +
         '<div class="psm-priority-explainer"><strong>Data ownership:</strong> MAU, PRU, NPSA and Revenue are system-fed outcomes. Tenant progress, customer agreement and partner notes can be maintained by the PSM or partner.</div>' +
         '<div class="psm-bulk-bar" id="psmBulkBar">' +
           '<span class="psm-bulk-label">Bulk update selected tenants:</span>' +
