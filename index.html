@@ -742,9 +742,9 @@
     .psm-workspace-table tbody tr:hover { background:#f7fbff; }
     .psm-workspace-scroll { overflow-x:hidden; border:1px solid #f0f0f0; border-radius:6px; }
     .psm-workspace-table { min-width:0; table-layout:fixed; }
-    .psm-workspace-table th, .psm-workspace-table td { white-space:normal; padding:6px; vertical-align:top; overflow-wrap:anywhere; }
+    .psm-workspace-table th, .psm-workspace-table td { white-space:normal; padding:8px; vertical-align:top; overflow-wrap:anywhere; }
     .psm-workspace-table th { font-size:10px; letter-spacing:0; line-height:1.2; }
-    .psm-workspace-table .psm-num-cell { padding-left:2px; padding-right:2px; text-align:center; }
+    .psm-workspace-table .psm-num-cell { padding-left:6px; padding-right:6px; text-align:center; }
     .psm-workspace-table select { width:100%; max-width:100%; }
     .psm-signal-list { display:flex; flex-direction:column; gap:0; font-size:10px; }
     .psm-signal-item { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:3px 0; border-bottom:1px solid #f0f0f0; }
@@ -2551,6 +2551,15 @@
       };
       var stageBulkOptions = PSM_PROGRESSION_STAGES.map(function(s){ return '<option value="'+s.key+'">'+s.label+'</option>'; }).join('');
       var selectedGoals = c.goals && c.goals.length ? c.goals : [c.goal];
+      var goalCount = selectedGoals.length;
+      var customerWidth = 19 - goalCount;
+      var priorityWidth = goalCount >= 4 ? 6 : 7;
+      var metricWidth = goalCount === 1 ? 9 : (goalCount === 2 ? 8 : 7);
+      var workloadsWidth = 22 - goalCount;
+      var progressWidth = 19 - goalCount;
+      var notesWidth = 100 - 3 - customerWidth - priorityWidth - (metricWidth * goalCount) - workloadsWidth - progressWidth;
+      var metricCols = selectedGoals.map(function() { return '<col style="width:'+metricWidth+'%;">'; }).join('');
+      var workspaceCols = '<colgroup><col style="width:3%;"><col style="width:'+customerWidth+'%;"><col style="width:'+priorityWidth+'%;">'+metricCols+'<col style="width:'+workloadsWidth+'%;"><col style="width:'+progressWidth+'%;"><col style="width:'+notesWidth+'%;"></colgroup>';
       var metricHeaders = selectedGoals.map(function(goal) {
         return '<th class="psm-num-cell">'+psmEscapeHtml(goal)+'</th>';
       }).join('');
@@ -2590,14 +2599,14 @@
           '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'CRM sync requested \u2014 stages refresh from partner CRM\')">Sync from CRM</button>' +
           '<button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showToast(\'Exported \u2014 send to partner for periodic review\')">Export for Excel review</button>' +
         '</div>' +
-        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr>' +
-          '<th style="width:2%;text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
-          '<th style="width:11%;">Customer</th>' +
-          '<th style="width:5%;text-align:center;">Priority</th>' +
+        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table">'+workspaceCols+'<thead><tr>' +
+          '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleSelectAll(this.checked)" title="Select all"></th>' +
+          '<th>Customer</th>' +
+          '<th style="text-align:center;">Priority</th>' +
           metricHeaders +
-          '<th style="width:10%;">Workloads</th>' +
-          '<th style="width:9%;">Progress</th>' +
-          '<th style="width:11.5%;">Partner Notes</th>' +
+          '<th>Workloads</th>' +
+          '<th>Progress</th>' +
+          '<th>Partner Notes</th>' +
         '</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div style="margin-top:10px;font-size:11px;color:#616161;">Customer Agreement means confirmed interest in progressing the campaign motion, not a contract signature. In this prototype, values are illustrative; production telemetry and MCI field mappings require engineering data-contract validation.</div>' +
       '</div>';
