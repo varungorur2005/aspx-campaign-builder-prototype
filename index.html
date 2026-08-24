@@ -304,6 +304,7 @@
     .status-badge.active { background: #dff6dd; color: #107c10; }
     .status-badge.measuring { background: #fff4ce; color: #c19c00; }
     .status-badge.completed { background: #f3e8ff; color: #7719aa; }
+    .status-badge.paused { background: var(--cp-accent-soft); color: var(--cp-text); }
 
     /* Workload pills */
     .workload-pills { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -631,6 +632,15 @@
     #psmWizardModal .btn-group { margin-top: 18px; padding-top: 16px; border-top: 1px solid #edebe9; }
     .psm-wiz-hint { font-size: 12px; color: #616161; margin-bottom: 10px; line-height: 1.45; }
     .psm-wiz-note { font-size: 12px; color: #004578; background: #eef3fb; border: 1px solid #cfe0f5; border-radius: 6px; padding: 9px 12px; margin-top: 8px; line-height: 1.45; }
+    .psm-mvp-callout { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; margin-bottom:18px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); }
+    .psm-mvp-callout strong { display:block; margin-bottom:3px; font-size:13px; }
+    .psm-mvp-callout span { font-size:12px; line-height:1.45; color:var(--cp-text-muted); }
+    .psm-upload-zone { border:2px dashed var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface-soft); padding:22px; text-align:center; }
+    .psm-upload-zone input { margin-top:12px; max-width:100%; }
+    .psm-upload-status { margin-top:10px; padding:9px 12px; border-radius:0.625rem; font-size:12px; text-align:left; background:var(--cp-surface); border:1px solid var(--cp-border); color:var(--cp-text); }
+    .psm-mvp-customer-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .psm-mvp-customer-table th { text-align:left; padding:9px 10px; color:var(--cp-text-muted); border-bottom:1px solid var(--cp-border); background:var(--cp-surface-soft); }
+    .psm-mvp-customer-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); }
     .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
     .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
     .psm-wl-picker summary::-webkit-details-marker { display:none; }
@@ -837,7 +847,8 @@
           <option value="partner">Partner View</option>
           <option value="field">MSFT Field View</option>
           <option value="corp">MSFT Corp View</option>
-          <option value="psm">MSFT PSM View (V2) - Draft</option>
+          <option value="psm-mvp">MSFT PSM View (MVP)</option>
+          <option value="psm">PSM View (v2)</option>
         </select>
       </div>
     </div>
@@ -1115,6 +1126,38 @@
           <button class="btn btn-primary" id="psmWizardNextBtn" onclick="psmNextWizardStep()">Next</button>
           <button class="btn btn-primary" id="psmWizardLaunchBtn" onclick="psmLaunchCampaign()" style="display:none;">Create campaign</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="psmMvpCreateModal">
+    <div class="modal" style="width:560px;">
+      <h3>Create campaign from a customer list</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:18px;">Upload the list your team has already prepared. This MVP creates the campaign directly in ASPXi without the referrals, FTOP, or PRM workflow.</p>
+      <div class="form-group">
+        <label>Partner</label>
+        <div class="psm-context-note" id="psmMvpPartner"></div>
+      </div>
+      <div class="form-group">
+        <label>Campaign name <span class="required">*</span></label>
+        <input type="text" id="psmMvpCampaignName" placeholder="e.g. Contoso - Copilot growth Q1">
+      </div>
+      <div class="form-group">
+        <label>Customer list <span class="required">*</span></label>
+        <div class="psm-upload-zone">
+          <strong>Upload CSV or Excel</strong>
+          <div style="font-size:12px;color:#616161;margin-top:5px;">Required: Tenant ID. Customer Name and TPID are recommended. Additional columns are retained but ignored by the MVP.</div>
+          <input type="file" id="psmMvpFile" accept=".csv,.xlsx,.xls" onchange="psmHandleMvpFile(this)">
+          <div class="psm-upload-status" id="psmMvpUploadStatus">No file selected.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Campaign notes</label>
+        <textarea id="psmMvpInitialNotes" placeholder="Add context, goals, risks, or next steps for the campaign."></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="psmCreateMvpCampaign()">Create campaign</button>
+        <button class="btn btn-secondary" onclick="hideModal('psmMvpCreateModal')">Cancel</button>
       </div>
     </div>
   </div>
@@ -1517,6 +1560,7 @@
     let currentView = 'partner';
     const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
     const PSM_STATUS_ORDER = ['Draft', 'Submitted', 'Accepted', 'Active', 'Measuring', 'Completed'];
+    const PSM_MVP_STATUS_ORDER = ['Draft', 'Active', 'Paused', 'Completed'];
     const PSM_STATUS_COLORS = { Draft: '#616161', Submitted: '#0078d4', Accepted: '#038387', Active: '#107c10', Measuring: '#c19c00', Completed: '#7719aa' };
     const PSM_PROGRESSION_STAGES = [
       { key: 'targetList', label: 'Target List', sub: 'Tenants selected to pursue', color: '#0078d4', source: 'Auto', sourceNote: 'System-curated or uploaded list' },
@@ -1665,7 +1709,7 @@
             '<div class="sidebar-section">Referrals</div>' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Referrals</span></a>' +
           '</nav>';
-      } else if (currentView === 'psm') {
+      } else if (isPsmView()) {
         sidebar.innerHTML =
           '<nav class="sidebar-nav">' +
             '<a href="#" class="sidebar-link decorative" onclick="showToast(\'Growth Opportunities selected\'); return false;"><span>Growth Opportunities</span></a>' +
@@ -1684,8 +1728,13 @@
       }
     }
     //  VIEW SWITCH 
+    function isPsmView(view) {
+      var target = view || currentView;
+      return target === 'psm' || target === 'psm-mvp';
+    }
+
     function switchView(view) {
-      var leavingPsm = currentView === 'psm' && view !== 'psm';
+      var leavingPsm = isPsmView(currentView) && !isPsmView(view);
       if (leavingPsm) {
         psmRestoreDefaultLayout();
       }
@@ -1696,8 +1745,8 @@
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
         view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi';
-      document.getElementById('psmPartnerPicker').style.display = view === 'psm' ? 'flex' : 'none';
-      document.getElementById('psmPartnerBanner').style.display = view === 'psm' ? 'block' : 'none';
+      document.getElementById('psmPartnerPicker').style.display = isPsmView(view) ? 'flex' : 'none';
+      document.getElementById('psmPartnerBanner').style.display = isPsmView(view) ? 'block' : 'none';
       activeKpiFilter = null;
       activeChartFilter = null;
       psmActiveChartFilter = null;
@@ -1705,7 +1754,7 @@
       filterState = createEmptyFilterState();
       showDashboard();
       toggleFilter(false);
-      if (view === 'psm') {
+      if (isPsmView(view)) {
         document.getElementById('breadcrumb').style.display = 'none';
         psmRenderPartnerContext();
         renderPsmView();
@@ -2141,6 +2190,10 @@
     }
 
     function renderPsmView() {
+      if (currentView === 'psm-mvp') {
+        renderPsmMvpView();
+        return;
+      }
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
@@ -2163,6 +2216,18 @@
           '</div>' +
         '</div>' +
         '<div class="campaign-table-wrap" id="psmTableWrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
+      psmRenderDashboard();
+    }
+
+    function renderPsmMvpView() {
+      var dashboard = document.getElementById('dashboardView');
+      dashboard.setAttribute('data-psm-rendered', 'true');
+      dashboard.innerHTML =
+        '<div class="psm-aspx-title"><span class="insights">Insights</span><span class="divider">|</span><span class="section">Campaigns</span><span class="suite">AI Business Solutions &amp; Security &#9432;</span></div>' +
+        '<div class="psm-aspx-tabs"><button class="psm-aspx-tab active">PSM Campaigns (MVP)</button><button class="psm-aspx-tab" onclick="switchView(\'psm\')">PSM View (v2)</button></div>' +
+        '<div class="table-toolbar psm-toolbar"><div class="toolbar-left"><button class="btn btn-primary" onclick="psmOpenMvpCreate()">Create a campaign by uploading your partner campaign tracker file</button></div></div>' +
+        '<div class="table-toolbar"><div class="toolbar-left"><span style="font-size:13px;font-weight:600;">Campaigns for '+psmEscapeHtml(psmPartnerContext)+'</span></div><div class="toolbar-right"><div class="toolbar-search"><svg width="14" height="14" viewBox="0 0 20 20" fill="#999"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="text" placeholder="Search campaigns..." id="psmSearchInput" oninput="psmSearchTerm=this.value; psmRenderDashboard()"></div></div></div>' +
+        '<div class="campaign-table-wrap"><table class="campaign-table"><thead id="psmCampaignTableHead"></thead><tbody id="psmCampaignTableBody"></tbody></table></div>';
       psmRenderDashboard();
     }
 
@@ -2251,6 +2316,10 @@
     }
 
     function psmRenderDashboard() {
+      if (currentView === 'psm-mvp') {
+        psmRenderMvpDashboard();
+        return;
+      }
       psmCampaigns.forEach(psmEnrich);
       var scopedCampaigns = psmScopedCampaigns();
       var search = (psmSearchTerm || '').toLowerCase();
@@ -2258,6 +2327,30 @@
         if (search) {
           var haystack = [c.id, c.name, c.partner, c.region, c.workload, c.goal].join(' ').toLowerCase();
           if (haystack.indexOf(search) === -1) return false;
+        }
+
+        function psmMvpStatus(c) {
+          if (c.mvpStatus) return c.mvpStatus;
+          if (c.status === 'Completed') return 'Completed';
+          if (c.status === 'Active' || c.status === 'Measuring') return 'Active';
+          return 'Draft';
+        }
+
+        function psmRenderMvpDashboard() {
+          var search = (psmSearchTerm || '').toLowerCase();
+          var campaignsForPartner = psmScopedCampaigns().filter(function(c) {
+            return !search || [c.id, c.name, c.partner, psmMvpStatus(c)].join(' ').toLowerCase().indexOf(search) > -1;
+          });
+          document.getElementById('psmSearchInput').value = psmSearchTerm;
+          document.getElementById('psmCampaignTableHead').innerHTML = '<tr><th>Campaign ID</th><th>Campaign name</th><th>State</th><th>Customers</th><th>Source file</th><th>Last updated</th></tr>';
+          document.getElementById('psmCampaignTableBody').innerHTML = campaignsForPartner.length ? campaignsForPartner.map(function(c) {
+            return '<tr><td><a class="campaign-id-link" onclick="psmOpenDetail(\''+c.id+'\')">'+c.id+'</a></td>' +
+              '<td><strong>'+psmEscapeHtml(c.name)+'</strong></td>' +
+              '<td>'+psmRenderStatusBadge(psmMvpStatus(c))+'</td>' +
+              '<td>'+c.tenantCount.toLocaleString()+'</td>' +
+              '<td>'+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</td>' +
+              '<td>'+psmEscapeHtml(c.mvpUpdated || c.created)+'</td></tr>';
+          }).join('') : '<tr><td colspan="6" style="padding:28px;text-align:center;color:#616161;">No campaigns match this search.</td></tr>';
         }
         if (psmActiveChartFilter) {
           if ((psmActiveChartFilter.type === 'area' || psmActiveChartFilter.type === 'region') && c.region !== psmActiveChartFilter.value) return false;
@@ -2482,12 +2575,17 @@
       psmCurrentCampaign = psmCampaigns.find(function(c) { return c.id === id; });
       if (!psmCurrentCampaign) return;
       psmTrackMode = 'rollup';
-      document.getElementById('detailView').classList.add('show', 'psm-full-page');
+      document.getElementById('detailView').classList.add('show');
+      document.getElementById('detailView').classList.toggle('psm-full-page', currentView === 'psm');
       window.location.hash = 'psm-campaign-' + id;
       psmRenderDetail();
     }
 
     function psmRenderDetail() {
+      if (currentView === 'psm-mvp') {
+        psmRenderMvpDetail();
+        return;
+      }
       var c = psmCurrentCampaign;
       if (!c) return;
       psmEnrich(c);
@@ -2524,6 +2622,46 @@
         psmRenderTenantWorkspace(c) +
         '<div class="panel-card" id="psmTimelinePanel"><h2>Activity Timeline</h2><div class="audit-timeline">'+psmGetTimeline(c).slice().reverse().map(function(item) { return '<div class="audit-entry"><div class="audit-dot '+item.type+'"></div><div><div class="audit-text">'+item.text+'</div><div class="audit-date">'+item.date+(item.actor ? ' &middot; <strong>'+item.actor+'</strong>' : '')+'</div></div></div>'; }).join('')+'</div></div>' +
         '<div style="background:#fff4ce;border:1px solid #f0e5a1;border-radius:6px;padding:10px 14px;margin-top:16px;font-size:11px;color:#4d3800;"><strong>Compliance:</strong> Customer usage signals (MAU, PAU, seat penetration) are visible to Microsoft field users only and are not exposed to partner views.</div>';
+    }
+
+    function psmRenderMvpDetail() {
+      var c = psmCurrentCampaign;
+      if (!c) return;
+      psmEnrich(c);
+      var detail = document.getElementById('detailView');
+      detail.setAttribute('data-psm-rendered', 'true');
+      var customers = (c.customers || []).slice(0, 12);
+      detail.innerHTML =
+        '<div class="flyout-header"><span style="font-size:11px;color:#616161;">MVP Campaign Detail</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
+        '<div class="detail-header"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
+          '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
+          '<div class="detail-meta-item"><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
+          '<div class="detail-meta-item"><strong>Customers:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
+          '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
+        '</div></div>' +
+        '<div class="panel-card"><h2>Campaign update</h2><div class="form-group"><label>State</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(psmMvpStatus(c) === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div>' +
+          '<div class="form-group"><label>Campaign notes</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:11px;color:#616161;">Updates apply to the overall campaign, not individual customers.</span><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save update</button></div></div>' +
+        '<div class="panel-card"><h2>Uploaded customer list <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">(read-only in MVP)</span></h2>' +
+          '<div class="psm-context-note" style="margin-bottom:12px;">Customer rows can be viewed for confirmation, but customer states and notes are intentionally deferred to a fast-follow release.</div>' +
+          '<div style="overflow-x:auto;"><table class="psm-mvp-customer-table"><thead><tr><th>Customer</th><th>Tenant ID</th><th>Segment</th></tr></thead><tbody>' +
+          customers.map(function(customer) { return '<tr><td><strong>'+psmEscapeHtml(customer.name)+'</strong></td><td>'+psmEscapeHtml(customer.tenantId)+'</td><td>'+psmEscapeHtml(customer.segment || '\u2014')+'</td></tr>'; }).join('') +
+          '</tbody></table></div>' +
+          (c.tenantCount > customers.length ? '<div style="font-size:11px;color:var(--cp-text-muted);margin-top:10px;">Showing '+customers.length+' of '+c.tenantCount.toLocaleString()+' uploaded customers.</div>' : '') +
+        '</div>';
+    }
+
+    function psmSaveMvpUpdate(id) {
+      var c = psmCampaigns.find(function(x) { return x.id === id; });
+      if (!c) return;
+      c.mvpStatus = document.getElementById('psmMvpDetailStatus').value;
+      c.campaignUpdate = document.getElementById('psmMvpDetailNotes').value.trim();
+      c.campaignUpdateActor = 'Microsoft PSM';
+      c.mvpUpdated = today();
+      c.timeline = c.timeline || [];
+      c.timeline.push({ date: today(), text: 'Campaign update saved: ' + c.mvpStatus, type: c.mvpStatus === 'Completed' ? 'closed' : 'info', actor: 'Microsoft PSM' });
+      showToast('Campaign state and notes updated');
+      psmRenderMvpDetail();
     }
 
     function psmSetCampaignStatus(id, status) {
@@ -2968,6 +3106,71 @@
 
     function psmGenerateDeck(id) {
       showToast('Executive summary deck generated with Copilot Cowork \u2014 check your downloads');
+    }
+
+    var psmMvpUpload = { file: null, rowCount: 0, valid: false };
+
+    function psmOpenMvpCreate() {
+      psmMvpUpload = { file: null, rowCount: 0, valid: false };
+      document.getElementById('psmMvpPartner').innerHTML = '<strong>'+psmEscapeHtml(psmPartnerContext)+'</strong> &middot; PartnerOneID '+psmEscapeHtml(PSM_PARTNER_ONE[psmPartnerContext] || '\u2014');
+      document.getElementById('psmMvpCampaignName').value = '';
+      document.getElementById('psmMvpFile').value = '';
+      document.getElementById('psmMvpInitialNotes').value = '';
+      document.getElementById('psmMvpUploadStatus').textContent = 'No file selected.';
+      showModal('psmMvpCreateModal');
+    }
+
+    function psmHandleMvpFile(input) {
+      var file = input.files && input.files[0];
+      var status = document.getElementById('psmMvpUploadStatus');
+      psmMvpUpload = { file: file || null, rowCount: 0, valid: false };
+      if (!file) { status.textContent = 'No file selected.'; return; }
+      var extension = file.name.split('.').pop().toLowerCase();
+      if (['csv', 'xlsx', 'xls'].indexOf(extension) === -1) {
+        status.innerHTML = '<strong style="color:var(--cp-danger);">Unsupported file.</strong> Upload a CSV, XLSX, or XLS file.';
+        return;
+      }
+      if (extension === 'csv' && file.text) {
+        file.text().then(function(text) {
+          var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
+          var header = (lines[0] || '').toLowerCase().replace(/[_-]/g, ' ');
+          var hasTenantId = header.indexOf('tenant id') > -1 || header.indexOf('tenantid') > -1;
+          psmMvpUpload.rowCount = Math.max(0, lines.length - 1);
+          psmMvpUpload.valid = hasTenantId && psmMvpUpload.rowCount > 0;
+          status.innerHTML = psmMvpUpload.valid
+            ? '<strong style="color:var(--cp-success);">Ready to create.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' customer rows and a Tenant ID column.'
+            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Include a Tenant ID column and at least one customer row.';
+        });
+      } else {
+        psmMvpUpload.rowCount = Math.max(1, Math.min(5000, Math.round(file.size / 180)));
+        psmMvpUpload.valid = true;
+        status.innerHTML = '<strong style="color:var(--cp-success);">Ready to validate.</strong> '+psmEscapeHtml(file.name)+' will be checked for Tenant ID during import. Estimated rows: '+psmMvpUpload.rowCount.toLocaleString()+'.';
+      }
+    }
+
+    function psmCreateMvpCampaign() {
+      var name = document.getElementById('psmMvpCampaignName').value.trim();
+      if (!name) { showToast('Campaign name is required', true); return; }
+      if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
+      var listSize = psmMvpUpload.rowCount;
+      var newCampaign = {
+        id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: 'Microsoft PSM',
+        mpn: PSM_PARTNER_MPN[psmPartnerContext] || '', region: psmGetRegionForPartner(psmPartnerContext),
+        workload: 'Uploaded list', workloads: [], tenantCount: listSize, status: 'Draft', mvpStatus: 'Draft',
+        goal: 'Campaign tracking', goals: [], created: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
+        campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: 'Microsoft PSM',
+        mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0,
+        copilotPru: 0, agentMau: 0, coworkSessions: 0, mciWorkshops: 0, mciStatus: 'Not started',
+        motions: [], mciOffer: 'N/A', fundingCommitted: 0, trackedCount: 0, signals: [], activityLog: [],
+        scenarioId: 'manual', executionType: 'Uploaded', _enriched: true
+      };
+      newCampaign.customers = psmBuildCustomers(newCampaign, psmSeed(newCampaign));
+      newCampaign.timeline = [{ date: today(), text: 'Campaign created from ' + psmMvpUpload.file.name, type: 'info', actor: 'Microsoft PSM' }];
+      psmCampaigns.unshift(newCampaign);
+      hideModal('psmMvpCreateModal');
+      psmSearchTerm = '';
+      psmRenderDashboard();
+      showToast('Campaign created from ' + psmMvpUpload.file.name);
     }
 
     function psmOpenWizard() {
@@ -3697,7 +3900,7 @@
     var detailMode = 'campaign'; // 'campaign' or 'usage'
 
     function openCampaign(id) {
-      if (currentView === 'psm') {
+      if (isPsmView()) {
         psmOpenDetail(id);
         return;
       }
@@ -3719,13 +3922,13 @@
     function showDashboard() {
       document.getElementById('detailView').classList.remove('show', 'psm-full-page', 'psm-presenting');
       document.body.classList.remove('psm-presenting');
-      if (currentView === 'psm' && window.location.hash.indexOf('#psm-campaign-') === 0) history.replaceState(null, '', window.location.pathname + window.location.search);
+      if (isPsmView() && window.location.hash.indexOf('#psm-campaign-') === 0) history.replaceState(null, '', window.location.pathname + window.location.search);
       psmCurrentCampaign = null;
       currentCampaign = null;
     }
 
     function renderDetail() {
-      if (currentView === 'psm') {
+      if (isPsmView()) {
         psmRenderDetail();
         return;
       }
