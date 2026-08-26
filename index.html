@@ -1151,12 +1151,12 @@
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
         <div class="psm-template-row">
-          <span><strong>1. Download the template</strong><br>Columns: Tenant ID, Tenant Name, Customer Name</span>
+          <span><strong>1. Download the template</strong><br>Columns: Tenant / Customer Name, Tenant ID</span>
           <button class="btn btn-secondary" type="button" onclick="psmDownloadMvpTemplate()">Download template</button>
         </div>
         <div class="psm-upload-zone">
           <strong>2. Upload the completed template</strong>
-          <div style="font-size:12px;color:#616161;margin-top:5px;">Accepted formats: CSV or Excel. Tenant ID is the unique identifier; Tenant Name and Customer Name support review and partner mapping.</div>
+          <div style="font-size:12px;color:#616161;margin-top:5px;">Accepted formats: CSV or Excel. Enter the tenant or customer name for display and the Tenant ID for matching with ASPX.</div>
           <input type="file" id="psmMvpFile" accept=".csv,.xlsx,.xls" onchange="psmHandleMvpFile(this)">
           <div class="psm-upload-status" id="psmMvpUploadStatus">No file selected.</div>
         </div>
@@ -2692,8 +2692,7 @@
         }).join('');
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         return '<tr><td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' +
-          '<td><strong>'+psmEscapeHtml(customer.customerName || customer.name)+'</strong></td>' +
-          '<td>'+psmEscapeHtml(customer.tenantName || customer.name)+'</td>' +
+          '<td><strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong></td>' +
           '<td>'+psmEscapeHtml(customer.tenantId)+'</td>' +
           metricCells +
           '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td></tr>';
@@ -2701,7 +2700,7 @@
       return '<div class="panel-card"><h2>Tenant Progress <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+(c.customers || []).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
         '<div class="psm-context-note">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</div>' +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
-        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer Name</th><th>Tenant Name</th><th>Tenant ID</th>'+metricHeaders+'<th>Progress</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Tenant / Customer Name</th><th>Tenant ID</th>'+metricHeaders+'<th>Progress</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
       '</div>';
     }
 
@@ -3205,29 +3204,29 @@
       if (extension === 'csv' && file.text) {
         file.text().then(function(text) {
           var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
-          var headers = psmParseCsvLine(lines[0] || '').map(function(value) { return value.trim().toLowerCase().replace(/[_-]/g, ' '); });
-          var tenantIdIndex = headers.indexOf('tenant id');
-          var tenantNameIndex = headers.indexOf('tenant name');
-          var customerNameIndex = headers.indexOf('customer name');
-          var hasRequiredColumns = tenantIdIndex > -1 && tenantNameIndex > -1 && customerNameIndex > -1;
+          var headers = psmParseCsvLine(lines[0] || '').map(function(value) {
+            return value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+          });
+          var tenantCustomerNameIndex = headers.indexOf('tenantcustomername');
+          var tenantIdIndex = headers.indexOf('tenantid');
+          var hasRequiredColumns = tenantCustomerNameIndex > -1 && tenantIdIndex > -1;
           psmMvpUpload.rowCount = Math.max(0, lines.length - 1);
           psmMvpUpload.rows = lines.slice(1).map(function(line) {
             var values = psmParseCsvLine(line);
             return {
+              tenantCustomerName: (values[tenantCustomerNameIndex] || '').trim(),
               tenantId: (values[tenantIdIndex] || '').trim(),
-              tenantName: (values[tenantNameIndex] || '').trim(),
-              customerName: (values[customerNameIndex] || '').trim()
             };
-          }).filter(function(row) { return row.tenantId; });
+          }).filter(function(row) { return row.tenantCustomerName && row.tenantId; });
           psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === psmMvpUpload.rowCount && psmMvpUpload.rowCount > 0;
           status.innerHTML = psmMvpUpload.valid
             ? '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' tenants. All Tenant IDs are ready to match with ASPX.'
-            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the template headers Tenant ID, Tenant Name, and Customer Name, and ensure every row has a Tenant ID.';
+            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the template headers Tenant / Customer Name and Tenant ID, and complete both fields for every row.';
         });
       } else {
         psmMvpUpload.rowCount = Math.max(1, Math.min(5000, Math.round(file.size / 180)));
         psmMvpUpload.valid = true;
-        status.innerHTML = '<strong style="color:var(--cp-success);">Ready to validate.</strong> '+psmEscapeHtml(file.name)+' will be checked for the three template columns during import. Estimated tenants: '+psmMvpUpload.rowCount.toLocaleString()+'.';
+        status.innerHTML = '<strong style="color:var(--cp-success);">Ready to validate.</strong> '+psmEscapeHtml(file.name)+' will be checked for the two template columns during import. Estimated tenants: '+psmMvpUpload.rowCount.toLocaleString()+'.';
       }
     }
 
@@ -3248,7 +3247,7 @@
     }
 
     function psmDownloadMvpTemplate() {
-      var csv = 'Tenant ID,Tenant Name,Customer Name\r\n';
+      var csv = 'Tenant / Customer Name,Tenant ID\r\n';
       var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
@@ -3282,9 +3281,10 @@
         newCampaign.customers.forEach(function(customer, index) {
           var uploaded = psmMvpUpload.rows[index];
           if (!uploaded) return;
-          customer.name = uploaded.customerName || uploaded.tenantName;
-          customer.customerName = uploaded.customerName || uploaded.tenantName;
-          customer.tenantName = uploaded.tenantName;
+          customer.name = uploaded.tenantCustomerName;
+          customer.tenantCustomerName = uploaded.tenantCustomerName;
+          customer.customerName = uploaded.tenantCustomerName;
+          customer.tenantName = uploaded.tenantCustomerName;
           customer.tenantId = uploaded.tenantId;
         });
       }
