@@ -660,13 +660,25 @@
     #psmMvpCreateModal .psm-upload-zone > strong { display:block; margin-bottom:6px; color:var(--cp-text); font-size:13px; }
     #psmMvpCreateModal .psm-upload-help { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     #psmMvpCreateModal .btn-group { justify-content:flex-end; margin-top:4px; padding-top:20px; border-top:1px solid var(--cp-border); }
+    .psm-mvp-identifier-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .psm-live-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:11px; font-weight:600; }
     .psm-stage-label { display:inline-block; padding:4px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; font-weight:600; }
     .psm-mvp-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; margin:12px 0; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .psm-mvp-bulk-bar select { min-width:190px; padding:6px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .psm-mvp-progress-scroll { overflow-x:auto; }
-    .psm-mvp-progress-table { min-width:760px; table-layout:fixed; }
+    .psm-mvp-progress-table { min-width:1500px; table-layout:auto; }
     .psm-mvp-progress-table .psm-tenant-id { white-space:nowrap; overflow-wrap:normal; font-family:Consolas, "Courier New", Courier, monospace; }
+    .psm-mvp-impact-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+    .psm-mvp-impact-card { padding:14px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
+    .psm-mvp-impact-card .label { display:block; min-height:30px; color:var(--cp-text-muted); font-size:11px; font-weight:700; text-transform:uppercase; }
+    .psm-mvp-impact-card .current { display:block; margin:4px 0; color:var(--cp-text); font-size:24px; font-weight:700; }
+    .psm-mvp-impact-card .comparison { display:flex; justify-content:space-between; gap:8px; color:var(--cp-text-muted); font-size:11px; }
+    .psm-mvp-growth { color:var(--cp-success); font-weight:700; white-space:nowrap; }
+    .psm-mvp-segment-scroll { overflow-x:auto; border:1px solid var(--cp-border); border-radius:0.625rem; }
+    .psm-mvp-segment-table { width:100%; min-width:780px; border-collapse:collapse; font-size:12px; }
+    .psm-mvp-segment-table th, .psm-mvp-segment-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); text-align:right; white-space:nowrap; }
+    .psm-mvp-segment-table th:first-child, .psm-mvp-segment-table td:first-child { text-align:left; }
+    .psm-mvp-segment-table th { background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:10px; text-transform:uppercase; }
     .psm-mvp-table-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:12px 0 0; padding:8px 0; border-bottom:1px solid var(--cp-border); }
     .psm-mvp-table-actions { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
     .psm-mvp-table-toolbar .psm-mvp-toolbar-btn { min-height:34px; padding:7px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; box-shadow:0 0 2px var(--cp-border); }
@@ -698,6 +710,7 @@
       .psm-mvp-detail-heading { flex-direction:column; }
       .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
+      .psm-mvp-identifier-grid, .psm-mvp-impact-grid { grid-template-columns:1fr; }
     }
     .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
     .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
@@ -1197,6 +1210,16 @@
         <label>Partner</label>
         <div class="psm-context-note" id="psmMvpPartner"></div>
       </div>
+      <div class="psm-mvp-identifier-grid">
+        <div class="form-group">
+          <label>PartnerOneID</label>
+          <input type="text" id="psmMvpPartnerOneId" placeholder="Enter PartnerOneID">
+        </div>
+        <div class="form-group">
+          <label>Partner MPN ID</label>
+          <input type="text" id="psmMvpPartnerMpnId" placeholder="Enter Partner MPN ID">
+        </div>
+      </div>
       <div class="form-group">
         <label>Campaign name <span class="required">*</span></label>
         <input type="text" id="psmMvpCampaignName" placeholder="e.g. Contoso - Copilot growth Q1">
@@ -1204,13 +1227,13 @@
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
         <div class="psm-template-row">
-          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID</span>
+          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID, PartnerOneID, Partner MPN ID</span>
           <button class="btn btn-secondary" type="button" onclick="psmDownloadMvpTemplate()">Download template</button>
         </div>
         <div class="psm-upload-zone">
           <strong>2. Upload the completed template</strong>
-          <div class="psm-upload-help">Accepted formats: CSV or Excel. Enter the tenant or customer name for display and the Tenant ID for matching with ASPX.</div>
-          <input type="file" id="psmMvpFile" accept=".csv,.xlsx,.xls" onchange="psmHandleMvpFile(this)">
+          <div class="psm-upload-help">Accepted format: CSV. Enter the tenant or customer name for display and the Tenant ID for matching with ASPX.</div>
+          <input type="file" id="psmMvpFile" accept=".csv" onchange="psmHandleMvpFile(this)">
           <div class="psm-upload-status" id="psmMvpUploadStatus">No file selected.</div>
         </div>
       </div>
@@ -1685,6 +1708,13 @@
     const PSM_OPPORTUNITY = ['Acquire', 'Monetize', 'Grow', 'Other'];
     const PSM_TENANT_HEALTH = ['Healthy', 'E5 Upsell-Ready', 'E5 Unhealthy', 'E5 Exp Upsell-Ready', 'E5 Exp Unhealthy'];
     const PSM_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
+    const PSM_TENANT_COUNTRIES = ['United States', 'Germany', 'United Kingdom', 'Netherlands', 'Belgium', 'Korea'];
+    const PSM_CSP_TIERS = ['Direct', 'Indirect Provider', 'Indirect Reseller'];
+    const PSM_T2_RESELLERS = [
+      { id: 'T2-100124', name: 'Contoso Digital' },
+      { id: 'T2-100287', name: 'Contoso Consulting' },
+      { id: 'T2-100418', name: 'Contoso Retail' }
+    ];
     const PSM_CTAS = ['Land Copilot Chat', 'Drive Copilot Chat', 'Upsell free Copilot Chat to paid', 'Drive Agents & E7 upsell', 'Drive E5 Upsell', 'Drive usage on at-risk workloads'];
     const PSM_CUSTOMER_NAMES = ['Fabrikam', 'Fabrikam Health', 'Fabrikam Retail', 'Fabrikam Digital', 'Fabrikam Financial', 'Fabrikam Energy', 'Fabrikam Manufacturing', 'Fabrikam Logistics', 'Fabrikam Media', 'Fabrikam Public Sector'];
     const FILTER_STATUS_OPTIONS = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed', 'Blocked'];
@@ -1733,8 +1763,35 @@
     let psmWizardState = { step: 1, name: '', partner: 'Contoso', goals: ['MAU'], workload: 'Copilot' };
     let psmMvpTenantTableState = {
       campaignId: '', page: 1, pageSize: 10, search: '', stage: '', openPanel: '',
-      visibleColumns: { mau: true, pau: true, progress: true }
+      visibleColumns: {
+        segment: true, country: true,
+        copilotLicensedMau: true, copilotLicensedMauGrowth: true,
+        copilotPau: true, copilotPauGrowth: true,
+        coworkMau: true, coworkMauGrowth: true,
+        partnerName: false, partnerMpn: false, partnerOneId: false,
+        cspTier: false, t2ResellerId: false, t2ResellerName: false,
+        progress: true
+      }
     };
+    const PSM_MVP_TENANT_COLUMNS = [
+      { key: 'name', label: 'Customer / Tenant Name', fixed: true },
+      { key: 'tenantId', label: 'Tenant ID', fixed: true },
+      { key: 'segment', label: 'Tenant Segment' },
+      { key: 'country', label: 'Tenant Country/Region' },
+      { key: 'copilotLicensedMau', label: 'Copilot MAU (Licensed)' },
+      { key: 'copilotLicensedMauGrowth', label: 'Copilot MAU Growth' },
+      { key: 'copilotPau', label: 'Copilot PAU' },
+      { key: 'copilotPauGrowth', label: 'Copilot PAU Growth' },
+      { key: 'coworkMau', label: 'Cowork MAU' },
+      { key: 'coworkMauGrowth', label: 'Cowork MAU Growth' },
+      { key: 'partnerName', label: 'Partner Name' },
+      { key: 'partnerMpn', label: 'Partner Center ID (MPN)' },
+      { key: 'partnerOneId', label: 'PartnerOneID' },
+      { key: 'cspTier', label: 'CSP Tier' },
+      { key: 't2ResellerId', label: 'T2 Reseller ID' },
+      { key: 't2ResellerName', label: 'T2 Reseller Name' },
+      { key: 'progress', label: 'Progress' }
+    ];
     function createEmptyFilterState() {
       return { statuses: [], sources: [], areas: [], partnerNames: [], unified: [], campaignStatus: [] };
     }
@@ -2738,14 +2795,78 @@
         '<div class="flyout-header"><span style="font-size:11px;color:#616161;">MVP Campaign Detail</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
-          '<div class="detail-meta-item"><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
+          '<div class="detail-meta-item"><strong>Partner Name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
+          '<div class="detail-meta-item"><strong>PartnerOneID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
+          '<div class="detail-meta-item"><strong>Partner Center ID (MPN):</strong> '+psmEscapeHtml(c.mpn || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
+          '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+psmEscapeHtml(c.baselineDate || c.created)+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
         '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
         '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
           '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div></div>' +
+        psmRenderMvpImpact(c) +
         psmRenderMvpTenantWorkspace(c);
+    }
+
+    function psmMvpMetricTotals(customers) {
+      var fields = ['copilotLicensedMau', 'copilotPau', 'coworkMau'];
+      var totals = {};
+      fields.forEach(function(field) {
+        totals[field] = customers.reduce(function(sum, customer) { return sum + (customer[field] || 0); }, 0);
+        totals[field+'Baseline'] = customers.reduce(function(sum, customer) { return sum + (customer[field+'Baseline'] || 0); }, 0);
+        totals[field+'Growth'] = totals[field] - totals[field+'Baseline'];
+      });
+      return totals;
+    }
+
+    function psmMvpGrowthText(current, baseline) {
+      var growth = current - baseline;
+      var percent = baseline ? Math.round((growth / baseline) * 100) : 0;
+      return (growth >= 0 ? '+' : '')+growth.toLocaleString()+' ('+(percent >= 0 ? '+' : '')+percent+'%)';
+    }
+
+    function psmRenderMvpImpact(c) {
+      psmEnsureMvpTenantRows(c);
+      var metrics = [
+        { key: 'copilotLicensedMau', label: 'Copilot MAU (Licensed)' },
+        { key: 'copilotPau', label: 'Copilot PAU' },
+        { key: 'coworkMau', label: 'Cowork MAU' }
+      ];
+      var totals = psmMvpMetricTotals(c.customers || []);
+      var cards = metrics.map(function(metric) {
+        return '<div class="psm-mvp-impact-card"><span class="label">'+metric.label+'</span><span class="current">'+totals[metric.key].toLocaleString()+'</span><div class="comparison"><span>Baseline '+totals[metric.key+'Baseline'].toLocaleString()+'</span><span class="psm-mvp-growth">'+psmMvpGrowthText(totals[metric.key], totals[metric.key+'Baseline'])+'</span></div></div>';
+      }).join('');
+      var segments = {};
+      (c.customers || []).forEach(function(customer) {
+        var segment = customer.segment || 'Not Available';
+        if (!segments[segment]) segments[segment] = [];
+        segments[segment].push(customer);
+      });
+      var rows = Object.keys(segments).sort().map(function(segment) {
+        var segmentTotals = psmMvpMetricTotals(segments[segment]);
+        return '<tr><td><strong>'+psmEscapeHtml(segment)+'</strong><br><span style="color:var(--cp-text-muted);font-size:10px;">'+segments[segment].length+' tenants</span></td>' +
+          metrics.map(function(metric) {
+            return '<td>'+segmentTotals[metric.key].toLocaleString()+'</td><td class="psm-mvp-growth">'+psmMvpGrowthText(segmentTotals[metric.key], segmentTotals[metric.key+'Baseline'])+'</td>';
+          }).join('')+'</tr>';
+      }).join('');
+      return '<div class="panel-card"><h2>Campaign Impact <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">Baseline captured '+psmEscapeHtml(c.baselineDate || c.created)+'</span></h2>' +
+        '<div class="psm-mvp-impact-grid">'+cards+'</div>' +
+        '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3>' +
+        '<div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Copilot MAU</th><th>Growth</th><th>Copilot PAU</th><th>Growth</th><th>Cowork MAU</th><th>Growth</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+      '</div>';
+    }
+
+    function psmMvpTenantCell(customer, key, stage) {
+      if (key === 'name') return '<strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong>';
+      if (key === 'tenantId') return '<span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span>';
+      if (key === 'progress') return '<span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span>';
+      if (/Growth$/.test(key)) {
+        var metricKey = key.replace(/Growth$/, '');
+        return '<span class="psm-mvp-growth">'+psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0)+'</span>';
+      }
+      if (['copilotLicensedMau', 'copilotPau', 'coworkMau'].indexOf(key) > -1) return (customer[key] || 0).toLocaleString();
+      return psmEscapeHtml(customer[key] || '\u2014');
     }
 
     function psmRenderMvpTenantWorkspace(c) {
@@ -2754,6 +2875,9 @@
         return '<option value="'+stage.key+'">'+stage.label+'</option>';
       }).join('');
       var visible = psmMvpTenantTableState.visibleColumns;
+      var visibleColumns = PSM_MVP_TENANT_COLUMNS.filter(function(column) {
+        return column.fixed || visible[column.key];
+      });
       var indexedCustomers = (c.customers || []).map(function(customer, index) {
         return { customer: customer, index: index };
       });
@@ -2774,31 +2898,20 @@
         var index = item.index;
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         return '<tr><td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' +
-          '<td><strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong></td>' +
-          '<td class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</td>' +
-          (visible.mau ? '<td class="psm-num-cell">'+(customer.mau || 0).toLocaleString()+'</td>' : '') +
-          (visible.pau ? '<td class="psm-num-cell">'+(customer.pau || 0).toLocaleString()+'</td>' : '') +
-          (visible.progress ? '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td>' : '') +
+          visibleColumns.map(function(column) { return '<td>'+psmMvpTenantCell(customer, column.key, stage)+'</td>'; }).join('') +
         '</tr>';
       }).join('');
       if (!rows) {
-        var columnCount = 3 + (visible.mau ? 1 : 0) + (visible.pau ? 1 : 0) + (visible.progress ? 1 : 0);
+        var columnCount = 1 + visibleColumns.length;
         rows = '<tr><td colspan="'+columnCount+'" style="padding:24px;text-align:center;color:var(--cp-text-muted);">No tenants match the current filters.</td></tr>';
       }
-      var optionalHeaders =
-        (visible.mau ? '<th class="psm-num-cell">MAU</th>' : '') +
-        (visible.pau ? '<th class="psm-num-cell">PAU</th>' : '') +
-        (visible.progress ? '<th>Progress</th>' : '');
-      var optionalCols =
-        (visible.mau ? '<col style="width:11%;">' : '') +
-        (visible.pau ? '<col style="width:11%;">' : '') +
-        (visible.progress ? '<col style="width:22%;">' : '');
+      var headers = visibleColumns.map(function(column) { return '<th>'+column.label+'</th>'; }).join('');
       var firstRecord = filtered.length ? start + 1 : 0;
       var lastRecord = Math.min(start + psmMvpTenantTableState.pageSize, filtered.length);
       return '<div class="panel-card"><h2 class="psm-mvp-section-title">Tenant Progress <button type="button" class="psm-mvp-tooltip" aria-label="About Tenant Progress" aria-describedby="psmMvpProgressTooltip">i<span id="psmMvpProgressTooltip" class="psm-mvp-tooltip-text" role="tooltip">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</span></button> <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
         psmRenderMvpTenantToolbar(c, stageOptions) +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
-        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><colgroup><col style="width:5%;"><col style="width:29%;"><col style="width:22%;">'+optionalCols+'</colgroup><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer / Tenant Name</th><th class="psm-tenant-id">Tenant ID</th>'+optionalHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>'+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div class="psm-mvp-pagination"><span>Showing '+firstRecord+'-'+lastRecord+' of '+filtered.length+' records</span><div class="psm-mvp-pagination-controls"><label>Rows per page <select onchange="psmMvpSetPageSize(this.value)">'+[5,10,25,50].map(function(size){ return '<option value="'+size+'"'+(psmMvpTenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><button class="btn btn-secondary" onclick="psmMvpChangePage(-1)"'+(psmMvpTenantTableState.page <= 1 ? ' disabled' : '')+'>Previous</button><span>Page '+psmMvpTenantTableState.page+' of '+totalPages+'</span><button class="btn btn-secondary" onclick="psmMvpChangePage(1)"'+(psmMvpTenantTableState.page >= totalPages ? ' disabled' : '')+'>Next</button></div></div>' +
       '</div>';
     }
@@ -2810,14 +2923,7 @@
       } else if (psmMvpTenantTableState.openPanel === 'filter') {
         panel = '<div class="psm-mvp-action-panel"><div class="form-group"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div><div class="form-group"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div><button class="btn btn-primary" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary" onclick="psmMvpClearTenantFilter()">Clear</button></div>';
       } else if (psmMvpTenantTableState.openPanel === 'columns') {
-        var columns = [
-          { key: 'name', label: 'Customer / Tenant Name', fixed: true },
-          { key: 'tenantId', label: 'Tenant ID', fixed: true },
-          { key: 'mau', label: 'MAU' },
-          { key: 'pau', label: 'PAU' },
-          { key: 'progress', label: 'Progress' }
-        ];
-        panel = '<div class="psm-mvp-action-panel"><strong>Change Columns</strong>'+columns.map(function(column) {
+        panel = '<div class="psm-mvp-action-panel"><strong>Change Columns</strong>'+PSM_MVP_TENANT_COLUMNS.map(function(column) {
           var checked = column.fixed || psmMvpTenantTableState.visibleColumns[column.key];
           return '<label class="psm-mvp-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
         }).join('')+'</div>';
@@ -2827,20 +2933,42 @@
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'columns' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'columns\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'columns')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'add' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'add\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'add')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Add Customer</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn psm-mvp-toolbar-danger" onclick="psmRemoveSelectedTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6 2.5h4m-5.5 2 .6 9h5.8l.6-9M6.5 7v4m3-4v4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove Customer</button>' +
-        '<input type="file" id="psmMvpBulkAddFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
+        '<input type="file" id="psmMvpBulkAddFile" accept=".csv" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
+    }
+
+    function psmPopulateMvpTenantTelemetry(c, customer, index, seed) {
+      var metricSeed = seed + index * 19;
+      var baselineTime = Date.parse(c.baselineDate || c.created);
+      var ageDays = isNaN(baselineTime) ? 90 : Math.max(0, Math.floor((Date.now() - baselineTime) / 86400000));
+      var ageFactor = Math.min(1, ageDays / 90);
+      var baselineMau = typeof customer.copilotLicensedMauBaseline === 'number' ? customer.copilotLicensedMauBaseline : 80 + (metricSeed % 720);
+      var baselinePau = typeof customer.copilotPauBaseline === 'number' ? customer.copilotPauBaseline : baselineMau + 120 + (metricSeed % 540);
+      var baselineCowork = typeof customer.coworkMauBaseline === 'number' ? customer.coworkMauBaseline : 12 + (metricSeed % 180);
+      customer.copilotLicensedMauBaseline = baselineMau;
+      customer.copilotLicensedMau = typeof customer.copilotLicensedMau === 'number' ? customer.copilotLicensedMau : baselineMau + Math.round((18 + (metricSeed % 145)) * ageFactor);
+      customer.copilotPauBaseline = baselinePau;
+      customer.copilotPau = typeof customer.copilotPau === 'number' ? customer.copilotPau : baselinePau + Math.round((25 + (metricSeed % 190)) * ageFactor);
+      customer.coworkMauBaseline = baselineCowork;
+      customer.coworkMau = typeof customer.coworkMau === 'number' ? customer.coworkMau : baselineCowork + Math.round((4 + (metricSeed % 52)) * ageFactor);
+      customer.segment = customer.segment || PSM_SEGMENTS[metricSeed % PSM_SEGMENTS.length];
+      customer.country = customer.country || PSM_TENANT_COUNTRIES[metricSeed % PSM_TENANT_COUNTRIES.length];
+      customer.partnerName = customer.partnerName || c.partner;
+      customer.partnerMpn = customer.partnerMpn || c.mpn || PSM_PARTNER_MPN[c.partner] || '';
+      customer.partnerOneId = customer.partnerOneId || c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '';
+      customer.cspTier = customer.cspTier || PSM_CSP_TIERS[metricSeed % PSM_CSP_TIERS.length];
+      var reseller = PSM_T2_RESELLERS[metricSeed % PSM_T2_RESELLERS.length];
+      customer.t2ResellerId = customer.t2ResellerId || reseller.id;
+      customer.t2ResellerName = customer.t2ResellerName || reseller.name;
     }
 
     function psmEnsureMvpTenantRows(c) {
       c.customers = c.customers || [];
       if (!c.customers.length) return;
-      var target = Math.min(c.tenantCount || c.customers.length, 1000);
+      c.baselineDate = c.baselineDate || c.created;
+      c.partnerOneId = c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '';
+      var target = c.tenantCount || c.customers.length;
       var templates = c.customers.slice();
       var seed = psmSeed(c);
-      c.customers.forEach(function(customer, index) {
-        if (typeof customer.pau !== 'number') {
-          customer.pau = Math.max(customer.mau || 0, (customer.mau || 0) + 120 + ((seed + index * 17) % 480));
-        }
-      });
       while (c.customers.length < target) {
         var index = c.customers.length;
         var template = templates[index % templates.length];
@@ -2853,11 +2981,18 @@
         copy.customerName = name;
         copy.tenantName = name;
         copy.tenantId = 'ten-' + String(100000 + ((seed + index * 977) % 900000));
-        copy.mau = Math.max(0, (template.mau || 0) + (index % 7) * 16);
-        copy.pau = Math.max(copy.mau, (template.pau || copy.mau) + (index % 5) * 24);
+        delete copy.copilotLicensedMauBaseline;
+        delete copy.copilotLicensedMau;
+        delete copy.copilotPauBaseline;
+        delete copy.copilotPau;
+        delete copy.coworkMauBaseline;
+        delete copy.coworkMau;
         copy.stage = PSM_PROGRESSION_STAGES[(seed + index) % PSM_PROGRESSION_STAGES.length].key;
         c.customers.push(copy);
       }
+      c.customers.forEach(function(customer, index) {
+        psmPopulateMvpTenantTelemetry(c, customer, index, seed);
+      });
     }
 
     function psmMvpToggleTenantPanel(panel) {
@@ -2882,7 +3017,8 @@
     }
 
     function psmMvpToggleTenantColumn(key, visible) {
-      if (['mau', 'pau', 'progress'].indexOf(key) === -1) return;
+      var column = PSM_MVP_TENANT_COLUMNS.filter(function(item) { return item.key === key && !item.fixed; })[0];
+      if (!column) return;
       psmMvpTenantTableState.visibleColumns[key] = visible;
       psmRenderMvpDetail();
     }
@@ -2898,13 +3034,16 @@
       psmRenderMvpDetail();
     }
 
-    function psmMvpCreateTenantRecord(name, tenantId, c, index) {
+    function psmMvpCreateTenantRecord(name, tenantId, c, index, identifiers) {
+      identifiers = identifiers || {};
       return {
         name: name, tenantCustomerName: name, customerName: name, tenantName: name,
-        tenantId: tenantId, segment: 'Enterprise', stage: 'targetList',
+        tenantId: tenantId, segment: PSM_SEGMENTS[index % PSM_SEGMENTS.length], country: PSM_TENANT_COUNTRIES[index % PSM_TENANT_COUNTRIES.length], stage: 'targetList',
+        partnerOneId: identifiers.partnerOneId || c.partnerOneId || '',
+        partnerMpn: identifiers.partnerMpn || c.mpn || '',
         license: false, services: false, seatPen: 0, paidUtil: 0, whitespace: 0,
         copilotMauWhitespace: 0, freeToPaidWhitespace: 0, e7AgentsMau: 0,
-        consumedUnits: 0, copilotPru: 0, mau: (index % 6) * 24, pau: 240 + (index % 8) * 36, revenue: 0,
+        consumedUnits: 0, copilotPru: 0, revenue: 0,
         agentMau: 0, coworkSessions: 0, opportunity: 'Other', tenantHealth: 'Healthy',
         mciEligible: false, recommendedMci: 'N/A', mciWorkshops: 0, mciStatus: 'Not started',
         fundingCommitted: 0, targetedWorkloads: (c.workloads || []).slice(0, 1),
@@ -2923,6 +3062,9 @@
           var headers = psmParseCsvLine(lines[0] || '').map(function(value) { return value.trim().toLowerCase().replace(/[^a-z0-9]/g, ''); });
           var nameIndex = headers.indexOf('customertenantname');
           var tenantIdIndex = headers.indexOf('tenantid');
+          var partnerOneIdIndex = headers.indexOf('partneroneid');
+          var partnerMpnIndex = headers.indexOf('partnermpnid');
+          if (partnerMpnIndex === -1) partnerMpnIndex = headers.indexOf('partnercenteridmpn');
           if (nameIndex === -1 || tenantIdIndex === -1) {
             showToast('Use the Customer / Tenant Name and Tenant ID template columns', true);
             input.value = '';
@@ -2932,18 +3074,17 @@
             var values = psmParseCsvLine(line);
             var name = (values[nameIndex] || '').trim();
             var tenantId = (values[tenantIdIndex] || '').trim();
-            return name && tenantId ? psmMvpCreateTenantRecord(name, tenantId, c, index) : null;
+            var identifiers = {
+              partnerOneId: partnerOneIdIndex > -1 ? (values[partnerOneIdIndex] || '').trim() : '',
+              partnerMpn: partnerMpnIndex > -1 ? (values[partnerMpnIndex] || '').trim() : ''
+            };
+            return name && tenantId ? psmMvpCreateTenantRecord(name, tenantId, c, index, identifiers) : null;
           }).filter(Boolean);
           psmMvpAddTenantRows(c, additions, file.name);
           input.value = '';
         });
       } else {
-        var estimated = Math.max(1, Math.min(50, Math.round(file.size / 180)));
-        var additions = [];
-        for (var i = 0; i < estimated; i++) {
-          additions.push(psmMvpCreateTenantRecord('Imported Customer '+(i + 1), 'import-'+Date.now()+'-'+(i + 1), c, i));
-        }
-        psmMvpAddTenantRows(c, additions, file.name);
+        showToast('Upload a CSV file using the campaign template', true);
         input.value = '';
       }
     }
@@ -2969,12 +3110,24 @@
     function psmMvpDownloadTenants(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
-      var rows = [['Customer / Tenant Name', 'Tenant ID', 'MAU', 'PAU', 'Progress']];
+      psmEnsureMvpTenantRows(c);
+      var rows = [[
+        'Customer / Tenant Name', 'Tenant ID', 'Tenant Segment', 'Tenant Country/Region',
+        'Partner Name', 'Partner Center ID (MPN)', 'PartnerOneID', 'CSP Tier', 'T2 Reseller ID', 'T2 Reseller Name',
+        'Copilot MAU (Licensed) Baseline', 'Copilot MAU (Licensed) Current', 'Copilot MAU (Licensed) Growth',
+        'Copilot PAU Baseline', 'Copilot PAU Current', 'Copilot PAU Growth',
+        'Cowork MAU Baseline', 'Cowork MAU Current', 'Cowork MAU Growth', 'Progress'
+      ]];
       c.customers.forEach(function(customer) {
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         rows.push([
           customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name,
-          customer.tenantId, customer.mau || 0, customer.pau || 0, stage.label
+          customer.tenantId, customer.segment, customer.country,
+          customer.partnerName, customer.partnerMpn, customer.partnerOneId, customer.cspTier, customer.t2ResellerId, customer.t2ResellerName,
+          customer.copilotLicensedMauBaseline, customer.copilotLicensedMau, customer.copilotLicensedMau - customer.copilotLicensedMauBaseline,
+          customer.copilotPauBaseline, customer.copilotPau, customer.copilotPau - customer.copilotPauBaseline,
+          customer.coworkMauBaseline, customer.coworkMau, customer.coworkMau - customer.coworkMauBaseline,
+          stage.label
         ]);
       });
       var csv = rows.map(function(row) { return row.map(psmMvpCsvValue).join(','); }).join('\r\n');
@@ -3472,6 +3625,8 @@
     function psmOpenMvpCreate() {
       psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
       document.getElementById('psmMvpPartner').innerHTML = '<strong>'+psmEscapeHtml(psmPartnerContext)+'</strong> &middot; PartnerOneID '+psmEscapeHtml(PSM_PARTNER_ONE[psmPartnerContext] || '\u2014');
+      document.getElementById('psmMvpPartnerOneId').value = PSM_PARTNER_ONE[psmPartnerContext] || '';
+      document.getElementById('psmMvpPartnerMpnId').value = PSM_PARTNER_MPN[psmPartnerContext] || '';
       document.getElementById('psmMvpCampaignName').value = '';
       document.getElementById('psmMvpFile').value = '';
       document.getElementById('psmMvpInitialNotes').value = '';
@@ -3485,11 +3640,11 @@
       psmMvpUpload = { file: file || null, rowCount: 0, valid: false, rows: [] };
       if (!file) { status.textContent = 'No file selected.'; return; }
       var extension = file.name.split('.').pop().toLowerCase();
-      if (['csv', 'xlsx', 'xls'].indexOf(extension) === -1) {
-        status.innerHTML = '<strong style="color:var(--cp-danger);">Unsupported file.</strong> Upload a CSV, XLSX, or XLS file.';
+      if (extension !== 'csv') {
+        status.innerHTML = '<strong style="color:var(--cp-danger);">Unsupported file.</strong> Upload the completed CSV template.';
         return;
       }
-      if (extension === 'csv' && file.text) {
+      if (file.text) {
         file.text().then(function(text) {
           var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
           var headers = psmParseCsvLine(lines[0] || '').map(function(value) {
@@ -3498,24 +3653,40 @@
           var tenantCustomerNameIndex = headers.indexOf('customertenantname');
           if (tenantCustomerNameIndex === -1) tenantCustomerNameIndex = headers.indexOf('tenantcustomername');
           var tenantIdIndex = headers.indexOf('tenantid');
+          var partnerOneIdIndex = headers.indexOf('partneroneid');
+          var partnerMpnIndex = headers.indexOf('partnermpnid');
+          if (partnerMpnIndex === -1) partnerMpnIndex = headers.indexOf('partnercenteridmpn');
           var hasRequiredColumns = tenantCustomerNameIndex > -1 && tenantIdIndex > -1;
-          psmMvpUpload.rowCount = Math.max(0, lines.length - 1);
-          psmMvpUpload.rows = lines.slice(1).map(function(line) {
+          var parsedRows = lines.slice(1).map(function(line) {
             var values = psmParseCsvLine(line);
             return {
               tenantCustomerName: (values[tenantCustomerNameIndex] || '').trim(),
               tenantId: (values[tenantIdIndex] || '').trim(),
+              partnerOneId: partnerOneIdIndex > -1 ? (values[partnerOneIdIndex] || '').trim() : '',
+              partnerMpn: partnerMpnIndex > -1 ? (values[partnerMpnIndex] || '').trim() : ''
             };
-          }).filter(function(row) { return row.tenantCustomerName && row.tenantId; });
-          psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === psmMvpUpload.rowCount && psmMvpUpload.rowCount > 0;
-          status.innerHTML = psmMvpUpload.valid
-            ? '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' tenants. All Tenant IDs are ready to match with ASPX.'
-            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the template headers Customer / Tenant Name and Tenant ID, and complete both fields for every row.';
+          });
+          var seenTenantIds = new Set();
+          var duplicateCount = 0;
+          psmMvpUpload.rows = parsedRows.filter(function(row) {
+            if (!row.tenantCustomerName || !row.tenantId) return false;
+            var tenantKey = row.tenantId.toLowerCase();
+            if (seenTenantIds.has(tenantKey)) { duplicateCount++; return false; }
+            seenTenantIds.add(tenantKey);
+            return true;
+          });
+          psmMvpUpload.rowCount = parsedRows.length;
+          psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === parsedRows.length && parsedRows.length > 0;
+          if (psmMvpUpload.valid) {
+            status.innerHTML = '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' unique tenants. All Tenant IDs are ready to match with ASPX.';
+          } else if (duplicateCount) {
+            status.innerHTML = '<strong style="color:var(--cp-danger);">Duplicate Tenant IDs found.</strong> Remove '+duplicateCount.toLocaleString()+' duplicate row'+(duplicateCount === 1 ? '' : 's')+' and upload the template again.';
+          } else {
+            status.innerHTML = '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the required headers Customer / Tenant Name and Tenant ID, and complete both fields for every row.';
+          }
         });
       } else {
-        psmMvpUpload.rowCount = Math.max(1, Math.min(5000, Math.round(file.size / 180)));
-        psmMvpUpload.valid = true;
-        status.innerHTML = '<strong style="color:var(--cp-success);">Ready to validate.</strong> '+psmEscapeHtml(file.name)+' will be checked for the two template columns during import. Estimated tenants: '+psmMvpUpload.rowCount.toLocaleString()+'.';
+        status.innerHTML = '<strong style="color:var(--cp-danger);">Unable to read this file.</strong> Download a fresh CSV template and try again.';
       }
     }
 
@@ -3536,7 +3707,7 @@
     }
 
     function psmDownloadMvpTemplate() {
-      var csv = 'Customer / Tenant Name,Tenant ID\r\n';
+      var csv = 'Customer / Tenant Name,Tenant ID,PartnerOneID,Partner MPN ID\r\n';
       var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
@@ -3553,25 +3724,24 @@
       var name = document.getElementById('psmMvpCampaignName').value.trim();
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
-      var listSize = psmMvpUpload.rowCount;
+      var listSize = psmMvpUpload.rows.length;
+      var uploadedPartner = psmMvpUpload.rows[0] || {};
+      var partnerOneId = uploadedPartner.partnerOneId || document.getElementById('psmMvpPartnerOneId').value.trim();
+      var partnerMpn = uploadedPartner.partnerMpn || document.getElementById('psmMvpPartnerMpnId').value.trim();
       var newCampaign = {
         id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: 'Microsoft PSM',
-        mpn: PSM_PARTNER_MPN[psmPartnerContext] || '', region: psmGetRegionForPartner(psmPartnerContext),
+        mpn: partnerMpn, partnerOneId: partnerOneId, region: psmGetRegionForPartner(psmPartnerContext),
         workload: 'ASPX usage', workloads: [], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
-        goal: 'Campaign tracking', goals: [], created: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
+        goal: 'Campaign tracking', goals: [], created: today(), baselineDate: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
         campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: 'Microsoft PSM',
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0,
         copilotPru: 0, agentMau: 0, coworkSessions: 0, mciWorkshops: 0, mciStatus: 'Not started',
         motions: [], mciOffer: 'N/A', fundingCommitted: 0, trackedCount: 0, signals: [], activityLog: [],
         scenarioId: 'manual', executionType: 'Uploaded', _enriched: true
       };
-      if (psmMvpUpload.rows.length) {
-        newCampaign.customers = psmMvpUpload.rows.slice(0, 1000).map(function(uploaded, index) {
-          return psmMvpCreateTenantRecord(uploaded.tenantCustomerName, uploaded.tenantId, newCampaign, index);
-        });
-      } else {
-        newCampaign.customers = psmBuildCustomers(newCampaign, psmSeed(newCampaign));
-      }
+      newCampaign.customers = psmMvpUpload.rows.map(function(uploaded, index) {
+        return psmMvpCreateTenantRecord(uploaded.tenantCustomerName, uploaded.tenantId, newCampaign, index, uploaded);
+      });
       newCampaign.timeline = [{ date: today(), text: 'Campaign created from ' + psmMvpUpload.file.name, type: 'info', actor: 'Microsoft PSM' }];
       psmCampaigns.unshift(newCampaign);
       hideModal('psmMvpCreateModal');
