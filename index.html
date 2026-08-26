@@ -1730,6 +1730,7 @@
       { key: 'id', label: 'Campaign ID', required: true },
       { key: 'name', label: 'Campaign Name' },
       { key: 'partner', label: 'Partner' },
+      { key: 'microsoftDri', label: 'Microsoft DRI' },
       { key: 'tenantCount', label: 'Tenants' },
       { key: 'status', label: 'Status' },
       { key: 'mvpUpdated', label: 'Last Updated' },
@@ -4251,6 +4252,7 @@
       if (c.mauGrowth > 0 && c.mauGrowth < 100) c.mauGrowth = Math.round(c.mauGrowth * 100);
       if (typeof c.npsa !== 'number') c.npsa = ['Active', 'Measuring', 'Completed'].indexOf(c.status) > -1 ? Math.round(c.tenantCount * (0.08 + (initialSeed % 4) * 0.03)) : 0;
       if (!c.owner) c.owner = ['Alex Chen (PSM)', 'Maya Patel (PSS)', 'Jordan Lee (PMM)', 'Sam Rivera (PDM)'][initialSeed % 4];
+      if (!c.microsoftDri) c.microsoftDri = 'Varun Gorur';
       if (!c.motions) c.motions = ['Partner GTM'];
       if (!c.mciOffer) c.mciOffer = c.mciWorkshops ? PSM_MCI_OFFERS[initialSeed % (PSM_MCI_OFFERS.length - 1)] : 'N/A';
       if (c._enriched) return c;
