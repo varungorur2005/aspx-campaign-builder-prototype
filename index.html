@@ -673,6 +673,17 @@
     .psm-mvp-impact-card .current { display:block; margin:4px 0; color:var(--cp-text); font-size:24px; font-weight:700; }
     .psm-mvp-impact-card .comparison { display:flex; justify-content:space-between; gap:8px; color:var(--cp-text-muted); font-size:11px; }
     .psm-mvp-growth { color:var(--cp-success); font-weight:700; white-space:nowrap; }
+    .psm-mvp-update-history { margin-top:14px; border-top:1px solid var(--cp-border); }
+    .psm-mvp-update-history summary { display:flex; align-items:center; gap:8px; padding:12px 2px 4px; color:var(--cp-text); font-size:12px; font-weight:700; cursor:pointer; list-style:none; }
+    .psm-mvp-update-history summary::-webkit-details-marker { display:none; }
+    .psm-mvp-update-history summary::before { content:'\25B8'; color:var(--cp-text-muted); font-size:13px; }
+    .psm-mvp-update-history[open] summary::before { content:'\25BE'; }
+    .psm-mvp-update-count { padding:2px 7px; border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:10px; font-weight:600; }
+    .psm-mvp-update-list { display:flex; flex-direction:column; gap:8px; padding-top:8px; }
+    .psm-mvp-update-entry { padding:10px 12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .psm-mvp-update-entry-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+    .psm-mvp-update-entry-meta { color:var(--cp-text-muted); font-size:10px; }
+    .psm-mvp-update-entry-notes { color:var(--cp-text); font-size:12px; line-height:1.45; white-space:pre-wrap; }
     .psm-mvp-segment-scroll { overflow-x:auto; border:1px solid var(--cp-border); border-radius:0.625rem; }
     .psm-mvp-segment-table { width:100%; min-width:780px; border-collapse:collapse; font-size:12px; }
     .psm-mvp-segment-table th, .psm-mvp-segment-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); text-align:right; white-space:nowrap; }
@@ -2522,7 +2533,10 @@
     }
 
     function psmRenderMvpDashboard() {
-      psmCampaigns.forEach(psmEnrich);
+      psmCampaigns.forEach(function(campaign) {
+        psmEnrich(campaign);
+        psmLoadMvpUpdateHistory(campaign);
+      });
       var search = (psmSearchTerm || '').toLowerCase();
       var filtered = psmScopedCampaigns().filter(function(c) {
         if (search) {
@@ -2789,6 +2803,7 @@
       var c = psmCurrentCampaign;
       if (!c) return;
       psmEnrich(c);
+      psmLoadMvpUpdateHistory(c);
       c.mvpStatus = psmGetMvpStatus(c);
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
@@ -2805,9 +2820,41 @@
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
         '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
         '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
-          '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div></div>' +
+          '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div>' +
+          psmRenderMvpUpdateHistory(c)+'</div>' +
         psmRenderMvpImpact(c) +
         psmRenderMvpTenantWorkspace(c);
+    }
+
+    function psmMvpUpdateStorageKey(id) {
+      return 'psmMvpCampaignUpdates:' + id;
+    }
+
+    function psmLoadMvpUpdateHistory(c) {
+      if (c._mvpUpdateHistoryLoaded) return;
+      try {
+        var stored = JSON.parse(localStorage.getItem(psmMvpUpdateStorageKey(c.id)) || '[]');
+        if (Array.isArray(stored)) c.campaignUpdates = stored;
+      } catch (e) {
+        c.campaignUpdates = c.campaignUpdates || [];
+      }
+      c.campaignUpdates = c.campaignUpdates || [];
+      var latest = c.campaignUpdates[c.campaignUpdates.length - 1];
+      if (latest) {
+        c.mvpStatus = latest.status;
+        c.campaignUpdate = latest.notes;
+        c.campaignUpdateActor = latest.actor;
+        c.mvpUpdated = latest.date;
+      }
+      c._mvpUpdateHistoryLoaded = true;
+    }
+
+    function psmRenderMvpUpdateHistory(c) {
+      var updates = (c.campaignUpdates || []).slice().reverse();
+      var entries = updates.length ? updates.map(function(update) {
+        return '<div class="psm-mvp-update-entry"><div class="psm-mvp-update-entry-head">'+psmRenderStatusBadge(update.status)+'<span class="psm-mvp-update-entry-meta">'+psmEscapeHtml(update.date)+' &middot; '+psmEscapeHtml(update.actor)+'</span></div><div class="psm-mvp-update-entry-notes">'+psmEscapeHtml(update.notes || 'No campaign notes provided.')+'</div></div>';
+      }).join('') : '<div class="psm-mvp-update-entry"><div class="psm-mvp-update-entry-notes" style="color:var(--cp-text-muted);">No campaign updates have been saved yet.</div></div>';
+      return '<details class="psm-mvp-update-history"><summary>Campaign update history <span class="psm-mvp-update-count">'+updates.length+' update'+(updates.length === 1 ? '' : 's')+'</span></summary><div class="psm-mvp-update-list">'+entries+'</div></details>';
     }
 
     function psmMvpMetricTotals(customers) {
@@ -3156,9 +3203,24 @@
       c.campaignUpdate = document.getElementById('psmMvpDetailNotes').value.trim();
       c.campaignUpdateActor = 'Microsoft PSM';
       c.mvpUpdated = today();
+      c.campaignUpdates = c.campaignUpdates || [];
+      var savedAt = new Date();
+      c.campaignUpdates.push({
+        status: c.mvpStatus,
+        notes: c.campaignUpdate,
+        actor: c.campaignUpdateActor,
+        date: savedAt.toLocaleString(),
+        timestamp: savedAt.toISOString()
+      });
+      var storageFailed = false;
+      try {
+        localStorage.setItem(psmMvpUpdateStorageKey(c.id), JSON.stringify(c.campaignUpdates));
+      } catch (e) {
+        storageFailed = true;
+      }
       c.timeline = c.timeline || [];
       c.timeline.push({ date: today(), text: 'Campaign update saved: ' + c.mvpStatus, type: c.mvpStatus === 'Closed' ? 'closed' : 'info', actor: 'Microsoft PSM' });
-      showToast('Campaign state and notes updated');
+      showToast(storageFailed ? 'Update saved for this session, but browser storage is unavailable' : 'Campaign status and notes saved to update history', storageFailed);
       psmRenderMvpDetail();
     }
 
