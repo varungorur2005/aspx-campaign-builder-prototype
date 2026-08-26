@@ -349,6 +349,8 @@
     /* ============================================================
        DETAIL FLYOUT
        ============================================================ */
+    .psm-mvp-flyout-backdrop { display:none; position:fixed; inset:48px 0 0; z-index:300; background:transparent; }
+    .psm-mvp-flyout-backdrop.show { display:block; }
     .detail-view {
       position: fixed; top: 48px; right: 0; bottom: 0;
       width: 1180px; max-width: 94vw; background: #fff;
@@ -1016,6 +1018,7 @@
   <!-- ==========
        DETAIL FLYOUT
        ========== -->
+  <div class="psm-mvp-flyout-backdrop" id="psmMvpFlyoutBackdrop" onclick="showDashboard()" aria-hidden="true"></div>
   <div class="detail-view" id="detailView">
     <div class="flyout-header">
       <span style="font-size:11px;color:#616161;">Campaign Detail</span>
@@ -2676,6 +2679,7 @@
       detailView.classList.add('show');
       detailView.classList.toggle('psm-full-page', currentView === 'psm');
       detailView.classList.toggle('psm-mvp-half-page', currentView === 'psm-mvp');
+      document.getElementById('psmMvpFlyoutBackdrop').classList.toggle('show', currentView === 'psm-mvp');
       window.location.hash = 'psm-campaign-' + id;
       psmRenderDetail();
     }
@@ -4319,6 +4323,7 @@
 
     function showDashboard() {
       document.getElementById('detailView').classList.remove('show', 'psm-full-page', 'psm-mvp-half-page', 'psm-presenting');
+      document.getElementById('psmMvpFlyoutBackdrop').classList.remove('show');
       document.body.classList.remove('psm-presenting');
       if (isPsmView() && window.location.hash.indexOf('#psm-campaign-') === 0) history.replaceState(null, '', window.location.pathname + window.location.search);
       psmCurrentCampaign = null;
