@@ -660,7 +660,6 @@
     #psmMvpCreateModal .psm-upload-zone > strong { display:block; margin-bottom:6px; color:var(--cp-text); font-size:13px; }
     #psmMvpCreateModal .psm-upload-help { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     #psmMvpCreateModal .btn-group { justify-content:flex-end; margin-top:4px; padding-top:20px; border-top:1px solid var(--cp-border); }
-    .psm-mvp-identifier-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .psm-live-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:11px; font-weight:600; }
     .psm-stage-label { display:inline-block; padding:4px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; font-weight:600; }
     .psm-mvp-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; margin:12px 0; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
@@ -710,7 +709,7 @@
       .psm-mvp-detail-heading { flex-direction:column; }
       .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
-      .psm-mvp-identifier-grid, .psm-mvp-impact-grid { grid-template-columns:1fr; }
+      .psm-mvp-impact-grid { grid-template-columns:1fr; }
     }
     .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
     .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
@@ -1206,20 +1205,6 @@
     <div class="modal psm-mvp-create-modal">
       <h3>Create campaign from a tenant list</h3>
       <p class="psm-mvp-create-intro">Use the standard template to identify the tenants in this campaign. ASPX will match each Tenant ID and supply the latest usage data.</p>
-      <div class="form-group">
-        <label>Partner</label>
-        <div class="psm-context-note" id="psmMvpPartner"></div>
-      </div>
-      <div class="psm-mvp-identifier-grid">
-        <div class="form-group">
-          <label>PartnerOneID</label>
-          <input type="text" id="psmMvpPartnerOneId" placeholder="Enter PartnerOneID">
-        </div>
-        <div class="form-group">
-          <label>Partner MPN ID</label>
-          <input type="text" id="psmMvpPartnerMpnId" placeholder="Enter Partner MPN ID">
-        </div>
-      </div>
       <div class="form-group">
         <label>Campaign name <span class="required">*</span></label>
         <input type="text" id="psmMvpCampaignName" placeholder="e.g. Contoso - Copilot growth Q1">
@@ -3624,9 +3609,6 @@
 
     function psmOpenMvpCreate() {
       psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
-      document.getElementById('psmMvpPartner').innerHTML = '<strong>'+psmEscapeHtml(psmPartnerContext)+'</strong> &middot; PartnerOneID '+psmEscapeHtml(PSM_PARTNER_ONE[psmPartnerContext] || '\u2014');
-      document.getElementById('psmMvpPartnerOneId').value = PSM_PARTNER_ONE[psmPartnerContext] || '';
-      document.getElementById('psmMvpPartnerMpnId').value = PSM_PARTNER_MPN[psmPartnerContext] || '';
       document.getElementById('psmMvpCampaignName').value = '';
       document.getElementById('psmMvpFile').value = '';
       document.getElementById('psmMvpInitialNotes').value = '';
@@ -3726,8 +3708,8 @@
       if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
       var listSize = psmMvpUpload.rows.length;
       var uploadedPartner = psmMvpUpload.rows[0] || {};
-      var partnerOneId = uploadedPartner.partnerOneId || document.getElementById('psmMvpPartnerOneId').value.trim();
-      var partnerMpn = uploadedPartner.partnerMpn || document.getElementById('psmMvpPartnerMpnId').value.trim();
+      var partnerOneId = uploadedPartner.partnerOneId || PSM_PARTNER_ONE[psmPartnerContext] || '';
+      var partnerMpn = uploadedPartner.partnerMpn || PSM_PARTNER_MPN[psmPartnerContext] || '';
       var newCampaign = {
         id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: 'Microsoft PSM',
         mpn: partnerMpn, partnerOneId: partnerOneId, region: psmGetRegionForPartner(psmPartnerContext),
