@@ -1212,7 +1212,7 @@
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
         <div class="psm-template-row">
-          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID, PartnerOneID, Partner MPN ID</span>
+          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID</span>
           <button class="btn btn-secondary" type="button" onclick="psmDownloadMvpTemplate()">Download template</button>
         </div>
         <div class="psm-upload-zone">
@@ -3690,7 +3690,7 @@
     }
 
     function psmDownloadMvpTemplate() {
-      var csv = 'Customer / Tenant Name,Tenant ID,PartnerOneID,Partner MPN ID\r\n';
+      var csv = 'Customer / Tenant Name,Tenant ID\r\n';
       var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
