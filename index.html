@@ -644,6 +644,9 @@
     .psm-stage-label { display:inline-block; padding:4px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; font-weight:600; }
     .psm-mvp-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; margin:12px 0; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .psm-mvp-bulk-bar select { min-width:190px; padding:6px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .psm-mvp-progress-scroll { overflow-x:auto; }
+    .psm-mvp-progress-table { min-width:760px; table-layout:fixed; }
+    .psm-mvp-progress-table .psm-tenant-id { white-space:nowrap; overflow-wrap:normal; font-family:Consolas, "Courier New", Courier, monospace; }
     .psm-mvp-customer-table { width:100%; border-collapse:collapse; font-size:12px; }
     .psm-mvp-customer-table th { text-align:left; padding:9px 10px; color:var(--cp-text-muted); border-bottom:1px solid var(--cp-border); background:var(--cp-surface-soft); }
     .psm-mvp-customer-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); }
@@ -1151,7 +1154,7 @@
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
         <div class="psm-template-row">
-          <span><strong>1. Download the template</strong><br>Columns: Tenant / Customer Name, Tenant ID</span>
+          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID</span>
           <button class="btn btn-secondary" type="button" onclick="psmDownloadMvpTemplate()">Download template</button>
         </div>
         <div class="psm-upload-zone">
@@ -2693,14 +2696,14 @@
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         return '<tr><td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' +
           '<td><strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong></td>' +
-          '<td>'+psmEscapeHtml(customer.tenantId)+'</td>' +
+          '<td class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</td>' +
           metricCells +
           '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td></tr>';
       }).join('');
       return '<div class="panel-card"><h2>Tenant Progress <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+(c.customers || []).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
         '<div class="psm-context-note">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</div>' +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
-        '<div class="psm-workspace-scroll"><table class="psm-cust-table psm-workspace-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Tenant / Customer Name</th><th>Tenant ID</th>'+metricHeaders+'<th>Progress</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><colgroup><col style="width:5%;"><col style="width:29%;"><col style="width:22%;"><col style="width:11%;"><col style="width:11%;"><col style="width:22%;"></colgroup><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer / Tenant Name</th><th class="psm-tenant-id">Tenant ID</th>'+metricHeaders+'<th>Progress</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
       '</div>';
     }
 
@@ -3221,7 +3224,7 @@
           psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === psmMvpUpload.rowCount && psmMvpUpload.rowCount > 0;
           status.innerHTML = psmMvpUpload.valid
             ? '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' tenants. All Tenant IDs are ready to match with ASPX.'
-            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the template headers Tenant / Customer Name and Tenant ID, and complete both fields for every row.';
+            : '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the template headers Customer / Tenant Name and Tenant ID, and complete both fields for every row.';
         });
       } else {
         psmMvpUpload.rowCount = Math.max(1, Math.min(5000, Math.round(file.size / 180)));
@@ -3247,7 +3250,7 @@
     }
 
     function psmDownloadMvpTemplate() {
-      var csv = 'Tenant / Customer Name,Tenant ID\r\n';
+      var csv = 'Customer / Tenant Name,Tenant ID\r\n';
       var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
