@@ -1733,7 +1733,7 @@
     let psmWizardState = { step: 1, name: '', partner: 'Contoso', goals: ['MAU'], workload: 'Copilot' };
     let psmMvpTenantTableState = {
       campaignId: '', page: 1, pageSize: 10, search: '', stage: '', openPanel: '',
-      visibleColumns: { mau: true, npsa: true, progress: true }
+      visibleColumns: { mau: true, pau: true, progress: true }
     };
     function createEmptyFilterState() {
       return { statuses: [], sources: [], areas: [], partnerNames: [], unified: [], campaignStatus: [] };
@@ -2777,21 +2777,21 @@
           '<td><strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong></td>' +
           '<td class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</td>' +
           (visible.mau ? '<td class="psm-num-cell">'+(customer.mau || 0).toLocaleString()+'</td>' : '') +
-          (visible.npsa ? '<td class="psm-num-cell">+'+(customer.npsa || 0).toLocaleString()+'</td>' : '') +
+          (visible.pau ? '<td class="psm-num-cell">'+(customer.pau || 0).toLocaleString()+'</td>' : '') +
           (visible.progress ? '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td>' : '') +
         '</tr>';
       }).join('');
       if (!rows) {
-        var columnCount = 3 + (visible.mau ? 1 : 0) + (visible.npsa ? 1 : 0) + (visible.progress ? 1 : 0);
+        var columnCount = 3 + (visible.mau ? 1 : 0) + (visible.pau ? 1 : 0) + (visible.progress ? 1 : 0);
         rows = '<tr><td colspan="'+columnCount+'" style="padding:24px;text-align:center;color:var(--cp-text-muted);">No tenants match the current filters.</td></tr>';
       }
       var optionalHeaders =
         (visible.mau ? '<th class="psm-num-cell">MAU</th>' : '') +
-        (visible.npsa ? '<th class="psm-num-cell">NPSA</th>' : '') +
+        (visible.pau ? '<th class="psm-num-cell">PAU</th>' : '') +
         (visible.progress ? '<th>Progress</th>' : '');
       var optionalCols =
         (visible.mau ? '<col style="width:11%;">' : '') +
-        (visible.npsa ? '<col style="width:11%;">' : '') +
+        (visible.pau ? '<col style="width:11%;">' : '') +
         (visible.progress ? '<col style="width:22%;">' : '');
       var firstRecord = filtered.length ? start + 1 : 0;
       var lastRecord = Math.min(start + psmMvpTenantTableState.pageSize, filtered.length);
@@ -2814,7 +2814,7 @@
           { key: 'name', label: 'Customer / Tenant Name', fixed: true },
           { key: 'tenantId', label: 'Tenant ID', fixed: true },
           { key: 'mau', label: 'MAU' },
-          { key: 'npsa', label: 'NPSA' },
+          { key: 'pau', label: 'PAU' },
           { key: 'progress', label: 'Progress' }
         ];
         panel = '<div class="psm-mvp-action-panel"><strong>Change Columns</strong>'+columns.map(function(column) {
@@ -2836,6 +2836,11 @@
       var target = Math.min(c.tenantCount || c.customers.length, 1000);
       var templates = c.customers.slice();
       var seed = psmSeed(c);
+      c.customers.forEach(function(customer, index) {
+        if (typeof customer.pau !== 'number') {
+          customer.pau = Math.max(customer.mau || 0, (customer.mau || 0) + 120 + ((seed + index * 17) % 480));
+        }
+      });
       while (c.customers.length < target) {
         var index = c.customers.length;
         var template = templates[index % templates.length];
@@ -2849,7 +2854,7 @@
         copy.tenantName = name;
         copy.tenantId = 'ten-' + String(100000 + ((seed + index * 977) % 900000));
         copy.mau = Math.max(0, (template.mau || 0) + (index % 7) * 16);
-        copy.npsa = Math.max(0, (template.npsa || 0) + (index % 5));
+        copy.pau = Math.max(copy.mau, (template.pau || copy.mau) + (index % 5) * 24);
         copy.stage = PSM_PROGRESSION_STAGES[(seed + index) % PSM_PROGRESSION_STAGES.length].key;
         c.customers.push(copy);
       }
@@ -2877,7 +2882,7 @@
     }
 
     function psmMvpToggleTenantColumn(key, visible) {
-      if (['mau', 'npsa', 'progress'].indexOf(key) === -1) return;
+      if (['mau', 'pau', 'progress'].indexOf(key) === -1) return;
       psmMvpTenantTableState.visibleColumns[key] = visible;
       psmRenderMvpDetail();
     }
@@ -2899,7 +2904,7 @@
         tenantId: tenantId, segment: 'Enterprise', stage: 'targetList',
         license: false, services: false, seatPen: 0, paidUtil: 0, whitespace: 0,
         copilotMauWhitespace: 0, freeToPaidWhitespace: 0, e7AgentsMau: 0,
-        consumedUnits: 0, copilotPru: 0, mau: (index % 6) * 24, npsa: index % 4, revenue: 0,
+        consumedUnits: 0, copilotPru: 0, mau: (index % 6) * 24, pau: 240 + (index % 8) * 36, revenue: 0,
         agentMau: 0, coworkSessions: 0, opportunity: 'Other', tenantHealth: 'Healthy',
         mciEligible: false, recommendedMci: 'N/A', mciWorkshops: 0, mciStatus: 'Not started',
         fundingCommitted: 0, targetedWorkloads: (c.workloads || []).slice(0, 1),
@@ -2964,12 +2969,12 @@
     function psmMvpDownloadTenants(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
-      var rows = [['Customer / Tenant Name', 'Tenant ID', 'MAU', 'NPSA', 'Progress']];
+      var rows = [['Customer / Tenant Name', 'Tenant ID', 'MAU', 'PAU', 'Progress']];
       c.customers.forEach(function(customer) {
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         rows.push([
           customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name,
-          customer.tenantId, customer.mau || 0, customer.npsa || 0, stage.label
+          customer.tenantId, customer.mau || 0, customer.pau || 0, stage.label
         ]);
       });
       var csv = rows.map(function(row) { return row.map(psmMvpCsvValue).join(','); }).join('\r\n');
