@@ -124,6 +124,7 @@
       border-bottom:2px solid transparent; margin-bottom:-1px;
     }
     .psm-aspx-tab.active { color:#0078d4; border-bottom-color:#0078d4; font-weight:600; }
+    .psm-aspx-tab:disabled { color:var(--cp-text-muted); cursor:default; opacity:0.75; }
 
     /* ============================================================
        APP LAYOUT
@@ -2293,7 +2294,7 @@
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML =
         '<div class="psm-aspx-title"><span class="insights">Insights</span><span class="divider">|</span><span class="section">Campaigns</span><span class="suite">AI Business Solutions &amp; Security &#9432;</span></div>' +
-        '<div class="psm-aspx-tabs"><button class="psm-aspx-tab" onclick="switchView(\'partner\'); switchSdcTab(\'fasttrack\')">FastTrack Referrals</button><button class="psm-aspx-tab" onclick="switchView(\'partner\'); switchSdcTab(\'clinic\')">Security Deal Clinic</button><button class="psm-aspx-tab active">PSM Campaign Builder</button></div>' +
+        '<div class="psm-aspx-tabs"><button class="psm-aspx-tab" type="button" disabled aria-disabled="true">FastTrack Referrals</button><button class="psm-aspx-tab" type="button" disabled aria-disabled="true">Security Deal Clinic</button><button class="psm-aspx-tab active" type="button">PSM Campaign Builder</button></div>' +
         '<div class="table-toolbar psm-toolbar"><div class="toolbar-left"><button class="btn btn-primary" onclick="psmOpenMvpCreate()">Create campaign from template</button></div></div>' +
         '<div class="table-toolbar" id="psmTableToolbar">' +
           '<div class="toolbar-left"><button class="toolbar-btn" onclick="showToast(\'Campaign export prepared\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Download</button></div>' +
