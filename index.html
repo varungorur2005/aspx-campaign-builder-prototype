@@ -362,6 +362,10 @@
       left: 200px; right: 0; width: auto; max-width: none;
       top:86px; border-left: none; box-shadow: none; padding: 24px 32px 80px;
     }
+    .detail-view.psm-mvp-half-page { left:auto; width:50vw; max-width:50vw; }
+    @media (max-width:900px) {
+      .detail-view.psm-mvp-half-page { width:100vw; max-width:100vw; }
+    }
     body.psm-presenting .top-nav, body.psm-presenting .sidebar { display: none; }
     body.psm-presenting .detail-view.psm-full-page { top: 0; left: 0; }
     body.psm-presenting .psm-edit-only, body.psm-presenting .flyout-close { display: none !important; }
@@ -2660,8 +2664,10 @@
         psmMvpTenantTableState.openPanel = '';
       }
       psmTrackMode = 'rollup';
-      document.getElementById('detailView').classList.add('show');
-      document.getElementById('detailView').classList.toggle('psm-full-page', isPsmView(currentView));
+      var detailView = document.getElementById('detailView');
+      detailView.classList.add('show');
+      detailView.classList.toggle('psm-full-page', currentView === 'psm');
+      detailView.classList.toggle('psm-mvp-half-page', currentView === 'psm-mvp');
       window.location.hash = 'psm-campaign-' + id;
       psmRenderDetail();
     }
@@ -4304,7 +4310,7 @@
     }
 
     function showDashboard() {
-      document.getElementById('detailView').classList.remove('show', 'psm-full-page', 'psm-presenting');
+      document.getElementById('detailView').classList.remove('show', 'psm-full-page', 'psm-mvp-half-page', 'psm-presenting');
       document.body.classList.remove('psm-presenting');
       if (isPsmView() && window.location.hash.indexOf('#psm-campaign-') === 0) history.replaceState(null, '', window.location.pathname + window.location.search);
       psmCurrentCampaign = null;
