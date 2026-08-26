@@ -672,6 +672,20 @@
     .psm-mvp-customer-table { width:100%; border-collapse:collapse; font-size:12px; }
     .psm-mvp-customer-table th { text-align:left; padding:9px 10px; color:var(--cp-text-muted); border-bottom:1px solid var(--cp-border); background:var(--cp-surface-soft); }
     .psm-mvp-customer-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); }
+    .psm-mvp-detail-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+    .psm-mvp-detail-heading > div:first-child { min-width:0; }
+    .psm-mvp-status-highlight { flex:0 0 auto; display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--cp-accent); border-radius:0.625rem; background:var(--cp-accent-soft); }
+    .psm-mvp-status-highlight label { color:var(--cp-accent); font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
+    .psm-mvp-status-highlight select { min-width:130px; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
+    .psm-mvp-section-title { display:flex; align-items:center; gap:7px; }
+    .psm-mvp-tooltip { position:relative; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border:1px solid var(--cp-border-strong); border-radius:50%; background:var(--cp-surface); color:var(--cp-text-muted); font-size:11px; font-weight:700; cursor:help; }
+    .psm-mvp-tooltip-text { position:absolute; z-index:20; top:calc(100% + 8px); left:50%; width:320px; padding:10px 12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); box-shadow:var(--cp-shadow); font-size:12px; font-weight:400; line-height:1.45; text-transform:none; transform:translateX(-50%); visibility:hidden; opacity:0; pointer-events:none; transition:opacity .15s; }
+    .psm-mvp-tooltip:hover .psm-mvp-tooltip-text, .psm-mvp-tooltip:focus .psm-mvp-tooltip-text { visibility:visible; opacity:1; }
+    @media (max-width:700px) {
+      .psm-mvp-detail-heading { flex-direction:column; }
+      .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
+      .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
+    }
     .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
     .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
     .psm-wl-picker summary::-webkit-details-marker { display:none; }
@@ -2697,15 +2711,14 @@
       detail.setAttribute('data-psm-rendered', 'true');
       detail.innerHTML =
         '<div class="flyout-header"><span style="font-size:11px;color:#616161;">MVP Campaign Detail</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
-        '<div class="detail-header"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
+        '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
           '<div class="detail-meta-item"><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div>' +
-        '<div class="panel-card"><div class="form-group"><label>Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div>' +
-          '<div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
+        '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
+        '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
           '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div></div>' +
         psmRenderMvpTenantWorkspace(c);
     }
@@ -2757,8 +2770,7 @@
         (visible.progress ? '<col style="width:22%;">' : '');
       var firstRecord = filtered.length ? start + 1 : 0;
       var lastRecord = Math.min(start + psmMvpTenantTableState.pageSize, filtered.length);
-      return '<div class="panel-card"><h2>Tenant Progress <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
-        '<div class="psm-context-note">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</div>' +
+      return '<div class="panel-card"><h2 class="psm-mvp-section-title">Tenant Progress <button type="button" class="psm-mvp-tooltip" aria-label="About Tenant Progress" aria-describedby="psmMvpProgressTooltip">i<span id="psmMvpProgressTooltip" class="psm-mvp-tooltip-text" role="tooltip">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</span></button> <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
         psmRenderMvpTenantToolbar(c, stageOptions) +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
         '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><colgroup><col style="width:5%;"><col style="width:29%;"><col style="width:22%;">'+optionalCols+'</colgroup><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer / Tenant Name</th><th class="psm-tenant-id">Tenant ID</th>'+optionalHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
@@ -2785,7 +2797,7 @@
           return '<label class="psm-mvp-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
         }).join('')+'</div>';
       }
-      return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'add\')">+ Add Customer</button><button class="toolbar-btn" onclick="psmRemoveSelectedTenants(\''+c.id+'\')">Remove Customer</button><button class="toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')">Download</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'filter\')">Filter</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'columns\')">Change Columns</button><input type="file" id="psmMvpBulkAddFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
+      return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')">Download</button></div><div class="psm-mvp-table-actions"><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'filter\')">Filter</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'columns\')">Change Columns</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'add\')">+ Add Customer</button><button class="toolbar-btn" onclick="psmRemoveSelectedTenants(\''+c.id+'\')">Remove Customer</button><input type="file" id="psmMvpBulkAddFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
     }
 
     function psmEnsureMvpTenantRows(c) {
