@@ -2604,7 +2604,7 @@
       if (!psmCurrentCampaign) return;
       psmTrackMode = 'rollup';
       document.getElementById('detailView').classList.add('show');
-      document.getElementById('detailView').classList.toggle('psm-full-page', currentView === 'psm');
+      document.getElementById('detailView').classList.toggle('psm-full-page', isPsmView(currentView));
       window.location.hash = 'psm-campaign-' + id;
       psmRenderDetail();
     }
