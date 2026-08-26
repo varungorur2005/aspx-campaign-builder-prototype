@@ -1886,6 +1886,9 @@
         psmRestoreDefaultLayout();
       }
       currentView = view;
+      var viewUrl = new URL(window.location.href);
+      viewUrl.searchParams.set('view', view);
+      history.replaceState(null, '', viewUrl.pathname + viewUrl.search + viewUrl.hash);
       document.body.classList.toggle('partner-view', view === 'partner');
       document.getElementById('viewSwitcherSelect').value = view;
       renderSidebar();
@@ -5760,7 +5763,9 @@
     }
 
     //  INIT 
-    switchView('partner');
+    var requestedView = new URLSearchParams(window.location.search).get('view');
+    var supportedViews = ['partner', 'field', 'corp', 'psm', 'psm-mvp'];
+    switchView(supportedViews.indexOf(requestedView) > -1 ? requestedView : 'partner');
   </script>
 </body>
 </html>
