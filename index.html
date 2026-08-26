@@ -647,6 +647,15 @@
     .psm-mvp-progress-scroll { overflow-x:auto; }
     .psm-mvp-progress-table { min-width:760px; table-layout:fixed; }
     .psm-mvp-progress-table .psm-tenant-id { white-space:nowrap; overflow-wrap:normal; font-family:Consolas, "Courier New", Courier, monospace; }
+    .psm-mvp-table-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:12px 0 0; padding:8px 0; border-bottom:1px solid var(--cp-border); }
+    .psm-mvp-table-actions { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+    .psm-mvp-action-panel { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; padding:12px; margin:8px 0; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .psm-mvp-action-panel .form-group { min-width:200px; margin:0; }
+    .psm-mvp-action-panel input, .psm-mvp-action-panel select { width:100%; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .psm-mvp-column-option { display:flex; align-items:center; gap:6px; color:var(--cp-text); font-size:12px; }
+    .psm-mvp-pagination { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 4px 0; color:var(--cp-text-muted); font-size:12px; }
+    .psm-mvp-pagination-controls { display:flex; align-items:center; gap:8px; }
+    .psm-mvp-pagination select { padding:5px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .psm-mvp-customer-table { width:100%; border-collapse:collapse; font-size:12px; }
     .psm-mvp-customer-table th { text-align:left; padding:9px 10px; color:var(--cp-text-muted); border-bottom:1px solid var(--cp-border); background:var(--cp-surface-soft); }
     .psm-mvp-customer-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); }
@@ -1177,10 +1186,10 @@
 
   <div class="modal-overlay" id="psmAddTenantModal">
     <div class="modal" style="width:480px;">
-      <h3>Add tenant to campaign</h3>
-      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Add a tenant manually when it is not part of the original target list.</p>
+      <h3>Add customer to campaign</h3>
+      <p style="font-size:13px;color:#616161;margin-bottom:16px;">Add a customer or tenant manually when it is not part of the original target list.</p>
       <div class="form-group">
-        <label>Customer name <span class="required">*</span></label>
+        <label>Customer / Tenant Name <span class="required">*</span></label>
         <input type="text" id="psmNewTenantName" placeholder="e.g. Fabrikam North America">
       </div>
       <div class="form-group">
@@ -1196,7 +1205,7 @@
         </select>
       </div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="psmAddTenant()">Add tenant</button>
+        <button class="btn btn-primary" onclick="psmAddTenant()">Add customer</button>
         <button class="btn btn-secondary" onclick="hideModal('psmAddTenantModal')">Cancel</button>
       </div>
     </div>
@@ -1677,6 +1686,10 @@
     let psmSearchTerm = '';
     let psmTrackMode = 'rollup';
     let psmWizardState = { step: 1, name: '', partner: 'Contoso', goals: ['MAU'], workload: 'Copilot' };
+    let psmMvpTenantTableState = {
+      campaignId: '', page: 1, pageSize: 10, search: '', stage: '', openPanel: '',
+      visibleColumns: { mau: true, npsa: true, progress: true }
+    };
     function createEmptyFilterState() {
       return { statuses: [], sources: [], areas: [], partnerNames: [], unified: [], campaignStatus: [] };
     }
@@ -2605,6 +2618,13 @@
     function psmOpenDetail(id) {
       psmCurrentCampaign = psmCampaigns.find(function(c) { return c.id === id; });
       if (!psmCurrentCampaign) return;
+      if (currentView === 'psm-mvp' && psmMvpTenantTableState.campaignId !== id) {
+        psmMvpTenantTableState.campaignId = id;
+        psmMvpTenantTableState.page = 1;
+        psmMvpTenantTableState.search = '';
+        psmMvpTenantTableState.stage = '';
+        psmMvpTenantTableState.openPanel = '';
+      }
       psmTrackMode = 'rollup';
       document.getElementById('detailView').classList.add('show');
       document.getElementById('detailView').classList.toggle('psm-full-page', isPsmView(currentView));
@@ -2678,33 +2698,241 @@
     }
 
     function psmRenderMvpTenantWorkspace(c) {
+      psmEnsureMvpTenantRows(c);
       var stageOptions = PSM_PROGRESSION_STAGES.map(function(stage) {
         return '<option value="'+stage.key+'">'+stage.label+'</option>';
       }).join('');
-      var metrics = ['MAU', 'NPSA'];
-      var metricHeaders = metrics.map(function(goal) {
-        return '<th class="psm-num-cell">'+psmEscapeHtml(goal)+'</th>';
-      }).join('');
-      var rows = (c.customers || []).map(function(customer, index) {
-        var metricCells = metrics.map(function(goal) {
-          if (goal === 'MAU') return '<td class="psm-num-cell">'+(customer.mau || 0).toLocaleString()+'</td>';
-          if (goal === 'PRU') return '<td class="psm-num-cell">'+(customer.copilotPru || 0).toLocaleString()+'</td>';
-          if (goal === 'NPSA') return '<td class="psm-num-cell">+'+(customer.npsa || 0).toLocaleString()+'</td>';
-          if (goal === 'Revenue') return '<td class="psm-num-cell">$'+(customer.revenue || 0).toLocaleString()+'</td>';
-          return '';
-        }).join('');
+      var visible = psmMvpTenantTableState.visibleColumns;
+      var indexedCustomers = (c.customers || []).map(function(customer, index) {
+        return { customer: customer, index: index };
+      });
+      var search = psmMvpTenantTableState.search.toLowerCase();
+      var filtered = indexedCustomers.filter(function(item) {
+        var customer = item.customer;
+        var name = customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name;
+        if (search && (name+' '+customer.tenantId).toLowerCase().indexOf(search) === -1) return false;
+        if (psmMvpTenantTableState.stage && customer.stage !== psmMvpTenantTableState.stage) return false;
+        return true;
+      });
+      var totalPages = Math.max(1, Math.ceil(filtered.length / psmMvpTenantTableState.pageSize));
+      psmMvpTenantTableState.page = Math.min(psmMvpTenantTableState.page, totalPages);
+      var start = (psmMvpTenantTableState.page - 1) * psmMvpTenantTableState.pageSize;
+      var pageRows = filtered.slice(start, start + psmMvpTenantTableState.pageSize);
+      var rows = pageRows.map(function(item) {
+        var customer = item.customer;
+        var index = item.index;
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         return '<tr><td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' +
           '<td><strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong></td>' +
           '<td class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</td>' +
-          metricCells +
-          '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td></tr>';
+          (visible.mau ? '<td class="psm-num-cell">'+(customer.mau || 0).toLocaleString()+'</td>' : '') +
+          (visible.npsa ? '<td class="psm-num-cell">+'+(customer.npsa || 0).toLocaleString()+'</td>' : '') +
+          (visible.progress ? '<td><span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span></td>' : '') +
+        '</tr>';
       }).join('');
-      return '<div class="panel-card"><h2>Tenant Progress <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+(c.customers || []).length+' of '+c.tenantCount.toLocaleString()+' tenants shown)</span></h2>' +
+      if (!rows) {
+        var columnCount = 3 + (visible.mau ? 1 : 0) + (visible.npsa ? 1 : 0) + (visible.progress ? 1 : 0);
+        rows = '<tr><td colspan="'+columnCount+'" style="padding:24px;text-align:center;color:var(--cp-text-muted);">No tenants match the current filters.</td></tr>';
+      }
+      var optionalHeaders =
+        (visible.mau ? '<th class="psm-num-cell">MAU</th>' : '') +
+        (visible.npsa ? '<th class="psm-num-cell">NPSA</th>' : '') +
+        (visible.progress ? '<th>Progress</th>' : '');
+      var optionalCols =
+        (visible.mau ? '<col style="width:11%;">' : '') +
+        (visible.npsa ? '<col style="width:11%;">' : '') +
+        (visible.progress ? '<col style="width:22%;">' : '');
+      var firstRecord = filtered.length ? start + 1 : 0;
+      var lastRecord = Math.min(start + psmMvpTenantTableState.pageSize, filtered.length);
+      return '<div class="panel-card"><h2>Tenant Progress <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
         '<div class="psm-context-note">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</div>' +
+        psmRenderMvpTenantToolbar(c, stageOptions) +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
-        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><colgroup><col style="width:5%;"><col style="width:29%;"><col style="width:22%;"><col style="width:11%;"><col style="width:11%;"><col style="width:22%;"></colgroup><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer / Tenant Name</th><th class="psm-tenant-id">Tenant ID</th>'+metricHeaders+'<th>Progress</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><colgroup><col style="width:5%;"><col style="width:29%;"><col style="width:22%;">'+optionalCols+'</colgroup><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th><th>Customer / Tenant Name</th><th class="psm-tenant-id">Tenant ID</th>'+optionalHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-mvp-pagination"><span>Showing '+firstRecord+'-'+lastRecord+' of '+filtered.length+' records</span><div class="psm-mvp-pagination-controls"><label>Rows per page <select onchange="psmMvpSetPageSize(this.value)">'+[5,10,25,50].map(function(size){ return '<option value="'+size+'"'+(psmMvpTenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><button class="btn btn-secondary" onclick="psmMvpChangePage(-1)"'+(psmMvpTenantTableState.page <= 1 ? ' disabled' : '')+'>Previous</button><span>Page '+psmMvpTenantTableState.page+' of '+totalPages+'</span><button class="btn btn-secondary" onclick="psmMvpChangePage(1)"'+(psmMvpTenantTableState.page >= totalPages ? ' disabled' : '')+'>Next</button></div></div>' +
       '</div>';
+    }
+
+    function psmRenderMvpTenantToolbar(c, stageOptions) {
+      var panel = '';
+      if (psmMvpTenantTableState.openPanel === 'add') {
+        panel = '<div class="psm-mvp-action-panel"><strong>Add Customer</strong><button class="btn btn-secondary" onclick="document.getElementById(\'psmMvpBulkAddFile\').click()">Bulk add from file</button><button class="btn btn-secondary" onclick="psmOpenAddTenant()">Add manually</button><span style="color:var(--cp-text-muted);font-size:12px;">Use the campaign template columns: Customer / Tenant Name and Tenant ID.</span></div>';
+      } else if (psmMvpTenantTableState.openPanel === 'filter') {
+        panel = '<div class="psm-mvp-action-panel"><div class="form-group"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div><div class="form-group"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div><button class="btn btn-primary" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary" onclick="psmMvpClearTenantFilter()">Clear</button></div>';
+      } else if (psmMvpTenantTableState.openPanel === 'columns') {
+        var columns = [
+          { key: 'name', label: 'Customer / Tenant Name', fixed: true },
+          { key: 'tenantId', label: 'Tenant ID', fixed: true },
+          { key: 'mau', label: 'MAU' },
+          { key: 'npsa', label: 'NPSA' },
+          { key: 'progress', label: 'Progress' }
+        ];
+        panel = '<div class="psm-mvp-action-panel"><strong>Change Columns</strong>'+columns.map(function(column) {
+          var checked = column.fixed || psmMvpTenantTableState.visibleColumns[column.key];
+          return '<label class="psm-mvp-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
+        }).join('')+'</div>';
+      }
+      return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'add\')">+ Add Customer</button><button class="toolbar-btn" onclick="psmRemoveSelectedTenants(\''+c.id+'\')">Remove Customer</button><button class="toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')">Download</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'filter\')">Filter</button><button class="toolbar-btn" onclick="psmMvpToggleTenantPanel(\'columns\')">Change Columns</button><input type="file" id="psmMvpBulkAddFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
+    }
+
+    function psmEnsureMvpTenantRows(c) {
+      c.customers = c.customers || [];
+      if (!c.customers.length) return;
+      var target = Math.min(c.tenantCount || c.customers.length, 1000);
+      var templates = c.customers.slice();
+      var seed = psmSeed(c);
+      while (c.customers.length < target) {
+        var index = c.customers.length;
+        var template = templates[index % templates.length];
+        var copy = Object.assign({}, template);
+        var baseName = template.tenantCustomerName || template.customerName || template.tenantName || template.name;
+        var group = Math.floor(index / templates.length) + 1;
+        var name = baseName + ' ' + group;
+        copy.name = name;
+        copy.tenantCustomerName = name;
+        copy.customerName = name;
+        copy.tenantName = name;
+        copy.tenantId = 'ten-' + String(100000 + ((seed + index * 977) % 900000));
+        copy.mau = Math.max(0, (template.mau || 0) + (index % 7) * 16);
+        copy.npsa = Math.max(0, (template.npsa || 0) + (index % 5));
+        copy.stage = PSM_PROGRESSION_STAGES[(seed + index) % PSM_PROGRESSION_STAGES.length].key;
+        c.customers.push(copy);
+      }
+    }
+
+    function psmMvpToggleTenantPanel(panel) {
+      psmMvpTenantTableState.openPanel = psmMvpTenantTableState.openPanel === panel ? '' : panel;
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpApplyTenantFilter() {
+      psmMvpTenantTableState.search = document.getElementById('psmMvpTenantSearch').value.trim();
+      psmMvpTenantTableState.stage = document.getElementById('psmMvpTenantStageFilter').value;
+      psmMvpTenantTableState.page = 1;
+      psmMvpTenantTableState.openPanel = '';
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpClearTenantFilter() {
+      psmMvpTenantTableState.search = '';
+      psmMvpTenantTableState.stage = '';
+      psmMvpTenantTableState.page = 1;
+      psmMvpTenantTableState.openPanel = '';
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpToggleTenantColumn(key, visible) {
+      if (['mau', 'npsa', 'progress'].indexOf(key) === -1) return;
+      psmMvpTenantTableState.visibleColumns[key] = visible;
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpSetPageSize(value) {
+      psmMvpTenantTableState.pageSize = parseInt(value, 10) || 10;
+      psmMvpTenantTableState.page = 1;
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpChangePage(change) {
+      psmMvpTenantTableState.page = Math.max(1, psmMvpTenantTableState.page + change);
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpCreateTenantRecord(name, tenantId, c, index) {
+      return {
+        name: name, tenantCustomerName: name, customerName: name, tenantName: name,
+        tenantId: tenantId, segment: 'Enterprise', stage: 'targetList',
+        license: false, services: false, seatPen: 0, paidUtil: 0, whitespace: 0,
+        copilotMauWhitespace: 0, freeToPaidWhitespace: 0, e7AgentsMau: 0,
+        consumedUnits: 0, copilotPru: 0, mau: (index % 6) * 24, npsa: index % 4, revenue: 0,
+        agentMau: 0, coworkSessions: 0, opportunity: 'Other', tenantHealth: 'Healthy',
+        mciEligible: false, recommendedMci: 'N/A', mciWorkshops: 0, mciStatus: 'Not started',
+        fundingCommitted: 0, targetedWorkloads: (c.workloads || []).slice(0, 1),
+        cta: '', comments: '', agreement: false, priority: 'Medium'
+      };
+    }
+
+    function psmMvpBulkAddCustomers(input, id) {
+      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
+      var file = input.files && input.files[0];
+      if (!c || !file) return;
+      var extension = file.name.split('.').pop().toLowerCase();
+      if (extension === 'csv' && file.text) {
+        file.text().then(function(text) {
+          var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
+          var headers = psmParseCsvLine(lines[0] || '').map(function(value) { return value.trim().toLowerCase().replace(/[^a-z0-9]/g, ''); });
+          var nameIndex = headers.indexOf('customertenantname');
+          var tenantIdIndex = headers.indexOf('tenantid');
+          if (nameIndex === -1 || tenantIdIndex === -1) {
+            showToast('Use the Customer / Tenant Name and Tenant ID template columns', true);
+            input.value = '';
+            return;
+          }
+          var additions = lines.slice(1).map(function(line, index) {
+            var values = psmParseCsvLine(line);
+            var name = (values[nameIndex] || '').trim();
+            var tenantId = (values[tenantIdIndex] || '').trim();
+            return name && tenantId ? psmMvpCreateTenantRecord(name, tenantId, c, index) : null;
+          }).filter(Boolean);
+          psmMvpAddTenantRows(c, additions, file.name);
+          input.value = '';
+        });
+      } else {
+        var estimated = Math.max(1, Math.min(50, Math.round(file.size / 180)));
+        var additions = [];
+        for (var i = 0; i < estimated; i++) {
+          additions.push(psmMvpCreateTenantRecord('Imported Customer '+(i + 1), 'import-'+Date.now()+'-'+(i + 1), c, i));
+        }
+        psmMvpAddTenantRows(c, additions, file.name);
+        input.value = '';
+      }
+    }
+
+    function psmMvpAddTenantRows(c, additions, fileName) {
+      var existing = new Set(c.customers.map(function(customer) { return customer.tenantId.toLowerCase(); }));
+      var added = 0;
+      additions.forEach(function(customer) {
+        if (existing.has(customer.tenantId.toLowerCase())) return;
+        existing.add(customer.tenantId.toLowerCase());
+        c.customers.push(customer);
+        added++;
+      });
+      if (!added) { showToast('No new Tenant IDs were found in '+fileName, true); return; }
+      c.tenantCount += added;
+      if (c.progression) c.progression.targetList += added;
+      psmMvpTenantTableState.page = Math.ceil(c.customers.length / psmMvpTenantTableState.pageSize);
+      psmMvpTenantTableState.openPanel = '';
+      showToast('Added '+added+' customer'+(added === 1 ? '' : 's')+' from '+fileName);
+      psmRenderMvpDetail();
+    }
+
+    function psmMvpDownloadTenants(id) {
+      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
+      if (!c) return;
+      var rows = [['Customer / Tenant Name', 'Tenant ID', 'MAU', 'NPSA', 'Progress']];
+      c.customers.forEach(function(customer) {
+        var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
+        rows.push([
+          customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name,
+          customer.tenantId, customer.mau || 0, customer.npsa || 0, stage.label
+        ]);
+      });
+      var csv = rows.map(function(row) { return row.map(psmMvpCsvValue).join(','); }).join('\r\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = c.id+'-tenant-progress.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast('Tenant Progress table downloaded');
+    }
+
+    function psmMvpCsvValue(value) {
+      var text = String(value == null ? '' : value);
+      return /[",\r\n]/.test(text) ? '"'+text.replace(/"/g, '""')+'"' : text;
     }
 
     function psmSaveMvpUpdate(id) {
@@ -2906,23 +3134,20 @@
       var name = document.getElementById('psmNewTenantName').value.trim();
       var tenantId = document.getElementById('psmNewTenantId').value.trim();
       var segment = document.getElementById('psmNewTenantSegment').value;
-      if (!name || !tenantId) { showToast('Customer name and Tenant ID are required', true); return; }
+      if (!name || !tenantId) { showToast('Customer / Tenant Name and Tenant ID are required', true); return; }
       if (c.customers.some(function(customer) { return customer.tenantId.toLowerCase() === tenantId.toLowerCase(); })) {
         showToast('That Tenant ID is already in this campaign', true);
         return;
       }
-      c.customers.push({
-        name: name, tenantId: tenantId, segment: segment, stage: 'targetList',
-        license: false, services: false, seatPen: 0, paidUtil: 0, whitespace: 0,
-        copilotMauWhitespace: 0, freeToPaidWhitespace: 0, e7AgentsMau: 0,
-        consumedUnits: 0, copilotPru: 0, mau: 0, npsa: 0, revenue: 0, agentMau: 0, coworkSessions: 0,
-        opportunity: 'Other', tenantHealth: 'Healthy', mciEligible: false,
-        recommendedMci: 'N/A', mciWorkshops: 0, mciStatus: 'Not started',
-        fundingCommitted: 0, targetedWorkloads: c.workloads.slice(0, 1),
-        cta: '', comments: '', agreement: false, priority: 'Medium'
-      });
+      var customer = psmMvpCreateTenantRecord(name, tenantId, c, c.customers.length);
+      customer.segment = segment;
+      c.customers.push(customer);
       c.tenantCount += 1;
       if (c.progression) c.progression.targetList += 1;
+      if (currentView === 'psm-mvp') {
+        psmMvpTenantTableState.page = Math.ceil(c.customers.length / psmMvpTenantTableState.pageSize);
+        psmMvpTenantTableState.openPanel = '';
+      }
       hideModal('psmAddTenantModal');
       showToast(name + ' added to the campaign');
       psmRenderDetail();
@@ -2938,7 +3163,7 @@
       indexes.forEach(function(index) { c.customers.splice(index, 1); });
       c.tenantCount = Math.max(0, c.tenantCount - indexes.length);
       if (c.progression) c.progression.targetList = Math.max(0, c.progression.targetList - indexes.length);
-      showToast('Removed ' + indexes.length + ' tenant' + (indexes.length === 1 ? '' : 's') + ' from the campaign');
+      showToast('Removed ' + indexes.length + ' customer' + (indexes.length === 1 ? '' : 's') + ' from the campaign');
       psmRenderDetail();
     }
 
@@ -3210,7 +3435,8 @@
           var headers = psmParseCsvLine(lines[0] || '').map(function(value) {
             return value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
           });
-          var tenantCustomerNameIndex = headers.indexOf('tenantcustomername');
+          var tenantCustomerNameIndex = headers.indexOf('customertenantname');
+          if (tenantCustomerNameIndex === -1) tenantCustomerNameIndex = headers.indexOf('tenantcustomername');
           var tenantIdIndex = headers.indexOf('tenantid');
           var hasRequiredColumns = tenantCustomerNameIndex > -1 && tenantIdIndex > -1;
           psmMvpUpload.rowCount = Math.max(0, lines.length - 1);
@@ -3279,17 +3505,12 @@
         motions: [], mciOffer: 'N/A', fundingCommitted: 0, trackedCount: 0, signals: [], activityLog: [],
         scenarioId: 'manual', executionType: 'Uploaded', _enriched: true
       };
-      newCampaign.customers = psmBuildCustomers(newCampaign, psmSeed(newCampaign));
       if (psmMvpUpload.rows.length) {
-        newCampaign.customers.forEach(function(customer, index) {
-          var uploaded = psmMvpUpload.rows[index];
-          if (!uploaded) return;
-          customer.name = uploaded.tenantCustomerName;
-          customer.tenantCustomerName = uploaded.tenantCustomerName;
-          customer.customerName = uploaded.tenantCustomerName;
-          customer.tenantName = uploaded.tenantCustomerName;
-          customer.tenantId = uploaded.tenantId;
+        newCampaign.customers = psmMvpUpload.rows.slice(0, 1000).map(function(uploaded, index) {
+          return psmMvpCreateTenantRecord(uploaded.tenantCustomerName, uploaded.tenantId, newCampaign, index);
         });
+      } else {
+        newCampaign.customers = psmBuildCustomers(newCampaign, psmSeed(newCampaign));
       }
       newCampaign.timeline = [{ date: today(), text: 'Campaign created from ' + psmMvpUpload.file.name, type: 'info', actor: 'Microsoft PSM' }];
       psmCampaigns.unshift(newCampaign);
