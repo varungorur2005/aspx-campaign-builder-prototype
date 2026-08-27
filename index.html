@@ -1754,11 +1754,11 @@
       { key: 'id', label: 'Campaign ID', required: true },
       { key: 'name', label: 'Campaign Name' },
       { key: 'partner', label: 'Partner' },
-      { key: 'microsoftDri', label: 'Microsoft DRI' },
       { key: 'tenantCount', label: 'Tenants' },
       { key: 'status', label: 'Status' },
       { key: 'mvpUpdated', label: 'Last Updated' },
-      { key: 'sourceFile', label: 'Source File' }
+      { key: 'sourceFile', label: 'Source File' },
+      { key: 'microsoftDri', label: 'Microsoft DRI' }
     ];
     let psmVisibleColumns = PSM_TABLE_COLUMNS.reduce(function(result, column) {
       result[column.key] = true;
