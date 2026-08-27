@@ -2808,6 +2808,9 @@
       psmEnrich(c);
       psmLoadMvpUpdateHistory(c);
       c.mvpStatus = psmGetMvpStatus(c);
+      var campaignMpnIds = [c.mpn].concat(PSM_PARTNER_ASSOCIATED_MPN[c.partner] || []).filter(function(mpnId, index, mpnIds) {
+        return mpnId && mpnIds.indexOf(mpnId) === index;
+      });
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
       detail.innerHTML =
@@ -2816,7 +2819,7 @@
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>Partner Name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOneID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
-          '<div class="detail-meta-item"><strong>Partner Center ID (MPN):</strong> '+psmEscapeHtml(c.mpn || '\u2014')+'</div>' +
+          '<div class="detail-meta-item"><strong>Partner Center IDs (MPN):</strong> '+psmEscapeHtml(campaignMpnIds.join(', ') || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
           '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+psmEscapeHtml(c.baselineDate || c.created)+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.mvpSourceFile || c.sourceFile || 'Existing ASPX list')+'</div>' +
