@@ -647,23 +647,32 @@
     .psm-upload-status { margin-top:10px; padding:9px 12px; border-radius:0.625rem; font-size:12px; text-align:left; background:var(--cp-surface); border:1px solid var(--cp-border); color:var(--cp-text); }
     .psm-template-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; padding:10px 12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .psm-template-row span { color:var(--cp-text-muted); font-size:12px; line-height:1.4; }
-    #psmMvpCreateModal .psm-mvp-create-modal { width:620px; max-height:90vh; overflow-y:auto; padding:28px 30px; }
+    #psmMvpCreateModal .psm-mvp-create-modal { width:720px; max-height:90vh; overflow-y:auto; padding:28px 30px; }
     #psmMvpCreateModal h3 { margin-bottom:8px; font-size:20px; color:var(--cp-text); }
     #psmMvpCreateModal .psm-mvp-create-intro { margin-bottom:24px; color:var(--cp-text-muted); line-height:1.5; }
     #psmMvpCreateModal .form-group { gap:8px; margin-bottom:22px; }
     #psmMvpCreateModal .form-group > label { font-size:12px; color:var(--cp-text); }
-    #psmMvpCreateModal .form-group > input, #psmMvpCreateModal .form-group > textarea { padding:10px 12px; border-radius:0.625rem; }
+    #psmMvpCreateModal .form-group > input, #psmMvpCreateModal .form-group > select, #psmMvpCreateModal .form-group > textarea { padding:10px 12px; border-radius:0.625rem; }
     #psmMvpCreateModal .form-group > textarea { min-height:84px; }
     #psmMvpCreateModal .psm-template-row { gap:20px; margin-bottom:16px; padding:14px 16px; }
     #psmMvpCreateModal .psm-template-row strong { display:block; margin-bottom:4px; color:var(--cp-text); font-size:13px; }
     #psmMvpCreateModal .psm-upload-zone { padding:24px; text-align:left; }
     #psmMvpCreateModal .psm-upload-zone > strong { display:block; margin-bottom:6px; color:var(--cp-text); font-size:13px; }
     #psmMvpCreateModal .psm-upload-help { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
+    #psmMvpCreateModal .psm-upload-checklist { margin:10px 0 0; padding-left:20px; color:var(--cp-text-muted); font-size:12px; line-height:1.55; }
+    .psm-mvp-template-guide { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; padding:14px 16px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .psm-mvp-template-guide div:first-child { grid-column:1 / -1; }
+    .psm-mvp-template-guide strong { display:block; margin-bottom:3px; color:var(--cp-text); font-size:11px; text-transform:uppercase; }
+    .psm-mvp-template-guide span { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     #psmMvpCreateModal .btn-group { justify-content:flex-end; margin-top:4px; padding-top:20px; border-top:1px solid var(--cp-border); }
     .psm-live-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:11px; font-weight:600; }
     .psm-stage-label { display:inline-block; padding:4px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; font-weight:600; }
     .psm-mvp-bulk-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; margin:12px 0; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .psm-mvp-bulk-bar select { min-width:190px; padding:6px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .psm-mvp-stage-summary { display:grid; grid-template-columns:repeat(5,minmax(120px,1fr)); gap:8px; margin:12px 0; overflow-x:auto; }
+    .psm-mvp-stage-summary-item { min-width:120px; padding:10px 12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .psm-mvp-stage-summary-item strong { display:block; margin-bottom:2px; color:var(--cp-text); font-size:18px; }
+    .psm-mvp-stage-summary-item span { color:var(--cp-text-muted); font-size:11px; }
     .psm-mvp-progress-scroll { overflow-x:auto; }
     .psm-mvp-progress-table { min-width:1500px; table-layout:auto; }
     .psm-mvp-progress-table .psm-tenant-id { white-space:nowrap; overflow-wrap:normal; font-family:Consolas, "Courier New", Courier, monospace; }
@@ -1215,20 +1224,30 @@
   <div class="modal-overlay" id="psmMvpCreateModal">
     <div class="modal psm-mvp-create-modal">
       <h3>Create campaign from a tenant list</h3>
-      <p class="psm-mvp-create-intro">Use the standard template to identify the tenants in this campaign. ASPX will match each Tenant ID and supply the latest usage data.</p>
+      <p class="psm-mvp-create-intro">Choose the business outcome, then upload the tenants to target. ASPX will match each Tenant ID, capture the campaign baseline, and supply the latest usage data.</p>
+      <div class="form-group">
+        <label>Campaign template <span class="required">*</span></label>
+        <select id="psmMvpCampaignTemplate" onchange="psmUpdateMvpTemplateGuide()"></select>
+        <div class="psm-mvp-template-guide" id="psmMvpTemplateGuide"></div>
+      </div>
       <div class="form-group">
         <label>Campaign name <span class="required">*</span></label>
-        <input type="text" id="psmMvpCampaignName" placeholder="e.g. Contoso - M365 Copilot adoption Q1">
+        <input type="text" id="psmMvpCampaignName" placeholder="Choose a template to generate an outcome-based name">
       </div>
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
         <div class="psm-template-row">
-          <span><strong>1. Download the template</strong><br>Columns: Customer / Tenant Name, Tenant ID</span>
+          <span><strong>1. Download the CSV template</strong><br>Keep both required column headers unchanged: Customer / Tenant Name and Tenant ID.</span>
           <button class="btn btn-secondary" type="button" onclick="psmDownloadMvpTemplate()">Download template</button>
         </div>
         <div class="psm-upload-zone">
           <strong>2. Upload the completed template</strong>
-          <div class="psm-upload-help">Accepted format: CSV. Enter the tenant or customer name for display and the Tenant ID for matching with ASPX.</div>
+          <div class="psm-upload-help">The file is validated before campaign creation. Use one row per tenant.</div>
+          <ol class="psm-upload-checklist">
+            <li>Save the completed template as a .csv file.</li>
+            <li>Enter a display name and Tenant ID on every row; do not leave either field blank.</li>
+            <li>Use each Tenant ID once. Duplicate Tenant IDs are rejected.</li>
+          </ol>
           <input type="file" id="psmMvpFile" accept=".csv" onchange="psmHandleMvpFile(this)">
           <div class="psm-upload-status" id="psmMvpUploadStatus">No file selected.</div>
         </div>
@@ -1684,14 +1703,14 @@
       'Contoso Cloud': ['901655', '901656']
     };
     const PSM_MVP_COPILOT_CAMPAIGNS = [
-      { name: 'Microsoft 365 Copilot Adoption - West US', workload: 'Microsoft 365 Copilot', sourceFile: 'contoso-m365-copilot-adoption.xlsx' },
-      { name: 'Copilot Chat Activation - EMEA', workload: 'Microsoft 365 Copilot Chat', sourceFile: 'contoso-copilot-chat-activation.xlsx' },
-      { name: 'Copilot Agents Expansion - ANZ', workload: 'Copilot Agents', sourceFile: 'contoso-copilot-agents-anz.csv' },
-      { name: 'Copilot Cowork Adoption - Central US', workload: 'Copilot Cowork', sourceFile: 'contoso-copilot-cowork-central.xlsx' },
-      { name: 'M365 Copilot Licensed MAU Growth - India', workload: 'Microsoft 365 Copilot', sourceFile: 'contoso-copilot-mau-india.xlsx' },
-      { name: 'Copilot Extensibility Readiness - UK', workload: 'Copilot Extensibility', sourceFile: 'contoso-copilot-extensibility-uk.csv' },
-      { name: 'Copilot Free-to-Paid Conversion - East US', workload: 'Microsoft 365 Copilot Chat', sourceFile: 'contoso-copilot-conversion-east.xlsx' },
-      { name: 'Copilot and Agents Usage Acceleration - APAC', workload: 'Copilot Agents', sourceFile: 'contoso-copilot-agents-apac.xlsx' }
+      { name: 'Microsoft 365 Copilot Adoption - West US', templateName: 'Microsoft 365 Copilot Adoption', workload: 'Microsoft 365 Copilot', sourceFile: 'contoso-m365-copilot-adoption.xlsx', useWhen: 'Licensed tenants need structured adoption support.', targeting: 'Tenants with eligible users and low or inconsistent Copilot usage.', outcome: 'Increase licensed Copilot MAU and sustained active use.' },
+      { name: 'Copilot Chat Activation - EMEA', templateName: 'Copilot Chat Activation', workload: 'Microsoft 365 Copilot Chat', sourceFile: 'contoso-copilot-chat-activation.xlsx', useWhen: 'Tenants have access to Copilot Chat but adoption is low.', targeting: 'Eligible tenants with limited recent Copilot Chat activity.', outcome: 'Increase Copilot PAU and establish repeat usage.' },
+      { name: 'Copilot Agents Expansion - ANZ', templateName: 'Copilot Agents Expansion', workload: 'Copilot Agents', sourceFile: 'contoso-copilot-agents-anz.csv', useWhen: 'Copilot customers are ready to identify and deploy agent scenarios.', targeting: 'Tenants with active Copilot users and agent expansion potential.', outcome: 'Grow agent adoption and measurable Copilot usage.' },
+      { name: 'Copilot Cowork Adoption - Central US', templateName: 'Copilot Cowork Adoption', workload: 'Copilot Cowork', sourceFile: 'contoso-copilot-cowork-central.xlsx', useWhen: 'Tenants need help activating collaborative Cowork scenarios.', targeting: 'Copilot tenants with low or no recent Cowork activity.', outcome: 'Increase Cowork MAU and repeat collaborative usage.' },
+      { name: 'M365 Copilot Licensed MAU Growth - India', templateName: 'M365 Copilot Licensed MAU Growth', workload: 'Microsoft 365 Copilot', sourceFile: 'contoso-copilot-mau-india.xlsx', useWhen: 'Licensed-seat adoption is below the expected usage level.', targeting: 'Tenants with a gap between licensed users and monthly active users.', outcome: 'Close the license-to-use gap and increase licensed MAU.' },
+      { name: 'Copilot Extensibility Readiness - UK', templateName: 'Copilot Extensibility Readiness', workload: 'Copilot Extensibility', sourceFile: 'contoso-copilot-extensibility-uk.csv', useWhen: 'Customers are evaluating plugins, connectors, or custom agents.', targeting: 'Tenants with Copilot adoption and extensibility prerequisites.', outcome: 'Advance qualified tenants toward an extensibility deployment.' },
+      { name: 'Copilot Free-to-Paid Conversion - East US', templateName: 'Copilot Free-to-Paid Conversion', workload: 'Microsoft 365 Copilot Chat', sourceFile: 'contoso-copilot-conversion-east.xlsx', useWhen: 'Active Copilot Chat users are candidates for paid Copilot.', targeting: 'Tenants with strong free usage and paid-license whitespace.', outcome: 'Create paid conversion opportunities while growing Copilot PAU.' },
+      { name: 'Copilot and Agents Usage Acceleration - APAC', templateName: 'Copilot and Agents Usage Acceleration', workload: 'Copilot Agents', sourceFile: 'contoso-copilot-agents-apac.xlsx', useWhen: 'Existing Copilot customers need broader usage across Copilot and agents.', targeting: 'Tenants with active licenses but uneven usage across experiences.', outcome: 'Increase Copilot MAU, PAU, and agent adoption together.' }
     ];
     (function expandPsmCampaignsByPartner() {
       var templates = psmCampaigns.map(function(campaign) {
@@ -1707,6 +1726,10 @@
           campaign.mvpName = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].name;
           campaign.mvpWorkload = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].workload;
           campaign.mvpSourceFile = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].sourceFile;
+          campaign.mvpTemplateName = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].templateName;
+          campaign.mvpUseWhen = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].useWhen;
+          campaign.mvpTargeting = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].targeting;
+          campaign.mvpOutcome = PSM_MVP_COPILOT_CAMPAIGNS[templateIndex].outcome;
           expanded.push(campaign);
         });
       });
@@ -2825,6 +2848,7 @@
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.mvpSourceFile || c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
         '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
+        '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(c.mvpTemplateName || c.mvpName || c.name)+'</strong><span><b>Target:</b> '+psmEscapeHtml(c.mvpTargeting || 'Tenants in the uploaded campaign list.')+' <b>Expected outcome:</b> '+psmEscapeHtml(c.mvpOutcome || 'Increase measurable Copilot adoption and usage.')+'</span></div></div>' +
         '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
           '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div>' +
           psmRenderMvpUpdateHistory(c)+'</div>' +
@@ -2962,7 +2986,17 @@
       var headers = visibleColumns.map(function(column) { return '<th>'+column.label+'</th>'; }).join('');
       var firstRecord = filtered.length ? start + 1 : 0;
       var lastRecord = Math.min(start + psmMvpTenantTableState.pageSize, filtered.length);
+      var stageCounts = {};
+      PSM_PROGRESSION_STAGES.forEach(function(stage) { stageCounts[stage.key] = 0; });
+      (c.customers || []).forEach(function(customer) {
+        stageCounts[customer.stage] = (stageCounts[customer.stage] || 0) + 1;
+      });
+      var stageSummary = PSM_PROGRESSION_STAGES.map(function(stage) {
+        return '<div class="psm-mvp-stage-summary-item" title="'+psmEscapeHtml(stage.sub)+'"><strong>'+stageCounts[stage.key].toLocaleString()+'</strong><span>'+psmEscapeHtml(stage.label)+'</span></div>';
+      }).join('');
       return '<div class="panel-card"><h2 class="psm-mvp-section-title">Tenant Progress <button type="button" class="psm-mvp-tooltip" aria-label="About Tenant Progress" aria-describedby="psmMvpProgressTooltip">i<span id="psmMvpProgressTooltip" class="psm-mvp-tooltip-text" role="tooltip">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</span></button> <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
+        '<div style="color:var(--cp-text-muted);font-size:12px;line-height:1.45;">Track where every tenant is in the campaign journey. The summary updates when selected tenants move to a new progress stage.</div>' +
+        '<div class="psm-mvp-stage-summary">'+stageSummary+'</div>' +
         psmRenderMvpTenantToolbar(c, stageOptions) +
         '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
         '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>'+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
@@ -3690,13 +3724,47 @@
     }
 
     var psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
+    var psmMvpGeneratedCampaignName = '';
+
+    function psmSelectedMvpTemplate() {
+      var select = document.getElementById('psmMvpCampaignTemplate');
+      var index = select ? parseInt(select.value, 10) : 0;
+      return PSM_MVP_COPILOT_CAMPAIGNS[index] || PSM_MVP_COPILOT_CAMPAIGNS[0];
+    }
+
+    function psmUpdateMvpTemplateGuide() {
+      var template = psmSelectedMvpTemplate();
+      var nameInput = document.getElementById('psmMvpCampaignName');
+      var canReplaceName = !nameInput.value.trim() || nameInput.value === psmMvpGeneratedCampaignName;
+      var baseName = template.templateName + ' - ' + psmGetRegionForPartner(psmPartnerContext);
+      var existingNames = psmCampaigns.map(function(campaign) {
+        return (campaign.mvpName || campaign.name).toLowerCase();
+      });
+      var suggestedName = baseName;
+      var sequence = 2;
+      while (existingNames.indexOf(suggestedName.toLowerCase()) > -1) {
+        suggestedName = baseName + ' ' + sequence;
+        sequence++;
+      }
+      document.getElementById('psmMvpTemplateGuide').innerHTML =
+        '<div><strong>Use this template when</strong><span>'+psmEscapeHtml(template.useWhen)+'</span></div>' +
+        '<div><strong>Targeting objective</strong><span>'+psmEscapeHtml(template.targeting)+'</span></div>' +
+        '<div><strong>Expected business outcome</strong><span>'+psmEscapeHtml(template.outcome)+'</span></div>';
+      if (canReplaceName) nameInput.value = suggestedName;
+      psmMvpGeneratedCampaignName = suggestedName;
+    }
 
     function psmOpenMvpCreate() {
       psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
+      psmMvpGeneratedCampaignName = '';
       document.getElementById('psmMvpCampaignName').value = '';
+      document.getElementById('psmMvpCampaignTemplate').innerHTML = PSM_MVP_COPILOT_CAMPAIGNS.map(function(template, index) {
+        return '<option value="'+index+'">'+psmEscapeHtml(template.templateName)+'</option>';
+      }).join('');
       document.getElementById('psmMvpFile').value = '';
       document.getElementById('psmMvpInitialNotes').value = '';
       document.getElementById('psmMvpUploadStatus').textContent = 'No file selected.';
+      psmUpdateMvpTemplateGuide();
       showModal('psmMvpCreateModal');
     }
 
@@ -3734,8 +3802,9 @@
           });
           var seenTenantIds = new Set();
           var duplicateCount = 0;
+          var incompleteCount = 0;
           psmMvpUpload.rows = parsedRows.filter(function(row) {
-            if (!row.tenantCustomerName || !row.tenantId) return false;
+            if (!row.tenantCustomerName || !row.tenantId) { incompleteCount++; return false; }
             var tenantKey = row.tenantId.toLowerCase();
             if (seenTenantIds.has(tenantKey)) { duplicateCount++; return false; }
             seenTenantIds.add(tenantKey);
@@ -3745,8 +3814,13 @@
           psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === parsedRows.length && parsedRows.length > 0;
           if (psmMvpUpload.valid) {
             status.innerHTML = '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' unique tenants. All Tenant IDs are ready to match with ASPX.';
-          } else if (duplicateCount) {
-            status.innerHTML = '<strong style="color:var(--cp-danger);">Duplicate Tenant IDs found.</strong> Remove '+duplicateCount.toLocaleString()+' duplicate row'+(duplicateCount === 1 ? '' : 's')+' and upload the template again.';
+          } else if (!hasRequiredColumns) {
+            status.innerHTML = '<strong style="color:var(--cp-danger);">Required headers are missing.</strong> Keep the headers Customer / Tenant Name and Tenant ID unchanged.';
+          } else if (duplicateCount || incompleteCount) {
+            var issues = [];
+            if (duplicateCount) issues.push(duplicateCount.toLocaleString()+' duplicate Tenant ID'+(duplicateCount === 1 ? '' : 's'));
+            if (incompleteCount) issues.push(incompleteCount.toLocaleString()+' incomplete row'+(incompleteCount === 1 ? '' : 's'));
+            status.innerHTML = '<strong style="color:var(--cp-danger);">File needs attention.</strong> Fix '+issues.join(' and ')+' before uploading the template again.';
           } else {
             status.innerHTML = '<strong style="color:var(--cp-danger);">File needs attention.</strong> Use the required headers Customer / Tenant Name and Tenant ID, and complete both fields for every row.';
           }
@@ -3788,6 +3862,7 @@
 
     function psmCreateMvpCampaign() {
       var name = document.getElementById('psmMvpCampaignName').value.trim();
+      var campaignTemplate = psmSelectedMvpTemplate();
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
       var listSize = psmMvpUpload.rows.length;
@@ -3797,7 +3872,8 @@
       var newCampaign = {
         id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: 'Microsoft PSM',
         mpn: partnerMpn, partnerOneId: partnerOneId, region: psmGetRegionForPartner(psmPartnerContext),
-        workload: 'Microsoft 365 Copilot', mvpWorkload: 'Microsoft 365 Copilot', workloads: ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Agents', 'Copilot Cowork'], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
+        workload: campaignTemplate.workload, mvpWorkload: campaignTemplate.workload, workloads: [campaignTemplate.workload], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
+        mvpTemplateName: campaignTemplate.templateName, mvpUseWhen: campaignTemplate.useWhen, mvpTargeting: campaignTemplate.targeting, mvpOutcome: campaignTemplate.outcome,
         goal: 'Campaign tracking', goals: [], created: today(), baselineDate: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
         campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: 'Microsoft PSM',
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0,
