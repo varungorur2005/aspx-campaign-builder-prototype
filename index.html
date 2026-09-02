@@ -660,6 +660,15 @@
     #psmMvpCreateModal .psm-upload-zone > strong { display:block; margin-bottom:6px; color:var(--cp-text); font-size:13px; }
     #psmMvpCreateModal .psm-upload-help { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     #psmMvpCreateModal .psm-upload-checklist { margin:10px 0 0; padding-left:20px; color:var(--cp-text-muted); font-size:12px; line-height:1.55; }
+    .psm-mvp-overlap-review { display:none; margin-top:12px; padding:12px; border:1px solid var(--cp-warning); border-radius:0.625rem; background:var(--cp-surface); }
+    .psm-mvp-overlap-review.show { display:block; }
+    .psm-mvp-overlap-review > strong { display:block; margin-bottom:4px; color:var(--cp-text); font-size:13px; }
+    .psm-mvp-overlap-review > p { margin:0 0 10px; color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
+    .psm-mvp-overlap-scroll { max-height:190px; overflow:auto; border:1px solid var(--cp-border); border-radius:0.625rem; }
+    .psm-mvp-overlap-table { width:100%; border-collapse:collapse; font-size:11px; }
+    .psm-mvp-overlap-table th, .psm-mvp-overlap-table td { padding:7px 8px; border-bottom:1px solid var(--cp-border); text-align:left; vertical-align:top; }
+    .psm-mvp-overlap-table th { position:sticky; top:0; background:var(--cp-surface-soft); color:var(--cp-text-muted); }
+    .psm-mvp-overlap-ack { display:flex; align-items:flex-start; gap:8px; margin-top:10px; color:var(--cp-text); font-size:12px; line-height:1.4; }
     .psm-mvp-template-guide { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; padding:14px 16px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .psm-mvp-template-guide div:first-child { grid-column:1 / -1; }
     .psm-mvp-template-guide strong { display:block; margin-bottom:3px; color:var(--cp-text); font-size:11px; text-transform:uppercase; }
@@ -693,6 +702,10 @@
     .psm-mvp-update-entry-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
     .psm-mvp-update-entry-meta { color:var(--cp-text-muted); font-size:10px; }
     .psm-mvp-update-entry-notes { color:var(--cp-text); font-size:12px; line-height:1.45; white-space:pre-wrap; }
+    .psm-mvp-owner-panel { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 16px; margin-bottom:16px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
+    .psm-mvp-owner-panel .form-group { min-width:230px; margin:0; }
+    .psm-mvp-owner-panel select { width:100%; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .psm-mvp-readonly { border-color:var(--cp-warning); background:var(--cp-surface-soft); }
     .psm-mvp-segment-scroll { overflow-x:auto; border:1px solid var(--cp-border); border-radius:0.625rem; }
     .psm-mvp-segment-table { width:100%; min-width:780px; border-collapse:collapse; font-size:12px; }
     .psm-mvp-segment-table th, .psm-mvp-segment-table td { padding:9px 10px; border-bottom:1px solid var(--cp-border); text-align:right; white-space:nowrap; }
@@ -1250,6 +1263,7 @@
           </ol>
           <input type="file" id="psmMvpFile" accept=".csv" onchange="psmHandleMvpFile(this)">
           <div class="psm-upload-status" id="psmMvpUploadStatus">No file selected.</div>
+          <div class="psm-mvp-overlap-review" id="psmMvpOverlapReview"></div>
         </div>
       </div>
       <div class="form-group">
@@ -1662,6 +1676,8 @@
     const STATE_ORDER = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
     const PSM_STATUS_ORDER = ['Draft', 'Submitted', 'Accepted', 'Active', 'Measuring', 'Completed'];
     const PSM_MVP_STATUS_ORDER = ['Defining', 'Executing', 'Closed'];
+    const PSM_CURRENT_USER = 'Varun Gorur';
+    const PSM_OWNERS = ['Varun Gorur', 'Alex Chen', 'Maya Patel', 'Jordan Lee', 'Sam Rivera'];
     const PSM_STATUS_COLORS = { Draft: '#616161', Submitted: '#0078d4', Accepted: '#038387', Active: '#107c10', Measuring: '#c19c00', Completed: '#7719aa' };
     const PSM_PROGRESSION_STAGES = [
       { key: 'targetList', label: 'Target List', sub: 'Tenants selected to pursue', color: '#0078d4', source: 'Auto', sourceNote: 'System-curated or uploaded list' },
@@ -2831,6 +2847,7 @@
       psmEnrich(c);
       psmLoadMvpUpdateHistory(c);
       c.mvpStatus = psmGetMvpStatus(c);
+      var isOwner = psmCanEditMvpCampaign(c);
       var campaignMpnIds = [c.mpn].concat(PSM_PARTNER_ASSOCIATED_MPN[c.partner] || []).filter(function(mpnId, index, mpnIds) {
         return mpnId && mpnIds.indexOf(mpnId) === index;
       });
@@ -2844,16 +2861,69 @@
           '<div class="detail-meta-item"><strong>PartnerOneID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>Partner Center IDs (MPN):</strong> '+psmEscapeHtml(campaignMpnIds.join(', ') || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
+          '<div class="detail-meta-item"><strong>Microsoft DRI:</strong> '+psmEscapeHtml(c.microsoftDri)+'</div>' +
           '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+psmEscapeHtml(c.baselineDate || c.created)+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.mvpSourceFile || c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus">'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
+        '</div></div><div class="psm-mvp-status-highlight"><label for="psmMvpDetailStatus">Campaign Status</label><select id="psmMvpDetailStatus"'+(isOwner ? '' : ' disabled')+'>'+PSM_MVP_STATUS_ORDER.map(function(status) { return '<option'+(c.mvpStatus === status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(c.mvpTemplateName || c.mvpName || c.name)+'</strong><span><b>Target:</b> '+psmEscapeHtml(c.mvpTargeting || 'Tenants in the uploaded campaign list.')+' <b>Expected outcome:</b> '+psmEscapeHtml(c.mvpOutcome || 'Increase measurable Copilot adoption and usage.')+'</span></div></div>' +
-        '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps...">'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
-          '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div>' +
+        psmRenderMvpOwnership(c, isOwner) +
+        '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="psmMvpDetailNotes" class="psm-campaign-update" placeholder="Add campaign progress, risks, decisions, or next steps..."'+(isOwner ? '' : ' readonly')+'>'+psmEscapeHtml(c.campaignUpdate || '')+'</textarea></div>' +
+          (isOwner ? '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmSaveMvpUpdate(\''+c.id+'\')">Save campaign update</button></div>' : '<div style="color:var(--cp-text-muted);font-size:12px;">Only the assigned Microsoft DRI can update this campaign.</div>') +
           psmRenderMvpUpdateHistory(c)+'</div>' +
         psmRenderMvpImpact(c) +
-        psmRenderMvpTenantWorkspace(c);
+        psmRenderMvpTenantWorkspace(c, isOwner);
+    }
+
+    function psmMvpOwnerStorageKey(id) {
+      return 'psmMvpCampaignOwner:' + id;
+    }
+
+    function psmLoadMvpOwner(c) {
+      if (c._mvpOwnerLoaded) return;
+      try {
+        var storedOwner = localStorage.getItem(psmMvpOwnerStorageKey(c.id));
+        if (storedOwner && PSM_OWNERS.indexOf(storedOwner) > -1) c.microsoftDri = storedOwner;
+      } catch (e) {}
+      c._mvpOwnerLoaded = true;
+    }
+
+    function psmCanEditMvpCampaign(c) {
+      return !!c && c.microsoftDri === PSM_CURRENT_USER;
+    }
+
+    function psmRenderMvpOwnership(c, isOwner) {
+      if (!isOwner) {
+        return '<div class="psm-mvp-owner-panel psm-mvp-readonly"><div><strong>Read-only campaign</strong><div style="margin-top:4px;color:var(--cp-text-muted);font-size:12px;">'+psmEscapeHtml(c.microsoftDri)+' is the assigned Microsoft DRI. You can review campaign and tenant details, but only the owner can make changes.</div></div></div>';
+      }
+      var options = PSM_OWNERS.map(function(owner) {
+        return '<option'+(owner === c.microsoftDri ? ' selected' : '')+'>'+psmEscapeHtml(owner)+'</option>';
+      }).join('');
+      return '<div class="psm-mvp-owner-panel"><div><strong>Campaign ownership</strong><div style="margin-top:4px;color:var(--cp-text-muted);font-size:12px;">Transfer ownership when another PSM needs to manage the campaign. You will retain read-only access after transfer.</div></div><div class="form-group"><label for="psmMvpOwnerSelect">Microsoft DRI / PSM</label><select id="psmMvpOwnerSelect">'+options+'</select></div><button class="btn btn-secondary" onclick="psmTransferMvpOwnership(\''+c.id+'\')">Transfer ownership</button></div>';
+    }
+
+    function psmTransferMvpOwnership(id) {
+      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can transfer this campaign', true); return; }
+      var newOwner = document.getElementById('psmMvpOwnerSelect').value;
+      if (PSM_OWNERS.indexOf(newOwner) === -1 || newOwner === c.microsoftDri) {
+        showToast(newOwner === c.microsoftDri ? 'Select a different PSM to transfer ownership' : 'Select a valid Microsoft DRI', true);
+        return;
+      }
+      if (!window.confirm('Transfer this campaign to ' + newOwner + '? You will retain read-only access after transfer.')) return;
+      c.microsoftDri = newOwner;
+      psmMvpTenantTableState.openPanel = '';
+      try {
+        localStorage.setItem(psmMvpOwnerStorageKey(c.id), newOwner);
+      } catch (e) {
+        showToast('Ownership changed for this session, but browser storage is unavailable', true);
+        psmRenderMvpDetail();
+        return;
+      }
+      c.timeline = c.timeline || [];
+      c.timeline.push({ date: today(), text: 'Campaign ownership transferred to ' + newOwner, type: 'info', actor: PSM_CURRENT_USER });
+      showToast('Campaign ownership transferred to ' + newOwner);
+      psmRenderMvpDetail();
     }
 
     function psmMvpUpdateStorageKey(id) {
@@ -2947,7 +3017,7 @@
       return psmEscapeHtml(customer[key] || '\u2014');
     }
 
-    function psmRenderMvpTenantWorkspace(c) {
+    function psmRenderMvpTenantWorkspace(c, isOwner) {
       psmEnsureMvpTenantRows(c);
       var stageOptions = PSM_PROGRESSION_STAGES.map(function(stage) {
         return '<option value="'+stage.key+'">'+stage.label+'</option>';
@@ -2975,12 +3045,12 @@
         var customer = item.customer;
         var index = item.index;
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
-        return '<tr><td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' +
+        return '<tr>'+(isOwner ? '<td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' : '') +
           visibleColumns.map(function(column) { return '<td>'+psmMvpTenantCell(customer, column.key, stage)+'</td>'; }).join('') +
         '</tr>';
       }).join('');
       if (!rows) {
-        var columnCount = 1 + visibleColumns.length;
+        var columnCount = visibleColumns.length + (isOwner ? 1 : 0);
         rows = '<tr><td colspan="'+columnCount+'" style="padding:24px;text-align:center;color:var(--cp-text-muted);">No tenants match the current filters.</td></tr>';
       }
       var headers = visibleColumns.map(function(column) { return '<th>'+column.label+'</th>'; }).join('');
@@ -2997,16 +3067,16 @@
       return '<div class="panel-card"><h2 class="psm-mvp-section-title">Tenant Progress <button type="button" class="psm-mvp-tooltip" aria-label="About Tenant Progress" aria-describedby="psmMvpProgressTooltip">i<span id="psmMvpProgressTooltip" class="psm-mvp-tooltip-text" role="tooltip">Usage metrics are the latest values from ASPX. Select tenants below to update progress in one action; tenant-level notes are intentionally out of scope for MVP.</span></button> <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>' +
         '<div style="color:var(--cp-text-muted);font-size:12px;line-height:1.45;">Track where every tenant is in the campaign journey. The summary updates when selected tenants move to a new progress stage.</div>' +
         '<div class="psm-mvp-stage-summary">'+stageSummary+'</div>' +
-        psmRenderMvpTenantToolbar(c, stageOptions) +
-        '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' +
-        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr><th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>'+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        psmRenderMvpTenantToolbar(c, stageOptions, isOwner) +
+        (isOwner ? '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' : '<div class="psm-mvp-bulk-bar"><strong>Read-only tenant progress</strong><span style="color:var(--cp-text-muted);font-size:12px;">The assigned Microsoft DRI can add, remove, or update tenants.</span></div>') +
+        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr>'+(isOwner ? '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>' : '')+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div class="psm-mvp-pagination"><span>Showing '+firstRecord+'-'+lastRecord+' of '+filtered.length+' records</span><div class="psm-mvp-pagination-controls"><label>Rows per page <select onchange="psmMvpSetPageSize(this.value)">'+[5,10,25,50].map(function(size){ return '<option value="'+size+'"'+(psmMvpTenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><button class="btn btn-secondary" onclick="psmMvpChangePage(-1)"'+(psmMvpTenantTableState.page <= 1 ? ' disabled' : '')+'>Previous</button><span>Page '+psmMvpTenantTableState.page+' of '+totalPages+'</span><button class="btn btn-secondary" onclick="psmMvpChangePage(1)"'+(psmMvpTenantTableState.page >= totalPages ? ' disabled' : '')+'>Next</button></div></div>' +
       '</div>';
     }
 
-    function psmRenderMvpTenantToolbar(c, stageOptions) {
+    function psmRenderMvpTenantToolbar(c, stageOptions, isOwner) {
       var panel = '';
-      if (psmMvpTenantTableState.openPanel === 'add') {
+      if (psmMvpTenantTableState.openPanel === 'add' && isOwner) {
         panel = '<div class="psm-mvp-action-panel"><strong>Add Customer</strong><button class="btn btn-secondary" onclick="document.getElementById(\'psmMvpBulkAddFile\').click()">Bulk add from file</button><button class="btn btn-secondary" onclick="psmOpenAddTenant()">Add manually</button><span style="color:var(--cp-text-muted);font-size:12px;">Use the campaign template columns: Customer / Tenant Name and Tenant ID.</span></div>';
       } else if (psmMvpTenantTableState.openPanel === 'filter') {
         panel = '<div class="psm-mvp-action-panel"><div class="form-group"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div><div class="form-group"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div><button class="btn btn-primary" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary" onclick="psmMvpClearTenantFilter()">Clear</button></div>';
@@ -3016,12 +3086,14 @@
           return '<label class="psm-mvp-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
         }).join('')+'</div>';
       }
+      var ownerActions = isOwner ?
+        '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'add' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'add\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'add')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Add Customer</button>' +
+        '<button class="toolbar-btn psm-mvp-toolbar-btn psm-mvp-toolbar-danger" onclick="psmRemoveSelectedTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6 2.5h4m-5.5 2 .6 9h5.8l.6-9M6.5 7v4m3-4v4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove Customer</button>' +
+        '<input type="file" id="psmMvpBulkAddFile" accept=".csv" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')">' : '';
       return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button></div><div class="psm-mvp-table-actions">' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'filter' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'filter\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'filter')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'columns' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'columns\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'columns')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>' +
-        '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'add' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'add\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'add')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Add Customer</button>' +
-        '<button class="toolbar-btn psm-mvp-toolbar-btn psm-mvp-toolbar-danger" onclick="psmRemoveSelectedTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6 2.5h4m-5.5 2 .6 9h5.8l.6-9M6.5 7v4m3-4v4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove Customer</button>' +
-        '<input type="file" id="psmMvpBulkAddFile" accept=".csv" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')"></div></div>'+panel;
+        ownerActions+'</div></div>'+panel;
     }
 
     function psmPopulateMvpTenantTelemetry(c, customer, index, seed) {
@@ -3084,6 +3156,10 @@
     }
 
     function psmMvpToggleTenantPanel(panel) {
+      if (panel === 'add' && !psmCanEditMvpCampaign(psmCurrentCampaign)) {
+        showToast('Only the assigned Microsoft DRI can add tenants', true);
+        return;
+      }
       psmMvpTenantTableState.openPanel = psmMvpTenantTableState.openPanel === panel ? '' : panel;
       psmRenderMvpDetail();
     }
@@ -3143,6 +3219,7 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       var file = input.files && input.files[0];
       if (!c || !file) return;
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can add tenants', true); input.value = ''; return; }
       var extension = file.name.split('.').pop().toLowerCase();
       if (extension === 'csv' && file.text) {
         file.text().then(function(text) {
@@ -3178,6 +3255,7 @@
     }
 
     function psmMvpAddTenantRows(c, additions, fileName) {
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can add tenants', true); return; }
       var existing = new Set(c.customers.map(function(customer) { return customer.tenantId.toLowerCase(); }));
       var added = 0;
       additions.forEach(function(customer) {
@@ -3239,9 +3317,10 @@
     function psmSaveMvpUpdate(id) {
       var c = psmCampaigns.find(function(x) { return x.id === id; });
       if (!c) return;
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can update this campaign', true); return; }
       c.mvpStatus = document.getElementById('psmMvpDetailStatus').value;
       c.campaignUpdate = document.getElementById('psmMvpDetailNotes').value.trim();
-      c.campaignUpdateActor = 'Microsoft PSM';
+      c.campaignUpdateActor = PSM_CURRENT_USER;
       c.mvpUpdated = today();
       c.campaignUpdates = c.campaignUpdates || [];
       var savedAt = new Date();
@@ -3259,7 +3338,7 @@
         storageFailed = true;
       }
       c.timeline = c.timeline || [];
-      c.timeline.push({ date: today(), text: 'Campaign update saved: ' + c.mvpStatus, type: c.mvpStatus === 'Closed' ? 'closed' : 'info', actor: 'Microsoft PSM' });
+      c.timeline.push({ date: today(), text: 'Campaign update saved: ' + c.mvpStatus, type: c.mvpStatus === 'Closed' ? 'closed' : 'info', actor: PSM_CURRENT_USER });
       showToast(storageFailed ? 'Update saved for this session, but browser storage is unavailable' : 'Campaign status and notes saved to update history', storageFailed);
       psmRenderMvpDetail();
     }
@@ -3438,6 +3517,7 @@
     }
 
     function psmOpenAddTenant() {
+      if (!psmCanEditMvpCampaign(psmCurrentCampaign)) { showToast('Only the assigned Microsoft DRI can add tenants', true); return; }
       document.getElementById('psmNewTenantName').value = '';
       document.getElementById('psmNewTenantId').value = '';
       document.getElementById('psmNewTenantSegment').value = 'Enterprise';
@@ -3447,6 +3527,7 @@
     function psmAddTenant() {
       var c = psmCurrentCampaign;
       if (!c) return;
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can add tenants', true); return; }
       var name = document.getElementById('psmNewTenantName').value.trim();
       var tenantId = document.getElementById('psmNewTenantId').value.trim();
       var segment = document.getElementById('psmNewTenantSegment').value;
@@ -3472,6 +3553,7 @@
     function psmRemoveSelectedTenants(id) {
       var c = psmCampaigns.find(function(x) { return x.id === id; });
       if (!c) return;
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can remove tenants', true); return; }
       var indexes = Array.from(document.querySelectorAll('.psm-cust-check:checked')).map(function(box) {
         return parseInt(box.getAttribute('data-idx'), 10);
       }).sort(function(a, b) { return b - a; });
@@ -3500,6 +3582,7 @@
     function psmBulkApplyStage(id) {
       var c = psmCampaigns.filter(function(x){ return x.id === id; })[0];
       if (!c) return;
+      if (!psmCanEditMvpCampaign(c)) { showToast('Only the assigned Microsoft DRI can update tenant progress', true); return; }
       var stage = document.getElementById('psmBulkStage').value;
       var boxes = document.querySelectorAll('.psm-cust-check:checked');
       if (!boxes.length) { showToast('Select at least one tenant first', true); return; }
@@ -3723,13 +3806,66 @@
       showToast('Executive summary deck generated with Copilot Cowork \u2014 check your downloads');
     }
 
-    var psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
+    var psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [], overlaps: [] };
     var psmMvpGeneratedCampaignName = '';
 
     function psmSelectedMvpTemplate() {
       var select = document.getElementById('psmMvpCampaignTemplate');
       var index = select ? parseInt(select.value, 10) : 0;
       return PSM_MVP_COPILOT_CAMPAIGNS[index] || PSM_MVP_COPILOT_CAMPAIGNS[0];
+    }
+
+    function psmFindMvpCampaignOverlaps(rows) {
+      var uploadedTenants = {};
+      rows.forEach(function(row) {
+        uploadedTenants[row.tenantId.toLowerCase()] = row;
+      });
+      var overlaps = {};
+      psmScopedCampaigns().forEach(function(campaign) {
+        psmEnrich(campaign);
+        psmEnsureMvpTenantRows(campaign);
+        (campaign.customers || []).forEach(function(customer) {
+          var tenantKey = (customer.tenantId || '').toLowerCase();
+          if (!uploadedTenants[tenantKey]) return;
+          if (!overlaps[tenantKey]) {
+            overlaps[tenantKey] = {
+              tenantId: uploadedTenants[tenantKey].tenantId,
+              tenantName: uploadedTenants[tenantKey].tenantCustomerName,
+              campaigns: []
+            };
+          }
+          if (!overlaps[tenantKey].campaigns.some(function(existing) { return existing.id === campaign.id; })) {
+            overlaps[tenantKey].campaigns.push({
+              id: campaign.id,
+              name: campaign.mvpName || campaign.name,
+              status: psmGetMvpStatus(campaign),
+              microsoftDri: campaign.microsoftDri
+            });
+          }
+        });
+      });
+      return Object.keys(overlaps).map(function(key) { return overlaps[key]; });
+    }
+
+    function psmRenderMvpOverlapReview() {
+      var review = document.getElementById('psmMvpOverlapReview');
+      var overlaps = psmMvpUpload.overlaps || [];
+      if (!overlaps.length) {
+        review.classList.remove('show');
+        review.innerHTML = '';
+        return;
+      }
+      var rows = overlaps.map(function(overlap) {
+        return overlap.campaigns.map(function(campaign, index) {
+          return '<tr><td>'+psmEscapeHtml(index ? '' : overlap.tenantName)+'</td><td class="psm-tenant-id">'+psmEscapeHtml(index ? '' : overlap.tenantId)+'</td><td><strong>'+psmEscapeHtml(campaign.id)+'</strong><br>'+psmEscapeHtml(campaign.name)+'</td><td>'+psmEscapeHtml(campaign.status)+'</td><td>'+psmEscapeHtml(campaign.microsoftDri)+'</td></tr>';
+        }).join('');
+      }).join('');
+      review.innerHTML =
+        '<strong>Possible duplicate campaign coverage found</strong>' +
+        '<p>'+overlaps.length.toLocaleString()+' uploaded Tenant ID'+(overlaps.length === 1 ? '' : 's')+' already appear in campaigns for '+psmEscapeHtml(psmPartnerContext)+'. Review the campaign and owner details before continuing.</p>' +
+        '<div class="psm-mvp-overlap-scroll"><table class="psm-mvp-overlap-table"><thead><tr><th>Customer / Tenant</th><th>Tenant ID</th><th>Existing Campaign</th><th>Status</th><th>Microsoft DRI</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<label class="psm-mvp-overlap-ack"><input type="checkbox" id="psmMvpOverlapAcknowledged">I reviewed the existing campaigns and still want to create this campaign.</label>';
+      review.classList.add('show');
     }
 
     function psmUpdateMvpTemplateGuide() {
@@ -3755,7 +3891,7 @@
     }
 
     function psmOpenMvpCreate() {
-      psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [] };
+      psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [], overlaps: [] };
       psmMvpGeneratedCampaignName = '';
       document.getElementById('psmMvpCampaignName').value = '';
       document.getElementById('psmMvpCampaignTemplate').innerHTML = PSM_MVP_COPILOT_CAMPAIGNS.map(function(template, index) {
@@ -3764,6 +3900,7 @@
       document.getElementById('psmMvpFile').value = '';
       document.getElementById('psmMvpInitialNotes').value = '';
       document.getElementById('psmMvpUploadStatus').textContent = 'No file selected.';
+      psmRenderMvpOverlapReview();
       psmUpdateMvpTemplateGuide();
       showModal('psmMvpCreateModal');
     }
@@ -3771,7 +3908,8 @@
     function psmHandleMvpFile(input) {
       var file = input.files && input.files[0];
       var status = document.getElementById('psmMvpUploadStatus');
-      psmMvpUpload = { file: file || null, rowCount: 0, valid: false, rows: [] };
+      psmMvpUpload = { file: file || null, rowCount: 0, valid: false, rows: [], overlaps: [] };
+      psmRenderMvpOverlapReview();
       if (!file) { status.textContent = 'No file selected.'; return; }
       var extension = file.name.split('.').pop().toLowerCase();
       if (extension !== 'csv') {
@@ -3779,7 +3917,9 @@
         return;
       }
       if (file.text) {
+        var uploadFile = file;
         file.text().then(function(text) {
+          if (psmMvpUpload.file !== uploadFile) return;
           var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
           var headers = psmParseCsvLine(lines[0] || '').map(function(value) {
             return value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -3813,7 +3953,9 @@
           psmMvpUpload.rowCount = parsedRows.length;
           psmMvpUpload.valid = hasRequiredColumns && psmMvpUpload.rows.length === parsedRows.length && parsedRows.length > 0;
           if (psmMvpUpload.valid) {
-            status.innerHTML = '<strong style="color:var(--cp-success);">Validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' unique tenants. All Tenant IDs are ready to match with ASPX.';
+            psmMvpUpload.overlaps = psmFindMvpCampaignOverlaps(psmMvpUpload.rows);
+            psmRenderMvpOverlapReview();
+            status.innerHTML = '<strong style="color:var(--cp-success);">Tenant IDs validated.</strong> '+psmEscapeHtml(file.name)+' contains '+psmMvpUpload.rowCount.toLocaleString()+' unique tenants.'+(psmMvpUpload.overlaps.length ? ' Review the possible existing campaign coverage below.' : ' No existing campaign coverage was found for these Tenant IDs.');
           } else if (!hasRequiredColumns) {
             status.innerHTML = '<strong style="color:var(--cp-danger);">Required headers are missing.</strong> Keep the headers Customer / Tenant Name and Tenant ID unchanged.';
           } else if (duplicateCount || incompleteCount) {
@@ -3865,26 +4007,30 @@
       var campaignTemplate = psmSelectedMvpTemplate();
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
+      if (psmMvpUpload.overlaps.length && !document.getElementById('psmMvpOverlapAcknowledged').checked) {
+        showToast('Review and acknowledge the existing campaign coverage before continuing', true);
+        return;
+      }
       var listSize = psmMvpUpload.rows.length;
       var uploadedPartner = psmMvpUpload.rows[0] || {};
       var partnerOneId = uploadedPartner.partnerOneId || PSM_PARTNER_ONE[psmPartnerContext] || '';
       var partnerMpn = uploadedPartner.partnerMpn || PSM_PARTNER_MPN[psmPartnerContext] || '';
       var newCampaign = {
-        id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: 'Microsoft PSM',
+        id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER,
         mpn: partnerMpn, partnerOneId: partnerOneId, region: psmGetRegionForPartner(psmPartnerContext),
         workload: campaignTemplate.workload, mvpWorkload: campaignTemplate.workload, workloads: [campaignTemplate.workload], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
         mvpTemplateName: campaignTemplate.templateName, mvpUseWhen: campaignTemplate.useWhen, mvpTargeting: campaignTemplate.targeting, mvpOutcome: campaignTemplate.outcome,
         goal: 'Campaign tracking', goals: [], created: today(), baselineDate: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
-        campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: 'Microsoft PSM',
+        campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: PSM_CURRENT_USER,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0,
         copilotPru: 0, agentMau: 0, coworkSessions: 0, mciWorkshops: 0, mciStatus: 'Not started',
         motions: [], mciOffer: 'N/A', fundingCommitted: 0, trackedCount: 0, signals: [], activityLog: [],
-        scenarioId: 'manual', executionType: 'Uploaded', _enriched: true
+        scenarioId: 'manual', executionType: 'Uploaded', _enriched: true, _mvpOwnerLoaded: true
       };
       newCampaign.customers = psmMvpUpload.rows.map(function(uploaded, index) {
         return psmMvpCreateTenantRecord(uploaded.tenantCustomerName, uploaded.tenantId, newCampaign, index, uploaded);
       });
-      newCampaign.timeline = [{ date: today(), text: 'Campaign created from ' + psmMvpUpload.file.name, type: 'info', actor: 'Microsoft PSM' }];
+      newCampaign.timeline = [{ date: today(), text: 'Campaign created from ' + psmMvpUpload.file.name, type: 'info', actor: PSM_CURRENT_USER }];
       psmCampaigns.unshift(newCampaign);
       hideModal('psmMvpCreateModal');
       psmSearchTerm = '';
@@ -4411,7 +4557,8 @@
       if (c.mauGrowth > 0 && c.mauGrowth < 100) c.mauGrowth = Math.round(c.mauGrowth * 100);
       if (typeof c.npsa !== 'number') c.npsa = ['Active', 'Measuring', 'Completed'].indexOf(c.status) > -1 ? Math.round(c.tenantCount * (0.08 + (initialSeed % 4) * 0.03)) : 0;
       if (!c.owner) c.owner = ['Alex Chen (PSM)', 'Maya Patel (PSS)', 'Jordan Lee (PMM)', 'Sam Rivera (PDM)'][initialSeed % 4];
-      if (!c.microsoftDri) c.microsoftDri = 'Varun Gorur';
+      if (!c.microsoftDri) c.microsoftDri = PSM_CURRENT_USER;
+      psmLoadMvpOwner(c);
       if (!c.motions) c.motions = ['Partner GTM'];
       if (!c.mciOffer) c.mciOffer = c.mciWorkshops ? PSM_MCI_OFFERS[initialSeed % (PSM_MCI_OFFERS.length - 1)] : 'N/A';
       if (c._enriched) return c;
