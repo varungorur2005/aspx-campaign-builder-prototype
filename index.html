@@ -669,10 +669,6 @@
     .psm-mvp-overlap-table th, .psm-mvp-overlap-table td { padding:7px 8px; border-bottom:1px solid var(--cp-border); text-align:left; vertical-align:top; }
     .psm-mvp-overlap-table th { position:sticky; top:0; background:var(--cp-surface-soft); color:var(--cp-text-muted); }
     .psm-mvp-overlap-ack { display:flex; align-items:flex-start; gap:8px; margin-top:10px; color:var(--cp-text); font-size:12px; line-height:1.4; }
-    .psm-mvp-template-guide { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; padding:14px 16px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
-    .psm-mvp-template-guide div:first-child { grid-column:1 / -1; }
-    .psm-mvp-template-guide strong { display:block; margin-bottom:3px; color:var(--cp-text); font-size:11px; text-transform:uppercase; }
-    .psm-mvp-template-guide span { color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     #psmMvpCreateModal .btn-group { justify-content:flex-end; margin-top:4px; padding-top:20px; border-top:1px solid var(--cp-border); }
     .psm-live-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:11px; font-weight:600; }
     .psm-stage-label { display:inline-block; padding:4px 8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; font-weight:600; }
@@ -1237,15 +1233,10 @@
   <div class="modal-overlay" id="psmMvpCreateModal">
     <div class="modal psm-mvp-create-modal">
       <h3>Create campaign from a tenant list</h3>
-      <p class="psm-mvp-create-intro">Choose the business outcome, then upload the tenants to target. ASPX will match each Tenant ID, capture the campaign baseline, and supply the latest usage data.</p>
-      <div class="form-group">
-        <label>Campaign template <span class="required">*</span></label>
-        <select id="psmMvpCampaignTemplate" onchange="psmUpdateMvpTemplateGuide()"></select>
-        <div class="psm-mvp-template-guide" id="psmMvpTemplateGuide"></div>
-      </div>
+      <p class="psm-mvp-create-intro">Download the standard CSV template, add the Customer / Tenant Name and Tenant ID from your existing list, and upload it. ASPX validates the Tenant IDs after upload.</p>
       <div class="form-group">
         <label>Campaign name <span class="required">*</span></label>
-        <input type="text" id="psmMvpCampaignName" placeholder="Choose a template to generate an outcome-based name">
+        <input type="text" id="psmMvpCampaignName" placeholder="e.g. M365 Copilot Licensed MAU Growth - West US">
       </div>
       <div class="form-group">
         <label>Tenant list <span class="required">*</span></label>
@@ -2415,7 +2406,7 @@
       dashboard.innerHTML =
         '<div class="psm-aspx-title"><span class="insights">Insights</span><span class="divider">|</span><span class="section">Campaigns</span><span class="suite">AI Business Solutions &amp; Security &#9432;</span></div>' +
         '<div class="psm-aspx-tabs"><button class="psm-aspx-tab" type="button" disabled aria-disabled="true">FastTrack Referrals</button><button class="psm-aspx-tab" type="button" disabled aria-disabled="true">Security Deal Clinic</button><button class="psm-aspx-tab active" type="button">PSM Campaign Builder</button></div>' +
-        '<div class="table-toolbar psm-toolbar"><div class="toolbar-left"><button class="btn btn-primary" onclick="psmOpenMvpCreate()">Create campaign from template</button></div></div>' +
+        '<div class="table-toolbar psm-toolbar"><div class="toolbar-left"><button class="btn btn-primary" onclick="psmOpenMvpCreate()">Create campaign from tenant list</button></div></div>' +
         '<div class="table-toolbar" id="psmTableToolbar">' +
           '<div class="toolbar-left"><button class="toolbar-btn" onclick="showToast(\'Campaign export prepared\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Download</button></div>' +
           '<div class="toolbar-right">' +
@@ -3807,13 +3798,6 @@
     }
 
     var psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [], overlaps: [] };
-    var psmMvpGeneratedCampaignName = '';
-
-    function psmSelectedMvpTemplate() {
-      var select = document.getElementById('psmMvpCampaignTemplate');
-      var index = select ? parseInt(select.value, 10) : 0;
-      return PSM_MVP_COPILOT_CAMPAIGNS[index] || PSM_MVP_COPILOT_CAMPAIGNS[0];
-    }
 
     function psmFindMvpCampaignOverlaps(rows) {
       var uploadedTenants = {};
@@ -3868,40 +3852,13 @@
       review.classList.add('show');
     }
 
-    function psmUpdateMvpTemplateGuide() {
-      var template = psmSelectedMvpTemplate();
-      var nameInput = document.getElementById('psmMvpCampaignName');
-      var canReplaceName = !nameInput.value.trim() || nameInput.value === psmMvpGeneratedCampaignName;
-      var baseName = template.templateName + ' - ' + psmGetRegionForPartner(psmPartnerContext);
-      var existingNames = psmCampaigns.map(function(campaign) {
-        return (campaign.mvpName || campaign.name).toLowerCase();
-      });
-      var suggestedName = baseName;
-      var sequence = 2;
-      while (existingNames.indexOf(suggestedName.toLowerCase()) > -1) {
-        suggestedName = baseName + ' ' + sequence;
-        sequence++;
-      }
-      document.getElementById('psmMvpTemplateGuide').innerHTML =
-        '<div><strong>Use this template when</strong><span>'+psmEscapeHtml(template.useWhen)+'</span></div>' +
-        '<div><strong>Targeting objective</strong><span>'+psmEscapeHtml(template.targeting)+'</span></div>' +
-        '<div><strong>Expected business outcome</strong><span>'+psmEscapeHtml(template.outcome)+'</span></div>';
-      if (canReplaceName) nameInput.value = suggestedName;
-      psmMvpGeneratedCampaignName = suggestedName;
-    }
-
     function psmOpenMvpCreate() {
       psmMvpUpload = { file: null, rowCount: 0, valid: false, rows: [], overlaps: [] };
-      psmMvpGeneratedCampaignName = '';
       document.getElementById('psmMvpCampaignName').value = '';
-      document.getElementById('psmMvpCampaignTemplate').innerHTML = PSM_MVP_COPILOT_CAMPAIGNS.map(function(template, index) {
-        return '<option value="'+index+'">'+psmEscapeHtml(template.templateName)+'</option>';
-      }).join('');
       document.getElementById('psmMvpFile').value = '';
       document.getElementById('psmMvpInitialNotes').value = '';
       document.getElementById('psmMvpUploadStatus').textContent = 'No file selected.';
       psmRenderMvpOverlapReview();
-      psmUpdateMvpTemplateGuide();
       showModal('psmMvpCreateModal');
     }
 
@@ -4004,7 +3961,6 @@
 
     function psmCreateMvpCampaign() {
       var name = document.getElementById('psmMvpCampaignName').value.trim();
-      var campaignTemplate = psmSelectedMvpTemplate();
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmMvpUpload.file || !psmMvpUpload.valid) { showToast('Upload a valid customer list first', true); return; }
       if (psmMvpUpload.overlaps.length && !document.getElementById('psmMvpOverlapAcknowledged').checked) {
@@ -4018,8 +3974,7 @@
       var newCampaign = {
         id: psmNextCampaignId(), name: name, partner: psmPartnerContext, owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER,
         mpn: partnerMpn, partnerOneId: partnerOneId, region: psmGetRegionForPartner(psmPartnerContext),
-        workload: campaignTemplate.workload, mvpWorkload: campaignTemplate.workload, workloads: [campaignTemplate.workload], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
-        mvpTemplateName: campaignTemplate.templateName, mvpUseWhen: campaignTemplate.useWhen, mvpTargeting: campaignTemplate.targeting, mvpOutcome: campaignTemplate.outcome,
+        workload: 'Microsoft 365 Copilot', mvpWorkload: 'Microsoft 365 Copilot', workloads: ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Agents', 'Copilot Cowork'], tenantCount: listSize, status: 'Draft', mvpStatus: 'Defining',
         goal: 'Campaign tracking', goals: [], created: today(), baselineDate: today(), mvpUpdated: today(), sourceFile: psmMvpUpload.file.name,
         campaignUpdate: document.getElementById('psmMvpInitialNotes').value.trim(), campaignUpdateActor: PSM_CURRENT_USER,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0,
