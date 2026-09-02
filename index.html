@@ -2904,16 +2904,16 @@
       if (!window.confirm('Transfer this campaign to ' + newOwner + '? You will retain read-only access after transfer.')) return;
       c.microsoftDri = newOwner;
       psmMvpTenantTableState.openPanel = '';
+      var storageFailed = false;
       try {
         localStorage.setItem(psmMvpOwnerStorageKey(c.id), newOwner);
       } catch (e) {
-        showToast('Ownership changed for this session, but browser storage is unavailable', true);
-        psmRenderMvpDetail();
-        return;
+        storageFailed = true;
       }
       c.timeline = c.timeline || [];
       c.timeline.push({ date: today(), text: 'Campaign ownership transferred to ' + newOwner, type: 'info', actor: PSM_CURRENT_USER });
-      showToast('Campaign ownership transferred to ' + newOwner);
+      showToast(storageFailed ? 'Ownership changed for this session, but browser storage is unavailable' : 'Campaign ownership transferred to ' + newOwner, storageFailed);
+      psmRenderMvpDashboard();
       psmRenderMvpDetail();
     }
 
