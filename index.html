@@ -2596,9 +2596,17 @@
     }
 
     function psmV3Campaigns() {
-      return psmCampaigns.filter(function(c) {
+      var campaigns = psmCampaigns.filter(function(c) {
         return [c.name, c.workload].concat(c.workloads || []).join(' ').toLowerCase().match(/copilot|cowork/);
       }).map(psmV3Enrich);
+      if (campaigns.length && !campaigns.some(function(c) { return c.v3Owner === PSM_CURRENT_USER; })) {
+        campaigns.slice(0, Math.min(3, campaigns.length)).forEach(function(c) {
+          c.v3Owner = PSM_CURRENT_USER;
+          c.owner = PSM_CURRENT_USER;
+          c.microsoftDri = PSM_CURRENT_USER;
+        });
+      }
+      return campaigns;
     }
 
     function psmV3FilteredCampaigns() {
