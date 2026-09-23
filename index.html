@@ -1430,12 +1430,12 @@
       <div class="form-group"><label>Update note <span class="required">*</span></label><textarea id="v3StatusNote" placeholder="Explain what changed and the next step"></textarea></div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3StatusModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3SaveStatus()">Save update</he-button_psmv3></div>
     </div>
+  </div>
 
-    <div class="filter-overlay" id="psmV3TablePanel" onclick="psmV3CloseTablePanel()">
-      <div class="filter-panel v3-filter-panel" onclick="event.stopPropagation()">
-        <h3><span id="psmV3TablePanelTitle">Filter campaigns</span><button style="background:none;border:none;font-size:20px;color:var(--cp-text-muted);cursor:pointer;" onclick="psmV3CloseTablePanel()">&times;</button></h3>
-        <div id="psmV3TablePanelBody"></div>
-      </div>
+  <div class="filter-overlay" id="psmV3TablePanel" onclick="psmV3CloseTablePanel()">
+    <div class="filter-panel v3-filter-panel" onclick="event.stopPropagation()">
+      <h3><span id="psmV3TablePanelTitle">Filter campaigns</span><button style="background:none;border:none;font-size:20px;color:var(--cp-text-muted);cursor:pointer;" onclick="psmV3CloseTablePanel()">&times;</button></h3>
+      <div id="psmV3TablePanelBody"></div>
     </div>
   </div>
 
