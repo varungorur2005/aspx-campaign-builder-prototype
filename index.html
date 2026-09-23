@@ -746,9 +746,6 @@
     .psm-v3-tenant-status-item span { display:block; margin-top:4px; color:var(--cp-text-muted); font-size:11px; font-weight:600; line-height:1.15; }
     .psm-v3-update-button { width:100%; min-height:34px; margin-top:9px; padding:7px 10px; white-space:nowrap; }
     #psmV3TablePanel.campaign-update-panel .filter-panel { width:400px; }
-    .psm-v3-status-search { position:relative; margin-bottom:12px; }
-    .psm-v3-status-search svg { position:absolute; top:50%; left:10px; width:16px; height:16px; color:var(--cp-text-muted); transform:translateY(-50%); pointer-events:none; }
-    .psm-v3-status-search input { width:100%; padding:9px 10px 9px 34px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .psm-v3-status-options { display:flex; flex-direction:column; gap:6px; }
     .psm-v3-status-option { display:flex; align-items:center; gap:9px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); cursor:pointer; }
     .psm-v3-status-option:has(input:checked) { border-color:var(--cp-link); background:var(--cp-surface-soft); font-weight:700; }
@@ -3541,20 +3538,13 @@
       var panel = document.getElementById('psmV3TablePanel');
       document.getElementById('psmV3TablePanelTitle').textContent = 'Update Campaign';
       document.getElementById('psmV3TablePanelBody').innerHTML =
-        '<div class="filter-section"><label>Campaign status</label><div class="psm-v3-status-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="search" placeholder="Search campaign status" aria-label="Search campaign status" oninput="psmV3FilterCampaignStatuses(this.value)"></div><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
+        '<div class="filter-section"><label>Campaign status</label><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
           return '<label class="psm-v3-status-option" data-status="'+status.toLowerCase()+'"><input type="radio" name="v3FlyoutStatus" value="'+status+'"'+(status === c.v3Status ? ' checked' : '')+'><span>'+status+'</span></label>';
         }).join('')+'</div></div>' +
         '<div class="form-group"><label for="v3FlyoutStatusNote">Update note <span class="required">*</span></label><textarea id="v3FlyoutStatusNote" placeholder="Explain what changed and the next step"></textarea></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveStatus()">Save update</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>' +
         '<section class="psm-v3-update-history"><h4>Activity History</h4>'+psmV3ActivityHistoryHtml(c)+'</section>';
       panel.classList.add('campaign-update-panel', 'show');
-    }
-
-    function psmV3FilterCampaignStatuses(value) {
-      var term = value.trim().toLowerCase();
-      document.querySelectorAll('.psm-v3-status-option').forEach(function(option) {
-        option.style.display = !term || option.getAttribute('data-status').indexOf(term) > -1 ? '' : 'none';
-      });
     }
 
     function psmV3SaveStatus() {
