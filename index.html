@@ -971,7 +971,7 @@
     .v3-kpi strong { display:block; margin-bottom:4px; color:var(--cp-text); font-size:23px; }
     .v3-kpi span { color:var(--cp-text-muted); font-size:11px; font-weight:700; text-transform:uppercase; }
     .v3-kpi small { display:block; margin-top:6px; color:var(--cp-text-muted); font-size:10px; line-height:1.35; }
-    .v3-charts { display:grid; grid-template-columns:minmax(360px,0.8fr) minmax(620px,1.2fr); gap:12px; margin-bottom:16px; overflow-x:auto; }
+    .v3-charts { display:grid; grid-template-columns:repeat(3,minmax(300px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
     .v3-card { padding:16px; border:1px solid var(--cp-border); border-radius:16px; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); }
     .v3-card h2 { margin:0 0 12px; font-size:15px; }
     .v3-bar-row { display:grid; grid-template-columns:90px 1fr 36px; align-items:center; gap:8px; margin:8px 0; color:var(--cp-text-muted); font-size:11px; }
@@ -2068,6 +2068,7 @@
     const PSM_MVP_TENANT_COLUMNS = [
       { key: 'name', label: 'Customer / Tenant Name', fixed: true },
       { key: 'tenantId', label: 'Tenant ID', fixed: true },
+      { key: 'workloads', label: 'Workloads', fixed: true },
       { key: 'segment', label: 'Tenant Segment' },
       { key: 'country', label: 'Tenant Country/Region' },
       { key: 'copilotLicensedMau', label: 'Copilot MAU (Licensed)' },
@@ -2716,6 +2717,7 @@
       { key: 'id', label: 'Campaign ID', fixed: true },
       { key: 'name', label: 'Campaign Name', fixed: true },
       { key: 'outcomes', label: 'Business Outcomes' },
+      { key: 'workloads', label: 'Workloads' },
       { key: 'owner', label: 'Microsoft DRI' },
       { key: 'partner', label: 'Partner' },
       { key: 'status', label: 'Status' },
@@ -2941,8 +2943,19 @@
       var outcomeLegend = outcomeCounts.map(function(outcome, index) {
         return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+outcomeColors[index]+';"></span><span>'+psmEscapeHtml(outcome.label)+'</span><strong>'+outcome.count+'</strong></div>';
       }).join('');
+      var workloadCounts = PSM_V3_COPILOT_WORKLOADS.map(function(workload) {
+        return { label: workload, count: campaigns.filter(function(c) { return (c.workloads || []).indexOf(workload) > -1; }).length };
+      });
+      var workloadColors = ['var(--cp-accent)', 'var(--cp-link)', 'var(--cp-success)', 'var(--cp-warning)', 'var(--cp-danger)'];
+      var workloadLabels = workloadCounts.map(function(workload) { return workload.label; });
+      var workloadValues = workloadCounts.map(function(workload) { return workload.count; });
+      var workloadSlices = pieSlices(workloadValues, workloadLabels, workloadColors);
+      var workloadLegend = workloadCounts.map(function(workload, index) {
+        return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+workloadColors[index]+';"></span><span>'+psmEscapeHtml(workload.label)+'</span><strong>'+workload.count+'</strong></div>';
+      }).join('');
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts"><he-card_psmv3 class="v3-card"><h2>Campaigns by status</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by status pie chart">'+(slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+statusLegend+'</div></div></he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaigns by business outcome</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by business outcome pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple business outcomes are counted in each applicable outcome.</div></he-card_psmv3></div>';
+        '<he-card_psmv3 class="v3-card"><h2>Campaigns by business outcome</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by business outcome pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple business outcomes are counted in each applicable outcome.</div></he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Campaigns by workload</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by workload pie chart">'+(workloadSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+workloadLegend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple workloads are counted in each applicable workload.</div></he-card_psmv3></div>';
     }
 
     function psmV3PriorityChips(c) {
@@ -2973,6 +2986,7 @@
           id: '<strong style="color:var(--cp-link);">'+c.id+'</strong>',
           name: '<strong>'+psmEscapeHtml(c.name)+'</strong>',
           outcomes: psmV3PriorityChips(c),
+          workloads: (c.workloads || []).map(function(workload) { return '<span class="v3-chip">'+psmEscapeHtml(workload)+'</span>'; }).join(''),
           owner: psmEscapeHtml(c.v3Owner),
           partner: psmEscapeHtml(c.partner),
           region: psmEscapeHtml(c.v3Region),
@@ -3057,7 +3071,7 @@
       var campaigns = psmV3FilteredCampaigns();
       var csv = columns.map(function(column) { return '"'+column.label+'"'; }).join(',')+'\r\n'+campaigns.map(function(c) {
         var values = {
-          id:c.id, name:c.name, outcomes:c.v3Outcomes.join('; '), owner:c.v3Owner, partner:c.partner, region:c.v3Region, area:c.v3Area,
+          id:c.id, name:c.name, outcomes:c.v3Outcomes.join('; '), workloads:(c.workloads || []).join('; '), owner:c.v3Owner, partner:c.partner, region:c.v3Region, area:c.v3Area,
           status:c.v3Status, tenants:c.tenantCount, mau:psmV3MetricTotal([c], 'paidMau'), pru:psmV3MetricTotal([c], 'pru'),
           npsa:psmV3MetricTotal([c], 'npsa'), revenue:psmV3MetricTotal([c], 'revenue'), updated:c.v3LastUpdated
         };
@@ -4378,6 +4392,7 @@
     function psmMvpTenantCell(customer, key, stage) {
       if (key === 'name') return '<strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong>';
       if (key === 'tenantId') return '<span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span>';
+      if (key === 'workloads') return (customer.targetedWorkloads || []).map(function(workload) { return '<span class="v3-chip">'+psmEscapeHtml(workload)+'</span>'; }).join('') || '\u2014';
       if (key === 'progress') return '<span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span>';
       if (/Growth$/.test(key)) {
         var metricKey = key.replace(/Growth$/, '');
@@ -4424,6 +4439,7 @@
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         var searchableValues = PSM_MVP_TENANT_COLUMNS.map(function(column) {
           if (column.key === 'name') return name;
+          if (column.key === 'workloads') return (customer.targetedWorkloads || []).join(' ');
           if (column.key === 'progress') return stage.label;
           if (/Growth$/.test(column.key)) {
             var metricKey = column.key.replace(/Growth$/, '');
