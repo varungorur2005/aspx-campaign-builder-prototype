@@ -2030,6 +2030,7 @@
     let psmWizardState = { step: 1, name: '', partner: 'Contoso', goals: ['MAU'], workload: 'Copilot' };
     let psmMvpTenantTableState = {
       campaignId: '', page: 1, pageSize: 10, search: '', stage: '', openPanel: '',
+      filters: {},
       visibleColumns: {
         segment: true, country: true,
         copilotLicensedMau: true, copilotLicensedMauGrowth: true,
@@ -2040,6 +2041,7 @@
         progress: true
       }
     };
+    let psmMvpTenantSearchTimer = null;
     const PSM_MVP_TENANT_COLUMNS = [
       { key: 'name', label: 'Customer / Tenant Name', fixed: true },
       { key: 'tenantId', label: 'Tenant ID', fixed: true },
@@ -3646,6 +3648,7 @@
         psmMvpTenantTableState.page = 1;
         psmMvpTenantTableState.search = '';
         psmMvpTenantTableState.stage = '';
+        psmMvpTenantTableState.filters = {};
         psmMvpTenantTableState.openPanel = '';
       }
       var detail = document.getElementById('detailView');
@@ -4091,6 +4094,7 @@
         psmMvpTenantTableState.page = 1;
         psmMvpTenantTableState.search = '';
         psmMvpTenantTableState.stage = '';
+        psmMvpTenantTableState.filters = {};
         psmMvpTenantTableState.openPanel = '';
       }
       psmTrackMode = 'rollup';
@@ -4339,8 +4343,39 @@
       var filtered = indexedCustomers.filter(function(item) {
         var customer = item.customer;
         var name = customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name;
-        if (search && (name+' '+customer.tenantId).toLowerCase().indexOf(search) === -1) return false;
+        var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
+        var searchableValues = PSM_MVP_TENANT_COLUMNS.map(function(column) {
+          if (column.key === 'name') return name;
+          if (column.key === 'progress') return stage.label;
+          if (/Growth$/.test(column.key)) {
+            var metricKey = column.key.replace(/Growth$/, '');
+            return psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0);
+          }
+          return customer[column.key] == null ? '' : customer[column.key];
+        });
+        if (search && searchableValues.join(' ').toLowerCase().indexOf(search) === -1) return false;
         if (psmMvpTenantTableState.stage && customer.stage !== psmMvpTenantTableState.stage) return false;
+        var filters = psmMvpTenantTableState.filters || {};
+        if (filters.name && name.toLowerCase().indexOf(filters.name.toLowerCase()) === -1) return false;
+        if (filters.tenantId && String(customer.tenantId || '').toLowerCase().indexOf(filters.tenantId.toLowerCase()) === -1) return false;
+        if (filters.segment && customer.segment !== filters.segment) return false;
+        if (filters.country && customer.country !== filters.country) return false;
+        if (filters.partnerName && String(customer.partnerName || '').toLowerCase().indexOf(filters.partnerName.toLowerCase()) === -1) return false;
+        if (filters.partnerMpn && String(customer.partnerMpn || '').toLowerCase().indexOf(filters.partnerMpn.toLowerCase()) === -1) return false;
+        if (filters.partnerOneId && String(customer.partnerOneId || '').toLowerCase().indexOf(filters.partnerOneId.toLowerCase()) === -1) return false;
+        if (filters.cspTier && customer.cspTier !== filters.cspTier) return false;
+        if (filters.t2ResellerId && String(customer.t2ResellerId || '').toLowerCase().indexOf(filters.t2ResellerId.toLowerCase()) === -1) return false;
+        if (filters.t2ResellerName && String(customer.t2ResellerName || '').toLowerCase().indexOf(filters.t2ResellerName.toLowerCase()) === -1) return false;
+        var numericFilters = [
+          ['copilotLicensedMau', 'mauMin'], ['copilotPau', 'pauMin'], ['coworkMau', 'coworkMin']
+        ];
+        if (numericFilters.some(function(pair) { return filters[pair[1]] !== '' && filters[pair[1]] != null && Number(customer[pair[0]] || 0) < Number(filters[pair[1]]); })) return false;
+        var growthFilters = [
+          ['copilotLicensedMau', 'mauGrowthMin'], ['copilotPau', 'pauGrowthMin'], ['coworkMau', 'coworkGrowthMin']
+        ];
+        if (growthFilters.some(function(pair) {
+          return filters[pair[1]] !== '' && filters[pair[1]] != null && ((customer[pair[0]] || 0) - (customer[pair[0]+'Baseline'] || 0)) < Number(filters[pair[1]]);
+        })) return false;
         return true;
       });
       var totalPages = Math.max(1, Math.ceil(filtered.length / psmMvpTenantTableState.pageSize));
@@ -4389,7 +4424,7 @@
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'add' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'add\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'add')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Add Customer</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn psm-mvp-toolbar-danger" onclick="psmRemoveSelectedTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6 2.5h4m-5.5 2 .6 9h5.8l.6-9M6.5 7v4m3-4v4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove Customer</button>' +
         '<input type="file" id="psmMvpBulkAddFile" accept=".csv" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')">' : '';
-      return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button></div><div class="psm-mvp-table-actions">' +
+      return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button></div><div class="psm-mvp-table-actions"><div class="toolbar-search"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="text" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search any table field" aria-label="Search any tenant table field" oninput="psmMvpQueueTenantSearch(this.value)"></div>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpOpenTenantFlyout(\'filter\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpOpenTenantFlyout(\'columns\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>' +
         ownerActions+'</div></div>'+panel;
@@ -4468,8 +4503,31 @@
       var title = document.getElementById('psmV3TablePanelTitle');
       var body = document.getElementById('psmV3TablePanelBody');
       if (panel === 'filter') {
+        var c = psmCurrentCampaign;
+        var filters = psmMvpTenantTableState.filters || {};
+        var customers = (c && c.customers) || [];
+        function options(values, selected, allLabel) {
+          var unique = values.filter(Boolean).filter(function(value, index, items) { return items.indexOf(value) === index; }).sort();
+          return '<option value="">'+allLabel+'</option>'+unique.map(function(value) { return '<option'+(value === selected ? ' selected' : '')+'>'+psmEscapeHtml(value)+'</option>'; }).join('');
+        }
+        function value(key) { return psmEscapeHtml(filters[key] == null ? '' : String(filters[key])); }
         title.textContent = 'Filter customer tenants';
-        body.innerHTML = '<div class="filter-section"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div>' +
+        body.innerHTML = '<div class="filter-section"><label>Customer / Tenant Name</label><input id="psmMvpFilterName" value="'+value('name')+'" placeholder="Contains name"></div>' +
+          '<div class="filter-section"><label>Tenant ID</label><input id="psmMvpFilterTenantId" value="'+value('tenantId')+'" placeholder="Contains Tenant ID"></div>' +
+          '<div class="filter-section"><label>Tenant Segment</label><select id="psmMvpFilterSegment">'+options(customers.map(function(customer) { return customer.segment; }), filters.segment, 'All segments')+'</select></div>' +
+          '<div class="filter-section"><label>Tenant Country/Region</label><select id="psmMvpFilterCountry">'+options(customers.map(function(customer) { return customer.country; }), filters.country, 'All countries/regions')+'</select></div>' +
+          '<div class="filter-section"><label>Copilot MAU (Licensed) - minimum</label><input type="number" min="0" id="psmMvpFilterMau" value="'+value('mauMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot MAU Growth - minimum</label><input type="number" id="psmMvpFilterMauGrowth" value="'+value('mauGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Copilot PAU - minimum</label><input type="number" min="0" id="psmMvpFilterPau" value="'+value('pauMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot PAU Growth - minimum</label><input type="number" id="psmMvpFilterPauGrowth" value="'+value('pauGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Cowork MAU - minimum</label><input type="number" min="0" id="psmMvpFilterCowork" value="'+value('coworkMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Cowork MAU Growth - minimum</label><input type="number" id="psmMvpFilterCoworkGrowth" value="'+value('coworkGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Partner Name</label><input id="psmMvpFilterPartnerName" value="'+value('partnerName')+'" placeholder="Contains partner name"></div>' +
+          '<div class="filter-section"><label>Partner Center ID (MPN)</label><input id="psmMvpFilterPartnerMpn" value="'+value('partnerMpn')+'" placeholder="Contains MPN ID"></div>' +
+          '<div class="filter-section"><label>PartnerOneID</label><input id="psmMvpFilterPartnerOneId" value="'+value('partnerOneId')+'" placeholder="Contains PartnerOneID"></div>' +
+          '<div class="filter-section"><label>CSP Tier</label><select id="psmMvpFilterCspTier">'+options(customers.map(function(customer) { return customer.cspTier; }), filters.cspTier, 'All CSP tiers')+'</select></div>' +
+          '<div class="filter-section"><label>T2 Reseller ID</label><input id="psmMvpFilterT2Id" value="'+value('t2ResellerId')+'" placeholder="Contains reseller ID"></div>' +
+          '<div class="filter-section"><label>T2 Reseller Name</label><input id="psmMvpFilterT2Name" value="'+value('t2ResellerName')+'" placeholder="Contains reseller name"></div>' +
           '<div class="filter-section"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div>' +
           '<div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmMvpClearTenantFilter()">Clear all</button></div>';
       } else {
@@ -4483,8 +4541,25 @@
     }
 
     function psmMvpApplyTenantFilter() {
-      psmMvpTenantTableState.search = document.getElementById('psmMvpTenantSearch').value.trim();
       psmMvpTenantTableState.stage = document.getElementById('psmMvpTenantStageFilter').value;
+      psmMvpTenantTableState.filters = {
+        name: document.getElementById('psmMvpFilterName').value.trim(),
+        tenantId: document.getElementById('psmMvpFilterTenantId').value.trim(),
+        segment: document.getElementById('psmMvpFilterSegment').value,
+        country: document.getElementById('psmMvpFilterCountry').value,
+        mauMin: document.getElementById('psmMvpFilterMau').value,
+        mauGrowthMin: document.getElementById('psmMvpFilterMauGrowth').value,
+        pauMin: document.getElementById('psmMvpFilterPau').value,
+        pauGrowthMin: document.getElementById('psmMvpFilterPauGrowth').value,
+        coworkMin: document.getElementById('psmMvpFilterCowork').value,
+        coworkGrowthMin: document.getElementById('psmMvpFilterCoworkGrowth').value,
+        partnerName: document.getElementById('psmMvpFilterPartnerName').value.trim(),
+        partnerMpn: document.getElementById('psmMvpFilterPartnerMpn').value.trim(),
+        partnerOneId: document.getElementById('psmMvpFilterPartnerOneId').value.trim(),
+        cspTier: document.getElementById('psmMvpFilterCspTier').value,
+        t2ResellerId: document.getElementById('psmMvpFilterT2Id').value.trim(),
+        t2ResellerName: document.getElementById('psmMvpFilterT2Name').value.trim()
+      };
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
       psmV3CloseTablePanel();
@@ -4492,12 +4567,21 @@
     }
 
     function psmMvpClearTenantFilter() {
-      psmMvpTenantTableState.search = '';
       psmMvpTenantTableState.stage = '';
+      psmMvpTenantTableState.filters = {};
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
       psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
+    }
+
+    function psmMvpQueueTenantSearch(value) {
+      window.clearTimeout(psmMvpTenantSearchTimer);
+      psmMvpTenantSearchTimer = window.setTimeout(function() {
+        psmMvpTenantTableState.search = value.trim();
+        psmMvpTenantTableState.page = 1;
+        psmRefreshTenantWorkspace();
+      }, 300);
     }
 
     function psmMvpToggleTenantColumn(key, visible) {
