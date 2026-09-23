@@ -2057,8 +2057,9 @@
       visibleColumns: {
         segment: true, country: true,
         copilotLicensedMau: true, copilotLicensedMauGrowth: true,
-        copilotPau: true, copilotPauGrowth: true,
+        npsa: true, npsaGrowth: true,
         coworkMau: true, coworkMauGrowth: true,
+        revenue: true, revenueGrowth: true,
         partnerName: false, partnerMpn: false, partnerOneId: false,
         cspTier: false, t2ResellerId: true, t2ResellerName: true,
         progress: true
@@ -2071,12 +2072,14 @@
       { key: 'workloads', label: 'Workloads', fixed: true },
       { key: 'segment', label: 'Tenant Segment' },
       { key: 'country', label: 'Tenant Country/Region' },
-      { key: 'copilotLicensedMau', label: 'Copilot MAU (Licensed)' },
-      { key: 'copilotLicensedMauGrowth', label: 'Copilot MAU Growth' },
-      { key: 'copilotPau', label: 'Copilot PAU' },
-      { key: 'copilotPauGrowth', label: 'Copilot PAU Growth' },
+      { key: 'copilotLicensedMau', label: 'Copilot Paid MAU' },
+      { key: 'copilotLicensedMauGrowth', label: 'Copilot Paid MAU (Growth)' },
+      { key: 'npsa', label: 'Copilot NPSA' },
+      { key: 'npsaGrowth', label: 'Copilot NPSA (Growth)' },
       { key: 'coworkMau', label: 'Cowork MAU' },
-      { key: 'coworkMauGrowth', label: 'Cowork MAU Growth' },
+      { key: 'coworkMauGrowth', label: 'Cowork MAU (Growth)' },
+      { key: 'revenue', label: 'Cowork Consumption Revenue' },
+      { key: 'revenueGrowth', label: 'Cowork Consumption Revenue (Growth)' },
       { key: 'partnerName', label: 'Partner Name' },
       { key: 'partnerMpn', label: 'Partner Center ID (MPN)' },
       { key: 'partnerOneId', label: 'PartnerOneID' },
@@ -3804,7 +3807,7 @@
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+(PSM_V3_OUTCOMES.length + (c.v3OtherOutcome ? 1 : 0))+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
-          '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+PSM_V3_OUTCOMES.map(function(outcome) { return '<th>'+outcome.short+' Growth</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div></div></details></div>' +
+          '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+PSM_V3_OUTCOMES.map(function(outcome) { return '<th>'+outcome.label+' (Growth)</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div></div></details></div>' +
         psmRenderMvpTenantWorkspace(c, canTransfer) +
         '';
       window.location.hash = 'psm-v3-campaign-'+id;
@@ -4352,10 +4355,10 @@
       return totals;
     }
 
-    function psmMvpGrowthText(current, baseline) {
+    function psmMvpGrowthText(current, baseline, prefix) {
       var growth = current - baseline;
       var percent = baseline ? Math.round((growth / baseline) * 100) : 0;
-      return (growth >= 0 ? '+' : '')+growth.toLocaleString()+' ('+(percent >= 0 ? '+' : '')+percent+'%)';
+      return (growth >= 0 ? '+' : '-')+(prefix || '')+Math.abs(growth).toLocaleString()+' ('+(percent >= 0 ? '+' : '')+percent+'%)';
     }
 
     function psmRenderMvpImpact(c) {
@@ -4396,9 +4399,10 @@
       if (key === 'progress') return '<span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span>';
       if (/Growth$/.test(key)) {
         var metricKey = key.replace(/Growth$/, '');
-        return '<span class="psm-mvp-growth">'+psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0)+'</span>';
+        return '<span class="psm-mvp-growth">'+psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0, metricKey === 'revenue' ? '$' : '')+'</span>';
       }
-      if (['copilotLicensedMau', 'copilotPau', 'coworkMau'].indexOf(key) > -1) return (customer[key] || 0).toLocaleString();
+      if (key === 'revenue') return '$'+(customer.revenue || 0).toLocaleString();
+      if (['copilotLicensedMau', 'npsa', 'coworkMau'].indexOf(key) > -1) return (customer[key] || 0).toLocaleString();
       return psmEscapeHtml(customer[key] || '\u2014');
     }
 
@@ -4461,11 +4465,11 @@
         if (filters.t2ResellerId && String(customer.t2ResellerId || '').toLowerCase().indexOf(filters.t2ResellerId.toLowerCase()) === -1) return false;
         if (filters.t2ResellerName && String(customer.t2ResellerName || '').toLowerCase().indexOf(filters.t2ResellerName.toLowerCase()) === -1) return false;
         var numericFilters = [
-          ['copilotLicensedMau', 'mauMin'], ['copilotPau', 'pauMin'], ['coworkMau', 'coworkMin']
+          ['copilotLicensedMau', 'mauMin'], ['npsa', 'npsaMin'], ['coworkMau', 'coworkMin'], ['revenue', 'revenueMin']
         ];
         if (numericFilters.some(function(pair) { return filters[pair[1]] !== '' && filters[pair[1]] != null && Number(customer[pair[0]] || 0) < Number(filters[pair[1]]); })) return false;
         var growthFilters = [
-          ['copilotLicensedMau', 'mauGrowthMin'], ['copilotPau', 'pauGrowthMin'], ['coworkMau', 'coworkGrowthMin']
+          ['copilotLicensedMau', 'mauGrowthMin'], ['npsa', 'npsaGrowthMin'], ['coworkMau', 'coworkGrowthMin'], ['revenue', 'revenueGrowthMin']
         ];
         if (growthFilters.some(function(pair) {
           return filters[pair[1]] !== '' && filters[pair[1]] != null && ((customer[pair[0]] || 0) - (customer[pair[0]+'Baseline'] || 0)) < Number(filters[pair[1]]);
@@ -4527,14 +4531,17 @@
       var ageDays = isNaN(baselineTime) ? 90 : Math.max(0, Math.floor((Date.now() - baselineTime) / 86400000));
       var ageFactor = Math.min(1, ageDays / 90);
       var baselineMau = typeof customer.copilotLicensedMauBaseline === 'number' ? customer.copilotLicensedMauBaseline : 80 + (metricSeed % 720);
-      var baselinePau = typeof customer.copilotPauBaseline === 'number' ? customer.copilotPauBaseline : baselineMau + 120 + (metricSeed % 540);
+      var baselineNpsa = typeof customer.npsaBaseline === 'number' ? customer.npsaBaseline : 8 + (metricSeed % 42);
       var baselineCowork = typeof customer.coworkMauBaseline === 'number' ? customer.coworkMauBaseline : 12 + (metricSeed % 180);
+      var baselineRevenue = typeof customer.revenueBaseline === 'number' ? customer.revenueBaseline : 4800 + (metricSeed % 38) * 650;
       customer.copilotLicensedMauBaseline = baselineMau;
       customer.copilotLicensedMau = typeof customer.copilotLicensedMau === 'number' ? customer.copilotLicensedMau : baselineMau + Math.round((18 + (metricSeed % 145)) * ageFactor);
-      customer.copilotPauBaseline = baselinePau;
-      customer.copilotPau = typeof customer.copilotPau === 'number' ? customer.copilotPau : baselinePau + Math.round((25 + (metricSeed % 190)) * ageFactor);
+      customer.npsaBaseline = baselineNpsa;
+      customer.npsa = typeof customer.npsa === 'number' && customer.npsa > 0 ? customer.npsa : baselineNpsa + Math.round((3 + (metricSeed % 18)) * ageFactor);
       customer.coworkMauBaseline = baselineCowork;
       customer.coworkMau = typeof customer.coworkMau === 'number' ? customer.coworkMau : baselineCowork + Math.round((4 + (metricSeed % 52)) * ageFactor);
+      customer.revenueBaseline = baselineRevenue;
+      customer.revenue = typeof customer.revenue === 'number' && customer.revenue > 0 ? customer.revenue : baselineRevenue + Math.round((900 + (metricSeed % 6400)) * ageFactor);
       customer.segment = customer.segment || PSM_SEGMENTS[metricSeed % PSM_SEGMENTS.length];
       customer.country = customer.country || PSM_TENANT_COUNTRIES[metricSeed % PSM_TENANT_COUNTRIES.length];
       customer.partnerName = customer.partnerName || c.partner;
@@ -4606,12 +4613,14 @@
           '<div class="filter-section"><label>Tenant ID</label><input id="psmMvpFilterTenantId" value="'+value('tenantId')+'" placeholder="Contains Tenant ID"></div>' +
           '<div class="filter-section"><label>Tenant Segment</label><select id="psmMvpFilterSegment">'+options(customers.map(function(customer) { return customer.segment; }), filters.segment, 'All segments')+'</select></div>' +
           '<div class="filter-section"><label>Tenant Country/Region</label><select id="psmMvpFilterCountry">'+options(customers.map(function(customer) { return customer.country; }), filters.country, 'All countries/regions')+'</select></div>' +
-          '<div class="filter-section"><label>Copilot MAU (Licensed) - minimum</label><input type="number" min="0" id="psmMvpFilterMau" value="'+value('mauMin')+'" placeholder="Any value"></div>' +
-          '<div class="filter-section"><label>Copilot MAU Growth - minimum</label><input type="number" id="psmMvpFilterMauGrowth" value="'+value('mauGrowthMin')+'" placeholder="Any growth"></div>' +
-          '<div class="filter-section"><label>Copilot PAU - minimum</label><input type="number" min="0" id="psmMvpFilterPau" value="'+value('pauMin')+'" placeholder="Any value"></div>' +
-          '<div class="filter-section"><label>Copilot PAU Growth - minimum</label><input type="number" id="psmMvpFilterPauGrowth" value="'+value('pauGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Copilot Paid MAU - minimum</label><input type="number" min="0" id="psmMvpFilterMau" value="'+value('mauMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot Paid MAU Growth - minimum</label><input type="number" id="psmMvpFilterMauGrowth" value="'+value('mauGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Copilot NPSA - minimum</label><input type="number" min="0" id="psmMvpFilterNpsa" value="'+value('npsaMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot NPSA Growth - minimum</label><input type="number" id="psmMvpFilterNpsaGrowth" value="'+value('npsaGrowthMin')+'" placeholder="Any growth"></div>' +
           '<div class="filter-section"><label>Cowork MAU - minimum</label><input type="number" min="0" id="psmMvpFilterCowork" value="'+value('coworkMin')+'" placeholder="Any value"></div>' +
           '<div class="filter-section"><label>Cowork MAU Growth - minimum</label><input type="number" id="psmMvpFilterCoworkGrowth" value="'+value('coworkGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Cowork Consumption Revenue - minimum</label><input type="number" min="0" id="psmMvpFilterRevenue" value="'+value('revenueMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Cowork Consumption Revenue Growth - minimum</label><input type="number" id="psmMvpFilterRevenueGrowth" value="'+value('revenueGrowthMin')+'" placeholder="Any growth"></div>' +
           '<div class="filter-section"><label>Partner Name</label><input id="psmMvpFilterPartnerName" value="'+value('partnerName')+'" placeholder="Contains partner name"></div>' +
           '<div class="filter-section"><label>Partner Center ID (MPN)</label><input id="psmMvpFilterPartnerMpn" value="'+value('partnerMpn')+'" placeholder="Contains MPN ID"></div>' +
           '<div class="filter-section"><label>PartnerOneID</label><input id="psmMvpFilterPartnerOneId" value="'+value('partnerOneId')+'" placeholder="Contains PartnerOneID"></div>' +
@@ -4639,10 +4648,12 @@
         country: document.getElementById('psmMvpFilterCountry').value,
         mauMin: document.getElementById('psmMvpFilterMau').value,
         mauGrowthMin: document.getElementById('psmMvpFilterMauGrowth').value,
-        pauMin: document.getElementById('psmMvpFilterPau').value,
-        pauGrowthMin: document.getElementById('psmMvpFilterPauGrowth').value,
+        npsaMin: document.getElementById('psmMvpFilterNpsa').value,
+        npsaGrowthMin: document.getElementById('psmMvpFilterNpsaGrowth').value,
         coworkMin: document.getElementById('psmMvpFilterCowork').value,
         coworkGrowthMin: document.getElementById('psmMvpFilterCoworkGrowth').value,
+        revenueMin: document.getElementById('psmMvpFilterRevenue').value,
+        revenueGrowthMin: document.getElementById('psmMvpFilterRevenueGrowth').value,
         partnerName: document.getElementById('psmMvpFilterPartnerName').value.trim(),
         partnerMpn: document.getElementById('psmMvpFilterPartnerMpn').value.trim(),
         partnerOneId: document.getElementById('psmMvpFilterPartnerOneId').value.trim(),
@@ -4782,9 +4793,10 @@
       var rows = [[
         'Customer / Tenant Name', 'Tenant ID', 'Tenant Segment', 'Tenant Country/Region',
         'Partner Name', 'Partner Center ID (MPN)', 'PartnerOneID', 'CSP Tier', 'T2 Reseller ID', 'T2 Reseller Name',
-        'Copilot MAU (Licensed) Baseline', 'Copilot MAU (Licensed) Current', 'Copilot MAU (Licensed) Growth',
-        'Copilot PAU Baseline', 'Copilot PAU Current', 'Copilot PAU Growth',
-        'Cowork MAU Baseline', 'Cowork MAU Current', 'Cowork MAU Growth', 'Progress'
+        'Copilot Paid MAU Baseline', 'Copilot Paid MAU Current', 'Copilot Paid MAU Growth',
+        'Copilot NPSA Baseline', 'Copilot NPSA Current', 'Copilot NPSA Growth',
+        'Cowork MAU Baseline', 'Cowork MAU Current', 'Cowork MAU Growth',
+        'Cowork Consumption Revenue Baseline', 'Cowork Consumption Revenue Current', 'Cowork Consumption Revenue Growth', 'Progress'
       ]];
       c.customers.forEach(function(customer) {
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
@@ -4793,8 +4805,9 @@
           customer.tenantId, customer.segment, customer.country,
           customer.partnerName, customer.partnerMpn, customer.partnerOneId, customer.cspTier, customer.t2ResellerId, customer.t2ResellerName,
           customer.copilotLicensedMauBaseline, customer.copilotLicensedMau, customer.copilotLicensedMau - customer.copilotLicensedMauBaseline,
-          customer.copilotPauBaseline, customer.copilotPau, customer.copilotPau - customer.copilotPauBaseline,
+          customer.npsaBaseline, customer.npsa, customer.npsa - customer.npsaBaseline,
           customer.coworkMauBaseline, customer.coworkMau, customer.coworkMau - customer.coworkMauBaseline,
+          customer.revenueBaseline, customer.revenue, customer.revenue - customer.revenueBaseline,
           stage.label
         ]);
       });
