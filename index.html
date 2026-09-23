@@ -730,18 +730,30 @@
     .psm-mvp-status-highlight { flex:0 0 auto; display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--cp-accent); border-radius:0.625rem; background:var(--cp-accent-soft); }
     .psm-mvp-status-highlight label { color:var(--cp-accent); font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
     .psm-mvp-status-highlight select { min-width:130px; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
-    .psm-v3-header-controls { display:flex; align-items:flex-start; gap:8px; width:100%; margin-top:16px; }
-    .psm-v3-header-controls-left { display:flex; align-items:flex-start; gap:8px; min-width:0; flex:1 1 auto; }
-    .psm-v3-header-controls .psm-mvp-status-highlight { justify-content:space-between; gap:8px; min-height:64px; padding:8px 10px; box-sizing:border-box; }
-    .psm-v3-header-controls .psm-mvp-status-highlight select { min-width:115px; }
-    .psm-v3-owner-highlight { margin-left:auto; }
-    .psm-v3-owner-highlight select { min-width:130px !important; }
+    .psm-v3-header-controls { display:flex; align-items:stretch; gap:8px; width:100%; margin-top:16px; }
+    .psm-v3-header-card { min-height:92px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); box-sizing:border-box; }
+    .psm-v3-header-card-label { display:block; margin-bottom:7px; color:var(--cp-text-muted); font-size:12px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
+    .psm-v3-campaign-status { flex:0 0 138px; }
+    .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:20px; line-height:1.25; }
+    .psm-v3-owner-highlight { flex:0 0 248px; }
+    .psm-v3-owner-controls { display:flex; align-items:center; gap:6px; }
+    .psm-v3-owner-highlight select { min-width:0; flex:1 1 auto; padding:7px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
     .psm-v3-owner-highlight .btn { min-height:32px; padding:6px 10px; white-space:nowrap; }
     .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
-    .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:4px; min-width:0; }
-    .psm-v3-tenant-status-item { min-width:0; padding-left:6px; border-left:1px solid var(--cp-border); }
-    .psm-v3-tenant-status-item strong { display:block; color:var(--cp-text); font-size:13px; line-height:1.1; }
-    .psm-v3-tenant-status-item span { display:block; margin-top:2px; color:var(--cp-text-muted); font-size:9px; line-height:1.15; }
+    .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:6px; min-width:0; }
+    .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
+    .psm-v3-tenant-status-item strong { display:block; color:var(--cp-text); font-size:19px; line-height:1; }
+    .psm-v3-tenant-status-item span { display:block; margin-top:4px; color:var(--cp-text-muted); font-size:11px; font-weight:600; line-height:1.15; }
+    .psm-v3-update-button { flex:0 0 auto; align-self:center; min-height:40px; padding:9px 14px; white-space:nowrap; }
+    #psmV3TablePanel.campaign-update-panel .filter-panel { width:400px; }
+    .psm-v3-status-search { position:relative; margin-bottom:12px; }
+    .psm-v3-status-search svg { position:absolute; top:50%; left:10px; width:16px; height:16px; color:var(--cp-text-muted); transform:translateY(-50%); pointer-events:none; }
+    .psm-v3-status-search input { width:100%; padding:9px 10px 9px 34px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .psm-v3-status-options { display:flex; flex-direction:column; gap:6px; }
+    .psm-v3-status-option { display:flex; align-items:center; gap:9px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); cursor:pointer; }
+    .psm-v3-status-option:has(input:checked) { border-color:var(--cp-link); background:var(--cp-surface-soft); font-weight:700; }
+    .psm-v3-update-history { margin-top:22px; padding-top:18px; border-top:1px solid var(--cp-border); }
+    .psm-v3-update-history h4 { margin:0 0 8px; color:var(--cp-text); font-size:15px; }
     .psm-mvp-section-title { display:flex; align-items:center; gap:7px; }
     .psm-v3-detail .psm-v3-section-heading,
     .psm-v3-detail .psm-mvp-section-title { margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--cp-border); color:var(--cp-text); font-size:15px; font-weight:700; line-height:1.3; text-transform:none; letter-spacing:normal; }
@@ -761,8 +773,8 @@
     @media (max-width:700px) {
       .psm-mvp-detail-heading { flex-direction:column; }
       .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
-      .psm-v3-header-controls, .psm-v3-header-controls-left { align-items:stretch; flex-direction:column; }
-      .psm-v3-owner-highlight { margin-left:0; }
+      .psm-v3-header-controls { align-items:stretch; flex-direction:column; }
+      .psm-v3-campaign-status, .psm-v3-owner-highlight { flex-basis:auto; }
       .psm-v3-tenant-highlight { min-width:0; }
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
       .psm-mvp-impact-grid { grid-template-columns:1fr; }
@@ -1478,16 +1490,6 @@
         <div class="form-group full"><label>Initial campaign note</label><textarea id="v3InitialNote" placeholder="Optional context, partner feedback, risks, or next steps"></textarea></div>
       </div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3CreateModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3CreateCampaign()">Create campaign</he-button_psmv3></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="psmV3StatusModal">
-    <div class="modal" style="width:520px;">
-      <h3>Update campaign</h3>
-      <p>Update the campaign status. A campaign can be closed only after every customer tenant reaches Outcome Measured.</p>
-      <div class="form-group"><label>Campaign status</label><select id="v3StatusValue"></select></div>
-      <div class="form-group"><label>Update note <span class="required">*</span></label><textarea id="v3StatusNote" placeholder="Explain what changed and the next step"></textarea></div>
-      <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3StatusModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3SaveStatus()">Save update</he-button_psmv3></div>
     </div>
   </div>
 
@@ -3044,7 +3046,8 @@
     }
 
     function psmV3CloseTablePanel() {
-      document.getElementById('psmV3TablePanel').classList.remove('show');
+      var panel = document.getElementById('psmV3TablePanel');
+      panel.classList.remove('show', 'campaign-update-panel');
     }
 
     function psmV3DownloadCampaigns() {
@@ -3518,21 +3521,45 @@
       psmV3OpenDetail(id);
     }
 
-    function psmV3OpenStatus(id, requestedStatus) {
+    function psmV3ActivityHistoryHtml(c) {
+      var history = [];
+      (c.v3Notes || []).slice().reverse().forEach(function(note) {
+        history.push('<div class="v3-activity"><time>'+psmEscapeHtml(note.date)+'</time><div><strong>Campaign update</strong><br>'+psmEscapeHtml(note.text)+'<br><span style="color:var(--cp-text-muted);">'+psmEscapeHtml(note.author)+'</span></div></div>');
+      });
+      (c.v3Activity || []).slice().reverse().forEach(function(item) {
+        history.push('<div class="v3-activity"><time>'+psmEscapeHtml(item.date)+'</time><div><strong>'+psmEscapeHtml(item.type)+'</strong><br>'+psmEscapeHtml(item.detail)+'</div></div>');
+      });
+      return history.join('') || '<div style="padding:12px 0;color:var(--cp-text-muted);font-size:12px;">No campaign activity yet.</div>';
+    }
+
+    function psmV3OpenCampaignUpdate(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       psmV3CurrentCampaign = c;
-      document.getElementById('v3StatusValue').innerHTML = PSM_V3_STATUS_FLOW.map(function(status) {
-        return '<option'+(status === (requestedStatus || c.v3Status) ? ' selected' : '')+'>'+status+'</option>';
-      }).join('');
-      document.getElementById('v3StatusNote').value = '';
-      showModal('psmV3StatusModal');
+      var panel = document.getElementById('psmV3TablePanel');
+      document.getElementById('psmV3TablePanelTitle').textContent = 'Update Campaign';
+      document.getElementById('psmV3TablePanelBody').innerHTML =
+        '<div class="filter-section"><label>Campaign status</label><div class="psm-v3-status-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="search" placeholder="Search campaign status" aria-label="Search campaign status" oninput="psmV3FilterCampaignStatuses(this.value)"></div><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
+          return '<label class="psm-v3-status-option" data-status="'+status.toLowerCase()+'"><input type="radio" name="v3FlyoutStatus" value="'+status+'"'+(status === c.v3Status ? ' checked' : '')+'><span>'+status+'</span></label>';
+        }).join('')+'</div></div>' +
+        '<div class="form-group"><label for="v3FlyoutStatusNote">Update note <span class="required">*</span></label><textarea id="v3FlyoutStatusNote" placeholder="Explain what changed and the next step"></textarea></div>' +
+        '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveStatus()">Save update</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>' +
+        '<section class="psm-v3-update-history"><h4>Activity History</h4>'+psmV3ActivityHistoryHtml(c)+'</section>';
+      panel.classList.add('campaign-update-panel', 'show');
+    }
+
+    function psmV3FilterCampaignStatuses(value) {
+      var term = value.trim().toLowerCase();
+      document.querySelectorAll('.psm-v3-status-option').forEach(function(option) {
+        option.style.display = !term || option.getAttribute('data-status').indexOf(term) > -1 ? '' : 'none';
+      });
     }
 
     function psmV3SaveStatus() {
       var c = psmV3CurrentCampaign;
-      var status = document.getElementById('v3StatusValue').value;
-      var note = document.getElementById('v3StatusNote').value.trim();
+      var selected = document.querySelector('input[name="v3FlyoutStatus"]:checked');
+      var status = selected ? selected.value : '';
+      var note = document.getElementById('v3FlyoutStatusNote').value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
       if (status === 'Closed' && (c.customers || []).some(function(customer) { return customer.stage !== 'outcomeMeasured'; })) {
         showToast('Every customer tenant must reach Outcome Measured before the campaign can be closed', true);
@@ -3544,7 +3571,7 @@
       c.v3LastUpdated = today();
       c.v3Activity = c.v3Activity || [];
       c.v3Activity.push({ date: today(), type: 'Campaign status', detail: previous+' → '+status+'. '+note });
-      hideModal('psmV3StatusModal');
+      psmV3CloseTablePanel();
       showToast('Campaign updated to '+status);
       psmV3OpenDetail(c.id);
     }
@@ -3724,8 +3751,6 @@
           return '<td>'+(c.v3BaselineAvailable ? '+'+delta.toLocaleString() : '\u2014')+'</td>';
         }).join('')+'</tr>';
       }).join('');
-      var notes = c.v3Notes.slice().reverse().map(function(note) { return '<div class="v3-note"><div class="v3-note-meta">'+psmEscapeHtml(note.date)+' · '+psmEscapeHtml(note.author)+'</div>'+psmEscapeHtml(note.text)+'</div>'; }).join('') || '<div style="color:var(--cp-text-muted);font-size:12px;">No campaign notes yet.</div>';
-      var activity = (c.v3Activity || []).slice().reverse().map(function(item) { return '<div class="v3-activity"><time>'+psmEscapeHtml(item.date)+'</time><div><strong>'+psmEscapeHtml(item.type)+'</strong><br>'+psmEscapeHtml(item.detail)+'</div></div>'; }).join('');
       var outcomeNames = c.v3Outcomes.map(function(id) {
         var outcome = PSM_V3_OUTCOMES.filter(function(item) { return item.id === id; })[0];
         return outcome ? outcome.label : id;
@@ -3743,11 +3768,8 @@
           '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-controls-left"><div class="psm-mvp-status-highlight"><label for="v3HeaderStatus">Campaign Status</label><select id="v3HeaderStatus" onchange="psmV3OpenStatus(\''+c.id+'\',this.value)"'+(canTransfer ? '' : ' disabled')+'>'+PSM_V3_STATUS_FLOW.map(function(status) { return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div><div class="psm-mvp-status-highlight psm-v3-tenant-highlight"><label>Tenant Status</label><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div></div><div class="psm-mvp-status-highlight psm-v3-owner-highlight"><label for="v3DetailOwner">Campaign Owner</label><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div>' +
+        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong></div><div class="psm-v3-header-card psm-v3-tenant-highlight"><span class="psm-v3-header-card-label">Tenant Status</span><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><label class="psm-v3-header-card-label" for="v3DetailOwner">Campaign Owner</label><div class="psm-v3-owner-controls"><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canTransfer ? '' : ' disabled')+'>Update Campaign</button></div></div>' +
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
-        '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Update</h2></summary><div class="psm-v3-section-collapse-body"><div class="form-group"><textarea id="v3NoteText" class="psm-campaign-update" maxlength="2000" aria-label="Campaign update" placeholder="Add campaign progress, risks, decisions, or next steps..."'+(canTransfer ? '' : ' readonly')+'></textarea></div>' +
-          (canTransfer ? '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmV3AddNote(\''+c.id+'\')">Save campaign update</button></div>' : '<div style="color:var(--cp-text-muted);font-size:12px;">Only the assigned Microsoft DRI can update this campaign.</div>') +
-          '<details class="psm-mvp-update-history"><summary class="psm-v3-activity-summary">Activity History <span class="psm-mvp-update-count">'+((c.v3Notes || []).length + (c.v3Activity || []).length)+' updates</span></summary><div class="psm-mvp-update-list"><div>'+notes+'</div><div>'+activity+'</div></div></details></div></details></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+(PSM_V3_OUTCOMES.length + (c.v3OtherOutcome ? 1 : 0))+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
           '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+PSM_V3_OUTCOMES.map(function(outcome) { return '<th>'+outcome.short+' Growth</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div>' +
