@@ -940,6 +940,11 @@
     .v3-bar-row { display:grid; grid-template-columns:90px 1fr 36px; align-items:center; gap:8px; margin:8px 0; color:var(--cp-text-muted); font-size:11px; }
     .v3-bar-track { height:12px; overflow:hidden; border-radius:0.625rem; background:var(--cp-surface-soft); }
     .v3-bar-fill { height:100%; border-radius:0.625rem; background:var(--cp-accent); }
+    .v3-pie-layout { display:flex; align-items:center; justify-content:center; gap:28px; min-height:190px; }
+    .v3-pie-chart { flex:0 0 150px; width:150px; height:150px; }
+    .v3-chart-legend { display:flex; flex-direction:column; gap:10px; min-width:150px; }
+    .v3-chart-legend-row { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:8px; color:var(--cp-text-muted); font-size:12px; }
+    .v3-chart-legend-swatch { width:12px; height:12px; border-radius:3px; }
     .v3-trend-svg { width:100%; height:150px; }
     .v3-table-wrap { overflow:auto; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-table { width:100%; min-width:1500px; border-collapse:collapse; font-size:12px; }
@@ -2834,27 +2839,46 @@
 
     function psmV3RenderCharts(campaigns) {
       var statuses = PSM_V3_STATUS_FLOW;
-      var maxStatus = Math.max.apply(null, statuses.map(function(status) { return campaigns.filter(function(c) { return c.v3Status === status; }).length; }).concat([1]));
-      var bars = statuses.map(function(status) {
-        var count = campaigns.filter(function(c) { return c.v3Status === status; }).length;
-        return '<div class="v3-bar-row"><span>'+status+'</span><div class="v3-bar-track"><div class="v3-bar-fill" style="width:'+Math.round(count / maxStatus * 100)+'%;"></div></div><strong>'+count+'</strong></div>';
+      var statusCounts = statuses.map(function(status) {
+        return campaigns.filter(function(c) { return c.v3Status === status; }).length;
+      });
+      var statusColors = ['var(--cp-accent)', 'var(--cp-success)', 'var(--cp-warning)'];
+      function pieSlices(counts, labels, colors) {
+        var total = counts.reduce(function(sum, count) { return sum + count; }, 0);
+        var startAngle = -Math.PI / 2;
+        return counts.map(function(count, index) {
+          if (!count || !total) return '';
+          var endAngle = startAngle + (count / total) * Math.PI * 2;
+          var largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+          var startX = 75 + 62 * Math.cos(startAngle);
+          var startY = 75 + 62 * Math.sin(startAngle);
+          var endX = 75 + 62 * Math.cos(endAngle);
+          var endY = 75 + 62 * Math.sin(endAngle);
+          var path = count === total
+            ? '<circle cx="75" cy="75" r="62" fill="'+colors[index]+'"><title>'+psmEscapeHtml(labels[index])+': '+count+'</title></circle>'
+            : '<path d="M 75 75 L '+startX+' '+startY+' A 62 62 0 '+largeArc+' 1 '+endX+' '+endY+' Z" fill="'+colors[index]+'"><title>'+psmEscapeHtml(labels[index])+': '+count+'</title></path>';
+          startAngle = endAngle;
+          return path;
+        }).join('');
+      }
+      var slices = pieSlices(statusCounts, statuses, statusColors);
+      var statusLegend = statuses.map(function(status, index) {
+        return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+statusColors[index]+';"></span><span>'+status+'</span><strong>'+statusCounts[index]+'</strong></div>';
       }).join('');
-      var periods = ['Baseline', 'M1', 'M2', 'M3', 'M4', 'Current'];
-      var fractions = [0, .16, .34, .54, .76, 1];
-      var metrics = ['paidMau', 'pru', 'npsa', 'revenue'];
-      var lines = metrics.map(function(metric, metricIndex) {
-        var totalBaseline = campaigns.reduce(function(sum, c) { return sum + (c.v3Outcomes.indexOf(metric) > -1 && c.v3BaselineAvailable ? c.v3Metrics[metric].baseline : 0); }, 0);
-        var totalCurrent = campaigns.reduce(function(sum, c) { return sum + (c.v3Outcomes.indexOf(metric) > -1 && c.v3BaselineAvailable ? c.v3Metrics[metric].current : 0); }, 0);
-        var maxValue = Math.max(totalCurrent, 1);
-        var points = fractions.map(function(fraction, index) {
-          var value = totalBaseline + (totalCurrent - totalBaseline) * fraction;
-          return (24 + index * 76)+','+(125 - (value / maxValue) * 92);
-        }).join(' ');
-        var dash = metricIndex === 1 ? ' stroke-dasharray="5 4"' : '';
-        return '<polyline points="'+points+'" fill="none" stroke="var(--cp-accent)" stroke-width="'+(3 - metricIndex * .5)+'" opacity="'+(1 - metricIndex * .22)+'"'+dash+'><title>'+PSM_V3_OUTCOMES.filter(function(o) { return o.id === metric; })[0].label+'</title></polyline>';
+      var outcomeCounts = PSM_V3_OUTCOMES.map(function(outcome) {
+        return { label: outcome.label, count: campaigns.filter(function(c) { return c.v3Outcomes.indexOf(outcome.id) > -1; }).length };
+      });
+      var otherCount = campaigns.filter(function(c) { return !!c.v3OtherOutcome; }).length;
+      if (otherCount) outcomeCounts.push({ label: 'Other', count: otherCount });
+      var outcomeColors = ['var(--cp-accent)', 'var(--cp-success)', 'var(--cp-warning)', 'var(--cp-link)', 'var(--cp-danger)'];
+      var outcomeLabels = outcomeCounts.map(function(outcome) { return outcome.label; });
+      var outcomeValues = outcomeCounts.map(function(outcome) { return outcome.count; });
+      var outcomeSlices = pieSlices(outcomeValues, outcomeLabels, outcomeColors);
+      var outcomeLegend = outcomeCounts.map(function(outcome, index) {
+        return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+outcomeColors[index]+';"></span><span>'+psmEscapeHtml(outcome.label)+'</span><strong>'+outcome.count+'</strong></div>';
       }).join('');
-      document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts"><he-card_psmv3 class="v3-card"><h2>Campaigns by status</h2>'+bars+'</he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Portfolio growth vs. FY target</h2><svg class="v3-trend-svg" viewBox="0 0 430 150" role="img" aria-label="Portfolio outcome progression">'+[30,60,90,120].map(function(y) { return '<line x1="24" y1="'+y+'" x2="410" y2="'+y+'" stroke="var(--cp-border)" />'; }).join('')+lines+'<line x1="24" y1="34" x2="410" y2="34" stroke="var(--cp-warning)" stroke-width="2" stroke-dasharray="7 5"><title>Fiscal-year target</title></line></svg><div style="display:flex;justify-content:space-between;color:var(--cp-text-muted);font-size:10px;">'+periods.map(function(period) { return '<span>'+period+'</span>'; }).join('')+'</div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Portfolio telemetry trends · Dashed target line: fiscal-year target · Revenue is provisional</div></he-card_psmv3></div>';
+      document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts"><he-card_psmv3 class="v3-card"><h2>Campaigns by status</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by status pie chart">'+(slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+statusLegend+'</div></div></he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Campaigns by business outcome</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by business outcome pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple business outcomes are counted in each applicable outcome.</div></he-card_psmv3></div>';
     }
 
     function psmV3PriorityChips(c) {
