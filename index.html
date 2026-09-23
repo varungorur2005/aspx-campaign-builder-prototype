@@ -964,7 +964,13 @@
     .v3-modal .form-group { margin-bottom:14px; }
     .v3-modal .form-group.full { grid-column:1 / -1; }
     .v3-modal .form-group input, .v3-modal .form-group select, .v3-modal .form-group textarea { border-color:var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
-    .v3-outcomes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .v3-outcomes { position:relative; }
+    .v3-outcome-select { position:relative; }
+    .v3-outcome-select > summary { display:flex; align-items:center; justify-content:space-between; min-height:38px; padding:8px 12px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); cursor:pointer; list-style:none; }
+    .v3-outcome-select > summary::-webkit-details-marker { display:none; }
+    .v3-outcome-select > summary::after { content:"▾"; margin-left:12px; color:var(--cp-text-muted); }
+    .v3-outcome-select[open] > summary::after { transform:rotate(180deg); }
+    .v3-outcome-menu { position:absolute; z-index:30; top:calc(100% + 4px); left:0; right:0; display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); box-shadow:var(--cp-shadow); }
     .v3-outcome-option { display:flex; gap:8px; align-items:center; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); font-size:12px; }
     .v3-other-outcome-row { display:flex; align-items:center; gap:8px; grid-column:1 / -1; }
     .v3-other-outcome-row .v3-outcome-option { min-width:calc(50% - 4px); }
@@ -972,7 +978,7 @@
     .v3-other-outcome.show { display:block; }
     .v3-other-outcome input { width:100%; }
     .v3-partner-lookup-label { display:flex; align-items:center; gap:7px; font-weight:600; white-space:nowrap; }
-    .v3-create-partner-row { display:grid; grid-template-columns:auto 150px minmax(0,1fr); gap:8px; align-items:center; }
+    .v3-create-partner-row { display:grid; grid-template-columns:150px minmax(0,1fr) auto; gap:8px; align-items:center; margin-top:6px; }
     .v3-create-partner-search { position:relative; }
     .v3-create-partner-search svg { position:absolute; left:10px; top:50%; width:16px; height:16px; color:var(--cp-text-muted); transform:translateY(-50%); pointer-events:none; }
     .v3-create-partner-search input { width:100%; padding-left:34px !important; }
@@ -983,7 +989,8 @@
     .v3-tooltip:hover .v3-tooltip-text, .v3-tooltip:focus .v3-tooltip-text { visibility:visible; opacity:1; }
     .v3-upload { padding:14px; border:1px dashed var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .v3-upload textarea { width:100%; min-height:92px; margin:8px 0; }
-    .v3-tenant-methods { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .v3-tenant-methods { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:stretch; }
+    .v3-tenant-or { display:flex; align-items:center; justify-content:center; color:var(--cp-text-muted); font-size:12px; font-weight:700; }
     .v3-tenant-method { display:flex; flex-direction:column; min-height:190px; padding:14px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-tenant-method p { margin:4px 0 10px; color:var(--cp-text-muted); font-size:11px; line-height:1.4; }
     .v3-tenant-method textarea { flex:1; min-height:100px; margin:0 0 10px; }
@@ -1439,8 +1446,8 @@
       <div class="v3-modal-grid">
         <div class="form-group full"><label>Campaign name <span class="required">*</span></label><input id="v3CampaignName" placeholder="e.g. Contoso FY27 Copilot growth"></div>
         <div class="form-group full"><label>Business outcome <span class="required">*</span></label><div class="v3-outcomes" id="v3OutcomeOptions"></div></div>
-        <div class="form-group full"><div class="v3-create-partner-row"><div class="v3-partner-lookup-label">Enter PartnerOne ID or MPN ID <span class="v3-tooltip" tabindex="0" aria-label="Partner identifier tip">?<span class="v3-tooltip-text">Tip: You may enter a single Partner One ID or multiple MPN IDs (comma-separated).</span></span> <span class="required">*</span></div><select id="v3PartnerIdType" onchange="psmV3UpdateCreatePartnerPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter PartnerOne ID (Limit one at a time)" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}" onblur="psmV3FindCreatePartner()"></div></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div>
-        <div class="form-group full"><label>Tenant IDs <span class="required">*</span></label><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box"><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation">Add Tenant IDs, then validate that each ID is valid and associated with the selected partner.</div></div></div></div>
+        <div class="form-group full"><div class="v3-partner-lookup-label">Enter PartnerOne ID or MPN ID <span class="v3-tooltip" tabindex="0" aria-label="Partner identifier tip">?<span class="v3-tooltip-text">Tip: You may enter a single Partner One ID or multiple MPN IDs (comma-separated).</span></span> <span class="required">*</span></div><div class="v3-create-partner-row"><select id="v3PartnerIdType" onchange="psmV3UpdateCreatePartnerPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter PartnerOne ID (Limit one at a time)" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div>
+        <div class="form-group full"><label>Tenant IDs <span class="required">*</span></label><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box"><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation">Add Tenant IDs, then validate that each ID is valid and associated with the selected partner.</div></div></div></div>
         <div class="form-group full"><label>Initial campaign note</label><textarea id="v3InitialNote" placeholder="Optional context, partner feedback, risks, or next steps"></textarea></div>
       </div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3CreateModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3CreateCampaign()">Create campaign</he-button_psmv3></div>
@@ -3018,12 +3025,16 @@
     function psmV3OutcomeOptions(containerId, prefix, selected) {
       selected = selected || [];
       var options = PSM_V3_OUTCOMES.map(function(outcome) {
-        return '<label class="v3-outcome-option"><input type="checkbox" name="'+prefix+'Outcome" value="'+outcome.id+'"'+(selected.indexOf(outcome.id) > -1 ? ' checked' : '')+(prefix === 'v3Migration' ? ' onchange="psmV3RenderMigrationMetrics()"' : '')+'><strong>'+outcome.label+'</strong></label>';
+        var change = prefix === 'v3Migration' ? 'psmV3RenderMigrationMetrics()' : 'psmV3UpdateOutcomeSummary()';
+        return '<label class="v3-outcome-option"><input type="checkbox" name="'+prefix+'Outcome" value="'+outcome.id+'"'+(selected.indexOf(outcome.id) > -1 ? ' checked' : '')+' onchange="'+change+'"><strong>'+outcome.label+'</strong></label>';
       }).join('');
       if (prefix === 'v3') {
-        options += '<div class="v3-other-outcome-row"><label class="v3-outcome-option"><input type="checkbox" name="v3Outcome" value="other" onchange="psmV3ToggleOtherOutcome(this.checked)"><strong>Other</strong></label><div class="v3-other-outcome" id="v3OtherOutcomeWrap"><input id="v3OtherOutcomeText" maxlength="120" placeholder="Enter another business outcome"></div></div>';
+        options += '<div class="v3-other-outcome-row"><label class="v3-outcome-option"><input type="checkbox" name="v3Outcome" value="other" onchange="psmV3ToggleOtherOutcome(this.checked);psmV3UpdateOutcomeSummary()"><strong>Other</strong></label><div class="v3-other-outcome" id="v3OtherOutcomeWrap"><input id="v3OtherOutcomeText" maxlength="120" placeholder="Enter another business outcome"></div></div>';
+        document.getElementById(containerId).innerHTML = '<details class="v3-outcome-select"><summary id="v3OutcomeSummary">Select business outcomes</summary><div class="v3-outcome-menu">'+options+'</div></details>';
+        psmV3UpdateOutcomeSummary();
+        return;
       }
-      document.getElementById(containerId).innerHTML = options;
+      document.getElementById(containerId).innerHTML = '<div class="v3-outcome-menu" style="position:static;box-shadow:none;">'+options+'</div>';
     }
 
     function psmV3SelectedOutcomes(prefix) {
@@ -3054,6 +3065,18 @@
       var wrap = document.getElementById('v3OtherOutcomeWrap');
       wrap.classList.toggle('show', show);
       if (!show) document.getElementById('v3OtherOutcomeText').value = '';
+    }
+
+    function psmV3UpdateOutcomeSummary() {
+      var summary = document.getElementById('v3OutcomeSummary');
+      if (!summary) return;
+      var selected = psmV3SelectedOutcomes('v3');
+      var labels = selected.map(function(id) {
+        if (id === 'other') return 'Other';
+        var outcome = PSM_V3_OUTCOMES.filter(function(item) { return item.id === id; })[0];
+        return outcome ? outcome.label : id;
+      });
+      summary.textContent = labels.length ? labels.join(', ') : 'Select business outcomes';
     }
 
     function psmV3UpdateCreatePartnerPlaceholder() {
