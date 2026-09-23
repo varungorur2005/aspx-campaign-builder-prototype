@@ -2950,8 +2950,8 @@
     const PSM_V3_OUTCOMES = [
       { id: 'paidMau', label: 'Copilot Paid MAU', short: 'MAU', pending: false },
       { id: 'npsa', label: 'Copilot NPSA', short: 'NPSA', pending: false },
-      { id: 'revenue', label: 'Cowork Consumption Revenue', short: 'Cowork Revenue', pending: false },
-      { id: 'pru', label: 'Cowork MAU', short: 'Cowork MAU', pending: false }
+      { id: 'pru', label: 'Cowork MAU', short: 'Cowork MAU', pending: false },
+      { id: 'revenue', label: 'Cowork Consumption Revenue', short: 'Cowork Revenue', pending: false }
     ];
     const PSM_V3_COPILOT_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Agents', 'Copilot Cowork', 'Copilot Extensibility'];
     const PSM_V3_STATUS_FLOW = ['Prepare', 'Execute', 'Review', 'Close'];
@@ -2991,10 +2991,10 @@
       { key: 'owner', label: 'Microsoft DRI' },
       { key: 'status', label: 'Status' },
       { key: 'tenants', label: 'Tenants' },
-      { key: 'mau', label: 'Copilot Paid MAU Δ' },
-      { key: 'npsa', label: 'Copilot NPSA Δ' },
-      { key: 'revenue', label: 'Cowork Consumption Revenue Δ' },
-      { key: 'pru', label: 'Cowork MAU Δ' },
+      { key: 'mau', label: 'Copilot Paid MAU (Growth)' },
+      { key: 'npsa', label: 'Copilot NPSA (Growth)' },
+      { key: 'pru', label: 'Cowork MAU (Growth)' },
+      { key: 'revenue', label: 'Cowork Consumption Revenue (Growth)' },
       { key: 'updated', label: 'Last Updated' }
     ];
     let psmV3VisibleColumns = PSM_V3_COLUMNS.reduce(function(columns, column) { columns[column.key] = true; return columns; }, {});
@@ -3159,6 +3159,21 @@
       }, 0);
     }
 
+    function psmV3MetricGrowth(c, metric, currency) {
+      if (c.v3Outcomes.indexOf(metric) === -1 || !c.v3BaselineAvailable) return '\u2014';
+      var values = c.v3Metrics[metric];
+      var increase = values.current - values.baseline;
+      var increaseSign = increase > 0 ? '+' : (increase < 0 ? '-' : '');
+      var increaseValue = Math.abs(increase).toLocaleString();
+      var formattedIncrease = currency
+        ? increaseSign+'$'+increaseValue
+        : increaseSign+increaseValue;
+      if (!values.baseline) return formattedIncrease;
+      var percentage = (increase / values.baseline) * 100;
+      var percentageSign = percentage > 0 ? '+' : '';
+      return formattedIncrease+' ('+percentageSign+percentage.toFixed(1)+'%)';
+    }
+
     function psmV3Kpi(value, label, helper) {
       return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><small>'+helper+'</small></he-card_psmv3>';
     }
@@ -3168,8 +3183,8 @@
         psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', campaigns.filter(function(c) { return c.v3Status !== 'Close'; }).length+' currently open') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'paidMau').toLocaleString(), 'Copilot Paid MAU', 'Change from campaign snapshots') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'npsa').toLocaleString(), 'Copilot NPSA', 'Change from campaign snapshots') +
-        psmV3Kpi('$'+psmV3MetricTotal(campaigns, 'revenue').toLocaleString(), 'Cowork Consumption Revenue', 'Change from campaign snapshots') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'pru').toLocaleString(), 'Cowork MAU', 'Change from campaign snapshots') +
+        psmV3Kpi('$'+psmV3MetricTotal(campaigns, 'revenue').toLocaleString(), 'Cowork Consumption Revenue', 'Change from campaign snapshots') +
       '</div>';
     }
 
@@ -3248,10 +3263,6 @@
       }
       var visibleColumns = PSM_V3_COLUMNS.filter(function(column) { return column.fixed || psmV3VisibleColumns[column.key]; });
       function cell(c, key) {
-        var paidDelta = c.v3Outcomes.indexOf('paidMau') > -1 && c.v3BaselineAvailable ? c.v3Metrics.paidMau.current - c.v3Metrics.paidMau.baseline : null;
-        var npsaDelta = c.v3Outcomes.indexOf('npsa') > -1 && c.v3BaselineAvailable ? c.v3Metrics.npsa.current - c.v3Metrics.npsa.baseline : null;
-        var pruDelta = c.v3Outcomes.indexOf('pru') > -1 && c.v3BaselineAvailable ? c.v3Metrics.pru.current - c.v3Metrics.pru.baseline : null;
-        var revenueDelta = c.v3Outcomes.indexOf('revenue') > -1 && c.v3BaselineAvailable ? c.v3Metrics.revenue.current - c.v3Metrics.revenue.baseline : null;
         var values = {
           id: '<strong style="color:var(--cp-link);">'+c.id+'</strong>',
           name: '<strong>'+psmEscapeHtml(c.name)+'</strong>',
@@ -3264,10 +3275,10 @@
           area: psmEscapeHtml(c.v3Area),
           status: psmRenderStatusBadge(c.v3Status),
           tenants: c.tenantCount.toLocaleString(),
-          mau: paidDelta == null ? '\u2014' : '+'+paidDelta.toLocaleString(),
-          pru: pruDelta == null ? '\u2014' : '+'+pruDelta.toLocaleString(),
-          npsa: npsaDelta == null ? '\u2014' : '+'+npsaDelta.toLocaleString(),
-          revenue: revenueDelta == null ? '\u2014' : '$'+revenueDelta.toLocaleString(),
+          mau: psmV3MetricGrowth(c, 'paidMau', false),
+          npsa: psmV3MetricGrowth(c, 'npsa', false),
+          pru: psmV3MetricGrowth(c, 'pru', false),
+          revenue: psmV3MetricGrowth(c, 'revenue', true),
           updated: psmEscapeHtml(c.v3LastUpdated)
         };
         return values[key];
@@ -3343,8 +3354,8 @@
       var csv = columns.map(function(column) { return '"'+column.label+'"'; }).join(',')+'\r\n'+campaigns.map(function(c) {
         var values = {
           id:c.id, name:c.name, partnerOneName:c.partner, partnerOneId:c.partnerOneId, outcomes:c.v3Outcomes.join('; '), workloads:(c.workloads || []).join('; '), owner:c.v3Owner, region:c.v3Region, area:c.v3Area,
-          status:c.v3Status, tenants:c.tenantCount, mau:psmV3MetricTotal([c], 'paidMau'), pru:psmV3MetricTotal([c], 'pru'),
-          npsa:psmV3MetricTotal([c], 'npsa'), revenue:psmV3MetricTotal([c], 'revenue'), updated:c.v3LastUpdated
+          status:c.v3Status, tenants:c.tenantCount, mau:psmV3MetricGrowth(c, 'paidMau', false), npsa:psmV3MetricGrowth(c, 'npsa', false),
+          pru:psmV3MetricGrowth(c, 'pru', false), revenue:psmV3MetricGrowth(c, 'revenue', true), updated:c.v3LastUpdated
         };
         return columns.map(function(column) { return '"'+String(values[column.key] == null ? '' : values[column.key]).replace(/"/g, '""')+'"'; }).join(',');
       }).join('\r\n');
@@ -3372,7 +3383,6 @@
         return '<label class="v3-outcome-option"><input type="checkbox" name="'+prefix+'Outcome" value="'+outcome.id+'"'+(selected.indexOf(outcome.id) > -1 ? ' checked' : '')+' onchange="'+change+'"><strong>'+outcome.label+'</strong></label>';
       }).join('');
       if (prefix === 'v3') {
-        options += '<div class="v3-other-outcome-row"><label class="v3-outcome-option"><input type="checkbox" name="v3Outcome" value="other" onchange="psmV3ToggleOtherOutcome(this.checked);psmV3UpdateOutcomeSummary()"><strong>Other</strong></label><div class="v3-other-outcome" id="v3OtherOutcomeWrap"><input id="v3OtherOutcomeText" maxlength="120" placeholder="Enter another business outcome"></div></div>';
         document.getElementById(containerId).innerHTML = '<details class="v3-outcome-select"><summary id="v3OutcomeSummary">Select business outcomes</summary><div class="v3-outcome-menu">'+options+'</div></details>';
         psmV3UpdateOutcomeSummary();
         return;
@@ -3415,8 +3425,6 @@
       psmV3OutcomeOptions('v3OutcomeOptions', 'v3', ['paidMau', 'pru']);
       psmV3CreateWorkloads = ['Microsoft 365 Copilot'];
       psmV3RenderWorkloadOptions();
-      document.getElementById('v3OtherOutcomeText').value = '';
-      document.getElementById('v3OtherOutcomeWrap').classList.remove('show');
       document.getElementById('v3CreatePartnerResult').className = 'v3-create-partner-result';
       document.getElementById('v3CreatePartnerResult').textContent = '';
       psmV3UpdateCreatePartnerPlaceholder();
@@ -3722,12 +3730,9 @@
 
     function psmV3CreateCampaign() {
       var name = document.getElementById('v3CampaignName').value.trim();
-      var selectedOutcomes = psmV3SelectedOutcomes('v3');
-      var outcomes = selectedOutcomes.filter(function(id) { return id !== 'other'; });
-      var otherOutcome = document.getElementById('v3OtherOutcomeText').value.trim();
+      var outcomes = psmV3SelectedOutcomes('v3');
       if (!name) { showToast('Campaign name is required', true); return; }
-      if (!selectedOutcomes.length) { showToast('Select at least one business outcome', true); return; }
-      if (selectedOutcomes.indexOf('other') > -1 && !otherOutcome) { showToast('Enter the other business outcome', true); return; }
+      if (!outcomes.length) { showToast('Select at least one business outcome', true); return; }
       if (!psmV3CreateWorkloads.length) { showToast('Select at least one Copilot workload', true); return; }
       if (!psmV3CreatePartner) { showToast('Find a partner using a PartnerOne ID or MPN ID', true); return; }
       if (!psmV3Upload.valid) { showToast('Validate the Tenant IDs before creating the campaign', true); return; }
@@ -3746,10 +3751,10 @@
       var c = {
         id: psmNextCampaignId(), name: name, partner: partner, owner: owner, microsoftDri: owner,
         region: region, workload: psmV3CreateWorkloads[0], workloads: psmV3CreateWorkloads.slice(),
-        tenantCount: tenantCount, status: 'Defining', goal: otherOutcome || 'Campaign tracking', goals: [], created: creationDate,
+        tenantCount: tenantCount, status: 'Defining', goal: 'Campaign tracking', goals: [], created: creationDate,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0, copilotPru: 0,
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
-        v3Owner: owner, v3Outcomes: outcomes, v3OtherOutcome: otherOutcome, v3Region: region,
+        v3Owner: owner, v3Outcomes: outcomes, v3Region: region,
         v3Area: area, v3Segments: PSM_V3_SEGMENTS.slice(0, 2), v3Partners: [partner],
         v3PartnerIds: ids, v3OpenDate: creationDate, v3BaselineDate: creationDate,
         v3LastUpdated: today(), v3Status: 'Prepare', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
