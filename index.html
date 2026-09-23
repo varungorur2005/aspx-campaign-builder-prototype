@@ -3561,10 +3561,6 @@
       var status = selected ? selected.value : '';
       var note = document.getElementById('v3FlyoutStatusNote').value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
-      if (status === 'Close' && (c.customers || []).some(function(customer) { return customer.stage !== 'outcomeMeasured'; })) {
-        showToast('Every customer tenant must reach Outcome Measured before the campaign can be closed', true);
-        return;
-      }
       var previous = c.v3Status;
       c.v3Status = status;
       c.status = status;
@@ -4545,7 +4541,6 @@
       }
       c.customers.forEach(function(customer, index) {
         psmPopulateMvpTenantTelemetry(c, customer, index, seed);
-        if (currentView === 'psm-v3' && c.v3Status === 'Close') customer.stage = 'outcomeMeasured';
       });
     }
 
