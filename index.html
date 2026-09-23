@@ -39,6 +39,7 @@
       --cp-sheen: rgba(255, 255, 255, 0.55);
       --cp-highlight: rgba(177, 31, 75, 0.12);
       --cp-aspx-nav: #1b3a5c;
+      --cp-aspx-header: #333333;
       --cp-link-soft: rgba(0, 120, 212, 0.08);
       --cp-ms-red: #f25022;
       --cp-ms-green: #7fba00;
@@ -71,6 +72,7 @@
       --cp-sheen: rgba(255, 255, 255, 0.04);
       --cp-highlight: rgba(253, 142, 161, 0.12);
       --cp-aspx-nav: #1b3a5c;
+      --cp-aspx-header: #333333;
       --cp-link-soft: rgba(77, 166, 255, 0.12);
       --cp-ms-red: #f25022;
       --cp-ms-green: #7fba00;
@@ -1185,6 +1187,113 @@
     .v3-create-overlay .v3-modal > h3 { font-size:20px; font-weight:600; }
     .v3-create-overlay .btn-group { position:sticky; bottom:0; margin:20px -24px -24px; padding:14px 24px; border-top:1px solid var(--cp-border); background:var(--cp-surface); }
     .filter-panel { border-left:1px solid var(--cp-border); background:var(--cp-surface); box-shadow:-4px 0 16px var(--cp-border); }
+    /* ASPX Local Demo VibeHub alignment */
+    .pc-global-search {
+      display:flex; align-items:center; width:min(606px,42vw); height:30px;
+      border:1px solid var(--cp-border-strong); background:var(--cp-text);
+    }
+    .pc-global-search svg { flex:0 0 auto; margin:0 7px; color:var(--cp-link); }
+    .pc-global-search input { width:100%; height:100%; border:0; outline:0; background:transparent; color:var(--cp-surface); font:inherit; font-size:11px; }
+    body.psm-v3-view { background:var(--cp-surface); font-size:12px; }
+    body.psm-v3-view .top-nav {
+      display:grid; grid-template-columns:minmax(300px,1fr) minmax(320px,606px) minmax(420px,1fr);
+      height:48px; padding:0 12px; background:var(--cp-aspx-header);
+    }
+    body.psm-v3-view .top-nav .nav-center { position:static; left:auto; transform:none; width:100%; }
+    body.psm-v3-view .top-nav .nav-right { justify-content:flex-end; }
+    body.psm-v3-view .top-nav .microsoft-logo,
+    body.psm-v3-view .top-nav .nav-separator,
+    body.psm-v3-view .top-nav .nav-page-name { display:none; }
+    body.psm-v3-view .top-nav .nav-product-lockup { gap:12px; }
+    body.psm-v3-view .top-nav .nav-platform-name { font-size:14px; font-weight:600; }
+    body.psm-v3-view .top-nav .nav-icon-btn { width:32px; height:32px; }
+    body.psm-v3-view .top-nav .nav-avatar { width:22px; height:22px; color:var(--cp-text); font-size:9px; }
+    body.psm-v3-view .prototype-switcher { padding:2px 6px; border-color:var(--cp-border-strong); background:var(--cp-aspx-header); }
+    body.psm-v3-view .prototype-switcher-label { font-size:10px; }
+    body.psm-v3-view .prototype-switcher select { height:24px; }
+    body.psm-v3-view #breadcrumb {
+      position:fixed; z-index:100; top:48px; right:0; left:0;
+      display:flex; align-items:center; gap:9px; height:48px; padding:0 8px !important;
+      border-color:var(--cp-border); background:var(--cp-surface) !important; color:var(--cp-text-muted) !important;
+    }
+    body.psm-v3-view .app-layout { min-height:calc(100vh - 48px); padding-top:48px; }
+    body.psm-v3-view .sidebar { width:280px; padding:0 0 40px; background:var(--cp-surface); border-color:var(--cp-border); }
+    body.psm-v3-view .sidebar-link, body.psm-v3-view .sidebar .nav-group-label {
+      display:flex; align-items:center; width:100%; min-height:36px; padding:8px 16px;
+      border:0; border-left:2px solid transparent; background:transparent; color:var(--cp-text); font-size:13px; text-align:left;
+    }
+    body.psm-v3-view .sidebar-link:hover { background:var(--cp-surface-soft); }
+    body.psm-v3-view .sidebar-link.active { padding-left:14px; border-left-color:var(--cp-link); background:transparent; color:var(--cp-text); font-weight:600; }
+    body.psm-v3-view .sidebar-link.indent { padding-left:32px; }
+    body.psm-v3-view .sidebar-link.indent.active { padding-left:30px; }
+    body.psm-v3-view .sidebar .nav-group-label { margin-top:8px; padding-top:10px; border-bottom:1px solid var(--cp-border); font-weight:600; }
+    body.psm-v3-view .main-content { min-width:0; background:var(--cp-surface); }
+    body.psm-v3-view .dashboard-view { padding:20px 24px 32px; }
+    body.psm-v3-view .v3-head { align-items:baseline; margin:0 0 18px; }
+    body.psm-v3-view .v3-title-line { display:flex; align-items:baseline; gap:9px; margin:0; color:var(--cp-text); font-size:28px; font-weight:400; }
+    body.psm-v3-view .v3-title-line strong { font-weight:400; }
+    body.psm-v3-view .v3-title-line > span:nth-of-type(2) { font-weight:600; }
+    body.psm-v3-view .v3-title-divider { color:var(--cp-text); }
+    body.psm-v3-view .v3-title-suite { margin-left:0; color:var(--cp-text); font-size:12px; font-weight:600; }
+    body.psm-v3-view .v3-title-info {
+      display:inline-flex; align-items:center; justify-content:center; width:12px; height:12px;
+      border:1px solid var(--cp-link); border-radius:50%; color:var(--cp-link); font-size:8px; font-style:normal;
+    }
+    body.psm-v3-view .v3-kpis { grid-template-columns:repeat(5,minmax(128px,1fr)); gap:24px; margin-bottom:32px; }
+    body.psm-v3-view .v3-kpi {
+      position:relative; min-height:110px; padding:20px; border-radius:2px;
+      box-shadow:0 1px 2px var(--cp-border);
+    }
+    body.psm-v3-view .v3-kpi span { order:0; margin:0 20px 4px 0; color:var(--cp-text); font-size:14px; font-weight:400; letter-spacing:0; text-transform:none; }
+    body.psm-v3-view .v3-kpi strong { order:1; margin:0; color:var(--cp-text); font-size:30px; font-weight:400; }
+    body.psm-v3-view .v3-kpi small { display:none; }
+    body.psm-v3-view .v3-kpi-info {
+      position:absolute; top:7px; right:7px; display:inline-flex; align-items:center; justify-content:center;
+      width:12px; height:12px; border:1px solid var(--cp-link); border-radius:50%;
+      color:var(--cp-link); font-size:8px; font-style:normal;
+    }
+    body.psm-v3-view .v3-charts { grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-bottom:32px; }
+    body.psm-v3-view .v3-card { min-height:325px; padding:12px 16px; border-radius:2px; box-shadow:0 1px 2px var(--cp-border); }
+    body.psm-v3-view .v3-card h2 { margin-bottom:4px; font-size:14px; font-weight:600; }
+    body.psm-v3-view .v3-pie-layout { justify-content:center; gap:24px; min-height:245px; }
+    body.psm-v3-view .v3-pie-chart { flex-basis:142px; width:142px; height:142px; }
+    body.psm-v3-view .v3-chart-legend { min-width:135px; gap:7px; }
+    body.psm-v3-view .v3-chart-legend-row { grid-template-columns:10px 1fr auto; gap:6px; font-size:11px; }
+    body.psm-v3-view .v3-chart-legend-swatch { width:10px; height:10px; border-radius:0; }
+    body.psm-v3-view .v3-table-toolbar { margin:0; padding:6px 0; border:0; }
+    body.psm-v3-view .v3-table-toolbar .toolbar-btn { min-height:32px; padding:5px 12px; border-radius:0; font-size:13px; }
+    body.psm-v3-view .v3-table-search-wrap { width:272px; height:30px; border-radius:0; }
+    body.psm-v3-view .v3-table-wrap { border:0; border-radius:0; box-shadow:none; }
+    body.psm-v3-view .v3-table { font-size:12px; table-layout:fixed; }
+    body.psm-v3-view .v3-table th, body.psm-v3-view .v3-table td {
+      min-width:120px; padding:12px; border-bottom:1px solid var(--cp-border); white-space:normal;
+    }
+    body.psm-v3-view .v3-table th {
+      padding-top:8px; padding-bottom:8px; background:var(--cp-surface); color:var(--cp-text);
+      font-size:12px; font-weight:600; line-height:1.25; text-transform:none;
+    }
+    body.psm-v3-view .v3-table tbody tr:hover { background:var(--cp-bg-elevated); }
+    body.psm-v3-view .v3-chip { margin:0 7px 2px 0; padding:0; background:transparent; color:var(--cp-link); font-size:12px; font-weight:400; text-decoration:underline; }
+    body.psm-v3-view .v3-pagination { margin-top:0; padding:9px 0 0; font-size:12px; }
+    body.psm-v3-view .btn { border-radius:2px; }
+    body.psm-v3-view #psmV3CreateModal,
+    body.psm-v3-view #psmV3TablePanel,
+    body.psm-v3-view #psmMvpTableFlyout { background:transparent; }
+    body.psm-v3-view .detail-view, body.psm-v3-view .filter-panel {
+      top:48px; background:var(--cp-surface); box-shadow:-5px 0 16px var(--cp-border);
+    }
+    body.psm-v3-view .filter-panel { width:400px; }
+    body.psm-v3-view .psm-v3-detail .flyout-header {
+      min-height:56px; margin:-20px -24px 20px; padding:18px 24px 10px;
+      border-bottom:1px solid var(--cp-border); background:var(--cp-surface);
+    }
+    body.psm-v3-view .psm-mvp-flyout-backdrop { inset:48px 0 0; }
+    body.psm-v3-view .v3-create-overlay { padding-top:48px; }
+    body.psm-v3-view .v3-create-overlay .v3-modal {
+      border-radius:0; background:var(--cp-surface); box-shadow:-5px 0 16px var(--cp-border);
+    }
+    body.psm-v3-view .v3-create-overlay .btn-group { min-height:72px; padding:20px 24px; }
+    body.psm-v3-view .psm-v3-detail .panel-card, body.psm-v3-view .psm-v3-header-card { border-radius:2px; box-shadow:none; }
     @media (max-width:1000px) { .v3-impact-grid { grid-template-columns:1fr; } }
   </style>
   <script type="module">
@@ -1248,6 +1357,9 @@
       <span class="nav-title nav-page-name" id="navPageName">Campaigns</span>
     </div>
     <div class="nav-center">
+      <label class="pc-global-search"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input type="search" placeholder="Search Partner Center" aria-label="Search Partner Center"></label>
+    </div>
+    <div class="nav-right">
       <div class="prototype-switcher" id="prototypeViewSwitcher">
         <span class="prototype-switcher-label">Prototype Views</span>
         <select id="viewSwitcherSelect" onchange="switchView(this.value)">
@@ -1259,8 +1371,6 @@
           <option value="psm-v3">PSM View (v3)</option>
         </select>
       </div>
-    </div>
-    <div class="nav-right">
       <div class="psm-partner-picker" id="psmPartnerPicker">
         <span>Enter PartnerOne ID or MPN ID</span>
         <select id="psmPartnerIdType" onchange="psmUpdatePartnerSearchPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select>
@@ -2244,6 +2354,25 @@
             '<div class="sidebar-section">Referrals</div>' +
             '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Referrals</span></a>' +
           '</nav>';
+      } else if (currentView === 'psm-v3') {
+        sidebar.innerHTML =
+          '<nav class="sidebar-nav">' +
+            '<a href="#" class="sidebar-link decorative" onclick="return false;"><span>Home</span></a>' +
+            '<a href="#" class="sidebar-link decorative active" onclick="return false;"><span>Insights</span></a>' +
+            '<div class="nav-group-label">Summary</div>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Overview</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Customers</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Products</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Cloud product performance</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Growth opportunities</span></a>' +
+            '<a href="#" class="sidebar-link active indent" onclick="return false;"><span>Campaigns</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Marketplace offers</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Referrals</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Benefits</span></a>' +
+            '<div class="nav-group-label">Download</div>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Reports</span></a>' +
+            '<a href="#" class="sidebar-link decorative indent" onclick="return false;"><span>Data exports</span></a>' +
+          '</nav>';
       } else if (isPsmView()) {
         sidebar.innerHTML =
           '<nav class="sidebar-nav">' +
@@ -2282,11 +2411,12 @@
       history.replaceState(null, '', viewUrl.pathname + viewUrl.search + viewUrl.hash);
       document.body.classList.toggle('partner-view', view === 'partner');
       document.body.classList.toggle('psm-view', isPsmView(view));
+      document.body.classList.toggle('psm-v3-view', view === 'psm-v3');
       document.getElementById('viewSwitcherSelect').value = view;
       renderSidebar();
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
-        view === 'psm-v3' ? 'AI Business Solutions & Security' : (view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi');
+        view === 'psm-v3' ? 'Microsoft Partner Center' : (view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi');
       document.getElementById('navPageName').textContent =
         isPsmView(view) ? 'Campaigns' : (view === 'partner' ? 'Referrals and Deal Clinics' : 'Security Deal Clinic');
       document.getElementById('psmPartnerPicker').style.display = isPsmView(view) && view !== 'psm-v3' ? 'flex' : 'none';
@@ -2300,7 +2430,11 @@
       showDashboard();
       toggleFilter(false);
       if (isPsmView(view)) {
-        document.getElementById('breadcrumb').style.display = 'none';
+        document.getElementById('breadcrumb').style.display = view === 'psm-v3' ? 'flex' : 'none';
+        if (view === 'psm-v3') {
+          document.getElementById('breadcrumb').innerHTML =
+            '<span>Partner Center</span><span class="chevron">&#8250;</span><span>Insights</span><span class="chevron">&#8250;</span><strong>PSM Campaigns</strong>';
+        }
         if (view !== 'psm-v3') psmRenderPartnerContext();
         renderPsmView();
         return;
@@ -2953,7 +3087,7 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML = '<div class="v3-shell">' +
-        '<div class="v3-head"><div><h1>PSM Campaigns</h1></div>' +
+        '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>PSM Campaigns</span><small class="v3-title-suite">ASPXi</small><i class="v3-title-info" title="AI Business Solutions &amp; Security Partner eXperience">i</i></h1></div>' +
         '<div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
         '<div id="psmV3Kpis"></div><div id="psmV3Charts"></div><div id="psmV3Table"></div></div>';
       psmV3RenderDashboard();
@@ -2998,7 +3132,7 @@
     }
 
     function psmV3Kpi(value, label, helper) {
-      return '<he-card_psmv3 class="v3-kpi"><strong>'+value+'</strong><span>'+label+'</span><small>'+helper+'</small></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><small>'+helper+'</small></he-card_psmv3>';
     }
 
     function psmV3RenderKpis(campaigns) {
