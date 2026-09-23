@@ -2690,18 +2690,18 @@
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
     const PSM_V3_ADDITIONAL_CAMPAIGNS = [
-      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', outcomes:['paidMau','pru'], created:'2026-08-26' },
-      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', outcomes:['paidMau','npsa'], created:'2026-07-18' },
-      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Close', outcomes:['paidMau','pru','revenue'], created:'2026-04-09' },
-      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Review', outcomes:['paidMau','npsa'], created:'2026-06-14' },
-      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Prepare', outcomes:['pru','npsa'], created:'2026-09-02' },
-      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Execute', outcomes:['paidMau','pru','npsa'], created:'2026-07-03' },
-      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Close', outcomes:['revenue','npsa'], created:'2026-03-21' },
-      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Prepare', outcomes:['paidMau','pru'], created:'2026-08-30' },
-      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Review', outcomes:['npsa','revenue'], created:'2026-05-28' },
-      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Close', outcomes:['paidMau','pru'], created:'2026-02-17' },
-      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Execute', outcomes:['paidMau','npsa'], created:'2026-09-08' },
-      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Review', outcomes:['paidMau','pru','npsa','revenue'], created:'2026-06-25' }
+      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot'], created:'2026-08-26' },
+      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot','Microsoft 365 Copilot Chat'], created:'2026-07-18' },
+      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Close', outcomes:['paidMau','pru','revenue'], workloads:['Microsoft 365 Copilot','Copilot Cowork'], created:'2026-04-09' },
+      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot Chat','Copilot Agents'], created:'2026-06-14' },
+      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Review', outcomes:['pru','npsa'], workloads:['Copilot Agents'], created:'2026-09-02' },
+      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Execute', outcomes:['paidMau','pru','npsa'], workloads:['Microsoft 365 Copilot','Copilot Cowork','Copilot Extensibility'], created:'2026-07-03' },
+      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Close', outcomes:['revenue','npsa'], workloads:['Copilot Cowork'], created:'2026-03-21' },
+      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Execute', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot Chat'], created:'2026-08-30' },
+      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Review', outcomes:['npsa','revenue'], workloads:['Microsoft 365 Copilot','Copilot Agents'], created:'2026-05-28' },
+      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Review', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot Chat'], created:'2026-02-17' },
+      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot Chat','Copilot Extensibility'], created:'2026-09-08' },
+      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Review', outcomes:['paidMau','pru','npsa','revenue'], workloads:['Microsoft 365 Copilot','Copilot Agents'], created:'2026-06-25' }
     ];
     let psmV3State = {
       persona: 'psm', search: '', owner: '', region: '', area: '', segment: '', partner: '', status: '', outcome: '',
@@ -2791,7 +2791,7 @@
         if (existingIds.has(item.id)) return;
         psmCampaigns.push({
           id: item.id, name: item.name, partner: item.partner, mpn: PSM_PARTNER_MPN[item.partner],
-          region: item.region, workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Copilot Cowork'],
+          region: item.region, workload: item.workloads[0], workloads: item.workloads.slice(),
           tenantCount: item.tenants, status: item.status, goal: 'MAU Growth', created: item.created,
           owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER, mauGrowth: 0, revenueGrowth: '$0',
           engagement: 0, executionType: 'Bulk', v3Owner: PSM_CURRENT_USER, v3Status: item.status,
