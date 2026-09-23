@@ -4392,11 +4392,24 @@
       '</div>';
     }
 
-    function psmMvpTenantCell(customer, key, stage) {
+    function psmV3CampaignMeasuresTenantMetric(campaign, key) {
+      if (currentView !== 'psm-v3') return true;
+      var outcomeByMetric = {
+        copilotLicensedMau: 'paidMau',
+        npsa: 'npsa',
+        coworkMau: 'pru',
+        revenue: 'revenue'
+      };
+      var outcome = outcomeByMetric[key.replace(/Growth$/, '')];
+      return !outcome || (campaign.v3Outcomes || []).indexOf(outcome) > -1;
+    }
+
+    function psmMvpTenantCell(customer, key, stage, campaign) {
       if (key === 'name') return '<strong>'+psmEscapeHtml(customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name)+'</strong>';
       if (key === 'tenantId') return '<span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span>';
       if (key === 'workloads') return (customer.targetedWorkloads || []).map(function(workload) { return '<span class="v3-chip">'+psmEscapeHtml(workload)+'</span>'; }).join('') || '\u2014';
       if (key === 'progress') return '<span class="psm-stage-label">'+psmEscapeHtml(stage.label)+'</span>';
+      if (!psmV3CampaignMeasuresTenantMetric(campaign, key)) return '-';
       if (/Growth$/.test(key)) {
         var metricKey = key.replace(/Growth$/, '');
         return '<span class="psm-mvp-growth">'+psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0, metricKey === 'revenue' ? '$' : '')+'</span>';
@@ -4445,6 +4458,7 @@
           if (column.key === 'name') return name;
           if (column.key === 'workloads') return (customer.targetedWorkloads || []).join(' ');
           if (column.key === 'progress') return stage.label;
+          if (!psmV3CampaignMeasuresTenantMetric(c, column.key)) return '';
           if (/Growth$/.test(column.key)) {
             var metricKey = column.key.replace(/Growth$/, '');
             return psmMvpGrowthText(customer[metricKey] || 0, customer[metricKey+'Baseline'] || 0);
@@ -4467,12 +4481,14 @@
         var numericFilters = [
           ['copilotLicensedMau', 'mauMin'], ['npsa', 'npsaMin'], ['coworkMau', 'coworkMin'], ['revenue', 'revenueMin']
         ];
-        if (numericFilters.some(function(pair) { return filters[pair[1]] !== '' && filters[pair[1]] != null && Number(customer[pair[0]] || 0) < Number(filters[pair[1]]); })) return false;
+        if (numericFilters.some(function(pair) {
+          return psmV3CampaignMeasuresTenantMetric(c, pair[0]) && filters[pair[1]] !== '' && filters[pair[1]] != null && Number(customer[pair[0]] || 0) < Number(filters[pair[1]]);
+        })) return false;
         var growthFilters = [
           ['copilotLicensedMau', 'mauGrowthMin'], ['npsa', 'npsaGrowthMin'], ['coworkMau', 'coworkGrowthMin'], ['revenue', 'revenueGrowthMin']
         ];
         if (growthFilters.some(function(pair) {
-          return filters[pair[1]] !== '' && filters[pair[1]] != null && ((customer[pair[0]] || 0) - (customer[pair[0]+'Baseline'] || 0)) < Number(filters[pair[1]]);
+          return psmV3CampaignMeasuresTenantMetric(c, pair[0]) && filters[pair[1]] !== '' && filters[pair[1]] != null && ((customer[pair[0]] || 0) - (customer[pair[0]+'Baseline'] || 0)) < Number(filters[pair[1]]);
         })) return false;
         return true;
       });
@@ -4485,7 +4501,7 @@
         var index = item.index;
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         return '<tr>'+(isOwner ? '<td style="text-align:center;"><input type="checkbox" class="psm-cust-check" data-idx="'+index+'" onchange="psmUpdateMvpSelectionCount()"></td>' : '') +
-          visibleColumns.map(function(column) { return '<td>'+psmMvpTenantCell(customer, column.key, stage)+'</td>'; }).join('') +
+          visibleColumns.map(function(column) { return '<td>'+psmMvpTenantCell(customer, column.key, stage, c)+'</td>'; }).join('') +
         '</tr>';
       }).join('');
       if (!rows) {
@@ -4790,6 +4806,9 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       psmEnsureMvpTenantRows(c);
+      function metricValue(key, value) {
+        return psmV3CampaignMeasuresTenantMetric(c, key) ? value : '-';
+      }
       var rows = [[
         'Customer / Tenant Name', 'Tenant ID', 'Tenant Segment', 'Tenant Country/Region',
         'Partner Name', 'Partner Center ID (MPN)', 'PartnerOneID', 'CSP Tier', 'T2 Reseller ID', 'T2 Reseller Name',
@@ -4804,10 +4823,10 @@
           customer.tenantCustomerName || customer.customerName || customer.tenantName || customer.name,
           customer.tenantId, customer.segment, customer.country,
           customer.partnerName, customer.partnerMpn, customer.partnerOneId, customer.cspTier, customer.t2ResellerId, customer.t2ResellerName,
-          customer.copilotLicensedMauBaseline, customer.copilotLicensedMau, customer.copilotLicensedMau - customer.copilotLicensedMauBaseline,
-          customer.npsaBaseline, customer.npsa, customer.npsa - customer.npsaBaseline,
-          customer.coworkMauBaseline, customer.coworkMau, customer.coworkMau - customer.coworkMauBaseline,
-          customer.revenueBaseline, customer.revenue, customer.revenue - customer.revenueBaseline,
+          metricValue('copilotLicensedMau', customer.copilotLicensedMauBaseline), metricValue('copilotLicensedMau', customer.copilotLicensedMau), metricValue('copilotLicensedMauGrowth', customer.copilotLicensedMau - customer.copilotLicensedMauBaseline),
+          metricValue('npsa', customer.npsaBaseline), metricValue('npsa', customer.npsa), metricValue('npsaGrowth', customer.npsa - customer.npsaBaseline),
+          metricValue('coworkMau', customer.coworkMauBaseline), metricValue('coworkMau', customer.coworkMau), metricValue('coworkMauGrowth', customer.coworkMau - customer.coworkMauBaseline),
+          metricValue('revenue', customer.revenueBaseline), metricValue('revenue', customer.revenue), metricValue('revenueGrowth', customer.revenue - customer.revenueBaseline),
           stage.label
         ]);
       });
