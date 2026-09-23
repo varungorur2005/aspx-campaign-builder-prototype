@@ -3604,18 +3604,6 @@
       psmV3OpenDetail(id);
     }
 
-    function psmV3DetailTrend(c) {
-      var fractions = [0, .12, .3, .5, .74, 1];
-      var labels = ['Baseline', 'M1', 'M2', 'M3', 'M4', 'Current'];
-      var charts = c.v3Outcomes.filter(function(id) { return c.v3Metrics[id]; }).map(function(id) {
-        var outcome = PSM_V3_OUTCOMES.filter(function(item) { return item.id === id; })[0];
-        var metric = c.v3Metrics[id];
-        var values = fractions.map(function(fraction) { return Math.round(metric.baseline + (metric.current - metric.baseline) * fraction); });
-        return psmMiniTrendChart(outcome.label+(outcome.pending ? ' (provisional)' : ''), values, labels);
-      }).join('');
-      return '<div class="v3-impact-grid">'+charts+'</div>';
-    }
-
     function psmV3OpenDetail(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
@@ -3705,7 +3693,6 @@
         '<div class="panel-card"><h2>Campaign Impact <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+Math.max(c.v3Outcomes.length + (c.v3OtherOutcome ? 1 : 0), 1)+',minmax(0,1fr));">'+metrics+'</div>' +
           '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+c.v3Outcomes.map(function(id) { var outcome = PSM_V3_OUTCOMES.filter(function(o) { return o.id === id; })[0]; return '<th>'+outcome.short+' Growth</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div>' +
-          (c.v3BaselineAvailable ? '<h3 style="font-size:13px;margin:18px 0 10px;">Progress from Campaign Baseline</h3>'+psmV3DetailTrend(c) : '') +
           '<div style="margin-top:10px;color:var(--cp-text-muted);font-size:11px;">* Revenue is provisional pending licensed-seller financial data and attribution confirmation.</div></div>' +
         psmRenderMvpTenantWorkspace(c, canTransfer) +
         '';
