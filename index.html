@@ -4349,21 +4349,14 @@
       var panel = '';
       if (psmMvpTenantTableState.openPanel === 'add' && isOwner) {
         panel = '<div class="psm-mvp-action-panel"><strong>Add Customer</strong><button class="btn btn-secondary" onclick="document.getElementById(\'psmMvpBulkAddFile\').click()">Bulk add from file</button><button class="btn btn-secondary" onclick="psmOpenAddTenant()">Add manually</button><span style="color:var(--cp-text-muted);font-size:12px;">Use the campaign template columns: Customer / Tenant Name and Tenant ID.</span></div>';
-      } else if (psmMvpTenantTableState.openPanel === 'filter') {
-        panel = '<div class="psm-mvp-action-panel"><div class="form-group"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div><div class="form-group"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div><button class="btn btn-primary" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary" onclick="psmMvpClearTenantFilter()">Clear</button></div>';
-      } else if (psmMvpTenantTableState.openPanel === 'columns') {
-        panel = '<div class="psm-mvp-action-panel"><strong>Change Columns</strong>'+PSM_MVP_TENANT_COLUMNS.map(function(column) {
-          var checked = column.fixed || psmMvpTenantTableState.visibleColumns[column.key];
-          return '<label class="psm-mvp-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
-        }).join('')+'</div>';
       }
       var ownerActions = isOwner ?
         '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'add' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'add\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'add')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Add Customer</button>' +
         '<button class="toolbar-btn psm-mvp-toolbar-btn psm-mvp-toolbar-danger" onclick="psmRemoveSelectedTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6 2.5h4m-5.5 2 .6 9h5.8l.6-9M6.5 7v4m3-4v4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove Customer</button>' +
         '<input type="file" id="psmMvpBulkAddFile" accept=".csv" style="display:none;" onchange="psmMvpBulkAddCustomers(this,\''+c.id+'\')">' : '';
       return '<div class="psm-mvp-table-toolbar"><div class="psm-mvp-table-actions"><button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpDownloadTenants(\''+c.id+'\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button></div><div class="psm-mvp-table-actions">' +
-        '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'filter' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'filter\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'filter')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button>' +
-        '<button class="toolbar-btn psm-mvp-toolbar-btn'+(psmMvpTenantTableState.openPanel === 'columns' ? ' active' : '')+'" onclick="psmMvpToggleTenantPanel(\'columns\')" aria-expanded="'+(psmMvpTenantTableState.openPanel === 'columns')+'"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>' +
+        '<button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpOpenTenantFlyout(\'filter\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button>' +
+        '<button class="toolbar-btn psm-mvp-toolbar-btn" onclick="psmMvpOpenTenantFlyout(\'columns\')"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>' +
         ownerActions+'</div></div>'+panel;
     }
 
@@ -4435,11 +4428,30 @@
       psmRefreshTenantWorkspace();
     }
 
+    function psmMvpOpenTenantFlyout(panel) {
+      var title = document.getElementById('psmV3TablePanelTitle');
+      var body = document.getElementById('psmV3TablePanelBody');
+      if (panel === 'filter') {
+        title.textContent = 'Filter customer tenants';
+        body.innerHTML = '<div class="filter-section"><label>Customer or Tenant ID</label><input id="psmMvpTenantSearch" value="'+psmEscapeHtml(psmMvpTenantTableState.search)+'" placeholder="Search name or Tenant ID"></div>' +
+          '<div class="filter-section"><label>Progress</label><select id="psmMvpTenantStageFilter"><option value="">All progress</option>'+PSM_PROGRESSION_STAGES.map(function(stage) { return '<option value="'+stage.key+'"'+(psmMvpTenantTableState.stage === stage.key ? ' selected' : '')+'>'+stage.label+'</option>'; }).join('')+'</select></div>' +
+          '<div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmMvpClearTenantFilter()">Clear all</button></div>';
+      } else {
+        title.textContent = 'Change columns';
+        body.innerHTML = '<div>'+PSM_MVP_TENANT_COLUMNS.map(function(column) {
+          var checked = column.fixed || psmMvpTenantTableState.visibleColumns[column.key];
+          return '<label class="v3-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
+        }).join('')+'</div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3CloseTablePanel()">Done</button></div>';
+      }
+      document.getElementById('psmV3TablePanel').classList.add('show');
+    }
+
     function psmMvpApplyTenantFilter() {
       psmMvpTenantTableState.search = document.getElementById('psmMvpTenantSearch').value.trim();
       psmMvpTenantTableState.stage = document.getElementById('psmMvpTenantStageFilter').value;
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
+      psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
     }
 
@@ -4448,6 +4460,7 @@
       psmMvpTenantTableState.stage = '';
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
+      psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
     }
 
