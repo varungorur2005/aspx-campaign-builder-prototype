@@ -731,20 +731,17 @@
     .psm-mvp-status-highlight label { color:var(--cp-accent); font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
     .psm-mvp-status-highlight select { min-width:130px; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
     .psm-v3-header-controls { display:flex; align-items:flex-start; gap:8px; width:100%; margin-top:16px; }
-    .psm-v3-header-controls-left { display:flex; align-items:flex-start; gap:8px; min-width:0; }
-    .psm-v3-header-controls .psm-mvp-status-highlight { justify-content:space-between; gap:8px; padding:8px 10px; }
+    .psm-v3-header-controls-left { display:flex; align-items:flex-start; gap:8px; min-width:0; flex:1 1 auto; }
+    .psm-v3-header-controls .psm-mvp-status-highlight { justify-content:space-between; gap:8px; min-height:64px; padding:8px 10px; box-sizing:border-box; }
     .psm-v3-header-controls .psm-mvp-status-highlight select { min-width:115px; }
     .psm-v3-owner-highlight { margin-left:auto; }
     .psm-v3-owner-highlight select { min-width:130px !important; }
     .psm-v3-owner-highlight .btn { min-height:32px; padding:6px 10px; white-space:nowrap; }
-    .psm-v3-tenant-highlight { position:relative; display:block; }
-    .psm-v3-tenant-highlight > summary { display:flex; align-items:center; gap:10px; min-height:35px; cursor:pointer; list-style:none; }
-    .psm-v3-tenant-highlight > summary::-webkit-details-marker { display:none; }
-    .psm-v3-tenant-highlight > summary::after { content:"\25BE"; color:var(--cp-accent); font-size:11px; transition:transform .15s; }
-    .psm-v3-tenant-highlight[open] > summary::after { transform:rotate(180deg); }
-    .psm-v3-tenant-status-value { color:var(--cp-text); font-size:12px; font-weight:600; white-space:nowrap; }
-    .psm-v3-tenant-status-popover { position:absolute; z-index:30; top:calc(100% + 8px); left:0; width:min(660px,calc(100vw - 96px)); padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); box-shadow:var(--cp-shadow); }
-    .psm-v3-tenant-status-popover .psm-mvp-stage-summary { margin:0; }
+    .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
+    .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:4px; min-width:0; }
+    .psm-v3-tenant-status-item { min-width:0; padding-left:6px; border-left:1px solid var(--cp-border); }
+    .psm-v3-tenant-status-item strong { display:block; color:var(--cp-text); font-size:13px; line-height:1.1; }
+    .psm-v3-tenant-status-item span { display:block; margin-top:2px; color:var(--cp-text-muted); font-size:9px; line-height:1.15; }
     .psm-mvp-section-title { display:flex; align-items:center; gap:7px; }
     .psm-v3-detail .psm-v3-section-heading,
     .psm-v3-detail .psm-mvp-section-title { margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--cp-border); color:var(--cp-text); font-size:15px; font-weight:700; line-height:1.3; text-transform:none; letter-spacing:normal; }
@@ -766,6 +763,7 @@
       .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
       .psm-v3-header-controls, .psm-v3-header-controls-left { align-items:stretch; flex-direction:column; }
       .psm-v3-owner-highlight { margin-left:0; }
+      .psm-v3-tenant-highlight { min-width:0; }
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
       .psm-mvp-impact-grid { grid-template-columns:1fr; }
     }
@@ -3745,7 +3743,7 @@
           '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-controls-left"><div class="psm-mvp-status-highlight"><label for="v3HeaderStatus">Campaign Status</label><select id="v3HeaderStatus" onchange="psmV3OpenStatus(\''+c.id+'\',this.value)"'+(canTransfer ? '' : ' disabled')+'>'+PSM_V3_STATUS_FLOW.map(function(status) { return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div><details class="psm-mvp-status-highlight psm-v3-tenant-highlight"><summary><label>Tenant Status</label><span class="psm-v3-tenant-status-value">'+tenantStageData.outcomeMeasured.toLocaleString()+' of '+tenantStageData.total.toLocaleString()+' Outcome Measured</span></summary><div class="psm-v3-tenant-status-popover"><div class="psm-mvp-stage-summary">'+tenantStageData.html+'</div></div></details></div><div class="psm-mvp-status-highlight psm-v3-owner-highlight"><label for="v3DetailOwner">Campaign Owner</label><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div>' +
+        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-controls-left"><div class="psm-mvp-status-highlight"><label for="v3HeaderStatus">Campaign Status</label><select id="v3HeaderStatus" onchange="psmV3OpenStatus(\''+c.id+'\',this.value)"'+(canTransfer ? '' : ' disabled')+'>'+PSM_V3_STATUS_FLOW.map(function(status) { return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div><div class="psm-mvp-status-highlight psm-v3-tenant-highlight"><label>Tenant Status</label><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div></div><div class="psm-mvp-status-highlight psm-v3-owner-highlight"><label for="v3DetailOwner">Campaign Owner</label><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div>' +
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Update</h2></summary><div class="psm-v3-section-collapse-body"><div class="form-group"><textarea id="v3NoteText" class="psm-campaign-update" maxlength="2000" aria-label="Campaign update" placeholder="Add campaign progress, risks, decisions, or next steps..."'+(canTransfer ? '' : ' readonly')+'></textarea></div>' +
           (canTransfer ? '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmV3AddNote(\''+c.id+'\')">Save campaign update</button></div>' : '<div style="color:var(--cp-text-muted);font-size:12px;">Only the assigned Microsoft DRI can update this campaign.</div>') +
@@ -4359,6 +4357,9 @@
       return {
         total: (c.customers || []).length,
         outcomeMeasured: counts.outcomeMeasured || 0,
+        inlineHtml: PSM_PROGRESSION_STAGES.map(function(stage) {
+          return '<div class="psm-v3-tenant-status-item" title="'+psmEscapeHtml(stage.sub)+'"><strong>'+counts[stage.key].toLocaleString()+'</strong><span>'+psmEscapeHtml(stage.label)+'</span></div>';
+        }).join(''),
         html: PSM_PROGRESSION_STAGES.map(function(stage) {
           return '<div class="psm-mvp-stage-summary-item" title="'+psmEscapeHtml(stage.sub)+'"><strong>'+counts[stage.key].toLocaleString()+'</strong><span>'+psmEscapeHtml(stage.label)+'</span></div>';
         }).join('')
