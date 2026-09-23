@@ -731,6 +731,11 @@
     .psm-mvp-status-highlight label { color:var(--cp-accent); font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
     .psm-mvp-status-highlight select { min-width:130px; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
     .psm-mvp-section-title { display:flex; align-items:center; gap:7px; }
+    .psm-v3-detail .psm-v3-section-heading,
+    .psm-v3-detail .psm-mvp-section-title { margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--cp-border); color:var(--cp-text); font-size:15px; font-weight:700; line-height:1.3; text-transform:none; letter-spacing:normal; }
+    .psm-v3-detail .psm-mvp-owner-panel .psm-v3-section-heading { margin-bottom:5px; padding:0; border:0; }
+    .psm-v3-detail .psm-v3-section-heading .psm-v3-heading-meta { color:var(--cp-text-muted); font-size:12px; font-weight:400; }
+    .psm-v3-detail .psm-v3-activity-summary { color:var(--cp-text); font-size:13px; font-weight:700; text-transform:none; }
     .psm-mvp-tooltip { position:relative; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border:1px solid var(--cp-border-strong); border-radius:50%; background:var(--cp-surface); color:var(--cp-text-muted); font-size:11px; font-weight:700; cursor:help; }
     .psm-mvp-tooltip-text { position:absolute; z-index:20; top:calc(100% + 8px); left:50%; width:320px; padding:10px 12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); box-shadow:var(--cp-shadow); font-size:12px; font-weight:400; line-height:1.45; text-transform:none; transform:translateX(-50%); visibility:hidden; opacity:0; pointer-events:none; transition:opacity .15s; }
     .psm-mvp-tooltip:hover .psm-mvp-tooltip-text, .psm-mvp-tooltip:focus .psm-mvp-tooltip-text { visibility:visible; opacity:1; }
@@ -2657,6 +2662,20 @@
     const PSM_V3_STATUS_FLOW = ['Defining', 'Executing', 'Closed'];
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
+    const PSM_V3_ADDITIONAL_CAMPAIGNS = [
+      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Defining', outcomes:['paidMau','pru'], created:'2026-08-26' },
+      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Executing', outcomes:['paidMau','npsa'], created:'2026-07-18' },
+      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Closed', outcomes:['paidMau','pru','revenue'], created:'2026-04-09' },
+      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Executing', outcomes:['paidMau','npsa'], created:'2026-06-14' },
+      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Defining', outcomes:['pru','npsa'], created:'2026-09-02' },
+      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Executing', outcomes:['paidMau','pru','npsa'], created:'2026-07-03' },
+      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Closed', outcomes:['revenue','npsa'], created:'2026-03-21' },
+      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Defining', outcomes:['paidMau','pru'], created:'2026-08-30' },
+      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Executing', outcomes:['npsa','revenue'], created:'2026-05-28' },
+      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Closed', outcomes:['paidMau','pru'], created:'2026-02-17' },
+      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Defining', outcomes:['paidMau','npsa'], created:'2026-09-08' },
+      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Executing', outcomes:['paidMau','pru','npsa','revenue'], created:'2026-06-25' }
+    ];
     let psmV3State = {
       persona: 'psm', search: '', owner: '', region: '', area: '', segment: '', partner: '', status: '', outcome: '',
       page: 1, pageSize: 10
@@ -2672,8 +2691,6 @@
       { key: 'outcomes', label: 'Business Outcomes' },
       { key: 'owner', label: 'Microsoft DRI' },
       { key: 'partner', label: 'Partner' },
-      { key: 'region', label: 'Region' },
-      { key: 'area', label: 'Area' },
       { key: 'status', label: 'Status' },
       { key: 'tenants', label: 'Tenants' },
       { key: 'mau', label: 'MAU Δ' },
@@ -2740,6 +2757,18 @@
     }
 
     function psmV3Campaigns() {
+      var existingIds = new Set(psmCampaigns.map(function(c) { return c.id; }));
+      PSM_V3_ADDITIONAL_CAMPAIGNS.forEach(function(item) {
+        if (existingIds.has(item.id)) return;
+        psmCampaigns.push({
+          id: item.id, name: item.name, partner: item.partner, mpn: PSM_PARTNER_MPN[item.partner],
+          region: item.region, workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Copilot Cowork'],
+          tenantCount: item.tenants, status: item.status, goal: 'MAU Growth', created: item.created,
+          owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER, mauGrowth: 0, revenueGrowth: '$0',
+          engagement: 0, executionType: 'Bulk', v3Owner: PSM_CURRENT_USER, v3Status: item.status,
+          v3Outcomes: item.outcomes.slice(), v3Region: item.region, v3Area: item.area
+        });
+      });
       var campaigns = psmCampaigns.filter(function(c) {
         return [c.name, c.workload].concat(c.workloads || []).join(' ').toLowerCase().match(/copilot|cowork/);
       }).map(psmV3Enrich);
@@ -3621,7 +3650,7 @@
       }
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
-      detail.classList.add('show', 'psm-mvp-half-page');
+      detail.classList.add('show', 'psm-mvp-half-page', 'psm-v3-detail');
       detail.classList.remove('psm-full-page');
       document.getElementById('psmMvpFlyoutBackdrop').classList.add('show');
       var canTransfer = c.v3Owner === PSM_CURRENT_USER;
@@ -3686,11 +3715,11 @@
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
         '</div></div><div class="psm-mvp-status-highlight"><label for="v3HeaderStatus">Campaign Status</label><select id="v3HeaderStatus" onchange="psmV3OpenStatus(\''+c.id+'\',this.value)"'+(canTransfer ? '' : ' disabled')+'>'+PSM_V3_STATUS_FLOW.map(function(status) { return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select></div></div></div>' +
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
-        (canTransfer ? '<div class="psm-mvp-owner-panel"><div><strong>Campaign ownership</strong><div style="margin-top:4px;color:var(--cp-text-muted);font-size:12px;">Transfer ownership when another PSM needs to manage the campaign. You will retain read-only access after transfer.</div></div><div class="form-group"><label for="v3DetailOwner">Microsoft DRI / PSM</label><select id="v3DetailOwner">'+ownerOptions+'</select></div><button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer ownership</button></div>' : '<div class="psm-mvp-owner-panel psm-mvp-readonly"><div><strong>Read-only campaign</strong><div style="margin-top:4px;color:var(--cp-text-muted);font-size:12px;">'+psmEscapeHtml(c.v3Owner)+' is the assigned Microsoft DRI. You can review campaign and tenant details, but only the owner can make changes.</div></div></div>') +
-        '<div class="panel-card"><div class="form-group"><label>Campaign Update</label><textarea id="v3NoteText" class="psm-campaign-update" maxlength="2000" placeholder="Add campaign progress, risks, decisions, or next steps..."'+(canTransfer ? '' : ' readonly')+'></textarea></div>' +
+        (canTransfer ? '<div class="psm-mvp-owner-panel"><div><h2 class="psm-v3-section-heading">Campaign Ownership</h2><div style="color:var(--cp-text-muted);font-size:12px;">Transfer ownership when another PSM needs to manage the campaign. You will retain read-only access after transfer.</div></div><div class="form-group"><label for="v3DetailOwner">Microsoft DRI / PSM</label><select id="v3DetailOwner">'+ownerOptions+'</select></div><button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer ownership</button></div>' : '<div class="psm-mvp-owner-panel psm-mvp-readonly"><div><h2 class="psm-v3-section-heading">Campaign Ownership</h2><div style="color:var(--cp-text-muted);font-size:12px;">'+psmEscapeHtml(c.v3Owner)+' is the assigned Microsoft DRI. You can review campaign and tenant details, but only the owner can make changes.</div></div></div>') +
+        '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Update</h2><div class="form-group"><textarea id="v3NoteText" class="psm-campaign-update" maxlength="2000" aria-label="Campaign update" placeholder="Add campaign progress, risks, decisions, or next steps..."'+(canTransfer ? '' : ' readonly')+'></textarea></div>' +
           (canTransfer ? '<div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="psmV3AddNote(\''+c.id+'\')">Save campaign update</button></div>' : '<div style="color:var(--cp-text-muted);font-size:12px;">Only the assigned Microsoft DRI can update this campaign.</div>') +
-          '<details class="psm-mvp-update-history"><summary>Activity history <span class="psm-mvp-update-count">'+((c.v3Notes || []).length + (c.v3Activity || []).length)+' updates</span></summary><div class="psm-mvp-update-list"><div>'+notes+'</div><div>'+activity+'</div></div></details></div>' +
-        '<div class="panel-card"><h2>Campaign Impact <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
+          '<details class="psm-mvp-update-history"><summary class="psm-v3-activity-summary">Activity History <span class="psm-mvp-update-count">'+((c.v3Notes || []).length + (c.v3Activity || []).length)+' updates</span></summary><div class="psm-mvp-update-list"><div>'+notes+'</div><div>'+activity+'</div></div></details></div>' +
+        '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+Math.max(c.v3Outcomes.length + (c.v3OtherOutcome ? 1 : 0), 1)+',minmax(0,1fr));">'+metrics+'</div>' +
           '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+c.v3Outcomes.map(function(id) { var outcome = PSM_V3_OUTCOMES.filter(function(o) { return o.id === id; })[0]; return '<th>'+outcome.short+' Growth</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div>' +
           '<div style="margin-top:10px;color:var(--cp-text-muted);font-size:11px;">* Revenue is provisional pending licensed-seller financial data and attribution confirmation.</div></div>' +
@@ -4124,6 +4153,7 @@
       });
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
+      detail.classList.remove('psm-v3-detail');
       detail.innerHTML =
         '<div class="flyout-header"><span style="font-size:11px;color:#616161;">MVP Campaign Detail</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.mvpName || c.name)+'</h1><div class="detail-meta">' +
@@ -4416,6 +4446,7 @@
       }
       c.customers.forEach(function(customer, index) {
         psmPopulateMvpTenantTelemetry(c, customer, index, seed);
+        if (currentView === 'psm-v3' && c.v3Status === 'Closed') customer.stage = 'outcomeMeasured';
       });
     }
 
