@@ -1483,6 +1483,7 @@
       <div class="v3-modal-grid">
         <div class="form-group full"><label>Campaign name <span class="required">*</span></label><input id="v3CampaignName" placeholder="e.g. Contoso FY27 Copilot growth"></div>
         <div class="form-group full"><label>Business outcome <span class="required">*</span></label><div class="v3-outcomes" id="v3OutcomeOptions"></div></div>
+        <div class="form-group full"><label>Workloads <span class="required">*</span> <span style="font-weight:400;color:var(--cp-text-muted);">(select one or more)</span></label><div id="v3WorkloadOptions"></div></div>
         <div class="form-group full"><div class="v3-partner-lookup-label">Enter PartnerOne ID or MPN ID <span class="v3-tooltip" tabindex="0" aria-label="Partner identifier tip">?<span class="v3-tooltip-text">Tip: You may enter a single Partner One ID or multiple MPN IDs (comma-separated).</span></span> <span class="required">*</span></div><div class="v3-create-partner-row"><select id="v3PartnerIdType" onchange="psmV3UpdateCreatePartnerPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter PartnerOne ID (Limit one at a time)" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div>
         <div class="form-group full"><label>Tenant IDs <span class="required">*</span></label><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box"><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation">Add Tenant IDs, then validate that each ID is valid and associated with the selected partner.</div></div></div></div>
         <div class="form-group full"><label>Initial campaign note</label><textarea id="v3InitialNote" placeholder="Optional context, partner feedback, risks, or next steps"></textarea></div>
@@ -2683,6 +2684,7 @@
       { id: 'revenue', label: 'Cowork Consumption Revenue', short: 'Cowork Revenue', pending: false },
       { id: 'pru', label: 'Cowork MAU', short: 'Cowork MAU', pending: false }
     ];
+    const PSM_V3_COPILOT_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Agents', 'Copilot Cowork', 'Copilot Extensibility'];
     const PSM_V3_STATUS_FLOW = ['Prepare', 'Execute', 'Review', 'Close'];
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
@@ -2707,6 +2709,7 @@
     let psmV3Upload = { file: null, rows: [], valid: false, overlaps: [] };
     let psmV3MigrationUpload = { file: null, rows: [], valid: false, overlaps: [] };
     let psmV3CreatePartner = null;
+    let psmV3CreateWorkloads = ['Microsoft 365 Copilot'];
     let psmV3CurrentCampaign = null;
     let psmV3SearchTimer = null;
     const PSM_V3_COLUMNS = [
@@ -3096,6 +3099,25 @@
       return Array.from(document.querySelectorAll('input[name="'+prefix+'Outcome"]:checked')).map(function(input) { return input.value; });
     }
 
+    function psmV3RenderWorkloadOptions() {
+      var container = document.getElementById('v3WorkloadOptions');
+      if (!container) return;
+      var workloadBoxes = PSM_V3_COPILOT_WORKLOADS.map(function(workload) {
+        return '<label><input type="checkbox" value="'+psmEscapeHtml(workload)+'"'+(psmV3CreateWorkloads.indexOf(workload) > -1 ? ' checked' : '')+' onchange="psmV3ToggleWorkload(this.value,this.checked)"> '+psmEscapeHtml(workload)+'</label>';
+      }).join('');
+      container.innerHTML = '<details class="psm-wl-picker"><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+psmV3CreateWorkloads.length+' selected</span></span></summary><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+psmWorkloadChipsHtml(psmV3CreateWorkloads)+'</div>';
+    }
+
+    function psmV3ToggleWorkload(workload, selected) {
+      var index = psmV3CreateWorkloads.indexOf(workload);
+      if (selected && index === -1) psmV3CreateWorkloads.push(workload);
+      if (!selected && index > -1) psmV3CreateWorkloads.splice(index, 1);
+      var count = document.getElementById('v3WorkloadCount');
+      var chips = document.getElementById('v3SelectedWorkloads');
+      if (count) count.textContent = psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected';
+      if (chips) chips.innerHTML = psmWorkloadChipsHtml(psmV3CreateWorkloads);
+    }
+
     function psmV3OpenCreate() {
       psmV3Upload = { file: null, rows: [], valid: false, overlaps: [] };
       psmV3CreatePartner = null;
@@ -3106,6 +3128,8 @@
       document.getElementById('v3PartnerIdType').value = 'PartnerOneID';
       document.getElementById('v3PartnerIdSearch').value = '';
       psmV3OutcomeOptions('v3OutcomeOptions', 'v3', ['paidMau', 'pru']);
+      psmV3CreateWorkloads = ['Microsoft 365 Copilot'];
+      psmV3RenderWorkloadOptions();
       document.getElementById('v3OtherOutcomeText').value = '';
       document.getElementById('v3OtherOutcomeWrap').classList.remove('show');
       document.getElementById('v3CreatePartnerResult').className = 'v3-create-partner-result';
@@ -3419,6 +3443,7 @@
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!selectedOutcomes.length) { showToast('Select at least one business outcome', true); return; }
       if (selectedOutcomes.indexOf('other') > -1 && !otherOutcome) { showToast('Enter the other business outcome', true); return; }
+      if (!psmV3CreateWorkloads.length) { showToast('Select at least one Copilot workload', true); return; }
       if (!psmV3CreatePartner) { showToast('Find a partner using a PartnerOne ID or MPN ID', true); return; }
       if (!psmV3Upload.valid) { showToast('Validate the Tenant IDs before creating the campaign', true); return; }
       if (psmV3Upload.overlaps.length && (!document.getElementById('v3OverlapAck') || !document.getElementById('v3OverlapAck').checked)) {
@@ -3435,7 +3460,7 @@
       var creationDate = today();
       var c = {
         id: psmNextCampaignId(), name: name, partner: partner, owner: owner, microsoftDri: owner,
-        region: region, workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Copilot Cowork'],
+        region: region, workload: psmV3CreateWorkloads[0], workloads: psmV3CreateWorkloads.slice(),
         tenantCount: tenantCount, status: 'Defining', goal: otherOutcome || 'Campaign tracking', goals: [], created: creationDate,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0, copilotPru: 0,
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
@@ -3445,7 +3470,11 @@
         v3LastUpdated: today(), v3Status: 'Prepare', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
         v3Source: 'New campaign', v3BaselineAvailable: true, v3Activity: [{ date: today(), type: 'Campaign created', detail: 'Tenant validation passed and baseline telemetry snapshot captured.' }], _v3Enriched: true
       };
-      c.customers = psmV3Upload.rows.map(function(row, index) { return psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index); });
+      c.customers = psmV3Upload.rows.map(function(row, index) {
+        var customer = psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index);
+        customer.targetedWorkloads = psmV3CreateWorkloads.slice();
+        return customer;
+      });
       var note = document.getElementById('v3InitialNote').value.trim();
       c.v3Notes = note ? [{ text: note, author: PSM_CURRENT_USER, date: new Date().toLocaleString() }] : [];
       psmCampaigns.unshift(c);
