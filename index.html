@@ -2984,10 +2984,11 @@
     const PSM_V3_COLUMNS = [
       { key: 'id', label: 'Campaign ID', fixed: true },
       { key: 'name', label: 'Campaign Name', fixed: true },
+      { key: 'partnerOneName', label: 'PartnerOne Name' },
+      { key: 'partnerOneId', label: 'PartnerOne ID' },
       { key: 'outcomes', label: 'Business Outcomes' },
       { key: 'workloads', label: 'Workloads' },
       { key: 'owner', label: 'Microsoft DRI' },
-      { key: 'partner', label: 'Partner' },
       { key: 'status', label: 'Status' },
       { key: 'tenants', label: 'Tenants' },
       { key: 'mau', label: 'Copilot Paid MAU Δ' },
@@ -3028,6 +3029,7 @@
       c.v3Segments = c.v3Segments || [PSM_V3_SEGMENTS[seed % PSM_V3_SEGMENTS.length], PSM_V3_SEGMENTS[(seed + 1) % PSM_V3_SEGMENTS.length]].filter(function(value, index, values) { return values.indexOf(value) === index; });
       c.v3Partners = c.v3Partners || [c.partner];
       c.v3Partners = [c.partner];
+      c.partnerOneId = c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '';
       c.v3PartnerIds = c.v3PartnerIds || c.v3Partners.reduce(function(ids, partner) {
         return ids.concat([PSM_PARTNER_ONE[partner] || '']).concat(PSM_PARTNER_ASSOCIATED_MPN[partner] || []);
       }, []).filter(Boolean);
@@ -3089,7 +3091,7 @@
       var search = psmV3State.search.toLowerCase();
       var campaigns = psmV3Campaigns().filter(function(c) {
         if (psmV3State.persona === 'psm' && c.v3Owner !== PSM_CURRENT_USER) return false;
-        if (search && [c.id, c.name, c.partner, c.v3Owner, c.v3Area, c.v3Region].join(' ').toLowerCase().indexOf(search) === -1) return false;
+        if (search && [c.id, c.name, c.partner, c.partnerOneId, c.v3Owner, c.v3Area, c.v3Region].join(' ').toLowerCase().indexOf(search) === -1) return false;
         if (psmV3State.owner && c.v3Owner !== psmV3State.owner) return false;
         if (psmV3State.region && c.v3Region !== psmV3State.region) return false;
         if (psmV3State.area && c.v3Area !== psmV3State.area) return false;
@@ -3253,10 +3255,11 @@
         var values = {
           id: '<strong style="color:var(--cp-link);">'+c.id+'</strong>',
           name: '<strong>'+psmEscapeHtml(c.name)+'</strong>',
+          partnerOneName: psmEscapeHtml(c.partner),
+          partnerOneId: psmEscapeHtml(c.partnerOneId || '\u2014'),
           outcomes: psmV3PriorityChips(c),
           workloads: (c.workloads || []).map(function(workload) { return '<span class="v3-chip">'+psmEscapeHtml(workload)+'</span>'; }).join(''),
           owner: psmEscapeHtml(c.v3Owner),
-          partner: psmEscapeHtml(c.partner),
           region: psmEscapeHtml(c.v3Region),
           area: psmEscapeHtml(c.v3Area),
           status: psmRenderStatusBadge(c.v3Status),
@@ -3295,7 +3298,7 @@
         '<div class="filter-section"><label>Region</label><select id="v3FilterRegion">'+psmV3Options(['Americas', 'EMEA', 'APAC'], psmV3State.region, 'All regions')+'</select></div>' +
         '<div class="filter-section"><label>Area</label><select id="v3FilterArea">'+psmV3Options(PSM_V3_AREAS, psmV3State.area, 'All areas')+'</select></div>' +
         '<div class="filter-section"><label>Tenant segment</label><select id="v3FilterSegment">'+psmV3Options(PSM_V3_SEGMENTS, psmV3State.segment, 'All segments')+'</select></div>' +
-        '<div class="filter-section"><label>Partner</label><select id="v3FilterPartner">'+psmV3Options(partners, psmV3State.partner, 'All partners')+'</select></div>' +
+        '<div class="filter-section"><label>PartnerOne Name</label><select id="v3FilterPartner">'+psmV3Options(partners, psmV3State.partner, 'All PartnerOne names')+'</select></div>' +
         '<div class="filter-section"><label>Campaign status</label><select id="v3FilterStatus">'+psmV3Options(PSM_V3_STATUS_FLOW, psmV3State.status, 'All statuses')+'</select></div>' +
         '<div class="filter-section"><label>Business outcome</label><select id="v3FilterOutcome"><option value="">All outcomes</option>'+PSM_V3_OUTCOMES.map(function(outcome) { return '<option value="'+outcome.id+'"'+(psmV3State.outcome === outcome.id ? ' selected' : '')+'>'+outcome.label+'</option>'; }).join('')+'<option value="other"'+(psmV3State.outcome === 'other' ? ' selected' : '')+'>Other</option></select></div>' +
         '<div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyFilters()">Apply</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearFilters();psmV3CloseTablePanel()">Clear all</button></div>';
@@ -3339,7 +3342,7 @@
       var campaigns = psmV3FilteredCampaigns();
       var csv = columns.map(function(column) { return '"'+column.label+'"'; }).join(',')+'\r\n'+campaigns.map(function(c) {
         var values = {
-          id:c.id, name:c.name, outcomes:c.v3Outcomes.join('; '), workloads:(c.workloads || []).join('; '), owner:c.v3Owner, partner:c.partner, region:c.v3Region, area:c.v3Area,
+          id:c.id, name:c.name, partnerOneName:c.partner, partnerOneId:c.partnerOneId, outcomes:c.v3Outcomes.join('; '), workloads:(c.workloads || []).join('; '), owner:c.v3Owner, region:c.v3Region, area:c.v3Area,
           status:c.v3Status, tenants:c.tenantCount, mau:psmV3MetricTotal([c], 'paidMau'), pru:psmV3MetricTotal([c], 'pru'),
           npsa:psmV3MetricTotal([c], 'npsa'), revenue:psmV3MetricTotal([c], 'revenue'), updated:c.v3LastUpdated
         };
