@@ -733,7 +733,7 @@
     .psm-v3-header-controls { display:flex; align-items:stretch; gap:8px; width:100%; margin-top:16px; }
     .psm-v3-header-card { min-height:92px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); box-sizing:border-box; }
     .psm-v3-header-card-label { display:block; margin-bottom:7px; color:var(--cp-text-muted); font-size:12px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
-    .psm-v3-campaign-status { flex:0 0 138px; }
+    .psm-v3-campaign-status { flex:0 0 164px; }
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:20px; line-height:1.25; }
     .psm-v3-owner-highlight { flex:0 0 248px; }
     .psm-v3-owner-controls { display:flex; align-items:center; gap:6px; }
@@ -744,7 +744,7 @@
     .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
     .psm-v3-tenant-status-item strong { display:block; color:var(--cp-text); font-size:19px; line-height:1; }
     .psm-v3-tenant-status-item span { display:block; margin-top:4px; color:var(--cp-text-muted); font-size:11px; font-weight:600; line-height:1.15; }
-    .psm-v3-update-button { flex:0 0 auto; align-self:center; min-height:40px; padding:9px 14px; white-space:nowrap; }
+    .psm-v3-update-button { width:100%; min-height:34px; margin-top:9px; padding:7px 10px; white-space:nowrap; }
     #psmV3TablePanel.campaign-update-panel .filter-panel { width:400px; }
     .psm-v3-status-search { position:relative; margin-bottom:12px; }
     .psm-v3-status-search svg { position:absolute; top:50%; left:10px; width:16px; height:16px; color:var(--cp-text-muted); transform:translateY(-50%); pointer-events:none; }
@@ -2685,22 +2685,22 @@
       { id: 'npsa', label: 'Copilot NPSA', short: 'NPSA', pending: false },
       { id: 'revenue', label: 'Revenue growth', short: 'Revenue', pending: true }
     ];
-    const PSM_V3_STATUS_FLOW = ['Defining', 'Executing', 'Closed'];
+    const PSM_V3_STATUS_FLOW = ['Prepare', 'Execute', 'Review', 'Close'];
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
     const PSM_V3_ADDITIONAL_CAMPAIGNS = [
-      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Defining', outcomes:['paidMau','pru'], created:'2026-08-26' },
-      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Executing', outcomes:['paidMau','npsa'], created:'2026-07-18' },
-      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Closed', outcomes:['paidMau','pru','revenue'], created:'2026-04-09' },
-      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Executing', outcomes:['paidMau','npsa'], created:'2026-06-14' },
-      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Defining', outcomes:['pru','npsa'], created:'2026-09-02' },
-      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Executing', outcomes:['paidMau','pru','npsa'], created:'2026-07-03' },
-      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Closed', outcomes:['revenue','npsa'], created:'2026-03-21' },
-      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Defining', outcomes:['paidMau','pru'], created:'2026-08-30' },
-      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Executing', outcomes:['npsa','revenue'], created:'2026-05-28' },
-      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Closed', outcomes:['paidMau','pru'], created:'2026-02-17' },
-      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Defining', outcomes:['paidMau','npsa'], created:'2026-09-08' },
-      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Executing', outcomes:['paidMau','pru','npsa','revenue'], created:'2026-06-25' }
+      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', outcomes:['paidMau','pru'], created:'2026-08-26' },
+      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', outcomes:['paidMau','npsa'], created:'2026-07-18' },
+      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Close', outcomes:['paidMau','pru','revenue'], created:'2026-04-09' },
+      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Review', outcomes:['paidMau','npsa'], created:'2026-06-14' },
+      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Prepare', outcomes:['pru','npsa'], created:'2026-09-02' },
+      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Execute', outcomes:['paidMau','pru','npsa'], created:'2026-07-03' },
+      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Close', outcomes:['revenue','npsa'], created:'2026-03-21' },
+      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Prepare', outcomes:['paidMau','pru'], created:'2026-08-30' },
+      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Review', outcomes:['npsa','revenue'], created:'2026-05-28' },
+      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Close', outcomes:['paidMau','pru'], created:'2026-02-17' },
+      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Execute', outcomes:['paidMau','npsa'], created:'2026-09-08' },
+      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Review', outcomes:['paidMau','pru','npsa','revenue'], created:'2026-06-25' }
     ];
     let psmV3State = {
       persona: 'psm', search: '', owner: '', region: '', area: '', segment: '', partner: '', status: '', outcome: '',
@@ -2730,12 +2730,12 @@
     function psmV3Status(c) {
       var source = c.v3Status || c.status;
       var map = {
-        Draft: 'Defining', New: 'Defining',
-        Submitted: 'Executing', Accepted: 'Executing', Active: 'Executing', Measuring: 'Executing',
-        Outreach: 'Executing', Engaged: 'Executing', Funding: 'Executing', Committed: 'Executing',
-        Completed: 'Closed'
+        Draft: 'Prepare', New: 'Prepare', Defining: 'Prepare',
+        Submitted: 'Execute', Accepted: 'Execute', Active: 'Execute', Executing: 'Execute',
+        Outreach: 'Execute', Engaged: 'Execute', Funding: 'Execute', Committed: 'Execute',
+        Measuring: 'Review', Completed: 'Close', Closed: 'Close'
       };
-      return map[source] || (PSM_V3_STATUS_FLOW.indexOf(source) > -1 ? source : 'Defining');
+      return map[source] || (PSM_V3_STATUS_FLOW.indexOf(source) > -1 ? source : 'Prepare');
     }
 
     function psmV3Enrich(c) {
@@ -2764,7 +2764,7 @@
       c.v3OpenDate = c.v3OpenDate || c.created;
       c.v3LastUpdated = c.v3LastUpdated || c.mvpUpdated || today();
       c.v3Status = psmV3Status(c);
-      var ageFactor = c.v3Status === 'Defining' ? 0 : (c.v3Status === 'Executing' ? 0.65 : 1);
+      var ageFactor = c.v3Status === 'Prepare' ? 0 : (c.v3Status === 'Execute' ? 0.45 : (c.v3Status === 'Review' ? 0.75 : 1));
       var paidBase = 1200 + (seed % 30) * 85;
       var pruBase = 1700 + (seed % 32) * 92;
       var npsaBase = 80 + (seed % 18) * 12;
@@ -2891,7 +2891,7 @@
 
     function psmV3RenderKpis(campaigns) {
       document.getElementById('psmV3Kpis').innerHTML = '<div class="v3-kpis">' +
-        psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', campaigns.filter(function(c) { return c.v3Status !== 'Closed'; }).length+' currently open') +
+        psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', campaigns.filter(function(c) { return c.v3Status !== 'Close'; }).length+' currently open') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'paidMau').toLocaleString(), 'MAU growth', 'Change from campaign snapshots') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'pru').toLocaleString(), 'PRU growth', 'Change from campaign snapshots') +
         psmV3Kpi('+'+psmV3MetricTotal(campaigns, 'npsa').toLocaleString(), 'NPSA growth', 'Change from campaign snapshots') +
@@ -2904,7 +2904,7 @@
       var statusCounts = statuses.map(function(status) {
         return campaigns.filter(function(c) { return c.v3Status === status; }).length;
       });
-      var statusColors = ['var(--cp-accent)', 'var(--cp-success)', 'var(--cp-warning)'];
+      var statusColors = ['var(--cp-accent)', 'var(--cp-link)', 'var(--cp-warning)', 'var(--cp-success)'];
       function pieSlices(counts, labels, colors) {
         var total = counts.reduce(function(sum, count) { return sum + count; }, 0);
         var startAngle = -Math.PI / 2;
@@ -3443,7 +3443,7 @@
         v3Owner: owner, v3Outcomes: outcomes, v3OtherOutcome: otherOutcome, v3Region: region,
         v3Area: area, v3Segments: PSM_V3_SEGMENTS.slice(0, 2), v3Partners: [partner],
         v3PartnerIds: ids, v3OpenDate: creationDate, v3BaselineDate: creationDate,
-        v3LastUpdated: today(), v3Status: 'Defining', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
+        v3LastUpdated: today(), v3Status: 'Prepare', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
         v3Source: 'New campaign', v3BaselineAvailable: true, v3Activity: [{ date: today(), type: 'Campaign created', detail: 'Tenant validation passed and baseline telemetry snapshot captured.' }], _v3Enriched: true
       };
       c.customers = psmV3Upload.rows.map(function(row, index) { return psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index); });
@@ -3480,7 +3480,7 @@
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
         v3Owner: owner, v3Outcomes: outcomes, v3Region: 'Americas', v3Area: 'US West', v3Segments: ['Enterprise'],
         v3Partners: psmV3PartnersForIds(ids, 'Contoso'), v3PartnerIds: ids, v3OpenDate: date, v3BaselineDate: date, v3LastUpdated: today(),
-        v3Status: 'Executing', v3Metrics: suppliedMetrics.metrics, v3Source: 'Legacy import: '+(document.getElementById('v3MigrationSource').value.trim() || 'Unspecified source'),
+        v3Status: 'Execute', v3Metrics: suppliedMetrics.metrics, v3Source: 'Legacy import: '+(document.getElementById('v3MigrationSource').value.trim() || 'Unspecified source'),
         v3BaselineAvailable: baselineAvailable, v3Notes: [], _v3Enriched: true
       };
       c.customers = psmV3MigrationUpload.rows.map(function(row, index) { return psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index); });
@@ -3561,7 +3561,7 @@
       var status = selected ? selected.value : '';
       var note = document.getElementById('v3FlyoutStatusNote').value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
-      if (status === 'Closed' && (c.customers || []).some(function(customer) { return customer.stage !== 'outcomeMeasured'; })) {
+      if (status === 'Close' && (c.customers || []).some(function(customer) { return customer.stage !== 'outcomeMeasured'; })) {
         showToast('Every customer tenant must reach Outcome Measured before the campaign can be closed', true);
         return;
       }
@@ -3573,6 +3573,7 @@
       c.v3Activity.push({ date: today(), type: 'Campaign status', detail: previous+' → '+status+'. '+note });
       psmV3CloseTablePanel();
       showToast('Campaign updated to '+status);
+      psmV3RenderDashboard();
       psmV3OpenDetail(c.id);
     }
 
@@ -3768,7 +3769,7 @@
           '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</div>' +
           '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
           '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong></div><div class="psm-v3-header-card psm-v3-tenant-highlight"><span class="psm-v3-header-card-label">Tenant Status</span><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><label class="psm-v3-header-card-label" for="v3DetailOwner">Campaign Owner</label><div class="psm-v3-owner-controls"><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canTransfer ? '' : ' disabled')+'>Update Campaign</button></div></div>' +
+        '</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canTransfer ? '' : ' disabled')+'>Update Campaign</button></div><div class="psm-v3-header-card psm-v3-tenant-highlight"><span class="psm-v3-header-card-label">Tenant Status</span><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><label class="psm-v3-header-card-label" for="v3DetailOwner">Campaign Owner</label><div class="psm-v3-owner-controls"><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div></div>' +
         '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+(PSM_V3_OUTCOMES.length + (c.v3OtherOutcome ? 1 : 0))+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
@@ -4544,7 +4545,7 @@
       }
       c.customers.forEach(function(customer, index) {
         psmPopulateMvpTenantTelemetry(c, customer, index, seed);
-        if (currentView === 'psm-v3' && c.v3Status === 'Closed') customer.stage = 'outcomeMeasured';
+        if (currentView === 'psm-v3' && c.v3Status === 'Close') customer.stage = 'outcomeMeasured';
       });
     }
 
