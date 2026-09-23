@@ -38,6 +38,12 @@
       --cp-panel-strong: rgba(255, 255, 255, 0.96);
       --cp-sheen: rgba(255, 255, 255, 0.55);
       --cp-highlight: rgba(177, 31, 75, 0.12);
+      --cp-aspx-nav: #1b3a5c;
+      --cp-link-soft: rgba(0, 120, 212, 0.08);
+      --cp-ms-red: #f25022;
+      --cp-ms-green: #7fba00;
+      --cp-ms-blue: #00a4ef;
+      --cp-ms-yellow: #ffb900;
     }
     html[data-theme="dark"] {
       color-scheme: dark;
@@ -64,6 +70,12 @@
       --cp-panel-strong: rgba(41, 41, 41, 0.96);
       --cp-sheen: rgba(255, 255, 255, 0.04);
       --cp-highlight: rgba(253, 142, 161, 0.12);
+      --cp-aspx-nav: #1b3a5c;
+      --cp-link-soft: rgba(77, 166, 255, 0.12);
+      --cp-ms-red: #f25022;
+      --cp-ms-green: #7fba00;
+      --cp-ms-blue: #00a4ef;
+      --cp-ms-yellow: #ffb900;
     }
     /* ============================================================
        RESET & BASE
@@ -1091,6 +1103,88 @@
     .v3-collapsible summary::after { content:"Maximize"; color:var(--cp-link); font-size:12px; font-weight:600; }
     .v3-collapsible[open] summary::after { content:"Minimize"; }
     .v3-collapsible[open] summary { margin-bottom:12px; }
+    /* ASPXi visual alignment */
+    .top-nav { background:var(--cp-aspx-nav); }
+    .nav-product-lockup { display:flex; align-items:center; gap:10px; min-width:0; }
+    .microsoft-logo { flex:0 0 auto; }
+    .nav-page-name { font-weight:400; }
+    .nav-icon-btn {
+      display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;
+      padding:0; border:0; border-radius:4px; background:transparent; color:var(--cp-surface);
+    }
+    .nav-icon-btn:hover { background:var(--cp-sheen); }
+    .prototype-switcher { display:flex; align-items:center; gap:8px; padding:4px 8px; border:1px solid var(--cp-border-strong); border-radius:4px; background:var(--cp-aspx-nav); }
+    .prototype-switcher-label { color:var(--cp-surface); font-size:11px; font-weight:600; white-space:nowrap; }
+    .prototype-switcher select { height:26px; padding:2px 7px; border:1px solid var(--cp-border); border-radius:3px; background:var(--cp-surface); color:var(--cp-text); font:inherit; font-size:11px; }
+    .sidebar { width:220px; background:var(--cp-surface-soft); border-color:var(--cp-border); }
+    .sidebar-link { gap:10px; color:var(--cp-text); }
+    .sidebar-link svg { flex:0 0 auto; color:var(--cp-text-muted); }
+    .sidebar-link:hover { background:var(--cp-bg-elevated); }
+    .sidebar-link.active { border-left-color:var(--cp-link); background:var(--cp-link-soft); color:var(--cp-link); }
+    .sidebar-link.active svg { color:var(--cp-link); }
+    body.psm-view .main-content { background:var(--cp-bg-elevated); }
+    body.psm-view .dashboard-view { padding:24px 32px 40px; }
+    .v3-head { align-items:center; margin-bottom:20px; }
+    .v3-head h1 { color:var(--cp-text); font-size:24px; font-weight:600; line-height:1.3; }
+    .v3-kpis { gap:12px; margin-bottom:20px; }
+    .v3-kpi {
+      min-height:112px; padding:16px; border-radius:0.625rem; background:var(--cp-surface);
+      box-shadow:0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+    .v3-kpi strong { color:var(--cp-link); font-size:28px; line-height:1.15; }
+    .v3-kpi span { margin-top:auto; font-size:11px; letter-spacing:.3px; }
+    .v3-kpi small { font-size:11px; }
+    .v3-charts { gap:12px; margin-bottom:20px; }
+    .v3-card {
+      border-radius:0.625rem; background:var(--cp-surface);
+      box-shadow:0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+    .v3-card h2 { color:var(--cp-text); font-size:14px; font-weight:600; }
+    .v3-pie-layout { justify-content:flex-start; min-height:180px; }
+    .v3-chart-legend-row { color:var(--cp-text); }
+    .v3-table-toolbar { margin-top:4px; padding:8px 0; border-top:0; border-bottom:1px solid var(--cp-border); }
+    .v3-table-toolbar .toolbar-btn { min-height:32px; padding:6px 10px; }
+    .v3-table-toolbar .toolbar-btn:hover { background:var(--cp-surface-soft); color:var(--cp-link); }
+    .v3-table-search-wrap {
+      display:flex; align-items:center; gap:6px; height:32px; padding:0 10px;
+      border:1px solid var(--cp-border-strong); border-radius:4px; background:var(--cp-surface);
+    }
+    .v3-table-search-wrap:focus-within { border-color:var(--cp-link); }
+    .v3-table-search-wrap svg { flex:0 0 auto; color:var(--cp-text-muted); }
+    .v3-table-search { width:190px; padding:0; border:0; outline:0; border-radius:0; background:transparent; }
+    .v3-table-wrap { border-radius:0.625rem; box-shadow:0 0 2px var(--cp-border); }
+    .v3-table th {
+      padding:10px 12px; border-bottom:2px solid var(--cp-border); background:var(--cp-surface-soft);
+      color:var(--cp-text); font-size:11px; font-weight:600; letter-spacing:.2px; white-space:normal;
+    }
+    .v3-table td { padding:10px 12px; }
+    .v3-table tbody tr:hover { background:var(--cp-link-soft); }
+    .v3-table td:first-child strong { color:var(--cp-link) !important; }
+    .v3-chip { border:0; border-radius:3px; background:var(--cp-link-soft); color:var(--cp-link); font-weight:600; }
+    .v3-pagination { padding:4px 0; }
+    .detail-view.psm-v3-detail {
+      background:var(--cp-bg-elevated); border-left:1px solid var(--cp-border);
+      box-shadow:-4px 0 16px var(--cp-border);
+    }
+    .psm-v3-detail .flyout-header { margin:-20px -24px 20px; padding:12px 24px; background:var(--cp-surface); border-bottom:1px solid var(--cp-border); }
+    .psm-v3-detail .detail-header { padding-bottom:4px; }
+    .psm-v3-detail .panel-card { border-radius:0.625rem; box-shadow:0 0 2px var(--cp-border), 0 1px 2px var(--cp-border); }
+    .psm-v3-header-card { border-radius:0.625rem; box-shadow:none; }
+    .psm-v3-campaign-status { border-left:3px solid var(--cp-link); }
+    .psm-v3-tenant-highlight { border-left:3px solid var(--cp-success); }
+    .psm-mvp-table-toolbar .psm-mvp-toolbar-btn { border:0; border-radius:4px; box-shadow:none; }
+    .psm-mvp-table-toolbar .psm-mvp-toolbar-btn:hover, .psm-mvp-table-toolbar .psm-mvp-toolbar-btn.active { border-color:transparent; background:var(--cp-surface-soft); color:var(--cp-link); }
+    .psm-v3-detail .psm-mvp-progress-table { min-width:2200px; table-layout:auto; }
+    .psm-v3-detail .psm-mvp-progress-table th, .psm-v3-detail .psm-mvp-progress-table td { min-width:120px; padding:10px 12px; overflow-wrap:normal; }
+    .psm-v3-detail .psm-mvp-progress-table th:first-child, .psm-v3-detail .psm-mvp-progress-table td:first-child { min-width:40px; width:40px; }
+    .psm-v3-detail .psm-mvp-progress-table th:nth-child(2), .psm-v3-detail .psm-mvp-progress-table td:nth-child(2) { min-width:170px; }
+    .psm-v3-detail .psm-mvp-progress-table th:nth-child(3), .psm-v3-detail .psm-mvp-progress-table td:nth-child(3) { min-width:115px; }
+    .psm-v3-detail .psm-mvp-progress-table th:nth-child(4), .psm-v3-detail .psm-mvp-progress-table td:nth-child(4) { min-width:165px; }
+    .v3-create-overlay .v3-modal { border-left:1px solid var(--cp-border); background:var(--cp-bg-elevated); }
+    .v3-create-overlay .v3-modal > h3, .v3-create-overlay .v3-modal > p { padding-left:4px; padding-right:4px; }
+    .v3-create-overlay .v3-modal > h3 { font-size:20px; font-weight:600; }
+    .v3-create-overlay .btn-group { position:sticky; bottom:0; margin:20px -24px -24px; padding:14px 24px; border-top:1px solid var(--cp-border); background:var(--cp-surface); }
+    .filter-panel { border-left:1px solid var(--cp-border); background:var(--cp-surface); box-shadow:-4px 0 16px var(--cp-border); }
     @media (max-width:1000px) { .v3-impact-grid { grid-template-columns:1fr; } }
   </style>
   <script type="module">
@@ -1141,14 +1235,22 @@
 
   <!-- ========== TOP NAV ========== -->
   <nav class="top-nav">
-    <div class="nav-left">
-      <button style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;">&#9776;</button>
-      <span class="nav-title nav-platform-name" style="font-weight:600;">Microsoft Partner Center</span>
+    <div class="nav-left nav-product-lockup">
+      <button class="nav-icon-btn" title="Navigation" aria-label="Navigation"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2.5 4.25h15v1.5h-15v-1.5Zm0 5h15v1.5h-15v-1.5Zm0 5h15v1.5h-15v-1.5Z"/></svg></button>
+      <svg class="microsoft-logo" width="20" height="20" viewBox="0 0 21 21" aria-hidden="true">
+        <rect x="0" y="0" width="10" height="10" fill="var(--cp-ms-red)"></rect>
+        <rect x="11" y="0" width="10" height="10" fill="var(--cp-ms-green)"></rect>
+        <rect x="0" y="11" width="10" height="10" fill="var(--cp-ms-blue)"></rect>
+        <rect x="11" y="11" width="10" height="10" fill="var(--cp-ms-yellow)"></rect>
+      </svg>
+      <span class="nav-title nav-platform-name">AI Business Solutions &amp; Security</span>
+      <span class="nav-separator">|</span>
+      <span class="nav-title nav-page-name" id="navPageName">Campaigns</span>
     </div>
     <div class="nav-center">
-      <div id="prototypeViewSwitcher" style="display:flex;align-items:center;gap:8px;background:#0078d4;border-radius:4px;padding:5px 12px;">
-        <span style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;">Prototype Views</span>
-        <select id="viewSwitcherSelect" onchange="switchView(this.value)" style="background:#fff;color:#242424;border:1px solid #d1d1d1;border-radius:3px;padding:3px 8px;font-size:12px;font-weight:500;cursor:pointer;outline:none;">
+      <div class="prototype-switcher" id="prototypeViewSwitcher">
+        <span class="prototype-switcher-label">Prototype Views</span>
+        <select id="viewSwitcherSelect" onchange="switchView(this.value)">
           <option value="partner">SDC (ASPX)</option>
           <option value="field">SDC-Field (ASPXi)</option>
           <option value="corp">SDC-Corp (ASPXi)</option>
@@ -1164,8 +1266,8 @@
         <select id="psmPartnerIdType" onchange="psmUpdatePartnerSearchPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select>
         <input id="psmPartnerIdSearch" type="text" placeholder="Enter PartnerOne ID" onkeydown="if(event.key==='Enter')psmFindPartner()">
       </div>
-      <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#128276;</button>
-      <button style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:6px;">&#9881;</button>
+      <button class="nav-icon-btn" title="Notifications" aria-label="Notifications"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3.03l-.88 1.76A1 1 0 0 0 4.5 14h11a1 1 0 0 0 .89-1.45l-.02-.03-.87-1.75V7.5A5.5 5.5 0 0 0 10 2Zm0 16a2.5 2.5 0 0 1-2.45-2h4.9A2.5 2.5 0 0 1 10 18Z"/></svg></button>
+      <button class="nav-icon-btn" title="Help and readiness" aria-label="Help and readiness"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Zm0-3.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5Zm.41-1.23a.5.5 0 0 1-.91 0V11.5c0-.28.22-.5.5-.5a1.5 1.5 0 1 0-1.5-1.5.5.5 0 0 1-1 0 2.5 2.5 0 1 1 2.91 2.47Z"/></svg></button>
       <div class="nav-avatar" title="Varun Gorur">VG</div>
     </div>
   </nav>
@@ -2145,9 +2247,9 @@
       } else if (isPsmView()) {
         sidebar.innerHTML =
           '<nav class="sidebar-nav">' +
-            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'Growth Opportunities selected\'); return false;"><span>Growth Opportunities</span></a>' +
-            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'MCI Performance selected\'); return false;"><span>MCI Performance</span></a>' +
-            '<a href="#" class="sidebar-link active" onclick="return false;"><span>Campaigns</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'Growth Opportunities selected\'); return false;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 12.5 5.5 9l2.5 2 5-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 5h3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Growth Opportunities</span></a>' +
+            '<a href="#" class="sidebar-link decorative" onclick="showToast(\'MCI Performance selected\'); return false;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 13.5v-4h2v4h-2Zm4.5 0v-7h2v7H7Zm4.5 0v-11h2v11h-2Z" stroke="currentColor" stroke-width="1.2"/></svg><span>MCI Performance</span></a>' +
+            '<a href="#" class="sidebar-link active" onclick="return false;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4.5h11v8h-11v-8Zm2-2h7v2h-7v-2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg><span>Campaigns</span></a>' +
           '</nav>';
       } else {
         sidebar.innerHTML =
@@ -2179,11 +2281,14 @@
       viewUrl.searchParams.set('view', view);
       history.replaceState(null, '', viewUrl.pathname + viewUrl.search + viewUrl.hash);
       document.body.classList.toggle('partner-view', view === 'partner');
+      document.body.classList.toggle('psm-view', isPsmView(view));
       document.getElementById('viewSwitcherSelect').value = view;
       renderSidebar();
       document.getElementById('dashboardView').classList.toggle('active', true);
       document.querySelector('.nav-platform-name').textContent =
-        view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi';
+        view === 'psm-v3' ? 'AI Business Solutions & Security' : (view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi');
+      document.getElementById('navPageName').textContent =
+        isPsmView(view) ? 'Campaigns' : (view === 'partner' ? 'Referrals and Deal Clinics' : 'Security Deal Clinic');
       document.getElementById('psmPartnerPicker').style.display = isPsmView(view) && view !== 'psm-v3' ? 'flex' : 'none';
       document.getElementById('psmPartnerBanner').style.display = isPsmView(view) && view !== 'psm-v3' ? 'block' : 'none';
       activeKpiFilter = null;
@@ -3008,7 +3113,7 @@
         return '<tr onclick="psmV3OpenDetail(\''+c.id+'\')">'+visibleColumns.map(function(column) { return '<td>'+cell(c, column.key)+'</td>'; }).join('')+'</tr>';
       }).join('');
       document.getElementById('psmV3Table').innerHTML =
-        '<div class="v3-table-toolbar"><div class="v3-actions"><button class="toolbar-btn" type="button" onclick="psmV3DownloadCampaigns()">Download</button></div><div class="v3-actions"><button class="toolbar-btn" type="button" onclick="psmV3OpenColumns()">Change columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenFilters()">Filter</button><input class="v3-table-search" aria-label="Search campaigns" placeholder="Search campaigns" value="'+psmEscapeHtml(psmV3State.search)+'" oninput="psmV3QueueSearch(this.value)"></div></div>' +
+        '<div class="v3-table-toolbar"><div class="v3-actions"><button class="toolbar-btn" type="button" onclick="psmV3DownloadCampaigns()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button></div><div class="v3-actions"><button class="toolbar-btn" type="button" onclick="psmV3OpenColumns()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenFilters()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search campaigns" placeholder="Search campaigns" value="'+psmEscapeHtml(psmV3State.search)+'" oninput="psmV3QueueSearch(this.value)"></div></div></div>' +
         '<div class="v3-table-wrap"><table class="v3-table"><thead><tr>'+visibleColumns.map(function(column) { return '<th>'+column.label+'</th>'; }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div class="v3-pagination"><span>Showing '+(start + 1)+'-'+Math.min(start + page.length, campaigns.length)+' of '+campaigns.length+' campaigns</span><div class="v3-actions"><label>Rows <select onchange="psmV3SetPageSize(this.value)">'+[10,25,50].map(function(size) { return '<option'+(psmV3State.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3Page(-1)"'+(psmV3State.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3State.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3Page(1)"'+(psmV3State.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>';
     }
@@ -3793,7 +3898,7 @@
       if (c.v3OtherOutcome) outcomeNames.push(c.v3OtherOutcome);
       outcomeNames = outcomeNames.join(', ');
       var ownerOptions = PSM_OWNERS.map(function(owner) { return '<option'+(owner === c.v3Owner ? ' selected' : '')+'>'+psmEscapeHtml(owner)+'</option>'; }).join('');
-      detail.innerHTML = '<div class="flyout-header"><span style="font-size:11px;color:var(--cp-text-muted);">MVP Campaign Detail</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
+      detail.innerHTML = '<div class="flyout-header"><span style="font-size:11px;color:var(--cp-text-muted);">Campaign details</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>Partner Name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
