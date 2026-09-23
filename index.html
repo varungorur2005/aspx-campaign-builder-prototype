@@ -975,6 +975,9 @@
     .v3-owner-top { min-width:240px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
     .v3-owner-top label { display:block; margin-bottom:4px; color:var(--cp-text-muted); font-size:10px; font-weight:700; text-transform:uppercase; }
     .v3-owner-top select { width:100%; padding:7px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .v3-status-top { min-width:180px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .v3-status-top label { display:block; margin-bottom:4px; color:var(--cp-text-muted); font-size:10px; font-weight:700; text-transform:uppercase; }
+    .v3-status-top select { width:100%; padding:7px 8px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .v3-meta { display:flex; gap:12px; flex-wrap:wrap; color:var(--cp-text-muted); font-size:11px; }
     .v3-impact-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
     .v3-impact { padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
@@ -1425,7 +1428,7 @@
   <div class="modal-overlay" id="psmV3StatusModal">
     <div class="modal" style="width:520px;">
       <h3>Update campaign</h3>
-      <p>Move the campaign through the proposed lifecycle. Completion is available only after every tenant reaches a terminal outcome.</p>
+      <p>Update the campaign status. A campaign can be closed only after every customer tenant reaches Outcome Measured.</p>
       <div class="form-group"><label>Campaign status</label><select id="v3StatusValue"></select></div>
       <div class="form-group"><label>Update note <span class="required">*</span></label><textarea id="v3StatusNote" placeholder="Explain what changed and the next step"></textarea></div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3StatusModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3SaveStatus()">Save update</he-button_psmv3></div>
@@ -2622,7 +2625,7 @@
       { id: 'npsa', label: 'Copilot NPSA', short: 'NPSA', pending: false },
       { id: 'revenue', label: 'Revenue growth', short: 'Revenue', pending: true }
     ];
-    const PSM_V3_STATUS_FLOW = ['New', 'Outreach', 'Engaged', 'Funding', 'Committed', 'Closed'];
+    const PSM_V3_STATUS_FLOW = ['Defining', 'Executing', 'Closed'];
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
     let psmV3State = {
@@ -2653,8 +2656,13 @@
 
     function psmV3Status(c) {
       var source = c.v3Status || c.status;
-      var map = { Draft: 'New', Submitted: 'Outreach', Accepted: 'Engaged', Active: 'Engaged', Measuring: 'Committed', Completed: 'Closed' };
-      return map[source] || (PSM_V3_STATUS_FLOW.indexOf(source) > -1 ? source : 'New');
+      var map = {
+        Draft: 'Defining', New: 'Defining',
+        Submitted: 'Executing', Accepted: 'Executing', Active: 'Executing', Measuring: 'Executing',
+        Outreach: 'Executing', Engaged: 'Executing', Funding: 'Executing', Committed: 'Executing',
+        Completed: 'Closed'
+      };
+      return map[source] || (PSM_V3_STATUS_FLOW.indexOf(source) > -1 ? source : 'Defining');
     }
 
     function psmV3Enrich(c) {
@@ -2683,7 +2691,7 @@
       c.v3OpenDate = c.v3OpenDate || c.created;
       c.v3LastUpdated = c.v3LastUpdated || c.mvpUpdated || today();
       c.v3Status = psmV3Status(c);
-      var ageFactor = c.v3Status === 'New' ? 0 : (c.v3Status === 'Outreach' ? 0.15 : (['Engaged', 'Funding'].indexOf(c.v3Status) > -1 ? 0.65 : 1));
+      var ageFactor = c.v3Status === 'Defining' ? 0 : (c.v3Status === 'Executing' ? 0.65 : 1);
       var paidBase = 1200 + (seed % 30) * 85;
       var pruBase = 1700 + (seed % 32) * 92;
       var npsaBase = 80 + (seed % 18) * 12;
@@ -3234,13 +3242,13 @@
       var c = {
         id: psmNextCampaignId(), name: name, partner: partner, owner: owner, microsoftDri: owner,
         region: region, workload: 'Copilot', workloads: ['Microsoft 365 Copilot', 'Copilot Cowork'],
-        tenantCount: tenantCount, status: 'New', goal: 'Campaign tracking', goals: [], created: document.getElementById('v3OpenDate').value || today(),
+        tenantCount: tenantCount, status: 'Defining', goal: 'Campaign tracking', goals: [], created: document.getElementById('v3OpenDate').value || today(),
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0, copilotPru: 0,
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
         v3Owner: owner, v3Outcomes: outcomes, v3Region: region,
         v3Area: area, v3Segments: PSM_V3_SEGMENTS.slice(0, 2), v3Partners: [partner],
         v3PartnerIds: ids, v3OpenDate: document.getElementById('v3OpenDate').value || today(), v3BaselineDate: document.getElementById('v3OpenDate').value || today(),
-        v3LastUpdated: today(), v3Status: 'New', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
+        v3LastUpdated: today(), v3Status: 'Defining', v3Metrics: psmV3NewMetrics(outcomes, tenantCount, true),
         v3Source: 'New campaign', v3BaselineAvailable: true, v3Activity: [{ date: today(), type: 'Campaign created', detail: 'Tenant validation passed and baseline telemetry snapshot captured.' }], _v3Enriched: true
       };
       c.customers = psmV3Upload.rows.map(function(row, index) { return psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index); });
@@ -3272,12 +3280,12 @@
       var tenantCount = psmV3MigrationUpload.rows.length;
       var c = {
         id: psmNextCampaignId(), name: name, partner: 'Contoso', owner: owner, microsoftDri: owner, region: 'Americas', workload: 'Copilot',
-        workloads: ['Microsoft 365 Copilot'], tenantCount: tenantCount, status: 'Engaged', goal: 'Campaign tracking', goals: [], created: date,
+        workloads: ['Microsoft 365 Copilot'], tenantCount: tenantCount, status: 'Executing', goal: 'Campaign tracking', goals: [], created: date,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0, copilotPru: 0,
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
         v3Owner: owner, v3Outcomes: outcomes, v3Region: 'Americas', v3Area: 'US West', v3Segments: ['Enterprise'],
         v3Partners: psmV3PartnersForIds(ids, 'Contoso'), v3PartnerIds: ids, v3OpenDate: date, v3BaselineDate: date, v3LastUpdated: today(),
-        v3Status: 'Engaged', v3Metrics: suppliedMetrics.metrics, v3Source: 'Legacy import: '+(document.getElementById('v3MigrationSource').value.trim() || 'Unspecified source'),
+        v3Status: 'Executing', v3Metrics: suppliedMetrics.metrics, v3Source: 'Legacy import: '+(document.getElementById('v3MigrationSource').value.trim() || 'Unspecified source'),
         v3BaselineAvailable: baselineAvailable, v3Notes: [], _v3Enriched: true
       };
       c.customers = psmV3MigrationUpload.rows.map(function(row, index) { return psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index); });
@@ -3318,12 +3326,12 @@
       psmV3OpenDetail(id);
     }
 
-    function psmV3OpenStatus(id) {
+    function psmV3OpenStatus(id, requestedStatus) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       psmV3CurrentCampaign = c;
       document.getElementById('v3StatusValue').innerHTML = PSM_V3_STATUS_FLOW.map(function(status) {
-        return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>';
+        return '<option'+(status === (requestedStatus || c.v3Status) ? ' selected' : '')+'>'+status+'</option>';
       }).join('');
       document.getElementById('v3StatusNote').value = '';
       showModal('psmV3StatusModal');
@@ -3334,8 +3342,8 @@
       var status = document.getElementById('v3StatusValue').value;
       var note = document.getElementById('v3StatusNote').value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
-      if (status === 'Closed' && (c.customers || []).some(function(customer) { return ['saleClosed', 'outcomeMeasured'].indexOf(customer.stage) === -1; })) {
-        showToast('Every tenant must reach Sale Closed or Outcome Measured before completion', true);
+      if (status === 'Closed' && (c.customers || []).some(function(customer) { return customer.stage !== 'outcomeMeasured'; })) {
+        showToast('Every customer tenant must reach Outcome Measured before the campaign can be closed', true);
         return;
       }
       var previous = c.v3Status;
@@ -3527,12 +3535,9 @@
         }).join('')+'</tr>';
       }).join('');
       var notes = c.v3Notes.slice().reverse().map(function(note) { return '<div class="v3-note"><div class="v3-note-meta">'+psmEscapeHtml(note.date)+' · '+psmEscapeHtml(note.author)+'</div>'+psmEscapeHtml(note.text)+'</div>'; }).join('') || '<div style="color:var(--cp-text-muted);font-size:12px;">No campaign notes yet.</div>';
-      var statusIndex = Math.max(0, PSM_V3_STATUS_FLOW.indexOf(c.v3Status));
-      var statusFlow = PSM_V3_STATUS_FLOW.map(function(status, index) { return '<div class="v3-status-step '+(index < statusIndex ? 'complete' : (index === statusIndex ? 'current' : ''))+'">'+status+'</div>'; }).join('');
       var activity = (c.v3Activity || []).slice().reverse().map(function(item) { return '<div class="v3-activity"><time>'+psmEscapeHtml(item.date)+'</time><div><strong>'+psmEscapeHtml(item.type)+'</strong><br>'+psmEscapeHtml(item.detail)+'</div></div>'; }).join('');
       detail.innerHTML = '<div class="flyout-header"><button class="toolbar-btn" onclick="showDashboard()">← Back to campaigns</button><span>Shareable campaign URL · '+c.id+'</span></div>' +
-        '<div class="v3-detail-head"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="v3-meta"><span><strong>ID:</strong> '+c.id+'</span><span><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</span><span><strong>Status:</strong> '+c.v3Status+'</span><span><strong>Open date:</strong> '+c.v3OpenDate+'</span><span><strong>Baseline snapshot:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</span></div><div style="margin-top:8px;">'+psmV3PriorityChips(c)+'</div></div><div class="v3-detail-actions"><div class="v3-owner-top"><label>Campaign owner</label><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+PSM_OWNERS.map(function(owner) { return '<option'+(owner === c.v3Owner ? ' selected' : '')+'>'+owner+'</option>'; }).join('')+'</select>'+(canTransfer ? '<button class="toolbar-btn" style="width:100%;margin-top:6px;" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer ownership</button>' : '')+'</div><he-button_psmv3 class="v3-btn" onclick="navigator.clipboard && navigator.clipboard.writeText(window.location.href);showToast(\'Campaign link copied\')">Copy link</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenStatus(\''+c.id+'\')">Update campaign</he-button_psmv3></div></div>' +
-        '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><h2>Campaign lifecycle</h2><div class="v3-status-flow">'+statusFlow+'</div></he-card_psmv3>' +
+        '<div class="v3-detail-head psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="v3-meta"><span><strong>Campaign ID:</strong> '+c.id+'</span><span><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</span><span><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</span><span><strong>Open date:</strong> '+c.v3OpenDate+'</span><span><strong>Baseline snapshot:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</span></div><div style="margin-top:8px;">'+psmV3PriorityChips(c)+'</div></div><div class="v3-detail-actions"><div class="v3-status-top"><label>Campaign status</label><select id="v3HeaderStatus">'+PSM_V3_STATUS_FLOW.map(function(status) { return '<option'+(status === c.v3Status ? ' selected' : '')+'>'+status+'</option>'; }).join('')+'</select><button class="btn btn-primary" style="width:100%;margin-top:6px;" onclick="psmV3OpenStatus(\''+c.id+'\',document.getElementById(\'v3HeaderStatus\').value)">Update campaign</button></div><div class="v3-owner-top"><label>Campaign owner</label><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+PSM_OWNERS.map(function(owner) { return '<option'+(owner === c.v3Owner ? ' selected' : '')+'>'+owner+'</option>'; }).join('')+'</select>'+(canTransfer ? '<button class="toolbar-btn" style="width:100%;margin-top:6px;" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer ownership</button>' : '')+'</div><he-button_psmv3 class="v3-btn" onclick="navigator.clipboard && navigator.clipboard.writeText(window.location.href);showToast(\'Campaign link copied\')">Copy link</he-button_psmv3></div></div>' +
         (!c.v3BaselineAvailable ? '<div class="v3-callout"><strong>Migration limitation:</strong><span>No reliable historical baseline was supplied, so retroactive impact is unavailable. Tracking begins with the first post-import telemetry snapshot.</span></div>' : '') +
         '<he-card_psmv3 class="v3-card"><details class="v3-collapsible"><summary><h2 style="margin:0;">Campaign impact</h2></summary><div class="v3-impact-grid">'+metrics+'</div><div style="margin-top:10px;color:var(--cp-text-muted);font-size:11px;">* Revenue is provisional pending licensed-seller financial data and attribution confirmation.</div></details></he-card_psmv3>' +
         (c.v3BaselineAvailable ? '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><details class="v3-collapsible"><summary><h2 style="margin:0;">Progress from campaign baseline</h2></summary>'+psmV3DetailTrend(c)+'</details></he-card_psmv3>' : '') +
