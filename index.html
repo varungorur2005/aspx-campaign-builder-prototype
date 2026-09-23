@@ -1320,6 +1320,10 @@
     }
     body.psm-v3-view .v3-page-tab.active { border-bottom-color:var(--cp-link); font-weight:600; }
     body.psm-v3-view .v3-page-tabs-row .v3-actions { padding-bottom:8px; }
+    body.psm-v3-view .psm-v3-campaign-summary {
+      display:grid; gap:5px; margin-top:9px; color:var(--cp-text-muted); font-size:12px; line-height:1.4;
+    }
+    body.psm-v3-view .psm-v3-campaign-summary strong { color:var(--cp-text); font-weight:600; }
     @media (max-width:1000px) { .v3-impact-grid { grid-template-columns:1fr; } }
   </style>
   <script type="module">
@@ -4053,19 +4057,14 @@
       });
       if (c.v3OtherOutcome) outcomeNames.push(c.v3OtherOutcome);
       outcomeNames = outcomeNames.join(', ');
+      var workloadNames = (c.workloads || []).join(', ');
       var ownerOptions = PSM_OWNERS.map(function(owner) { return '<option'+(owner === c.v3Owner ? ' selected' : '')+'>'+psmEscapeHtml(owner)+'</option>'; }).join('');
       detail.innerHTML = '<div class="flyout-header"><span style="font-size:11px;color:var(--cp-text-muted);">Campaign details</span><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
-          '<div class="detail-meta-item"><strong>Partner Name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
-          '<div class="detail-meta-item"><strong>Region:</strong> '+psmEscapeHtml(c.region)+'</div>' +
-          '<div class="detail-meta-item"><strong>Area:</strong> '+psmEscapeHtml(c.v3Area)+'</div>' +
-          '<div class="detail-meta-item"><strong>Tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
-          '<div class="detail-meta-item"><strong>Campaign baseline:</strong> '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'Unavailable')+'</div>' +
-          '<div class="detail-meta-item"><strong>Source:</strong> '+psmEscapeHtml(c.sourceFile || 'Existing ASPX list')+'</div>' +
-          '<div class="detail-meta-item"><span class="psm-live-badge">&#8635; Usage refreshed from ASPX '+today()+'</span></div>' +
-        '</div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><label class="psm-v3-header-card-label" for="v3DetailOwner">Campaign Owner</label><div class="psm-v3-owner-controls"><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canTransfer ? '' : ' disabled')+'>Update Campaign</button></div><div class="psm-v3-header-card psm-v3-tenant-highlight"><span class="psm-v3-header-card-label">Tenant Status</span><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div></div></div>' +
-        '<div class="psm-mvp-callout"><span aria-hidden="true">&#9432;</span><div><strong>'+psmEscapeHtml(outcomeNames)+'</strong><span><b>Target:</b> '+c.tenantCount.toLocaleString()+' customer tenants associated with '+psmEscapeHtml(c.partner)+'. <b>Expected outcome:</b> Drive measurable '+psmEscapeHtml(outcomeNames)+' growth.</span></div></div>' +
+          '<div class="detail-meta-item"><strong>Partner:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
+          '<div class="detail-meta-item"><strong>Customer tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
+        '</div><div class="psm-v3-campaign-summary"><div><strong>Business outcomes:</strong> '+psmEscapeHtml(outcomeNames || 'Not selected')+'</div><div><strong>Workloads:</strong> '+psmEscapeHtml(workloadNames || 'Not selected')+'</div></div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><label class="psm-v3-header-card-label" for="v3DetailOwner">Campaign Owner</label><div class="psm-v3-owner-controls"><select id="v3DetailOwner"'+(canTransfer ? '' : ' disabled')+'>'+ownerOptions+'</select>'+(canTransfer ? '<button class="btn btn-secondary" onclick="psmV3TransferOwner(\''+c.id+'\')">Transfer</button>' : '')+'</div></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canTransfer ? '' : ' disabled')+'>Update Campaign</button></div><div class="psm-v3-header-card psm-v3-tenant-highlight"><span class="psm-v3-header-card-label">Tenant Status</span><div class="psm-v3-tenant-status-inline">'+tenantStageData.inlineHtml+'</div></div></div></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse"><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+(PSM_V3_OUTCOMES.length + (c.v3OtherOutcome ? 1 : 0))+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
           '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+PSM_V3_OUTCOMES.map(function(outcome) { return '<th>'+outcome.label+' (Growth)</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div></div></details></div>' +
@@ -4705,6 +4704,7 @@
       }).join('');
       var visible = psmMvpTenantTableState.visibleColumns;
       var visibleColumns = PSM_MVP_TENANT_COLUMNS.filter(function(column) {
+        if (currentView === 'psm-v3' && column.key === 'workloads') return false;
         return column.fixed || visible[column.key];
       });
       var indexedCustomers = (c.customers || []).map(function(customer, index) {
@@ -4717,6 +4717,7 @@
         var stage = PSM_PROGRESSION_STAGES.filter(function(item) { return item.key === customer.stage; })[0] || PSM_PROGRESSION_STAGES[0];
         var searchableValues = PSM_MVP_TENANT_COLUMNS.map(function(column) {
           if (column.key === 'name') return name;
+          if (currentView === 'psm-v3' && column.key === 'workloads') return '';
           if (column.key === 'workloads') return (customer.targetedWorkloads || []).join(' ');
           if (column.key === 'progress') return stage.label;
           if (!psmV3CampaignMeasuresTenantMetric(c, column.key)) return '';
@@ -4908,7 +4909,10 @@
           '<div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmMvpApplyTenantFilter()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmMvpClearTenantFilter()">Clear all</button></div>';
       } else {
         title.textContent = 'Change columns';
-        body.innerHTML = '<div>'+PSM_MVP_TENANT_COLUMNS.map(function(column) {
+        var availableColumns = PSM_MVP_TENANT_COLUMNS.filter(function(column) {
+          return currentView !== 'psm-v3' || column.key !== 'workloads';
+        });
+        body.innerHTML = '<div>'+availableColumns.map(function(column) {
           var checked = column.fixed || psmMvpTenantTableState.visibleColumns[column.key];
           return '<label class="v3-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
         }).join('')+'</div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3CloseTablePanel()">Done</button></div>';
