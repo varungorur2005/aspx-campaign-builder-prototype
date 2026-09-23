@@ -3475,6 +3475,15 @@
       psmV3Enrich(c);
       psmV3LoadNotes(c);
       psmV3CurrentCampaign = c;
+      psmCurrentCampaign = c;
+      c.microsoftDri = c.v3Owner;
+      if (psmMvpTenantTableState.campaignId !== id) {
+        psmMvpTenantTableState.campaignId = id;
+        psmMvpTenantTableState.page = 1;
+        psmMvpTenantTableState.search = '';
+        psmMvpTenantTableState.stage = '';
+        psmMvpTenantTableState.openPanel = '';
+      }
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
       detail.classList.add('show', 'psm-full-page');
@@ -3529,7 +3538,7 @@
         (c.v3BaselineAvailable ? '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><details class="v3-collapsible"><summary><h2 style="margin:0;">Progress from campaign baseline</h2></summary>'+psmV3DetailTrend(c)+'</details></he-card_psmv3>' : '') +
         '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><details class="v3-collapsible"><summary><h2 style="margin:0;">Impact by tenant segment</h2></summary><div class="v3-table-wrap"><table class="v3-table" style="min-width:700px;"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+c.v3Outcomes.map(function(id) { var outcome = PSM_V3_OUTCOMES.filter(function(o) { return o.id === id; })[0]; return '<th>'+outcome.short+' Δ</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div></details></he-card_psmv3>' +
         '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><h2>Campaign notes</h2>'+(canTransfer ? '<textarea id="v3NoteText" maxlength="2000" placeholder="Add partner feedback, risks, decisions, or next steps..." style="width:100%;min-height:90px;padding:9px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></textarea><div style="display:flex;justify-content:flex-end;margin-top:8px;"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3AddNote(\''+c.id+'\')">Add note</he-button_psmv3></div>' : '<div style="color:var(--cp-text-muted);font-size:12px;margin-bottom:10px;">Read-only: only the assigned owner can add notes.</div>')+'<div style="margin-top:12px;">'+notes+'</div><div class="v3-activity-card" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cp-border);"><details ontoggle="psmV3ToggleActivity(this)"><summary><h2 style="margin:0;">Activity history</h2><span class="v3-activity-toggle">Maximize</span></summary><div>'+activity+'</div></details></div></he-card_psmv3>' +
-        psmV3TenantWorkspace(c) +
+        psmRenderMvpTenantWorkspace(c, canTransfer) +
         '';
       window.location.hash = 'psm-v3-campaign-'+id;
     }
@@ -4267,7 +4276,7 @@
         return;
       }
       psmMvpTenantTableState.openPanel = psmMvpTenantTableState.openPanel === panel ? '' : panel;
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpApplyTenantFilter() {
@@ -4275,7 +4284,7 @@
       psmMvpTenantTableState.stage = document.getElementById('psmMvpTenantStageFilter').value;
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpClearTenantFilter() {
@@ -4283,24 +4292,32 @@
       psmMvpTenantTableState.stage = '';
       psmMvpTenantTableState.page = 1;
       psmMvpTenantTableState.openPanel = '';
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpToggleTenantColumn(key, visible) {
       var column = PSM_MVP_TENANT_COLUMNS.filter(function(item) { return item.key === key && !item.fixed; })[0];
       if (!column) return;
       psmMvpTenantTableState.visibleColumns[key] = visible;
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpSetPageSize(value) {
       psmMvpTenantTableState.pageSize = parseInt(value, 10) || 10;
       psmMvpTenantTableState.page = 1;
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpChangePage(change) {
       psmMvpTenantTableState.page = Math.max(1, psmMvpTenantTableState.page + change);
+      psmRefreshTenantWorkspace();
+    }
+
+    function psmRefreshTenantWorkspace() {
+      if (currentView === 'psm-v3' && psmV3CurrentCampaign) {
+        psmV3OpenDetail(psmV3CurrentCampaign.id);
+        return;
+      }
       psmRenderMvpDetail();
     }
 
@@ -4376,7 +4393,7 @@
       psmMvpTenantTableState.page = Math.ceil(c.customers.length / psmMvpTenantTableState.pageSize);
       psmMvpTenantTableState.openPanel = '';
       showToast('Added '+added+' customer'+(added === 1 ? '' : 's')+' from '+fileName);
-      psmRenderMvpDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmMvpDownloadTenants(id) {
@@ -4474,7 +4491,7 @@
       c.timeline = c.timeline || [];
       c.timeline.push({ date: today(), text: 'Status changed to ' + status, type: status === 'Completed' ? 'closed' : 'info', actor: 'Microsoft PSM' });
       showToast('Campaign status updated to ' + status);
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmRenderCampaignMetrics(c, trackedPct) {
@@ -4653,7 +4670,7 @@
       }
       hideModal('psmAddTenantModal');
       showToast(name + ' added to the campaign');
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmRemoveSelectedTenants(id) {
@@ -4668,7 +4685,7 @@
       c.tenantCount = Math.max(0, c.tenantCount - indexes.length);
       if (c.progression) c.progression.targetList = Math.max(0, c.progression.targetList - indexes.length);
       showToast('Removed ' + indexes.length + ' customer' + (indexes.length === 1 ? '' : 's') + ' from the campaign');
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmImportTenantUpdates(input, id) {
@@ -4682,7 +4699,7 @@
       }
       input.value = '';
       showToast(file.name + ' synced — ' + updated + ' tenant updates applied');
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmBulkApplyStage(id) {
@@ -4702,7 +4719,7 @@
         }
       }
       showToast('Updated ' + boxes.length + ' tenant' + (boxes.length === 1 ? '' : 's') + ' \u2192 ' + stageLabel);
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmBulkSetAgreement(id) {
@@ -4715,7 +4732,7 @@
         if (c.customers && c.customers[idx]) c.customers[idx].agreement = true;
       }
       showToast('Marked agreement on ' + boxes.length + ' tenant' + (boxes.length === 1 ? '' : 's'));
-      psmRenderDetail();
+      psmRefreshTenantWorkspace();
     }
 
     function psmSaveCustomerComment(id, idx, value) {
