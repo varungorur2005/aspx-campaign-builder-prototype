@@ -4074,9 +4074,8 @@
         }
         if (!c.v3BaselineAvailable) return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+'</span><span class="current">Unavailable</span><div class="comparison"><span>Historical baseline not available</span></div></div>';
         var delta = metric.current - metric.baseline;
-        var progress = metric.target > metric.baseline ? Math.round(delta / (metric.target - metric.baseline) * 100) : 0;
         var prefix = id === 'revenue' ? '$' : '';
-        return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+(outcome.pending ? ' *' : '')+'</span><span class="current">'+prefix+metric.current.toLocaleString()+'</span><div class="comparison"><span>Baseline '+prefix+metric.baseline.toLocaleString()+'</span><span class="psm-mvp-growth">+'+prefix+delta.toLocaleString()+'</span></div><div style="margin-top:6px;color:var(--cp-text-muted);font-size:10px;">FY target '+prefix+metric.target.toLocaleString()+' · '+progress+'% of target lift</div></div>';
+        return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+(outcome.pending ? ' *' : '')+'</span><span class="current">'+prefix+metric.current.toLocaleString()+'</span><div class="comparison"><span>Baseline '+prefix+metric.baseline.toLocaleString()+'</span><span class="psm-mvp-growth">+'+prefix+delta.toLocaleString()+'</span></div></div>';
       }).join('');
       if (c.v3OtherOutcome) {
         metrics += '<div class="psm-mvp-impact-card"><span class="label">Other business outcome</span><span class="current" style="font-size:16px;">'+psmEscapeHtml(c.v3OtherOutcome)+'</span><div class="comparison"><span>Tracking definition to be confirmed</span></div></div>';
