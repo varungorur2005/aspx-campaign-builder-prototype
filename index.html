@@ -3474,7 +3474,7 @@
     function psmV3UpdateCreatePartnerPlaceholder() {
       var type = document.getElementById('v3PartnerIdType').value;
       var input = document.getElementById('v3PartnerIdSearch');
-      input.placeholder = type === 'MPNID' ? 'e.g. 1129042, 1129088, 1129125' : 'Enter PartnerOne ID (Limit one at a time)';
+      input.placeholder = type === 'MPNID' ? 'Enter one or more MPN IDs, separated by commas' : 'Enter PartnerOne ID (Limit one at a time)';
       input.value = '';
       psmV3ClearCreatePartner();
     }
