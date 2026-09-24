@@ -810,7 +810,7 @@
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
       .psm-mvp-impact-grid { grid-template-columns:1fr; }
     }
-    .psm-wl-picker { border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
+    .psm-wl-picker { border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); overflow:hidden; }
     .psm-wl-picker summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; cursor:pointer; list-style:none; color:var(--cp-text); }
     .psm-wl-picker summary::-webkit-details-marker { display:none; }
     .psm-wl-picker summary::after { content:'▾'; color:var(--cp-text-muted); font-size:12px; transition:transform .15s; }
@@ -823,7 +823,7 @@
     .psm-wl-grid label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; margin-bottom:0; color:var(--cp-text); }
     .v3-picker-search { width:calc(100% - 28px); margin:0 14px 10px; padding:8px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .v3-metric-picker { display:grid; gap:12px; }
-    .v3-metric-step { overflow:hidden; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
+    .v3-metric-step { overflow:hidden; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-metric-step > summary { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:start; padding:10px 12px; cursor:pointer; list-style:none; }
     .v3-metric-step > summary::-webkit-details-marker { display:none; }
     .v3-metric-step > summary::after { content:'▾'; align-self:center; color:var(--cp-text-muted); font-size:12px; transition:transform .15s; }
@@ -3732,17 +3732,15 @@
 
     function psmV3UpdateSecondaryMetricSummary() {
       var count = document.getElementById('v3SecondaryMetricCount');
-      var selected = document.getElementById('v3SelectedTrackingMetrics');
+      var primarySelected = document.getElementById('v3SelectedPrimaryMetric');
+      var secondarySelected = document.getElementById('v3SelectedSecondaryMetrics');
       if (count) count.textContent = psmV3CreateSecondaryMetrics.length+'/4 selected';
-      if (selected) {
-        var chips = psmV3CreatePrimaryMetric
-          ? '<span class="psm-wl-chip">Primary · '+psmEscapeHtml(psmV3MetricLabel(psmV3CreatePrimaryMetric))+'</span>'
-          : '';
-        chips += psmV3CreateSecondaryMetrics.map(function(metric) {
-          return '<span class="psm-wl-chip">Secondary · '+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>';
-        }).join('');
-        selected.innerHTML = chips;
-      }
+      if (primarySelected) primarySelected.innerHTML = psmV3CreatePrimaryMetric
+        ? '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(psmV3CreatePrimaryMetric))+'</span>'
+        : '';
+      if (secondarySelected) secondarySelected.innerHTML = psmV3CreateSecondaryMetrics.map(function(metric) {
+        return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>';
+      }).join('');
     }
 
     function psmV3FilterMetrics(value) {
@@ -3771,9 +3769,9 @@
       }).join('');
       var primarySummary = psmV3CreatePrimaryMetric ? psmV3MetricLabel(psmV3CreatePrimaryMetric) : 'Not selected';
       container.innerHTML = '<div class="v3-metric-picker">' +
-        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p><span class="v3-metric-collapsed-value">'+psmEscapeHtml(primarySummary)+'</span></div></div></summary><div class="v3-metric-step-body"><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select></div></details>' +
-        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div></div></details>' +
-      '</div><div class="psm-wl-selected" id="v3SelectedTrackingMetrics"></div>';
+        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p><span class="v3-metric-collapsed-value">'+psmEscapeHtml(primarySummary)+'</span></div></div></summary><div class="v3-metric-step-body"><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select><div class="psm-wl-selected" id="v3SelectedPrimaryMetric"></div></div></details>' +
+        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div><div class="psm-wl-selected" id="v3SelectedSecondaryMetrics"></div></div></details>' +
+      '</div>';
       psmV3UpdateSecondaryMetricSummary();
     }
 
