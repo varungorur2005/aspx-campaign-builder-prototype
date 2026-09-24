@@ -814,7 +814,22 @@
     .psm-wl-picker-title strong { font-size:13px; }
     .psm-wl-picker-title span { font-size:11px; color:var(--cp-text-muted); font-weight:400; }
     .psm-wl-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px 18px; max-height:210px; overflow-y:auto; border-top:1px solid var(--cp-border); padding:12px 14px; }
-    .psm-wl-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 400; margin-bottom: 0; color: #242424; }
+    .psm-wl-grid label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; margin-bottom:0; color:var(--cp-text); }
+    .v3-picker-search { width:calc(100% - 28px); margin:0 14px 10px; padding:8px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .v3-metric-picker { display:grid; gap:12px; }
+    .v3-metric-step { display:grid; grid-template-columns:32px minmax(0,1fr); gap:12px; padding:14px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
+    .v3-metric-step.primary { border-color:var(--cp-accent); background:var(--cp-accent-soft); }
+    .v3-metric-step-number { display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:var(--cp-accent); color:var(--cp-accent-fg); font-size:13px; font-weight:700; }
+    .v3-metric-step-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .v3-metric-step-head strong { display:block; font-size:13px; }
+    .v3-metric-step-head p { margin:3px 0 0; color:var(--cp-text-muted); font-size:11px; font-weight:400; }
+    .v3-metric-step select, .v3-metric-step input[type="search"] { width:100%; padding:9px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .v3-metric-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:260px; margin-top:10px; overflow-y:auto; }
+    .v3-metric-option { display:flex; align-items:flex-start; gap:9px; min-height:52px; margin:0 !important; padding:9px 10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text) !important; font-size:12px !important; font-weight:600 !important; cursor:pointer; }
+    .v3-metric-option input { margin-top:2px; }
+    .v3-metric-option small { display:block; margin-top:3px; color:var(--cp-text-muted); font-size:10px; font-weight:400; }
+    .v3-secondary-summary { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .v3-secondary-summary:empty { display:none; }
     .psm-wl-selected { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .psm-wl-chip { display:inline-flex; align-items:center; padding:3px 8px; border-radius:0.625rem; background:var(--cp-accent-soft); color:var(--cp-accent); font-size:11px; font-weight:600; }
     .psm-target-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; margin-top:12px; }
@@ -2990,34 +3005,132 @@
       { id: 'pru', label: 'Cowork MAU', short: 'Cowork MAU', pending: false },
       { id: 'revenue', label: 'Cowork Consumption Revenue', short: 'Cowork Revenue', pending: false }
     ];
-    const PSM_V3_COPILOT_WORKLOADS = ['Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Agents', 'Copilot Cowork', 'Copilot Extensibility'];
+    const PSM_V3_COPILOT_WORKLOADS = [
+      'Microsoft 365 Copilot', 'Microsoft 365 Copilot Chat', 'Copilot Cowork',
+      'Copilot Agents', 'Copilot Extensibility',
+      'Copilot in Teams', 'Copilot in Outlook', 'Copilot in Word', 'Copilot in Excel',
+      'Copilot in PowerPoint', 'Copilot in OneNote', 'Copilot in Viva Engage',
+      'Sales Copilot (CRM)', 'Copilot Chat Agents', 'Connector Agents',
+      'Custom Engine Agents', 'Plugin Agents'
+    ];
+    const PSM_V3_E3_WORKLOADS = [
+      'Teams', 'Exchange Online (EXO)', 'SharePoint', 'Microsoft 365 Apps',
+      'Teams Meeting', 'Teams Phone', 'Microsoft Entra ID P1 + P2', 'Intune',
+      'Microsoft Defender for Endpoint P1 + P2', 'Microsoft Defender for Office 365 P1 + P2',
+      'Microsoft Defender for Identity', 'Microsoft Defender for Cloud Apps P1 + P2',
+      'Microsoft Purview Discover and Respond P1 + P2',
+      'Microsoft Purview Information Protection P1 + P2',
+      'Microsoft Purview Data Lifecycle Management P1 + P2'
+    ];
+    const PSM_V3_E5_WORKLOADS = PSM_V3_E3_WORKLOADS.concat([
+      'Microsoft Entra ID P2', 'Microsoft Purview Discover and Respond P2',
+      'Microsoft Purview Information Protection P2',
+      'Microsoft Purview Data Lifecycle Management P2',
+      'Microsoft Purview Insider Risk Management'
+    ]);
+    const PSM_V3_E5_EXPANSION_WORKLOADS = [
+      'Microsoft Entra ID P2', 'Microsoft Defender for Endpoint P1 + P2',
+      'Microsoft Defender for Office 365 P1 + P2', 'Microsoft Defender for Identity',
+      'Microsoft Defender for Cloud Apps P1 + P2',
+      'Microsoft Purview Discover and Respond P2',
+      'Microsoft Purview Information Protection P2',
+      'Microsoft Purview Data Lifecycle Management P2',
+      'Microsoft Purview Insider Risk Management'
+    ];
+    function psmV3SecureMetrics(prefix, opportunityLabel, includeAtRisk) {
+      var metrics = [
+        { id:prefix+'Tenants', label:'Tenants', format:'number', category:'Portfolio' },
+        { id:prefix+'TotalSeats', label:'Total Microsoft 365 Seat Count', format:'number', category:'Licensing' },
+        { id:prefix+'Mau', label:'Workload Monthly Active Users (MAU)', format:'number', category:'Usage' },
+        { id:prefix+'Pau', label:'Workload Paid Available Users (PAU)', format:'number', category:'Usage' },
+        { id:prefix+'Utilization', label:'Workload Utilization', format:'percent', category:'Usage' },
+        { id:prefix+'UsageWhitespace', label:'Workload Usage Whitespace', format:'number', category:'Usage' },
+        { id:prefix+'UpsellReady', label:'Upsell Ready Tenants', format:'number', category:'Opportunity health' },
+        { id:prefix+'Unhealthy', label:'Unhealthy Tenants', format:'number', category:'Opportunity health' },
+        { id:prefix+'E7UpsellReady', label:'E7 Upsell-ready Tenants', format:'number', category:'Opportunity health' },
+        { id:prefix+'PotentialEarnings', label:'Total Potential Earnings', format:'currency', category:'Incentives' },
+        { id:prefix+'OpportunityUnits', label:'Opportunity Units', format:'number', category:'Incentives' },
+        { id:prefix+'MaxCompUnits', label:'Maximum Compensable Units', format:'number', category:'Incentives' },
+        { id:prefix+'PriorHwm', label:'Prior High Water Mark (HWM)', format:'number', category:'Historical usage' },
+        { id:prefix+'StartingHwm', label:'Starting High Water Mark (HWM)', format:'number', category:'Historical usage' }
+      ];
+      if (includeAtRisk) metrics.splice(8, 0, { id:prefix+'AtRisk', label:'At Risk Tenants', format:'number', category:'Opportunity health' });
+      return metrics;
+    }
     const PSM_V3_OPPORTUNITIES = [
       { id:'copilot', label:'Copilot', workloads:PSM_V3_COPILOT_WORKLOADS, metrics:[
-        { id:'paidMau', label:'Copilot Paid MAU', format:'number' }, { id:'npsa', label:'Copilot NPSA', format:'number' },
-        { id:'pru', label:'Cowork MAU', format:'number' }, { id:'revenue', label:'Cowork Consumption Revenue', format:'currency' },
-        { id:'copilotPau', label:'Copilot PAU', format:'number' }, { id:'copilotUtilization', label:'Copilot Utilization', format:'percent' },
-        { id:'copilotSeatWhitespace', label:'Copilot Seats Whitespace', format:'number' }, { id:'allAgentsMau', label:'All Agents MAU', format:'number' }
+        { id:'copilotTenants', label:'Tenants', format:'number', category:'Portfolio' },
+        { id:'copilotSeatPenetration', label:'Copilot Seat Penetration', format:'percent', category:'Licensing' },
+        { id:'copilotEligibleSeats', label:'Copilot Eligible Microsoft 365 Seats', format:'number', category:'Licensing' },
+        { id:'copilotSeatWhitespace', label:'Copilot Seats Whitespace', format:'number', category:'Licensing' },
+        { id:'cspTransactedLicenses', label:'CSP Transacted Licenses', format:'number', category:'Licensing' },
+        { id:'cspTransactedLicensePercent', label:'CSP Transacted Licenses Percent', format:'percent', category:'Licensing' },
+        { id:'copilotTrialDaysRemaining', label:'Copilot in 30 Trial Days Remaining', format:'number', category:'Licensing' },
+        { id:'paidMau', label:'Copilot MAU (Licensed)', format:'number', category:'Usage' },
+        { id:'copilotPau', label:'Copilot PAU', format:'number', category:'Usage' },
+        { id:'copilotUtilization', label:'Copilot Utilization', format:'percent', category:'Usage' },
+        { id:'freeCopilotMau', label:'Free Copilot MAU (Unlicensed)', format:'number', category:'Usage' },
+        { id:'allCopilotMau', label:'All Copilot MAU', format:'number', category:'Usage' },
+        { id:'pru', label:'Cowork MAU', format:'number', category:'Usage' },
+        { id:'allAgentsMau', label:'All Agents MAU', format:'number', category:'Usage' },
+        { id:'copilotTeamsMau', label:'Copilot in Teams MAU', format:'number', category:'Product usage' },
+        { id:'copilotOutlookMau', label:'Copilot in Outlook MAU', format:'number', category:'Product usage' },
+        { id:'copilotWordMau', label:'Copilot in Word MAU', format:'number', category:'Product usage' },
+        { id:'copilotExcelMau', label:'Copilot in Excel MAU', format:'number', category:'Product usage' },
+        { id:'copilotPowerPointMau', label:'Copilot in PowerPoint MAU', format:'number', category:'Product usage' },
+        { id:'copilotOneNoteMau', label:'Copilot in OneNote MAU', format:'number', category:'Product usage' },
+        { id:'copilotEngageMau', label:'Copilot in Viva Engage MAU', format:'number', category:'Product usage' },
+        { id:'salesCopilotMau', label:'Sales Copilot (CRM) MAU', format:'number', category:'Product usage' },
+        { id:'copilotChatAgentsMau', label:'Copilot Chat Agents MAU', format:'number', category:'Agent usage' },
+        { id:'connectorAgentsMau', label:'Connector Agents MAU', format:'number', category:'Agent usage' },
+        { id:'customEngineAgentsMau', label:'Custom Engine Agents MAU', format:'number', category:'Agent usage' },
+        { id:'pluginsAgentsMau', label:'Plugin Agents MAU', format:'number', category:'Agent usage' },
+        { id:'freeToPaidWhitespace', label:'Free to Paid Whitespace', format:'percent', category:'Conversion signals' },
+        { id:'freeChatPenetration', label:'Free Chat Penetration', format:'percent', category:'Conversion signals' },
+        { id:'m365CopilotPenetration', label:'Microsoft 365 Copilot Penetration', format:'percent', category:'Conversion signals' },
+        { id:'copilotChatPenetration', label:'Copilot Chat Penetration', format:'percent', category:'Conversion signals' },
+        { id:'copilotChatWhitespace', label:'Copilot Chat Whitespace', format:'number', category:'Conversion signals' },
+        { id:'usersAtUsageLimits', label:'Users Experiencing Usage Limits', format:'number', category:'Conversion signals' },
+        { id:'usageLimitUserPercent', label:'Free Users Reaching Usage Limits', format:'percent', category:'Conversion signals' },
+        { id:'cumulativeLicenseRequests', label:'Cumulative License Requests', format:'number', category:'Conversion signals' },
+        { id:'acquireTenants', label:'Acquire Tenants', format:'number', category:'Targeting scenarios' },
+        { id:'monetizeTenants', label:'Monetize Tenants', format:'number', category:'Targeting scenarios' },
+        { id:'growTenants', label:'Grow Tenants', format:'number', category:'Targeting scenarios' },
+        { id:'copilotE7UpsellReady', label:'E7 Upsell-ready Tenants', format:'number', category:'Targeting scenarios' },
+        { id:'npsa', label:'Copilot NPSA', format:'number', category:'Campaign outcomes' },
+        { id:'revenue', label:'Cowork Consumption Revenue', format:'currency', category:'Campaign outcomes' },
+        { id:'copilotPotentialEarnings', label:'Potential Earnings', format:'currency', category:'Incentives' },
+        { id:'copilotCporEarnings', label:'CPOR Potential Earnings', format:'currency', category:'Incentives' },
+        { id:'copilotMciEarnings', label:'MCI Potential Earnings', format:'currency', category:'Incentives' },
+        { id:'copilotOpportunityUnits', label:'Opportunity Units', format:'number', category:'Incentives' },
+        { id:'copilotMaxCompUnits', label:'Maximum Compensable Units', format:'number', category:'Incentives' },
+        { id:'copilotPriorHwm', label:'Prior High Water Mark (HWM)', format:'number', category:'Historical usage' },
+        { id:'copilotStartingHwm', label:'Starting High Water Mark (HWM)', format:'number', category:'Historical usage' }
       ]},
-      { id:'m365e3', label:'Microsoft 365 E3', workloads:['Microsoft Teams','Exchange Online','SharePoint and OneDrive','Microsoft 365 Apps','Microsoft Entra ID'], metrics:[
-        { id:'e3Mau', label:'Microsoft 365 E3 MAU', format:'number' }, { id:'e3Pau', label:'Microsoft 365 E3 PAU', format:'number' },
-        { id:'e3Utilization', label:'Microsoft 365 E3 Utilization', format:'percent' }, { id:'e3UsageWhitespace', label:'Microsoft 365 E3 Usage Whitespace', format:'number' },
-        { id:'e3EligibleSeats', label:'Microsoft 365 E3 Eligible Seats', format:'number' }
-      ]},
-      { id:'m365e5', label:'Microsoft 365 E5', workloads:['Microsoft Defender','Microsoft Purview','Microsoft Entra ID','Microsoft Teams','Power BI'], metrics:[
-        { id:'e5Mau', label:'Microsoft 365 E5 MAU', format:'number' }, { id:'e5Pau', label:'Microsoft 365 E5 PAU', format:'number' },
-        { id:'e5Utilization', label:'Microsoft 365 E5 Utilization', format:'percent' }, { id:'e5UsageWhitespace', label:'Microsoft 365 E5 Usage Whitespace', format:'number' },
-        { id:'e5EligibleSeats', label:'Microsoft 365 E5 Eligible Seats', format:'number' }
-      ]},
-      { id:'m365e5Expansion', label:'Microsoft 365 E5 Expansion', workloads:['Microsoft Defender','Microsoft Purview','Microsoft Entra ID Governance','Microsoft Teams Premium','Power BI'], metrics:[
-        { id:'e5ExpansionMau', label:'E5 Expansion MAU', format:'number' }, { id:'e5ExpansionPau', label:'E5 Expansion PAU', format:'number' },
-        { id:'e5ExpansionUtilization', label:'E5 Expansion Utilization', format:'percent' }, { id:'e5ExpansionWhitespace', label:'E5 Expansion Whitespace', format:'number' },
-        { id:'e5ExpansionEligibleSeats', label:'E5 Expansion Eligible Seats', format:'number' }
-      ]},
-      { id:'cloudEndpoints', label:'Cloud Endpoints', workloads:['Windows 365','Microsoft Intune','Microsoft Entra ID','Azure Virtual Desktop'], metrics:[
-        { id:'windows365Mau', label:'Windows 365 MAU', format:'number' }, { id:'windows365Pau', label:'Windows 365 PAU', format:'number' },
-        { id:'windows365Utilization', label:'Windows 365 Utilization', format:'percent' }, { id:'windows365Whitespace', label:'Windows 365 Whitespace', format:'number' },
-        { id:'intuneMau', label:'Intune MAU', format:'number' }, { id:'intuneUtilization', label:'Intune Utilization', format:'percent' },
-        { id:'entraMau', label:'Microsoft Entra ID MAU', format:'number' }, { id:'entraUtilization', label:'Microsoft Entra ID Utilization', format:'percent' }
+      { id:'m365e3', label:'Microsoft 365 E3', workloads:PSM_V3_E3_WORKLOADS, metrics:psmV3SecureMetrics('e3','Microsoft 365 E3',false) },
+      { id:'m365e5', label:'Microsoft 365 E5', workloads:PSM_V3_E5_WORKLOADS, metrics:psmV3SecureMetrics('e5','Microsoft 365 E5',true) },
+      { id:'m365e5Expansion', label:'Microsoft 365 E5 Expansion', workloads:PSM_V3_E5_EXPANSION_WORKLOADS, metrics:psmV3SecureMetrics('e5Expansion','Microsoft 365 E5 Expansion',true) },
+      { id:'cloudEndpoints', label:'Cloud Endpoints', workloads:['Windows 365','Microsoft Intune','Microsoft Entra ID'], metrics:[
+        { id:'cloudTenants', label:'Tenants', format:'number', category:'Portfolio' },
+        { id:'w365SeatPenetration', label:'Windows 365 Seat Penetration', format:'percent', category:'Licensing' },
+        { id:'w365EligibleSeats', label:'Windows 365 Eligible Seats', format:'number', category:'Licensing' },
+        { id:'windows365Whitespace', label:'Windows 365 Whitespace', format:'number', category:'Licensing' },
+        { id:'me5Seats', label:'Microsoft 365 E5 Seats', format:'number', category:'Licensing' },
+        { id:'me3Seats', label:'Microsoft 365 E3 Seats', format:'number', category:'Licensing' },
+        { id:'f3Seats', label:'Microsoft 365 F3 Seats', format:'number', category:'Licensing' },
+        { id:'windowsPau', label:'Windows PAU', format:'number', category:'Licensing' },
+        { id:'windows365Mau', label:'Windows 365 MAU', format:'number', category:'Usage' },
+        { id:'windows365Pau', label:'Windows 365 PAU', format:'number', category:'Usage' },
+        { id:'windows365Utilization', label:'Windows 365 Utilization', format:'percent', category:'Usage' },
+        { id:'intuneMau', label:'Intune MAU', format:'number', category:'Usage' },
+        { id:'intuneUtilization', label:'Intune Utilization', format:'percent', category:'Usage' },
+        { id:'entraMau', label:'Microsoft Entra ID MAU', format:'number', category:'Usage' },
+        { id:'entraUtilization', label:'Microsoft Entra ID Utilization', format:'percent', category:'Usage' },
+        { id:'landW365Tenants', label:'Land Windows 365 Tenants', format:'number', category:'Sales motions' },
+        { id:'expandW365Tenants', label:'Expand Windows 365 Tenants', format:'number', category:'Sales motions' },
+        { id:'expandFrontlineTenants', label:'Expand to Frontline (Flex) Tenants', format:'number', category:'Sales motions' },
+        { id:'cloudIncentiveEligible', label:'Incentive Eligible Tenants', format:'number', category:'Incentives' },
+        { id:'cloudPotentialEarnings', label:'Potential Earnings', format:'currency', category:'Incentives' }
       ]}
     ];
     const PSM_V3_STATUS_FLOW = ['Prepare', 'Execute', 'Review', 'Close'];
@@ -3515,9 +3628,16 @@
         return;
       }
       var workloadBoxes = opportunity.workloads.map(function(workload) {
-        return '<label><input type="checkbox" value="'+psmEscapeHtml(workload)+'"'+(psmV3CreateWorkloads.indexOf(workload) > -1 ? ' checked' : '')+' onchange="psmV3ToggleWorkload(this.value,this.checked)"> '+psmEscapeHtml(workload)+'</label>';
+        return '<label data-search="'+psmEscapeHtml(workload.toLowerCase())+'"><input type="checkbox" value="'+psmEscapeHtml(workload)+'"'+(psmV3CreateWorkloads.indexOf(workload) > -1 ? ' checked' : '')+' onchange="psmV3ToggleWorkload(this.value,this.checked)"> '+psmEscapeHtml(workload)+'</label>';
       }).join('');
-      container.innerHTML = '<details class="psm-wl-picker"><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+(psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+'</span></span></summary><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+(psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '')+'</div>';
+      container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+(psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+' · '+opportunity.workloads.length+' available</span></span></summary><input class="v3-picker-search" type="search" placeholder="Search '+opportunity.workloads.length+' workloads" aria-label="Search workloads" oninput="psmV3FilterWorkloads(this.value)"><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+(psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '')+'</div>';
+    }
+
+    function psmV3FilterWorkloads(value) {
+      var term = value.trim().toLowerCase();
+      document.querySelectorAll('#v3WorkloadOptions .psm-wl-grid label').forEach(function(label) {
+        label.style.display = !term || label.getAttribute('data-search').indexOf(term) > -1 ? '' : 'none';
+      });
     }
 
     function psmV3OpportunityChanged() {
@@ -3547,8 +3667,23 @@
         psmV3CreateSecondaryMetrics.push(metric);
       }
       if (!checked && index > -1) psmV3CreateSecondaryMetrics.splice(index, 1);
+      psmV3UpdateSecondaryMetricSummary();
+    }
+
+    function psmV3UpdateSecondaryMetricSummary() {
       var count = document.getElementById('v3SecondaryMetricCount');
+      var summary = document.getElementById('v3SecondaryMetricSummary');
       if (count) count.textContent = psmV3CreateSecondaryMetrics.length+'/4 selected';
+      if (summary) summary.innerHTML = psmV3CreateSecondaryMetrics.map(function(metric) {
+        return '<span class="v3-chip">'+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>';
+      }).join('');
+    }
+
+    function psmV3FilterMetrics(value) {
+      var term = value.trim().toLowerCase();
+      document.querySelectorAll('#v3SecondaryMetricOptions .v3-metric-option').forEach(function(option) {
+        option.style.display = !term || option.getAttribute('data-search').indexOf(term) > -1 ? '' : 'none';
+      });
     }
 
     function psmV3RenderTrackingMetricOptions() {
@@ -3559,13 +3694,20 @@
         container.innerHTML = '<div class="v3-validation">Select an opportunity to see its available metrics.</div>';
         return;
       }
-      var primaryOptions = '<option value="">Select the primary metric</option>'+opportunity.metrics.map(function(metric) {
-        return '<option value="'+metric.id+'"'+(metric.id === psmV3CreatePrimaryMetric ? ' selected' : '')+'>'+psmEscapeHtml(metric.label)+'</option>';
+      var categories = opportunity.metrics.map(function(metric) { return metric.category || 'Metrics'; }).filter(function(category, index, values) { return values.indexOf(category) === index; });
+      var primaryOptions = '<option value="">Select the primary metric</option>'+categories.map(function(category) {
+        return '<optgroup label="'+psmEscapeHtml(category)+'">'+opportunity.metrics.filter(function(metric) { return (metric.category || 'Metrics') === category; }).map(function(metric) {
+          return '<option value="'+metric.id+'"'+(metric.id === psmV3CreatePrimaryMetric ? ' selected' : '')+'>'+psmEscapeHtml(metric.label)+'</option>';
+        }).join('')+'</optgroup>';
       }).join('');
       var secondaryOptions = opportunity.metrics.filter(function(metric) { return metric.id !== psmV3CreatePrimaryMetric; }).map(function(metric) {
-        return '<label><input type="checkbox" name="v3SecondaryMetric" value="'+metric.id+'"'+(psmV3CreateSecondaryMetrics.indexOf(metric.id) > -1 ? ' checked' : '')+' onchange="psmV3ToggleSecondaryMetric(this.value,this.checked)"> '+psmEscapeHtml(metric.label)+'</label>';
+        return '<label class="v3-metric-option" data-search="'+psmEscapeHtml((metric.label+' '+(metric.category || '')).toLowerCase())+'"><input type="checkbox" name="v3SecondaryMetric" value="'+metric.id+'"'+(psmV3CreateSecondaryMetrics.indexOf(metric.id) > -1 ? ' checked' : '')+' onchange="psmV3ToggleSecondaryMetric(this.value,this.checked)"><span>'+psmEscapeHtml(metric.label)+'<small>'+psmEscapeHtml(metric.category || 'Metric')+'</small></span></label>';
       }).join('');
-      container.innerHTML = '<div class="v3-modal-grid"><div class="form-group"><label for="v3PrimaryMetric">Primary metric</label><select id="v3PrimaryMetric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select></div><div class="form-group"><label>Secondary metrics <span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></label><div class="psm-wl-grid">'+secondaryOptions+'</div></div></div>';
+      container.innerHTML = '<div class="v3-metric-picker">' +
+        '<section class="v3-metric-step primary"><span class="v3-metric-step-number">1</span><div><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p></div></div><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select></div></section>' +
+        '<section class="v3-metric-step"><span class="v3-metric-step-number">2</span><div><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div><div class="v3-secondary-summary" id="v3SecondaryMetricSummary"></div></div></section>' +
+      '</div>';
+      psmV3UpdateSecondaryMetricSummary();
     }
 
     function psmV3ToggleWorkload(workload, selected) {
@@ -3574,7 +3716,8 @@
       if (!selected && index > -1) psmV3CreateWorkloads.splice(index, 1);
       var count = document.getElementById('v3WorkloadCount');
       var chips = document.getElementById('v3SelectedWorkloads');
-      if (count) count.textContent = psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected';
+      var opportunity = psmV3Opportunity(psmV3CreateOpportunity);
+      if (count) count.textContent = (psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+(opportunity ? ' · '+opportunity.workloads.length+' available' : '');
       if (chips) chips.innerHTML = psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '';
     }
 
