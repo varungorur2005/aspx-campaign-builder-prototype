@@ -3263,7 +3263,15 @@
       c.v3Outcomes = c.v3Outcomes || outcomeSets[seed % outcomeSets.length].slice();
       c.v3Opportunity = c.v3Opportunity || 'copilot';
       c.v3PrimaryMetric = c.v3PrimaryMetric || c.v3Outcomes[0] || 'paidMau';
-      c.v3SecondaryMetrics = c.v3SecondaryMetrics || c.v3Outcomes.filter(function(metric) { return metric !== c.v3PrimaryMetric; }).slice(0, 4);
+      var opportunity = psmV3Opportunity(c.v3Opportunity);
+      var availableSecondaryMetrics = opportunity.metrics.map(function(metric) { return metric.id; }).filter(function(metricId) { return metricId !== c.v3PrimaryMetric; });
+      c.v3SecondaryMetrics = (c.v3SecondaryMetrics || c.v3Outcomes).filter(function(metricId, index, metrics) {
+        return metricId !== c.v3PrimaryMetric && availableSecondaryMetrics.indexOf(metricId) > -1 && metrics.indexOf(metricId) === index;
+      }).slice(0, 4);
+      for (var secondaryIndex = 0; c.v3SecondaryMetrics.length < 4 && secondaryIndex < availableSecondaryMetrics.length; secondaryIndex++) {
+        var candidateMetric = availableSecondaryMetrics[(seed + secondaryIndex) % availableSecondaryMetrics.length];
+        if (c.v3SecondaryMetrics.indexOf(candidateMetric) === -1) c.v3SecondaryMetrics.push(candidateMetric);
+      }
       c.v3TrackingMetrics = [c.v3PrimaryMetric].concat(c.v3SecondaryMetrics);
       var storedOwner = '';
       try { storedOwner = localStorage.getItem(psmMvpOwnerStorageKey(c.id)) || ''; } catch (e) {}
@@ -3307,6 +3315,19 @@
             ? (3 + (seed + index) % 9) * ageFactor
             : Math.max(1, Math.round(metric.baseline * (.08 + ((seed + index) % 8) / 100) * ageFactor));
           metric.current = metric.baseline + increase;
+        });
+      }
+      var missingMetrics = c.v3TrackingMetrics.filter(function(metricId) { return !c.v3Metrics[metricId]; });
+      if (missingMetrics.length) {
+        var generatedMetrics = psmV3NewMetrics(missingMetrics, c.tenantCount, true);
+        missingMetrics.forEach(function(metricId, index) {
+          var metric = generatedMetrics[metricId];
+          var definition = psmV3MetricDefinition(metricId);
+          var increase = definition.format === 'percent'
+            ? (3 + (seed + index) % 9) * ageFactor
+            : Math.max(1, Math.round(metric.baseline * (.08 + ((seed + index) % 8) / 100) * ageFactor));
+          metric.current = metric.baseline + increase;
+          c.v3Metrics[metricId] = metric;
         });
       }
       c.v3Activity = c.v3Activity || [{ date: c.v3OpenDate, type: 'Campaign created', detail: 'Baseline telemetry snapshot captured.' }];
