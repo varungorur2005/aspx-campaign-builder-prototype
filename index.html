@@ -2209,11 +2209,17 @@
     };
     const PSM_PARTNER_ASSOCIATED_MPN = {
       'Contoso': ['596949', '596950', '596951'],
-      'Contoso Digital': ['123456', '123457', '123458'],
+      'Contoso Digital': ['123456', '1129042', '1129088', '1129125'],
       'Contoso Consulting': ['1722483', '1722484', '1722485'],
       'Contoso Retail': ['1088231', '1088232'],
       'Contoso Systems': ['734512', '734513'],
       'Contoso Cloud': ['901655', '901656']
+    };
+    const PSM_MPN_NAMES = {
+      '123456': 'Contoso Digital',
+      '1129042': 'Contoso Digital',
+      '1129088': 'Contoso Consulting',
+      '1129125': 'Contoso Retail'
     };
     const PSM_MVP_COPILOT_CAMPAIGNS = [
       { name: 'Microsoft 365 Copilot Adoption - West US', templateName: 'Microsoft 365 Copilot Adoption', workload: 'Microsoft 365 Copilot', sourceFile: 'contoso-m365-copilot-adoption.xlsx', useWhen: 'Licensed tenants need structured adoption support.', targeting: 'Tenants with eligible users and low or inconsistent Copilot usage.', outcome: 'Increase licensed Copilot MAU and sustained active use.' },
@@ -3468,7 +3474,7 @@
     function psmV3UpdateCreatePartnerPlaceholder() {
       var type = document.getElementById('v3PartnerIdType').value;
       var input = document.getElementById('v3PartnerIdSearch');
-      input.placeholder = type === 'MPNID' ? 'Enter one or more MPN IDs, separated by commas' : 'Enter PartnerOne ID (Limit one at a time)';
+      input.placeholder = type === 'MPNID' ? 'e.g. 1129042, 1129088, 1129125' : 'Enter PartnerOne ID (Limit one at a time)';
       input.value = '';
       psmV3ClearCreatePartner();
     }
@@ -3510,7 +3516,7 @@
       psmV3CreatePartner = uniquePartners[0];
       var validationDetails = ids.map(function(id, index) {
         var label = type === 'MPNID'
-          ? psmEscapeHtml(matches[index])+' (MPN ID: '+psmEscapeHtml(id)+')'
+          ? psmEscapeHtml(PSM_MPN_NAMES[id] || matches[index])+' (MPN ID: '+psmEscapeHtml(id)+')'
           : psmEscapeHtml(psmV3CreatePartner)+' (PartnerOne ID: '+psmEscapeHtml(id)+')';
         return '<span class="v3-create-partner-value"><span>'+label+'</span><button class="v3-create-partner-remove" type="button" data-id="'+psmEscapeHtml(id)+'" onclick="psmV3RemoveCreatePartnerId(this.dataset.id)" aria-label="Remove '+psmEscapeHtml(id)+'" title="Remove">&times;</button></span>';
       }).join('');
