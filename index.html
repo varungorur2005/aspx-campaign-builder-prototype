@@ -823,6 +823,7 @@
     .psm-wl-grid label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; margin-bottom:0; color:var(--cp-text); }
     .v3-picker-search { width:calc(100% - 28px); margin:0 14px 10px; padding:8px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     .v3-metric-picker { display:grid; gap:12px; }
+    .v3-metric-picker-group > .psm-wl-selected { margin-top:8px; }
     .v3-metric-step { overflow:hidden; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-metric-step > summary { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:start; padding:10px 12px; cursor:pointer; list-style:none; }
     .v3-metric-step > summary::-webkit-details-marker { display:none; }
@@ -3776,10 +3777,10 @@
       var secondaryOptions = opportunity.metrics.filter(function(metric) { return metric.id !== psmV3CreatePrimaryMetric; }).map(function(metric) {
         return '<label class="v3-metric-option" data-search="'+psmEscapeHtml((metric.label+' '+(metric.category || '')).toLowerCase())+'"><input type="checkbox" name="v3SecondaryMetric" value="'+metric.id+'"'+(psmV3CreateSecondaryMetrics.indexOf(metric.id) > -1 ? ' checked' : '')+' onchange="psmV3ToggleSecondaryMetric(this.value,this.checked)"><span>'+psmEscapeHtml(metric.label)+'<small>'+psmEscapeHtml(metric.category || 'Metric')+'</small></span></label>';
       }).join('');
-      var primarySummary = psmV3CreatePrimaryMetric ? psmV3MetricLabel(psmV3CreatePrimaryMetric) : 'Not selected';
+      var primarySummary = psmV3CreatePrimaryMetric ? '1 selected' : 'Not selected';
       container.innerHTML = '<div class="v3-metric-picker">' +
-        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p><span class="v3-metric-collapsed-value">'+psmEscapeHtml(primarySummary)+'</span></div></div></summary><div class="v3-metric-step-body"><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select><div class="psm-wl-selected" id="v3SelectedPrimaryMetric"></div></div></details>' +
-        '<details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div><div class="psm-wl-selected" id="v3SelectedSecondaryMetrics"></div></div></details>' +
+        '<div class="v3-metric-picker-group"><details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p><span class="v3-metric-collapsed-value">'+primarySummary+'</span></div></div></summary><div class="v3-metric-step-body"><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select></div></details><div class="psm-wl-selected" id="v3SelectedPrimaryMetric"></div></div>' +
+        '<div class="v3-metric-picker-group"><details class="v3-metric-step" open><summary><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div></div></details><div class="psm-wl-selected" id="v3SelectedSecondaryMetrics"></div></div>' +
       '</div>';
       psmV3UpdateSecondaryMetricSummary();
     }
