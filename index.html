@@ -1742,7 +1742,7 @@
         <div class="form-group full"><label>Business outcome <span class="required">*</span></label><div class="v3-outcomes" id="v3OutcomeOptions"></div></div>
         <div class="form-group full"><label>Workloads <span class="required">*</span></label><div id="v3WorkloadOptions"></div></div>
         <div class="form-group full"><div class="v3-partner-lookup-label">Enter PartnerOne ID or MPN ID <span class="v3-tooltip" tabindex="0" aria-label="Partner identifier tip">?<span class="v3-tooltip-text">Tip: You may enter a single PartnerOne ID or multiple MPN IDs separated by commas.</span></span> <span class="required">*</span></div><div class="v3-create-partner-row"><select id="v3PartnerIdType" onchange="psmV3UpdateCreatePartnerPlaceholder()"><option value="PartnerOneID">PartnerOne ID</option><option value="MPNID">MPN ID</option></select><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter PartnerOne ID (Limit one at a time)" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div>
-        <div class="form-group full"><label>Tenant IDs <span class="required">*</span></label><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box"><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation"></div></div></div></div>
+        <div class="form-group full"><label>Tenant IDs <span class="required">*</span></label><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box" id="v3TenantValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation"></div></div></div></div>
         <div class="form-group full"><label>Initial campaign note</label><textarea id="v3InitialNote" placeholder="Optional context, partner feedback, risks, or next steps"></textarea></div>
       </div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3CreateModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3CreateCampaign()">Create campaign</he-button_psmv3></div>
@@ -3421,7 +3421,7 @@
       var workloadBoxes = PSM_V3_COPILOT_WORKLOADS.map(function(workload) {
         return '<label><input type="checkbox" value="'+psmEscapeHtml(workload)+'"'+(psmV3CreateWorkloads.indexOf(workload) > -1 ? ' checked' : '')+' onchange="psmV3ToggleWorkload(this.value,this.checked)"> '+psmEscapeHtml(workload)+'</label>';
       }).join('');
-      container.innerHTML = '<details class="psm-wl-picker"><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+(psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+'</span></span></summary><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+psmWorkloadChipsHtml(psmV3CreateWorkloads)+'</div>';
+      container.innerHTML = '<details class="psm-wl-picker"><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+(psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+'</span></span></summary><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+(psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '')+'</div>';
     }
 
     function psmV3ToggleWorkload(workload, selected) {
@@ -3431,7 +3431,7 @@
       var count = document.getElementById('v3WorkloadCount');
       var chips = document.getElementById('v3SelectedWorkloads');
       if (count) count.textContent = psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected';
-      if (chips) chips.innerHTML = psmWorkloadChipsHtml(psmV3CreateWorkloads);
+      if (chips) chips.innerHTML = psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '';
     }
 
     function psmV3OpenCreate() {
@@ -3449,6 +3449,7 @@
       document.getElementById('v3CreatePartnerResult').className = 'v3-create-partner-result';
       document.getElementById('v3CreatePartnerResult').textContent = '';
       psmV3UpdateCreatePartnerPlaceholder();
+      document.getElementById('v3TenantValidationBox').hidden = true;
       document.getElementById('v3TenantValidation').className = 'v3-validation';
       document.getElementById('v3TenantValidation').textContent = '';
       showModal('psmV3CreateModal');
@@ -3540,7 +3541,9 @@
 
     function psmV3ResetTenantValidation() {
       psmV3Upload = { file: null, rows: [], valid: false, overlaps: [] };
+      var box = document.getElementById('v3TenantValidationBox');
       var status = document.getElementById('v3TenantValidation');
+      if (box) box.hidden = true;
       if (status) {
         status.className = 'v3-validation';
         status.textContent = '';
@@ -3607,9 +3610,13 @@
     }
 
     function psmV3ValidateRows(ids) {
+      var box = document.getElementById('v3TenantValidationBox');
+      var status = document.getElementById('v3TenantValidation');
+      if (box) box.hidden = false;
       var partner = psmV3CreatePartner;
       if (!partner) {
-        showToast('Find a partner using a PartnerOne ID or MPN ID first', true);
+        status.className = 'v3-validation warning';
+        status.textContent = 'Find a partner using a PartnerOne ID or MPN ID first.';
         return;
       }
       var seen = new Set();
@@ -3632,7 +3639,6 @@
       });
       psmV3Upload.valid = validIds.length > 0 && !duplicateIds.length && !invalidIds.length && !wrongPartnerIds.length;
       psmV3Upload.overlaps = psmV3FindOverlaps(psmV3Upload.rows);
-      var status = document.getElementById('v3TenantValidation');
       status.className = 'v3-validation'+(psmV3Upload.valid && !psmV3Upload.overlaps.length ? '' : ' warning');
       status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>checked</div><div class="v3-validation-stat"><strong>'+validIds.length+'</strong>associated with '+psmEscapeHtml(partner)+'</div><div class="v3-validation-stat"><strong>'+(duplicateIds.length+invalidIds.length+wrongPartnerIds.length)+'</strong>need attention</div></div>' +
         (invalidIds.length ? '<div><strong>Invalid Tenant IDs:</strong> '+invalidIds.map(psmEscapeHtml).join(', ')+'</div>' : '') +
@@ -3649,6 +3655,7 @@
     function psmV3ValidateTenantFile(input) {
       var file = input.files && input.files[0];
       var status = document.getElementById('v3TenantValidation');
+      document.getElementById('v3TenantValidationBox').hidden = false;
       psmV3Upload = { file: file || null, rows: [], valid: false, overlaps: [] };
       if (!file) { status.textContent = 'Select a CSV or TXT file.'; return; }
       if (['csv', 'txt'].indexOf(file.name.split('.').pop().toLowerCase()) === -1 || !file.text) {
