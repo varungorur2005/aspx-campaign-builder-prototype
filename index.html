@@ -1024,7 +1024,7 @@
     .v3-kpi strong { display:block; margin-bottom:4px; color:var(--cp-text); font-size:23px; }
     .v3-kpi span { color:var(--cp-text-muted); font-size:11px; font-weight:700; text-transform:uppercase; }
     .v3-kpi small { display:block; margin-top:6px; color:var(--cp-text-muted); font-size:10px; line-height:1.35; }
-    .v3-charts { display:grid; grid-template-columns:repeat(3,minmax(340px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
+    .v3-charts { display:grid; grid-template-columns:repeat(2,minmax(340px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
     .v3-card { padding:16px; border:1px solid var(--cp-border); border-radius:16px; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); }
     .v3-card h2 { margin:0 0 12px; font-size:15px; }
     .v3-bar-row { display:grid; grid-template-columns:90px 1fr 36px; align-items:center; gap:8px; margin:8px 0; color:var(--cp-text-muted); font-size:11px; }
@@ -1319,7 +1319,7 @@
       width:12px; height:12px; border:1px solid var(--cp-link); border-radius:50%;
       color:var(--cp-link); font-size:8px; font-style:normal;
     }
-    body.psm-v3-view .v3-charts { grid-template-columns:repeat(3,minmax(340px,1fr)); gap:24px; margin-bottom:32px; }
+    body.psm-v3-view .v3-charts { grid-template-columns:repeat(2,minmax(340px,1fr)); gap:24px; margin-bottom:32px; }
     body.psm-v3-view .v3-card { min-height:325px; padding:12px 16px; border-radius:2px; box-shadow:0 1px 2px var(--cp-border); }
     body.psm-v3-view .v3-card h2 { margin-bottom:4px; font-size:14px; font-weight:600; }
     body.psm-v3-view .v3-pie-layout { justify-content:center; gap:24px; min-height:245px; }
@@ -1327,7 +1327,6 @@
     body.psm-v3-view .v3-chart-legend { min-width:135px; gap:7px; }
     body.psm-v3-view .v3-chart-legend-row { grid-template-columns:10px 1fr auto; gap:6px; font-size:11px; }
     body.psm-v3-view .v3-chart-legend-swatch { width:10px; height:10px; border-radius:0; }
-    body.psm-v3-view .v3-metric-chart .v3-chart-legend { max-height:220px; overflow-y:auto; padding-right:4px; }
     body.psm-v3-view .v3-table-toolbar { margin:0; padding:6px 0; border:0; }
     body.psm-v3-view .v3-table-toolbar .toolbar-btn { min-height:32px; padding:5px 12px; border-radius:0; font-size:13px; }
     body.psm-v3-view .v3-table-search-wrap { width:272px; height:30px; border-radius:0; }
@@ -3507,31 +3506,8 @@
       var outcomeLegend = outcomeCounts.map(function(outcome, index) {
         return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+outcomeColors[index]+';"></span><span>'+psmEscapeHtml(outcome.label)+'</span><strong>'+outcome.count+'</strong></div>';
       }).join('');
-      function metricDistribution(metricIds) {
-        var counts = {};
-        metricIds.filter(Boolean).forEach(function(metricId) {
-          counts[metricId] = (counts[metricId] || 0) + 1;
-        });
-        return Object.keys(counts).map(function(metricId) {
-          return { id:metricId, label:psmV3MetricLabel(metricId), count:counts[metricId] };
-        }).sort(function(a, b) { return b.count - a.count || a.label.localeCompare(b.label); });
-      }
-      function chartData(items) {
-        var palette = ['var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)', 'var(--cp-chart-4)', 'var(--cp-chart-5)'];
-        var colors = items.map(function(item, index) { return palette[index % palette.length]; });
-        var labels = items.map(function(item) { return item.label; });
-        var values = items.map(function(item) { return item.count; });
-        return {
-          slices: pieSlices(values, labels, colors),
-          legend: items.map(function(item, index) {
-            return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+colors[index]+';"></span><span>'+psmEscapeHtml(item.label)+'</span><strong>'+item.count+'</strong></div>';
-          }).join('')
-        };
-      }
-      var primaryMetricChart = chartData(metricDistribution(campaigns.map(function(c) { return c.v3PrimaryMetric; })));
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts"><he-card_psmv3 class="v3-card"><h2>Campaigns by status</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by status pie chart">'+(slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+statusLegend+'</div></div></he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaigns by opportunity</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by opportunity pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div></he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card v3-metric-chart"><h2>Campaigns by Primary Metric</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by primary metric pie chart">'+(primaryMetricChart.slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No primary metrics</title></circle>')+'</svg><div class="v3-chart-legend">'+primaryMetricChart.legend+'</div></div></he-card_psmv3></div>';
+        '<he-card_psmv3 class="v3-card"><h2>Campaigns by opportunity</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by opportunity pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div></he-card_psmv3></div>';
     }
 
     function psmV3PriorityChips(c) {
