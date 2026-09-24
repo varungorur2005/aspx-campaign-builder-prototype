@@ -3261,9 +3261,18 @@
         ['paidMau', 'pru'], ['pru', 'revenue'], ['paidMau', 'pru', 'npsa', 'revenue']
       ];
       c.v3Outcomes = c.v3Outcomes || outcomeSets[seed % outcomeSets.length].slice();
+      var hasConfiguredOpportunity = !!c.v3Opportunity;
       c.v3Opportunity = c.v3Opportunity || 'copilot';
       c.v3PrimaryMetric = c.v3PrimaryMetric || c.v3Outcomes[0] || 'paidMau';
       var opportunity = psmV3Opportunity(c.v3Opportunity);
+      if (!hasConfiguredOpportunity) {
+        var workloadCount = 1 + (seed % 3);
+        c.workloads = [];
+        for (var workloadIndex = 0; workloadIndex < workloadCount; workloadIndex++) {
+          c.workloads.push(opportunity.workloads[(seed + workloadIndex * 5) % opportunity.workloads.length]);
+        }
+        c.workload = c.workloads[0];
+      }
       var availableSecondaryMetrics = opportunity.metrics.map(function(metric) { return metric.id; }).filter(function(metricId) { return metricId !== c.v3PrimaryMetric; });
       c.v3SecondaryMetrics = (c.v3SecondaryMetrics || c.v3Outcomes).filter(function(metricId, index, metrics) {
         return metricId !== c.v3PrimaryMetric && availableSecondaryMetrics.indexOf(metricId) > -1 && metrics.indexOf(metricId) === index;
