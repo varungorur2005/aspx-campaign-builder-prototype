@@ -45,6 +45,11 @@
       --cp-ms-green: #7fba00;
       --cp-ms-blue: #00a4ef;
       --cp-ms-yellow: #ffb900;
+      --cp-chart-1: #0099bc;
+      --cp-chart-2: #8c005d;
+      --cp-chart-3: #5272d9;
+      --cp-chart-4: #c19c00;
+      --cp-chart-5: #8764b8;
     }
     html[data-theme="dark"] {
       color-scheme: dark;
@@ -3194,7 +3199,7 @@
       var statusCounts = statuses.map(function(status) {
         return campaigns.filter(function(c) { return c.v3Status === status; }).length;
       });
-      var statusColors = ['var(--cp-accent)', 'var(--cp-link)', 'var(--cp-warning)', 'var(--cp-success)'];
+      var statusColors = ['var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)', 'var(--cp-chart-4)'];
       function pieSlices(counts, labels, colors) {
         var total = counts.reduce(function(sum, count) { return sum + count; }, 0);
         var startAngle = -Math.PI / 2;
@@ -3222,7 +3227,7 @@
       });
       var otherCount = campaigns.filter(function(c) { return !!c.v3OtherOutcome; }).length;
       if (otherCount) outcomeCounts.push({ label: 'Other', count: otherCount });
-      var outcomeColors = ['var(--cp-accent)', 'var(--cp-success)', 'var(--cp-warning)', 'var(--cp-link)', 'var(--cp-danger)'];
+      var outcomeColors = ['var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)', 'var(--cp-chart-4)', 'var(--cp-chart-5)'];
       var outcomeLabels = outcomeCounts.map(function(outcome) { return outcome.label; });
       var outcomeValues = outcomeCounts.map(function(outcome) { return outcome.count; });
       var outcomeSlices = pieSlices(outcomeValues, outcomeLabels, outcomeColors);
@@ -3232,7 +3237,7 @@
       var workloadCounts = PSM_V3_COPILOT_WORKLOADS.map(function(workload) {
         return { label: workload, count: campaigns.filter(function(c) { return (c.workloads || []).indexOf(workload) > -1; }).length };
       });
-      var workloadColors = ['var(--cp-accent)', 'var(--cp-link)', 'var(--cp-success)', 'var(--cp-warning)', 'var(--cp-danger)'];
+      var workloadColors = ['var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)', 'var(--cp-chart-4)', 'var(--cp-chart-5)'];
       var workloadLabels = workloadCounts.map(function(workload) { return workload.label; });
       var workloadValues = workloadCounts.map(function(workload) { return workload.count; });
       var workloadSlices = pieSlices(workloadValues, workloadLabels, workloadColors);
