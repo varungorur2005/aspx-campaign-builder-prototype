@@ -1225,12 +1225,31 @@
     .psm-v3-tenant-highlight { border-left:3px solid var(--cp-success); }
     .psm-mvp-table-toolbar .psm-mvp-toolbar-btn { border:0; border-radius:4px; box-shadow:none; }
     .psm-mvp-table-toolbar .psm-mvp-toolbar-btn:hover, .psm-mvp-table-toolbar .psm-mvp-toolbar-btn.active { border-color:transparent; background:var(--cp-surface-soft); color:var(--cp-link); }
-    .psm-v3-detail .psm-mvp-progress-table { min-width:2200px; table-layout:auto; }
-    .psm-v3-detail .psm-mvp-progress-table th, .psm-v3-detail .psm-mvp-progress-table td { min-width:120px; padding:10px 12px; overflow-wrap:normal; }
-    .psm-v3-detail .psm-mvp-progress-table th:first-child, .psm-v3-detail .psm-mvp-progress-table td:first-child { min-width:40px; width:40px; }
-    .psm-v3-detail .psm-mvp-progress-table th:nth-child(2), .psm-v3-detail .psm-mvp-progress-table td:nth-child(2) { min-width:170px; }
-    .psm-v3-detail .psm-mvp-progress-table th:nth-child(3), .psm-v3-detail .psm-mvp-progress-table td:nth-child(3) { min-width:115px; }
-    .psm-v3-detail .psm-mvp-progress-table th:nth-child(4), .psm-v3-detail .psm-mvp-progress-table td:nth-child(4) { min-width:165px; }
+    .psm-v3-detail .psm-mvp-progress-scroll,
+    .psm-v3-detail .psm-mvp-top-scroll {
+      overflow-x:scroll; overflow-y:hidden; scrollbar-gutter:stable;
+      scrollbar-color:var(--cp-border-strong) var(--cp-surface-soft);
+      scrollbar-width:auto;
+    }
+    .psm-v3-detail .psm-mvp-top-scroll { height:18px; margin:8px 0 4px; border:1px solid var(--cp-border); border-radius:2px; background:var(--cp-surface-soft); }
+    .psm-v3-detail .psm-mvp-top-scroll-content { height:1px; }
+    .psm-v3-detail .psm-mvp-progress-scroll::-webkit-scrollbar,
+    .psm-v3-detail .psm-mvp-top-scroll::-webkit-scrollbar { height:12px; }
+    .psm-v3-detail .psm-mvp-progress-scroll::-webkit-scrollbar-track,
+    .psm-v3-detail .psm-mvp-top-scroll::-webkit-scrollbar-track { background:var(--cp-surface-soft); }
+    .psm-v3-detail .psm-mvp-progress-scroll::-webkit-scrollbar-thumb,
+    .psm-v3-detail .psm-mvp-top-scroll::-webkit-scrollbar-thumb { border:2px solid var(--cp-surface-soft); border-radius:0.625rem; background:var(--cp-border-strong); }
+    .psm-v3-detail .psm-mvp-progress-table { width:max-content; min-width:100%; table-layout:auto; }
+    .psm-v3-detail .psm-mvp-progress-table th,
+    .psm-v3-detail .psm-mvp-progress-table td { min-width:84px; padding:6px 7px; }
+    .psm-v3-detail .psm-mvp-progress-table th { max-width:112px; white-space:normal; overflow-wrap:anywhere; line-height:1.25; }
+    .psm-v3-detail .psm-mvp-progress-table td { white-space:nowrap; }
+    .psm-v3-detail .psm-mvp-progress-table th:first-child,
+    .psm-v3-detail .psm-mvp-progress-table td:first-child { min-width:34px; width:34px; padding-left:5px; padding-right:5px; }
+    .psm-v3-detail .psm-mvp-progress-table th:nth-child(2),
+    .psm-v3-detail .psm-mvp-progress-table td:nth-child(2) { min-width:145px; }
+    .psm-v3-detail .psm-mvp-progress-table th:nth-child(3),
+    .psm-v3-detail .psm-mvp-progress-table td:nth-child(3) { min-width:112px; }
     .v3-create-overlay .v3-modal { border-left:1px solid var(--cp-border); background:var(--cp-bg-elevated); }
     .v3-create-overlay .v3-modal > h3, .v3-create-overlay .v3-modal > p { padding-left:4px; padding-right:4px; }
     .v3-create-overlay .v3-modal > h3 { font-size:20px; font-weight:600; }
@@ -4504,6 +4523,7 @@
           '<h3 style="font-size:13px;margin:4px 0 10px;">Impact by Tenant Segment</h3><div class="psm-mvp-segment-scroll"><table class="psm-mvp-segment-table"><thead><tr><th>Tenant Segment</th><th>Tenants</th>'+c.v3TrackingMetrics.map(function(id) { return '<th>'+psmV3MetricLabel(id)+' (Growth)</th>'; }).join('')+'</tr></thead><tbody>'+segmentRows+'</tbody></table></div></div></details></div>' +
         psmRenderMvpTenantWorkspace(c, canTransfer) +
         '';
+      requestAnimationFrame(function() { requestAnimationFrame(psmMvpInitializeTenantScroll); });
       window.location.hash = 'psm-v3-campaign-'+id;
     }
 
@@ -5153,6 +5173,21 @@
       };
     }
 
+    function psmMvpSyncTenantScroll(source, targetId) {
+      var target = document.getElementById(targetId);
+      if (target && target.scrollLeft !== source.scrollLeft) target.scrollLeft = source.scrollLeft;
+    }
+
+    function psmMvpInitializeTenantScroll() {
+      var viewport = document.getElementById('psmMvpTenantTableScroll');
+      var topScroll = document.getElementById('psmMvpTenantTopScroll');
+      var topContent = document.getElementById('psmMvpTenantTopScrollContent');
+      var table = viewport && viewport.querySelector('table');
+      if (!viewport || !topScroll || !topContent || !table) return;
+      topContent.style.width = table.scrollWidth+'px';
+      topScroll.hidden = table.scrollWidth <= viewport.clientWidth + 1;
+    }
+
     function psmRenderMvpTenantWorkspace(c, isOwner) {
       psmEnsureMvpTenantRows(c);
       var stageOptions = PSM_PROGRESSION_STAGES.map(function(stage) {
@@ -5242,7 +5277,8 @@
       var tableContent =
         psmRenderMvpTenantToolbar(c, stageOptions, isOwner) +
         (isOwner ? '<div class="psm-mvp-bulk-bar"><strong>Bulk update</strong><select id="psmBulkStage">'+stageOptions+'</select><button class="btn btn-primary" onclick="psmBulkApplyStage(\''+c.id+'\')">Update selected tenants</button><span id="psmMvpSelectionCount" style="color:var(--cp-text-muted);font-size:12px;">0 selected</span></div>' : '<div class="psm-mvp-bulk-bar"><strong>Read-only tenant progress</strong><span style="color:var(--cp-text-muted);font-size:12px;">The Campaign Owner or a designated PSM leader can add, remove, or update tenants.</span></div>') +
-        '<div class="psm-workspace-scroll psm-mvp-progress-scroll"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr>'+(isOwner ? '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>' : '')+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
+        '<div class="psm-mvp-top-scroll" id="psmMvpTenantTopScroll" role="region" aria-label="Scroll customer tenant columns" tabindex="0" onfocus="psmMvpInitializeTenantScroll()" onpointerenter="psmMvpInitializeTenantScroll()" onscroll="psmMvpSyncTenantScroll(this,\'psmMvpTenantTableScroll\')"><div class="psm-mvp-top-scroll-content" id="psmMvpTenantTopScrollContent"></div></div>' +
+        '<div class="psm-workspace-scroll psm-mvp-progress-scroll" id="psmMvpTenantTableScroll" onscroll="psmMvpSyncTenantScroll(this,\'psmMvpTenantTopScroll\')"><table class="psm-cust-table psm-workspace-table psm-mvp-progress-table"><thead><tr>'+(isOwner ? '<th style="text-align:center;"><input type="checkbox" onchange="psmToggleMvpCustomers(this.checked)"></th>' : '')+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>' +
         '<div class="psm-mvp-pagination"><span>Showing '+firstRecord+'-'+lastRecord+' of '+filtered.length+' records</span><div class="psm-mvp-pagination-controls"><label>Rows per page <select onchange="psmMvpSetPageSize(this.value)">'+[5,10,25,50].map(function(size){ return '<option value="'+size+'"'+(psmMvpTenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><button class="btn btn-secondary" onclick="psmMvpChangePage(-1)"'+(psmMvpTenantTableState.page <= 1 ? ' disabled' : '')+'>Previous</button><span>Page '+psmMvpTenantTableState.page+' of '+totalPages+'</span><button class="btn btn-secondary" onclick="psmMvpChangePage(1)"'+(psmMvpTenantTableState.page >= totalPages ? ' disabled' : '')+'>Next</button></div></div>';
       return currentView === 'psm-v3'
         ? '<div class="panel-card"><h2 class="psm-mvp-section-title">Campaign Customer Tenants <span style="font-size:12px;font-weight:400;color:var(--cp-text-muted);">('+c.customers.length+' records)</span></h2>'+tableContent+'</div>'
