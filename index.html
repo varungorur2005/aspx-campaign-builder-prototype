@@ -1324,6 +1324,13 @@
     }
     body.psm-v3-view .v3-table tbody tr:hover { background:var(--cp-bg-elevated); }
     body.psm-v3-view .v3-chip { margin:0 7px 2px 0; padding:0; background:transparent; color:var(--cp-text); font-size:12px; font-weight:400; text-decoration:none; }
+    body.psm-v3-view .v3-secondary-collapsed-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+    body.psm-v3-view .v3-selected-metric-tag {
+      display:inline-flex; align-items:center; min-height:22px; padding:2px 8px;
+      border:1px solid var(--cp-border); border-radius:2px;
+      background:var(--cp-surface); color:var(--cp-text); font-size:11px; font-weight:600;
+    }
+    body.psm-v3-view .v3-selected-metric-empty { color:var(--cp-text-muted); font-size:11px; font-weight:400; }
     body.psm-v3-view .v3-pagination { margin-top:0; padding:9px 0 0; font-size:12px; }
     body.psm-v3-view .btn { border-radius:2px; }
     body.psm-v3-view #psmV3CreateModal,
@@ -3734,11 +3741,13 @@
 
     function psmV3UpdateSecondaryMetricSummary() {
       var count = document.getElementById('v3SecondaryMetricCount');
-      var summary = document.getElementById('v3SecondaryMetricSummary');
+      var summary = document.getElementById('v3SecondaryMetricCollapsedSummary');
       if (count) count.textContent = psmV3CreateSecondaryMetrics.length+'/4 selected';
-      if (summary) summary.innerHTML = psmV3CreateSecondaryMetrics.map(function(metric) {
-        return '<span class="v3-chip">'+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>';
-      }).join('');
+      if (summary) {
+        summary.innerHTML = psmV3CreateSecondaryMetrics.length
+          ? psmV3CreateSecondaryMetrics.map(function(metric) { return '<span class="v3-selected-metric-tag">'+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>'; }).join('')
+          : '<span class="v3-selected-metric-empty">No secondary metrics selected</span>';
+      }
     }
 
     function psmV3FilterMetrics(value) {
@@ -3768,7 +3777,7 @@
       var primarySummary = psmV3CreatePrimaryMetric ? psmV3MetricLabel(psmV3CreatePrimaryMetric) : 'Not selected';
       container.innerHTML = '<div class="v3-metric-picker">' +
         '<details class="v3-metric-step primary" open><summary><span class="v3-metric-step-number">1</span><div class="v3-metric-step-head"><div><strong>Choose the primary metric</strong><p>The main measure used to evaluate campaign success.</p><span class="v3-metric-collapsed-value">'+psmEscapeHtml(primarySummary)+'</span></div></div></summary><div class="v3-metric-step-body"><select id="v3PrimaryMetric" aria-label="Primary metric" onchange="psmV3SetPrimaryMetric(this.value)">'+primaryOptions+'</select></div></details>' +
-        '<details class="v3-metric-step" open><summary><span class="v3-metric-step-number">2</span><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div><div class="v3-secondary-summary" id="v3SecondaryMetricSummary"></div></div></details>' +
+        '<details class="v3-metric-step" open><summary><span class="v3-metric-step-number">2</span><div class="v3-metric-step-head"><div><strong>Add secondary metrics</strong><p>Choose up to four supporting measures from '+opportunity.metrics.length+' ASPX metrics.</p><div class="v3-secondary-collapsed-tags" id="v3SecondaryMetricCollapsedSummary"></div></div><span id="v3SecondaryMetricCount">'+psmV3CreateSecondaryMetrics.length+'/4 selected</span></div></summary><div class="v3-metric-step-body"><input type="search" placeholder="Search available metrics" aria-label="Search secondary metrics" oninput="psmV3FilterMetrics(this.value)"><div class="v3-metric-options" id="v3SecondaryMetricOptions">'+secondaryOptions+'</div></div></details>' +
       '</div>';
       psmV3UpdateSecondaryMetricSummary();
     }
