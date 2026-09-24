@@ -1025,7 +1025,7 @@
     .v3-kpi strong { display:block; margin-bottom:4px; color:var(--cp-text); font-size:23px; }
     .v3-kpi span { color:var(--cp-text-muted); font-size:11px; font-weight:700; text-transform:uppercase; }
     .v3-kpi small { display:block; margin-top:6px; color:var(--cp-text-muted); font-size:10px; line-height:1.35; }
-    .v3-charts { display:grid; grid-template-columns:repeat(3,minmax(300px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
+    .v3-charts { display:grid; grid-template-columns:repeat(5,minmax(340px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
     .v3-card { padding:16px; border:1px solid var(--cp-border); border-radius:16px; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); }
     .v3-card h2 { margin:0 0 12px; font-size:15px; }
     .v3-bar-row { display:grid; grid-template-columns:90px 1fr 36px; align-items:center; gap:8px; margin:8px 0; color:var(--cp-text-muted); font-size:11px; }
@@ -1301,7 +1301,7 @@
       width:12px; height:12px; border:1px solid var(--cp-link); border-radius:50%;
       color:var(--cp-link); font-size:8px; font-style:normal;
     }
-    body.psm-v3-view .v3-charts { grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-bottom:32px; }
+    body.psm-v3-view .v3-charts { grid-template-columns:repeat(5,minmax(340px,1fr)); gap:24px; margin-bottom:32px; }
     body.psm-v3-view .v3-card { min-height:325px; padding:12px 16px; border-radius:2px; box-shadow:0 1px 2px var(--cp-border); }
     body.psm-v3-view .v3-card h2 { margin-bottom:4px; font-size:14px; font-weight:600; }
     body.psm-v3-view .v3-pie-layout { justify-content:center; gap:24px; min-height:245px; }
@@ -1309,6 +1309,7 @@
     body.psm-v3-view .v3-chart-legend { min-width:135px; gap:7px; }
     body.psm-v3-view .v3-chart-legend-row { grid-template-columns:10px 1fr auto; gap:6px; font-size:11px; }
     body.psm-v3-view .v3-chart-legend-swatch { width:10px; height:10px; border-radius:0; }
+    body.psm-v3-view .v3-metric-chart .v3-chart-legend { max-height:220px; overflow-y:auto; padding-right:4px; }
     body.psm-v3-view .v3-table-toolbar { margin:0; padding:6px 0; border:0; }
     body.psm-v3-view .v3-table-toolbar .toolbar-btn { min-height:32px; padding:5px 12px; border-radius:0; font-size:13px; }
     body.psm-v3-view .v3-table-search-wrap { width:272px; height:30px; border-radius:0; }
@@ -3157,18 +3158,18 @@
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
     const PSM_V3_CURRENT_ROLE = 'leader';
     const PSM_V3_ADDITIONAL_CAMPAIGNS = [
-      { id:'PSM-601', name:'Copilot Activation - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot'], created:'2026-08-26' },
-      { id:'PSM-602', name:'Copilot Value Realization - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot','Microsoft 365 Copilot Chat'], created:'2026-07-18' },
-      { id:'PSM-603', name:'Copilot Expansion - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Close', outcomes:['paidMau','pru','revenue'], workloads:['Microsoft 365 Copilot','Copilot Cowork'], created:'2026-04-09' },
-      { id:'PSM-604', name:'Copilot Adoption - United Kingdom', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot Chat','Copilot Agents'], created:'2026-06-14' },
-      { id:'PSM-605', name:'Copilot Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Review', outcomes:['pru','npsa'], workloads:['Copilot Agents'], created:'2026-09-02' },
-      { id:'PSM-606', name:'Copilot Usage Acceleration - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Execute', outcomes:['paidMau','pru','npsa'], workloads:['Microsoft 365 Copilot','Copilot Cowork','Copilot Extensibility'], created:'2026-07-03' },
-      { id:'PSM-607', name:'Copilot Revenue Growth - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Close', outcomes:['revenue','npsa'], workloads:['Copilot Cowork'], created:'2026-03-21' },
-      { id:'PSM-608', name:'Copilot Customer Value - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Execute', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot Chat'], created:'2026-08-30' },
-      { id:'PSM-609', name:'Copilot Seat Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Review', outcomes:['npsa','revenue'], workloads:['Microsoft 365 Copilot','Copilot Agents'], created:'2026-05-28' },
-      { id:'PSM-610', name:'Copilot Productivity - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Review', outcomes:['paidMau','pru'], workloads:['Microsoft 365 Copilot Chat'], created:'2026-02-17' },
-      { id:'PSM-611', name:'Copilot Engagement - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Execute', outcomes:['paidMau','npsa'], workloads:['Microsoft 365 Copilot Chat','Copilot Extensibility'], created:'2026-09-08' },
-      { id:'PSM-612', name:'Copilot Portfolio Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Review', outcomes:['paidMau','pru','npsa','revenue'], workloads:['Microsoft 365 Copilot','Copilot Agents'], created:'2026-06-25' }
+      { id:'PSM-601', name:'Microsoft 365 E3 Usage Growth - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', opportunity:'m365e3', primaryMetric:'e3Mau', secondaryMetrics:['e3Utilization','e3UsageWhitespace'], workloads:['Teams','Exchange Online (EXO)','SharePoint'], created:'2026-08-26' },
+      { id:'PSM-602', name:'Microsoft 365 E3 Readiness - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', opportunity:'m365e3', primaryMetric:'e3Utilization', secondaryMetrics:['e3Mau','e3Pau'], workloads:['Microsoft 365 Apps','Teams Meeting','Intune'], created:'2026-07-18' },
+      { id:'PSM-603', name:'Microsoft 365 E3 Upsell - Germany', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Close', opportunity:'m365e3', primaryMetric:'e3UpsellReady', secondaryMetrics:['e3UsageWhitespace','e3PotentialEarnings'], workloads:['Microsoft Entra ID P1 + P2','Microsoft Defender for Endpoint P1 + P2'], created:'2026-04-09' },
+      { id:'PSM-604', name:'Microsoft 365 E5 Security Adoption - UK', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Execute', opportunity:'m365e5', primaryMetric:'e5Mau', secondaryMetrics:['e5Utilization','e5UsageWhitespace'], workloads:['Microsoft Defender for Endpoint P1 + P2','Microsoft Defender for Office 365 P1 + P2'], created:'2026-06-14' },
+      { id:'PSM-605', name:'Microsoft 365 E5 Compliance Readiness - India', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Review', opportunity:'m365e5', primaryMetric:'e5UpsellReady', secondaryMetrics:['e5Unhealthy','e5PotentialEarnings'], workloads:['Microsoft Purview Information Protection P1 + P2','Microsoft Purview Data Lifecycle Management P1 + P2'], created:'2026-09-02' },
+      { id:'PSM-606', name:'Microsoft 365 E5 Value Realization - ANZ', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Execute', opportunity:'m365e5', primaryMetric:'e5Utilization', secondaryMetrics:['e5Mau','e5AtRisk'], workloads:['Microsoft Entra ID P2','Microsoft Defender for Identity','Microsoft Defender for Cloud Apps P1 + P2'], created:'2026-07-03' },
+      { id:'PSM-607', name:'Microsoft 365 E5 Expansion - East', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Close', opportunity:'m365e5Expansion', primaryMetric:'e5ExpansionMau', secondaryMetrics:['e5ExpansionUtilization','e5ExpansionUsageWhitespace'], workloads:['Microsoft Entra ID P2','Microsoft Defender for Endpoint P1 + P2'], created:'2026-03-21' },
+      { id:'PSM-608', name:'E5 Compliance Expansion - Southeast Asia', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Execute', opportunity:'m365e5Expansion', primaryMetric:'e5ExpansionUpsellReady', secondaryMetrics:['e5ExpansionPotentialEarnings','e5ExpansionOpportunityUnits'], workloads:['Microsoft Purview Discover and Respond P2','Microsoft Purview Information Protection P2'], created:'2026-08-30' },
+      { id:'PSM-609', name:'E5 Security Expansion - West', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Review', opportunity:'m365e5Expansion', primaryMetric:'e5ExpansionUtilization', secondaryMetrics:['e5ExpansionMau','e5ExpansionAtRisk'], workloads:['Microsoft Defender for Office 365 P1 + P2','Microsoft Defender for Cloud Apps P1 + P2'], created:'2026-05-28' },
+      { id:'PSM-610', name:'Windows 365 Land - Canada', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Review', opportunity:'cloudEndpoints', primaryMetric:'windows365Mau', secondaryMetrics:['windows365Utilization','windows365Whitespace'], workloads:['Windows 365','Microsoft Intune'], created:'2026-02-17' },
+      { id:'PSM-611', name:'Cloud Endpoints Expansion - UK', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Execute', opportunity:'cloudEndpoints', primaryMetric:'expandW365Tenants', secondaryMetrics:['intuneMau','entraMau'], workloads:['Windows 365','Microsoft Intune','Microsoft Entra ID'], created:'2026-09-08' },
+      { id:'PSM-612', name:'Cloud Endpoints Value Growth - India', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Review', opportunity:'cloudEndpoints', primaryMetric:'windows365Utilization', secondaryMetrics:['w365EligibleSeats','cloudPotentialEarnings'], workloads:['Windows 365','Microsoft Intune'], created:'2026-06-25' }
     ];
     let psmV3State = {
       persona: 'rpl', search: '', owner: '', region: '', area: '', country: '', segment: '', partner: '', status: '', opportunity: '',
@@ -3274,12 +3275,25 @@
       var pruBase = 1700 + (seed % 32) * 92;
       var npsaBase = 80 + (seed % 18) * 12;
       var revenueBase = 180000 + (seed % 25) * 14000;
-      c.v3Metrics = c.v3Metrics || {
-        paidMau: { baseline: paidBase, current: paidBase + Math.round((180 + seed % 420) * ageFactor), target: paidBase + 720 },
-        pru: { baseline: pruBase, current: pruBase + Math.round((220 + seed % 510) * ageFactor), target: pruBase + 860 },
-        npsa: { baseline: npsaBase, current: npsaBase + Math.round((18 + seed % 70) * ageFactor), target: npsaBase + 120 },
-        revenue: { baseline: revenueBase, current: revenueBase + Math.round((28000 + seed % 90000) * ageFactor), target: revenueBase + 160000 }
-      };
+      if (!c.v3Metrics && c.v3Opportunity === 'copilot') {
+        c.v3Metrics = {
+          paidMau: { baseline: paidBase, current: paidBase + Math.round((180 + seed % 420) * ageFactor), target: paidBase + 720 },
+          pru: { baseline: pruBase, current: pruBase + Math.round((220 + seed % 510) * ageFactor), target: pruBase + 860 },
+          npsa: { baseline: npsaBase, current: npsaBase + Math.round((18 + seed % 70) * ageFactor), target: npsaBase + 120 },
+          revenue: { baseline: revenueBase, current: revenueBase + Math.round((28000 + seed % 90000) * ageFactor), target: revenueBase + 160000 }
+        };
+      }
+      if (!c.v3Metrics) {
+        c.v3Metrics = psmV3NewMetrics(c.v3TrackingMetrics, c.tenantCount, true);
+        c.v3TrackingMetrics.forEach(function(metricId, index) {
+          var metric = c.v3Metrics[metricId];
+          var definition = psmV3MetricDefinition(metricId);
+          var increase = definition.format === 'percent'
+            ? (3 + (seed + index) % 9) * ageFactor
+            : Math.max(1, Math.round(metric.baseline * (.08 + ((seed + index) % 8) / 100) * ageFactor));
+          metric.current = metric.baseline + increase;
+        });
+      }
       c.v3Activity = c.v3Activity || [{ date: c.v3OpenDate, type: 'Campaign created', detail: 'Baseline telemetry snapshot captured.' }];
       c.v3Source = c.v3Source || 'New campaign';
       c.v3BaselineAvailable = c.v3BaselineAvailable !== false;
@@ -3297,7 +3311,11 @@
           tenantCount: item.tenants, status: item.status, goal: 'MAU Growth', created: item.created,
           owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER, mauGrowth: 0, revenueGrowth: '$0',
           engagement: 0, executionType: 'Bulk', v3Owner: PSM_CURRENT_USER, v3Status: item.status,
-          v3Outcomes: item.outcomes.slice(), v3Region: item.region, v3Area: item.area
+          v3Opportunity: item.opportunity, v3PrimaryMetric: item.primaryMetric,
+          v3SecondaryMetrics: item.secondaryMetrics.slice(),
+          v3TrackingMetrics: [item.primaryMetric].concat(item.secondaryMetrics),
+          v3Outcomes: [item.primaryMetric].concat(item.secondaryMetrics),
+          v3Region: item.region, v3Area: item.area
         });
       });
       var campaigns = psmCampaigns.filter(function(c) {
@@ -3464,6 +3482,29 @@
       var outcomeLegend = outcomeCounts.map(function(outcome, index) {
         return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+outcomeColors[index]+';"></span><span>'+psmEscapeHtml(outcome.label)+'</span><strong>'+outcome.count+'</strong></div>';
       }).join('');
+      function metricDistribution(metricIds) {
+        var counts = {};
+        metricIds.filter(Boolean).forEach(function(metricId) {
+          counts[metricId] = (counts[metricId] || 0) + 1;
+        });
+        return Object.keys(counts).map(function(metricId) {
+          return { id:metricId, label:psmV3MetricLabel(metricId), count:counts[metricId] };
+        }).sort(function(a, b) { return b.count - a.count || a.label.localeCompare(b.label); });
+      }
+      function chartData(items) {
+        var palette = ['var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)', 'var(--cp-chart-4)', 'var(--cp-chart-5)'];
+        var colors = items.map(function(item, index) { return palette[index % palette.length]; });
+        var labels = items.map(function(item) { return item.label; });
+        var values = items.map(function(item) { return item.count; });
+        return {
+          slices: pieSlices(values, labels, colors),
+          legend: items.map(function(item, index) {
+            return '<div class="v3-chart-legend-row"><span class="v3-chart-legend-swatch" style="background:'+colors[index]+';"></span><span>'+psmEscapeHtml(item.label)+'</span><strong>'+item.count+'</strong></div>';
+          }).join('')
+        };
+      }
+      var primaryMetricChart = chartData(metricDistribution(campaigns.map(function(c) { return c.v3PrimaryMetric; })));
+      var secondaryMetricChart = chartData(metricDistribution(campaigns.reduce(function(metrics, c) { return metrics.concat(c.v3SecondaryMetrics || []); }, [])));
       var allWorkloads = PSM_V3_OPPORTUNITIES.reduce(function(values, opportunity) { return values.concat(opportunity.workloads); }, []).filter(function(value, index, values) { return values.indexOf(value) === index; });
       var workloadCounts = allWorkloads.map(function(workload) {
         return { label: workload, count: campaigns.filter(function(c) { return (c.workloads || []).indexOf(workload) > -1; }).length };
@@ -3478,6 +3519,8 @@
       }).join('');
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts"><he-card_psmv3 class="v3-card"><h2>Campaigns by status</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by status pie chart">'+(slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+statusLegend+'</div></div></he-card_psmv3>' +
         '<he-card_psmv3 class="v3-card"><h2>Campaigns by opportunity</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by opportunity pie chart">'+(outcomeSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+outcomeLegend+'</div></div></he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card v3-metric-chart"><h2>Campaigns by Primary Metric</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by primary metric pie chart">'+(primaryMetricChart.slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No primary metrics</title></circle>')+'</svg><div class="v3-chart-legend">'+primaryMetricChart.legend+'</div></div></he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card v3-metric-chart"><h2>Campaigns by Secondary Metrics</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by secondary metrics pie chart">'+(secondaryMetricChart.slices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No secondary metrics</title></circle>')+'</svg><div class="v3-chart-legend">'+secondaryMetricChart.legend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple secondary metrics are counted in each selected metric.</div></he-card_psmv3>' +
         '<he-card_psmv3 class="v3-card"><h2>Campaigns by workload</h2><div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="Campaigns by workload pie chart">'+(workloadSlices || '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No campaigns</title></circle>')+'</svg><div class="v3-chart-legend">'+workloadLegend+'</div></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Campaigns with multiple workloads are counted in each applicable workload.</div></he-card_psmv3></div>';
     }
 
