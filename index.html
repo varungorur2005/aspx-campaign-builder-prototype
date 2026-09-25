@@ -3548,9 +3548,22 @@
       ]
     };
 
-    function psmV3HasValidBaseline(c) {
+    function psmV3ProgressionTotal(campaigns, key) {
+      return campaigns.reduce(function(total, c) {
+        return total + (c.progression && Number(c.progression[key]) || 0);
+      }, 0);
+    }
+
+    function psmV3CampaignNeedsAttention(c) {
+      if (!c.v3Owner) return true;
+      if (c.v3Status !== 'Execute' && c.v3Status !== 'Review') return false;
       var metric = c.v3Metrics && c.v3Metrics[c.v3PrimaryMetric];
-      return !!(c.v3BaselineAvailable && metric && Number.isFinite(metric.baseline) && Number.isFinite(metric.current));
+      var outcomeStalled = !!(c.v3BaselineAvailable && metric && Number.isFinite(metric.baseline) &&
+        Number.isFinite(metric.current) && metric.current <= metric.baseline);
+      var targetList = c.progression && Number(c.progression.targetList) || 0;
+      var contacted = c.progression && Number(c.progression.contacted) || 0;
+      var executionStalled = targetList > 0 && contacted / targetList < .35;
+      return outcomeStalled || executionStalled;
     }
 
     function psmV3OpportunityKpi(campaigns, config) {
@@ -3571,35 +3584,76 @@
     }
 
     function psmV3RenderKpis(campaigns) {
-      var openCampaigns = campaigns.filter(function(c) { return c.v3Status !== 'Close'; });
-      var tenantCount = campaigns.reduce(function(sum, c) { return sum + c.tenantCount; }, 0);
-      var baselineCampaigns = campaigns.filter(psmV3HasValidBaseline);
-      var growing = baselineCampaigns.filter(function(c) {
-        var metric = c.v3Metrics[c.v3PrimaryMetric];
-        return metric.current > metric.baseline;
-      }).length;
-      var growingPercent = baselineCampaigns.length ? Math.round(growing / baselineCampaigns.length * 100) : 0;
-      var needingAttention = baselineCampaigns.filter(function(c) {
-        var metric = c.v3Metrics[c.v3PrimaryMetric];
-        return (c.v3Status === 'Execute' || c.v3Status === 'Review') && metric.current <= metric.baseline;
-      }).length;
-      var baselinePercent = campaigns.length ? Math.round(baselineCampaigns.length / campaigns.length * 100) : 0;
-      var cards = [
-        psmV3Kpi(openCampaigns.length.toLocaleString(), 'Open campaigns', 'Prepare, Execute, and Review stages'),
-        psmV3Kpi(tenantCount.toLocaleString(), 'Customer tenants', 'Across the filtered campaigns')
-      ];
+      var activeCampaigns = campaigns.filter(function(c) { return c.v3Status === 'Execute' || c.v3Status === 'Review'; });
+      var targetList = psmV3ProgressionTotal(campaigns, 'targetList');
+      var contacted = psmV3ProgressionTotal(campaigns, 'contacted');
+      var qualified = psmV3ProgressionTotal(campaigns, 'opportunity');
+      var outcomeMeasured = psmV3ProgressionTotal(campaigns, 'outcomeMeasured');
+      var tenantsInExecution = Math.max(0, contacted - outcomeMeasured);
+      var tenantsNeedingAction = Math.max(0, targetList - contacted);
+      var attentionCampaigns = campaigns.filter(psmV3CampaignNeedsAttention);
       var opportunityKpis = PSM_V3_OPPORTUNITY_KPIS[psmV3State.opportunity];
-      if (opportunityKpis) {
-        opportunityKpis.forEach(function(config) { cards.push(psmV3OpportunityKpi(campaigns, config)); });
+      var cards;
+      if (isPsmRplView()) {
+        var assignedOwners = campaigns.map(function(c) { return c.v3Owner; }).filter(function(owner, index, owners) { return owner && owners.indexOf(owner) === index; });
+        var unassigned = campaigns.filter(function(c) { return !c.v3Owner; }).length;
+        cards = [
+          psmV3Kpi(activeCampaigns.length.toLocaleString(), 'Active campaigns', 'Campaigns in Execute or Review'),
+          psmV3Kpi(contacted.toLocaleString(), 'Customer tenants reached', 'Tenants with confirmed customer contact or further progression'),
+          psmV3Kpi(qualified.toLocaleString(), 'Tenants progressing', 'Tenants with a qualified opportunity or later outcome'),
+          psmV3Kpi(attentionCampaigns.length.toLocaleString(), 'Leadership attention', 'Execute or Review campaigns with stalled execution, flat or declining outcomes, or no owner'),
+          psmV3Kpi(assignedOwners.length+' PSM'+(assignedOwners.length === 1 ? '' : 's'), 'PSM portfolio coverage', unassigned+' unassigned campaign'+(unassigned === 1 ? '' : 's'))
+        ];
+        if (opportunityKpis) {
+          cards = cards.slice(0, 3);
+          opportunityKpis.forEach(function(config) { cards.push(psmV3OpportunityKpi(campaigns, config)); });
+        }
       } else {
-        cards.push(psmV3Kpi(growing+' of '+baselineCampaigns.length+' \u00b7 '+growingPercent+'%', 'Primary metrics growing', 'Campaigns above their valid baseline snapshot'));
-        cards.push(psmV3Kpi(needingAttention.toLocaleString(), 'Campaigns needing attention', 'Primary metric is flat or declining in Execute or Review'));
-        cards.push(psmV3Kpi(baselineCampaigns.length+' of '+campaigns.length+' \u00b7 '+baselinePercent+'%', 'Baseline coverage', 'Campaigns with a valid primary-metric telemetry snapshot'));
+        cards = [
+          psmV3Kpi(activeCampaigns.length.toLocaleString(), 'Active campaigns', 'Campaigns in Execute or Review'),
+          psmV3Kpi(tenantsInExecution.toLocaleString(), 'Tenants in execution', 'Contacted tenants still progressing toward a measured outcome'),
+          psmV3Kpi(tenantsNeedingAction.toLocaleString(), 'Tenants needing action', 'Targeted tenants that have not yet been contacted'),
+          psmV3Kpi(attentionCampaigns.length.toLocaleString(), 'Campaigns needing attention', 'Execute or Review campaigns with stalled execution or a flat or declining primary outcome'),
+          psmV3Kpi(outcomeMeasured.toLocaleString(), 'Outcomes measured', 'Tenants with telemetry-confirmed campaign outcomes')
+        ];
+        if (opportunityKpis) {
+          cards = cards.slice(0, 3);
+          opportunityKpis.forEach(function(config) { cards.push(psmV3OpportunityKpi(campaigns, config)); });
+        }
       }
       document.getElementById('psmV3Kpis').innerHTML = '<div class="v3-kpis" style="grid-template-columns:repeat('+cards.length+',minmax(128px,1fr));">'+cards.join('')+'</div>';
     }
 
     function psmV3RenderCharts(campaigns) {
+      if (isPsmRplView()) {
+        var progression = [
+          { label:'Targeted', value:psmV3ProgressionTotal(campaigns, 'targetList') },
+          { label:'Reached', value:psmV3ProgressionTotal(campaigns, 'contacted') },
+          { label:'Qualified', value:psmV3ProgressionTotal(campaigns, 'opportunity') },
+          { label:'Sale closed', value:psmV3ProgressionTotal(campaigns, 'saleClosed') },
+          { label:'Measured', value:psmV3ProgressionTotal(campaigns, 'outcomeMeasured') }
+        ];
+        var progressionMax = Math.max.apply(null, progression.map(function(item) { return item.value; }).concat([1]));
+        var progressionRows = progression.map(function(item) {
+          return '<div class="v3-bar-row" style="grid-template-columns:100px 1fr 54px;"><span>'+item.label+'</span><div class="v3-bar-track"><div class="v3-bar-fill" style="width:'+Math.round(item.value / progressionMax * 100)+'%;"></div></div><strong>'+item.value.toLocaleString()+'</strong></div>';
+        }).join('');
+        var owners = campaigns.map(function(c) { return c.v3Owner || 'Unassigned'; }).filter(function(owner, index, values) { return values.indexOf(owner) === index; }).sort();
+        var ownerAttention = owners.map(function(owner) {
+          return {
+            label:owner,
+            value:campaigns.filter(function(c) { return (c.v3Owner || 'Unassigned') === owner && psmV3CampaignNeedsAttention(c); }).length
+          };
+        }).sort(function(a, b) { return b.value - a.value || a.label.localeCompare(b.label); });
+        var attentionMax = Math.max.apply(null, ownerAttention.map(function(item) { return item.value; }).concat([1]));
+        var attentionRows = ownerAttention.map(function(item) {
+          return '<div class="v3-bar-row" style="grid-template-columns:100px 1fr 36px;"><span title="'+psmEscapeHtml(item.label)+'">'+psmEscapeHtml(item.label)+'</span><div class="v3-bar-track"><div class="v3-bar-fill" style="width:'+Math.round(item.value / attentionMax * 100)+'%;"></div></div><strong>'+item.value+'</strong></div>';
+        }).join('');
+        document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts">' +
+          '<he-card_psmv3 class="v3-card"><h2>Customer tenant progression</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Current portfolio movement from target list through measured outcome.</p>'+progressionRows+'</he-card_psmv3>' +
+          '<he-card_psmv3 class="v3-card"><h2>Campaigns needing attention by PSM</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Campaigns requiring leadership intervention or ownership support.</p>'+attentionRows+'</he-card_psmv3>' +
+        '</div>';
+        return;
+      }
       var statuses = PSM_V3_STATUS_FLOW;
       var statusCounts = statuses.map(function(status) {
         return campaigns.filter(function(c) { return c.v3Status === status; }).length;
