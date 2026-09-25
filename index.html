@@ -50,6 +50,7 @@
       --cp-chart-3: #5272d9;
       --cp-chart-4: #c19c00;
       --cp-chart-5: #8764b8;
+      --cp-chart-6: #498205;
     }
     html[data-theme="dark"] {
       color-scheme: dark;
@@ -1018,16 +1019,15 @@
     .v3-charts { display:grid; grid-template-columns:repeat(2,minmax(340px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
     .v3-card { padding:16px; border:1px solid var(--cp-border); border-radius:16px; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); }
     .v3-card h2 { margin:0 0 12px; font-size:15px; }
-    .v3-bar-row { display:grid; grid-template-columns:90px 1fr 36px; align-items:center; gap:8px; margin:8px 0; color:var(--cp-text-muted); font-size:11px; }
-    .v3-bar-track { height:12px; overflow:hidden; border-radius:0.625rem; background:var(--cp-surface-soft); }
-    .v3-bar-fill { height:100%; border-radius:0.625rem; background:var(--cp-accent); }
-    .psm-v3-chart-button { width:100%; padding:5px 4px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
-    .psm-v3-chart-button:hover, .psm-v3-chart-button:focus-visible { background:var(--cp-accent-soft); outline:1px solid var(--cp-accent); }
     .v3-pie-layout { display:flex; align-items:center; justify-content:center; gap:28px; min-height:190px; }
     .v3-pie-chart { flex:0 0 150px; width:150px; height:150px; }
     .v3-chart-legend { display:flex; flex-direction:column; gap:10px; min-width:150px; }
     .v3-chart-legend-row { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:8px; color:var(--cp-text-muted); font-size:12px; }
     .v3-chart-legend-swatch { width:12px; height:12px; border-radius:3px; }
+    button.v3-chart-legend-row { width:100%; padding:5px 6px; border:1px solid transparent; background:transparent; text-align:left; cursor:pointer; }
+    button.v3-chart-legend-row:hover, button.v3-chart-legend-row:focus-visible { border-color:var(--cp-accent); background:var(--cp-accent-soft); outline:0; }
+    .v3-pie-slice.interactive { cursor:pointer; }
+    .v3-pie-slice.interactive:hover, .v3-pie-slice.interactive:focus { opacity:.82; outline:none; }
     .v3-trend-svg { width:100%; height:150px; }
     .v3-table-wrap { overflow:auto; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-table { width:100%; min-width:1500px; border-collapse:collapse; font-size:12px; }
@@ -1305,13 +1305,13 @@
       display:inline-flex; align-items:center; justify-content:center; width:12px; height:12px;
       border:1px solid var(--cp-link); border-radius:50%; color:var(--cp-link); font-size:8px; font-style:normal;
     }
-    body.psm-v3-view .v3-kpis { grid-template-columns:repeat(5,minmax(128px,1fr)); gap:24px; margin-bottom:32px; }
+    body.psm-v3-view .v3-kpis { grid-template-columns:repeat(5,minmax(120px,1fr)); gap:16px; margin-bottom:24px; }
     body.psm-v3-view .v3-kpi {
-      position:relative; min-height:110px; padding:20px; border-radius:2px;
+      position:relative; height:92px; min-height:92px; max-height:92px; padding:14px 16px; overflow:hidden; border-radius:2px;
       box-shadow:0 1px 2px var(--cp-border);
     }
-    body.psm-v3-view .v3-kpi span { order:0; margin:0 20px 4px 0; color:var(--cp-text); font-size:14px; font-weight:400; letter-spacing:0; text-transform:none; }
-    body.psm-v3-view .v3-kpi strong { order:1; margin:0; color:var(--cp-text); font-size:30px; font-weight:400; }
+    body.psm-v3-view .v3-kpi span { order:0; margin:0 18px 3px 0; color:var(--cp-text); font-size:13px; font-weight:400; letter-spacing:0; text-transform:none; }
+    body.psm-v3-view .v3-kpi strong { order:1; margin:0; color:var(--cp-text); font-size:26px; font-weight:400; }
     body.psm-v3-view .v3-kpi small { display:none; }
     body.psm-v3-view .v3-kpi-info {
       position:absolute; top:7px; right:7px; display:inline-flex; align-items:center; justify-content:center;
@@ -3552,30 +3552,59 @@
       document.getElementById('psmV3Kpis').innerHTML = '<div class="v3-kpis" style="grid-template-columns:repeat('+cards.length+',minmax(128px,1fr));">'+cards.join('')+'</div>';
     }
 
+    const PSM_V3_HARMONY_CHART_COLORS = [
+      'var(--cp-chart-1)', 'var(--cp-chart-2)', 'var(--cp-chart-3)',
+      'var(--cp-chart-4)', 'var(--cp-chart-5)', 'var(--cp-chart-6)'
+    ];
+
+    function psmV3PieChart(items, ariaLabel) {
+      var total = items.reduce(function(sum, item) { return sum + Math.max(0, Number(item.value) || 0); }, 0);
+      var startAngle = -Math.PI / 2;
+      var slices = items.map(function(item, index) {
+        var value = Math.max(0, Number(item.value) || 0);
+        if (!value || !total) return '';
+        var color = PSM_V3_HARMONY_CHART_COLORS[index % PSM_V3_HARMONY_CHART_COLORS.length];
+        var endAngle = startAngle + value / total * Math.PI * 2;
+        var largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+        var startX = 75 + 62 * Math.cos(startAngle);
+        var startY = 75 + 62 * Math.sin(startAngle);
+        var endX = 75 + 62 * Math.cos(endAngle);
+        var endY = 75 + 62 * Math.sin(endAngle);
+        var action = item.action ? ' class="v3-pie-slice interactive" tabindex="0" role="button" onclick="'+item.action+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+item.action+';}"' : ' class="v3-pie-slice"';
+        var shape = value === total
+          ? '<circle cx="75" cy="75" r="62" fill="'+color+'"'+action+'><title>'+psmEscapeHtml(item.label)+': '+psmEscapeHtml(item.display)+'</title></circle>'
+          : '<path d="M 75 75 L '+startX+' '+startY+' A 62 62 0 '+largeArc+' 1 '+endX+' '+endY+' Z" fill="'+color+'"'+action+'><title>'+psmEscapeHtml(item.label)+': '+psmEscapeHtml(item.display)+'</title></path>';
+        startAngle = endAngle;
+        return shape;
+      }).join('');
+      var legend = items.map(function(item, index) {
+        var color = PSM_V3_HARMONY_CHART_COLORS[index % PSM_V3_HARMONY_CHART_COLORS.length];
+        var content = '<span class="v3-chart-legend-swatch" style="background:'+color+';"></span><span>'+psmEscapeHtml(item.label)+'</span><strong>'+psmEscapeHtml(item.display)+'</strong>';
+        return item.action
+          ? '<button type="button" class="v3-chart-legend-row" onclick="'+item.action+'">'+content+'</button>'
+          : '<div class="v3-chart-legend-row">'+content+'</div>';
+      }).join('');
+      var empty = '<circle cx="75" cy="75" r="62" fill="var(--cp-surface-soft)" stroke="var(--cp-border)"><title>No data</title></circle>';
+      return '<div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="'+psmEscapeHtml(ariaLabel)+'">'+(slices || empty)+'</svg><div class="v3-chart-legend">'+legend+'</div></div>';
+    }
+
     function psmV3RenderCharts(campaigns) {
       var lifecycle = PSM_V3_STATUS_FLOW.map(function(status) {
-        return { label:status, value:campaigns.filter(function(c) { return c.v3Status === status; }).length };
+        var value = campaigns.filter(function(c) { return c.v3Status === status; }).length;
+        return { label:status, value:value, display:value.toLocaleString() };
       });
-      var lifecycleMax = Math.max.apply(null, lifecycle.map(function(item) { return item.value; }).concat([1]));
-      var lifecycleRows = lifecycle.map(function(item) {
-        return '<div class="v3-bar-row" style="grid-template-columns:100px 1fr 36px;"><span>'+item.label+'</span><div class="v3-bar-track"><div class="v3-bar-fill" style="width:'+Math.round(item.value / lifecycleMax * 100)+'%;"></div></div><strong>'+item.value+'</strong></div>';
-      }).join('');
       var outcomeData = PSM_V3_OUTCOMES.filter(function(outcome) { return !outcome.pending; }).map(function(outcome) {
         var delta = campaigns.reduce(function(sum, c) {
           var metric = c.v3Metrics && c.v3Metrics[outcome.id];
           return sum + (metric ? Number(metric.current || 0) - Number(metric.baseline || 0) : 0);
         }, 0);
-        return { outcome:outcome, value:delta };
+        var definition = psmV3MetricDefinition(outcome.id);
+        var formatted = definition.format === 'currency' ? '$'+Math.round(Math.abs(delta)).toLocaleString() : Math.round(Math.abs(delta)).toLocaleString();
+        return { label:outcome.short, value:Math.abs(delta), display:(delta >= 0 ? '+' : '-')+formatted };
       });
-      var outcomeMax = Math.max.apply(null, outcomeData.map(function(item) { return Math.abs(item.value); }).concat([1]));
-      var outcomeRows = outcomeData.map(function(item) {
-        var definition = psmV3MetricDefinition(item.outcome.id);
-        var formatted = definition.format === 'currency' ? '$'+Math.round(Math.abs(item.value)).toLocaleString() : Math.round(Math.abs(item.value)).toLocaleString();
-        return '<div class="v3-bar-row" style="grid-template-columns:142px 1fr 86px;"><span>'+psmEscapeHtml(item.outcome.short)+'</span><div class="v3-bar-track"><div class="v3-bar-fill" style="width:'+Math.round(Math.abs(item.value) / outcomeMax * 100)+'%;"></div></div><strong>'+(item.value >= 0 ? '+' : '-')+formatted+'</strong></div>';
-      }).join('');
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts">' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Campaigns by manually maintained lifecycle status.</p>'+lifecycleRows+'</he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Business outcome impact</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Absolute portfolio change from each campaign baseline. Month-over-month comparison is not included.</p>'+outcomeRows+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Campaigns by manually maintained lifecycle status.</p>'+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Business outcome impact</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Absolute portfolio change from each campaign baseline. Month-over-month comparison is not included.</p>'+psmV3PieChart(outcomeData, 'Business outcome impact pie chart')+'</he-card_psmv3>' +
       '</div>';
     }
 
@@ -4455,16 +4484,24 @@
         });
         assignedCount = c.tenantCount;
       }
-      var lifecycleMax = Math.max.apply(null, Object.keys(tenantStageData.counts).map(function(key) { return tenantStageData.counts[key]; }).concat([1]));
-      var lifecycleRows = PSM_V3_LIFECYCLE_STAGES.map(function(stage) {
+      var lifecycleChart = PSM_V3_LIFECYCLE_STAGES.map(function(stage) {
         var count = tenantStageData.counts[stage.key] || 0;
-        return '<button class="psm-v3-chart-button" type="button" onclick="psmV3FilterTenantChart(\'stage\',\''+stage.key+'\')"><span class="v3-bar-row" style="grid-template-columns:104px 1fr 42px;"><span>'+stage.label+'</span><span class="v3-bar-track"><span class="v3-bar-fill" style="display:block;width:'+Math.round(count / lifecycleMax * 100)+'%;"></span></span><strong>'+count+'</strong></span></button>';
-      }).join('');
-      var segmentMax = Math.max.apply(null, segmentCounts.concat([1]));
-      var segmentRows = detailSegments.map(function(segment, index) {
+        return {
+          label:stage.label,
+          value:count,
+          display:count.toLocaleString(),
+          action:"psmV3FilterTenantChart('stage','"+stage.key+"')"
+        };
+      });
+      var segmentChart = detailSegments.map(function(segment, index) {
         var count = segmentCounts[index];
-        return '<button class="psm-v3-chart-button" type="button" onclick="psmV3FilterTenantChart(\'segment\',\''+encodeURIComponent(segment)+'\')"><span class="v3-bar-row" style="grid-template-columns:142px 1fr 42px;"><span>'+psmEscapeHtml(segment)+'</span><span class="v3-bar-track"><span class="v3-bar-fill" style="display:block;width:'+Math.round(count / segmentMax * 100)+'%;"></span></span><strong>'+count+'</strong></span></button>';
-      }).join('');
+        return {
+          label:segment,
+          value:count,
+          display:count.toLocaleString(),
+          action:"psmV3FilterTenantChart('segment','"+encodeURIComponent(segment)+"')"
+        };
+      });
       var outcomeNames = c.v3TrackingMetrics.map(psmV3MetricLabel).join(', ');
       var workloadNames = (c.workloads || []).join(', ');
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
@@ -4484,7 +4521,7 @@
         '</div></div><div class="psm-v3-header-card psm-v3-owner-highlight"><span class="psm-v3-header-card-label">Campaign Owner</span><strong>'+psmEscapeHtml(c.v3Owner)+'</strong></div></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong><button class="btn btn-primary psm-v3-update-button" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled')+'>Update Campaign</button></div></div></div>' +
         '<div class="panel-card"><details class="psm-v3-section-collapse" open><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+c.v3TrackingMetrics.length+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
-          '<div class="v3-charts" style="margin:18px 0 0;"><div class="v3-card"><h2>Customer tenant lifecycle</h2><p style="margin:4px 0 12px;color:var(--cp-text-muted);font-size:11px;">Select a stage to filter the customer tenant table.</p>'+lifecycleRows+'</div><div class="v3-card"><h2>Customer tenants by segment</h2><p style="margin:4px 0 12px;color:var(--cp-text-muted);font-size:11px;">Select a segment to filter the customer tenant table.</p>'+segmentRows+'</div></div></div></details></div>' +
+          '<div class="v3-charts" style="margin:18px 0 0;"><div class="v3-card"><h2>Customer tenant lifecycle</h2><p style="margin:4px 0 12px;color:var(--cp-text-muted);font-size:11px;">Select a slice or legend item to filter the customer tenant table.</p>'+psmV3PieChart(lifecycleChart, 'Customer tenant lifecycle pie chart')+'</div><div class="v3-card"><h2>Customer tenants by segment</h2><p style="margin:4px 0 12px;color:var(--cp-text-muted);font-size:11px;">Select a slice or legend item to filter the customer tenant table.</p>'+psmV3PieChart(segmentChart, 'Customer tenants by segment pie chart')+'</div></div></div></details></div>' +
         psmRenderMvpTenantWorkspace(c, canEdit) +
         '<div class="panel-card"><h2>Comments and activity history</h2>'+initialNotePanel+'<div class="form-group" style="margin:16px 0;"><label for="v3NoteText">Add comment</label><textarea id="v3NoteText" placeholder="Add partner feedback, a decision, risk, or next step"></textarea><button class="btn btn-primary" style="margin-top:8px;" onclick="psmV3AddNote(\''+c.id+'\')">Add comment</button></div><div class="v3-activity-list">'+psmV3ActivityHistoryHtml(c)+'</div></div>';
       requestAnimationFrame(function() { requestAnimationFrame(psmMvpInitializeTenantScroll); });
