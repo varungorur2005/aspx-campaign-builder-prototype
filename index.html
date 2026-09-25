@@ -752,15 +752,15 @@
     .psm-mvp-status-highlight { flex:0 0 auto; display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--cp-accent); border-radius:0.625rem; background:var(--cp-accent-soft); }
     .psm-mvp-status-highlight label { color:var(--cp-accent); font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
     .psm-mvp-status-highlight select { min-width:130px; padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font-weight:600; }
-    .psm-v3-header-controls { display:flex; align-items:stretch; gap:16px; width:100%; margin-top:20px; }
+    .psm-v3-heading-actions { flex:0 0 auto; display:flex; align-items:flex-start; gap:8px; }
     .psm-v3-header-card { min-height:92px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); box-sizing:border-box; }
     .psm-v3-header-card-label { display:block; margin-bottom:7px; color:var(--cp-text-muted); font-size:12px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
     .psm-v3-initial-note { border-left:3px solid var(--cp-link); }
     .psm-v3-initial-note h2 { margin:0 0 8px; font-size:14px; }
     .psm-v3-initial-note p { margin:0; color:var(--cp-text); font-size:13px; line-height:1.5; white-space:pre-wrap; }
     .psm-v3-initial-note-meta { display:block; margin-top:8px; color:var(--cp-text-muted); font-size:11px; }
-    .psm-v3-campaign-status { flex:0 0 190px; }
-    .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:20px; line-height:1.25; }
+    .psm-v3-campaign-status { flex:0 0 160px; min-height:58px; padding:8px 10px; }
+    .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-owner-meta { display:inline-flex; align-items:center; gap:5px; }
     .psm-v3-owner-edit { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; padding:0; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-link); cursor:pointer; }
     .psm-v3-owner-edit:hover, .psm-v3-owner-edit:focus-visible { border-color:var(--cp-link); background:var(--cp-link-soft); outline:0; }
@@ -797,9 +797,7 @@
     @media (max-width:700px) {
       .psm-mvp-detail-heading { flex-direction:column; }
       .psm-mvp-status-highlight { width:100%; justify-content:space-between; }
-      .psm-v3-header-controls { align-items:stretch; flex-direction:column; }
-      .psm-v3-campaign-status { flex-basis:auto; }
-      .psm-v3-heading-update { align-self:flex-end; }
+      .psm-v3-heading-actions { width:100%; justify-content:flex-end; }
       .psm-v3-tenant-highlight { min-width:0; }
       .psm-mvp-tooltip-text { left:0; max-width:calc(100vw - 72px); transform:none; }
       .psm-mvp-impact-grid { grid-template-columns:1fr; }
@@ -1029,14 +1027,14 @@
     button.v3-chart-legend-row:hover, button.v3-chart-legend-row:focus-visible { border-color:var(--cp-accent); background:var(--cp-accent-soft); outline:0; }
     .v3-pie-slice.interactive { cursor:pointer; }
     .v3-pie-slice.interactive:hover, .v3-pie-slice.interactive:focus { opacity:.82; outline:none; }
-    .psm-v3-detail-pie-row { display:grid; grid-template-columns:repeat(5,minmax(210px,1fr)); gap:12px; margin-top:18px; padding-bottom:4px; overflow-x:auto; }
-    .psm-v3-detail-pie-card { min-width:210px; padding:12px; border:1px solid var(--cp-border); background:var(--cp-surface-soft); }
-    .psm-v3-detail-pie-card h3 { min-height:30px; margin:0 0 6px; color:var(--cp-text); font-size:12px; line-height:1.25; }
-    .psm-v3-detail-pie-card .v3-pie-layout { flex-direction:column; justify-content:flex-start; gap:8px; min-height:0; }
-    .psm-v3-detail-pie-card .v3-pie-chart { flex-basis:96px; width:96px; height:96px; }
-    .psm-v3-detail-pie-card .v3-chart-legend { width:100%; min-width:0; gap:3px; }
-    .psm-v3-detail-pie-card .v3-chart-legend-row { grid-template-columns:9px 1fr auto; gap:5px; font-size:10px; }
-    .psm-v3-detail-pie-card .v3-chart-legend-swatch { width:9px; height:9px; }
+    .psm-v3-detail-pie-row { display:grid; grid-template-columns:repeat(5,minmax(170px,1fr)); gap:8px; margin-top:14px; padding-bottom:4px; overflow-x:auto; }
+    .psm-v3-detail-pie-card { min-width:170px; padding:8px; border:1px solid var(--cp-border); background:var(--cp-surface-soft); }
+    .psm-v3-detail-pie-card h3 { min-height:26px; margin:0 0 4px; color:var(--cp-text); font-size:11px; line-height:1.2; }
+    body.psm-v3-view .psm-v3-detail-pie-card .v3-pie-layout { align-items:flex-start; justify-content:flex-start; gap:5px; min-height:0; }
+    body.psm-v3-view .psm-v3-detail-pie-card .v3-pie-chart { flex-basis:64px; width:64px; height:64px; }
+    body.psm-v3-view .psm-v3-detail-pie-card .v3-chart-legend { flex:1 1 auto; width:auto; min-width:0; gap:3px; }
+    body.psm-v3-view .psm-v3-detail-pie-card .v3-chart-legend-row { grid-template-columns:8px 1fr auto; gap:4px; padding:3px 4px; font-size:9px; }
+    body.psm-v3-view .psm-v3-detail-pie-card .v3-chart-legend-swatch { width:8px; height:8px; }
     .v3-trend-svg { width:100%; height:150px; }
     .v3-table-wrap { overflow:auto; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-table { width:100%; min-width:1500px; border-collapse:collapse; font-size:12px; }
@@ -4588,7 +4586,7 @@
           '<div class="detail-meta-item"><strong>Business outcomes:</strong> '+psmEscapeHtml(outcomeNames || 'Not selected')+'</div>' +
           '<div class="detail-meta-item"><strong>Workloads:</strong> '+psmEscapeHtml(workloadNames || 'Not selected')+'</div>' +
           '<div class="detail-meta-item psm-v3-owner-meta"><strong>Campaign created by:</strong> '+psmEscapeHtml(c.v3Owner)+' <button class="psm-v3-owner-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner" title="Edit campaign owner"'+(canEdit ? '' : ' disabled')+'><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10.8 2.2 13.8 5.2 6 13H3v-3l7.8-7.8ZM9.5 3.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>' +
-        '</div></div><button class="btn btn-primary psm-v3-update-button psm-v3-heading-update" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled')+'>Update Campaign</button></div><div class="psm-v3-header-controls"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong></div></div></div>' +
+        '</div></div><div class="psm-v3-heading-actions"><div class="psm-v3-header-card psm-v3-campaign-status"><span class="psm-v3-header-card-label">Campaign Status</span><strong>'+psmEscapeHtml(c.v3Status)+'</strong></div><button class="btn btn-primary psm-v3-update-button psm-v3-heading-update" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled')+'>Update Campaign</button></div></div></div>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         '<div class="panel-card"><details class="psm-v3-section-collapse" open><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
           '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+c.v3TrackingMetrics.length+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
