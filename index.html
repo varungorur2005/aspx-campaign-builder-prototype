@@ -389,22 +389,8 @@
     }
     body.psm-presenting .top-nav, body.psm-presenting .sidebar { display: none !important; }
     body.psm-presenting .detail-view.psm-full-page { top: 0; left: 0; }
-    body.psm-presenting .detail-view.psm-v3-detail {
-      top: 0; left: 0; width: 100vw; max-width: none; height: 100vh; z-index: 3000;
-    }
-    body.psm-presenting .psm-v3-detail > .flyout-header .v3-actions,
-    body.psm-presenting .psm-v3-owner-highlight,
-    body.psm-presenting .psm-v3-update-button,
-    body.psm-presenting .psm-mvp-bulk-bar,
-    body.psm-presenting .psm-mvp-action-row { display: none !important; }
     body.psm-presenting .psm-edit-only, body.psm-presenting .flyout-close { display: none !important; }
     body.psm-presenting .detail-header { padding: 8px 0 12px; border-bottom: 1px solid var(--cp-border); }
-    .psm-v3-exit-presentation { display:none; }
-    body.psm-presenting .psm-v3-exit-presentation {
-      position:fixed; z-index:4000; top:16px; right:24px;
-      display:inline-flex !important; align-items:center; gap:6px;
-      box-shadow:0 0 2px var(--cp-border-strong);
-    }
     .flyout-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px;
@@ -1223,8 +1209,8 @@
     .v3-chip { border:0; border-radius:3px; background:var(--cp-link-soft); color:var(--cp-link); font-weight:600; }
     .v3-pagination { padding:4px 0; }
     .detail-view.psm-v3-detail {
-      background:var(--cp-bg-elevated); border-left:1px solid var(--cp-border);
-      box-shadow:-4px 0 16px var(--cp-border);
+      top:48px; left:0; right:0; bottom:0; width:auto; max-width:none; box-sizing:border-box;
+      padding:20px 24px 80px; background:var(--cp-bg-elevated); border-left:0; box-shadow:none;
     }
     .psm-v3-detail .flyout-header { margin:-20px -24px 20px; padding:12px 24px; background:var(--cp-surface); border-bottom:1px solid var(--cp-border); }
     .psm-v3-detail .detail-header { padding-bottom:4px; }
@@ -4656,8 +4642,8 @@
       }
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
-      detail.classList.add('show', 'psm-mvp-half-page', 'psm-v3-detail');
-      detail.classList.remove('psm-full-page');
+      detail.classList.add('show', 'psm-full-page', 'psm-v3-detail');
+      detail.classList.remove('psm-mvp-half-page');
       document.getElementById('psmMvpFlyoutBackdrop').classList.add('show');
       var canEdit = psmV3CanEdit(c);
       var canTransfer = isPsmRplView();
@@ -4704,7 +4690,7 @@
       var initialNotePanel = initialNote
         ? '<div class="panel-card psm-v3-initial-note"><h2>Initial campaign note</h2><p>'+psmEscapeHtml(initialNote.text)+'</p><span class="psm-v3-initial-note-meta">Added by '+psmEscapeHtml(initialNote.author || c.v3CreatedBy)+' · '+psmEscapeHtml(initialNote.date || c.v3OpenDate)+'</span></div>'
         : '';
-      detail.innerHTML = '<button class="btn btn-primary psm-v3-exit-presentation" type="button" onclick="psmTogglePresentation()" aria-label="Exit campaign presentation">&times; Exit presentation</button><div class="flyout-header"><div class="v3-actions"><button class="btn btn-secondary" onclick="psmV3CopyCampaign(\''+c.id+'\')">Copy campaign</button><button class="btn btn-secondary" onclick="psmTogglePresentation()">Present campaign</button></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
+      detail.innerHTML = '<div class="flyout-header"><div class="v3-actions"><button class="btn btn-secondary" onclick="psmV3CopyCampaign(\''+c.id+'\')">Copy campaign</button></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOneID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
