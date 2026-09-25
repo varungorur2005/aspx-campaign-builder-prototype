@@ -3201,6 +3201,7 @@
     const PSM_V3_STATUS_FLOW = ['Prepare', 'Execute', 'Review', 'Close'];
     const PSM_V3_AREAS = ['US West', 'US East', 'Canada', 'UK', 'Germany', 'India', 'ANZ', 'Southeast Asia'];
     const PSM_V3_SEGMENTS = ['Enterprise', 'SME&C Corporate', 'SME&C SMB'];
+    const PSM_V3_DEMO_EDIT_ALL = true;
     const PSM_V3_ADDITIONAL_CAMPAIGNS = [
       { id:'PSM-601', name:'Microsoft 365 E3 Usage Growth - Northwest', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'Prepare', opportunity:'m365e3', primaryMetric:'e3Mau', secondaryMetrics:['e3Utilization','e3UsageWhitespace'], workloads:['Teams','Exchange Online (EXO)','SharePoint'], created:'2026-08-26' },
       { id:'PSM-602', name:'Microsoft 365 E3 Readiness - Canada', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Execute', opportunity:'m365e3', primaryMetric:'e3Utilization', secondaryMetrics:['e3Mau','e3Pau'], workloads:['Microsoft 365 Apps','Teams Meeting','Intune'], created:'2026-07-18' },
@@ -4618,7 +4619,7 @@
     }
 
     function psmV3CanEdit(c) {
-      return !!c && (isPsmRplView() || c.v3Owner === PSM_CURRENT_USER);
+      return !!c && (PSM_V3_DEMO_EDIT_ALL || isPsmRplView() || c.v3Owner === PSM_CURRENT_USER);
     }
 
     function psmV3CopyCampaign(id) {
