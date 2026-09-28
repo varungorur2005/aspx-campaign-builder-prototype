@@ -831,6 +831,7 @@
     .v3-metric-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:260px; margin-top:10px; overflow-y:auto; }
     .v3-metric-option { display:flex; align-items:flex-start; gap:9px; min-height:52px; margin:0 !important; padding:9px 10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text) !important; font-size:12px !important; font-weight:600 !important; cursor:pointer; }
     .v3-metric-option input { margin-top:2px; }
+    .v3-metric-option.pending, .v3-metric-option.limit-reached { opacity:.62; cursor:not-allowed; }
     .v3-metric-option small { display:block; margin-top:3px; color:var(--cp-text-muted); font-size:10px; font-weight:400; }
     .psm-wl-selected { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .psm-wl-chip { display:inline-flex; align-items:center; padding:3px 8px; border-radius:0.625rem; background:var(--cp-accent-soft); color:var(--cp-accent); font-size:11px; font-weight:600; }
@@ -1804,8 +1805,7 @@
       <div class="v3-modal-grid">
         <section class="v3-create-section"><h4>Campaign</h4><p>Name the effort so PSMs can identify its partner and intended outcome.</p><div class="form-group full"><label>Campaign name <span class="required">*</span></label><input id="v3CampaignName" placeholder="e.g. Contoso FY27 Copilot consumption"></div></section>
         <section class="v3-create-section"><h4>Partner</h4><p>Look up one PartnerOne ID. The resolved partner provides the context for tenant validation.</p><div class="form-group full"><div class="v3-partner-lookup-label">PartnerOne ID <span class="required">*</span></div><input type="hidden" id="v3PartnerIdType" value="PartnerOneID"><div class="v3-create-partner-row partnerone-only"><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter one PartnerOne ID" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div></section>
-        <section class="v3-create-section"><h4>Business outcomes</h4><p>Select the Copilot outcomes this campaign is intended to drive. All selected outcomes are tracked equally from the campaign baseline.</p><div class="form-group full"><div id="v3TrackingMetricOptions"></div></div></section>
-        <section class="v3-create-section"><h4>Copilot workloads</h4><p>Select the products and motions the partner will use to drive the outcomes.</p><div class="form-group full"><div id="v3WorkloadOptions"></div></div></section>
+        <section class="v3-create-section"><h4>Business outcomes</h4><p>Select up to four Copilot outcomes this campaign is intended to drive. Workloads will be mapped to the selected outcomes in the backend.</p><div class="form-group full"><div id="v3TrackingMetricOptions"></div></div></section>
         <section class="v3-create-section"><h4>Customer tenants</h4><p>Paste or upload Tenant IDs, then validate their association with the selected PartnerOne ID.</p><div class="form-group full"><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box" id="v3TenantValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation"></div></div></div></div></section>
         <section class="v3-create-section"><h4>Campaign context</h4><p>Add optional context that should appear near the top of the campaign detail.</p><div class="form-group full"><label for="v3InitialNote">Comment</label><textarea id="v3InitialNote" placeholder="Partner feedback, risks, decisions, or next steps"></textarea></div></section>
       </div>
@@ -2428,14 +2428,14 @@
       { key: 'workloads', label: 'Workloads', fixed: true },
       { key: 'segment', label: 'Tenant Segment' },
       { key: 'country', label: 'Tenant Country/Region' },
-      { key: 'copilotLicensedMau', label: 'Copilot Paid MAU' },
-      { key: 'copilotLicensedMauGrowth', label: 'Copilot Paid MAU (Growth)' },
+      { key: 'copilotLicensedMau', label: 'Copilot MAU (Licensed)' },
+      { key: 'copilotLicensedMauGrowth', label: 'Copilot MAU (Licensed) Growth' },
       { key: 'npsa', label: 'Copilot NPSA' },
       { key: 'npsaGrowth', label: 'Copilot NPSA (Growth)' },
       { key: 'coworkMau', label: 'Cowork MAU' },
       { key: 'coworkMauGrowth', label: 'Cowork MAU (Growth)' },
-      { key: 'revenue', label: 'Cowork Consumption Revenue' },
-      { key: 'revenueGrowth', label: 'Cowork Consumption Revenue (Growth)' },
+      { key: 'revenue', label: 'Copilot Consumption Revenue' },
+      { key: 'revenueGrowth', label: 'Copilot Consumption Revenue Growth' },
       { key: 'partnerName', label: 'Partner Name' },
       { key: 'partnerMpn', label: 'Partner Center ID (MPN)' },
       { key: 'partnerOneId', label: 'PartnerOneID' },
@@ -2701,7 +2701,7 @@
           dropdown.style.display = 'none';
         }
       }
-      ['v3WorkloadOptions', 'v3TrackingMetricOptions'].forEach(function(containerId) {
+      ['v3TrackingMetricOptions'].forEach(function(containerId) {
         var container = document.getElementById(containerId);
         if (!container || container.contains(e.target)) return;
         container.querySelectorAll('details[open]').forEach(function(details) {
@@ -3073,12 +3073,13 @@
     }
 
     const PSM_V3_OUTCOMES = [
-      { id: 'paidMau', label: 'Copilot Paid MAU', short: 'MAU', pending: false },
-      { id: 'npsa', label: 'Copilot NPSA', short: 'NPSA', pending: false },
+      { id: 'copilotEligibleSeats', label: 'Copilot Eligible M365 Seats', short: 'Eligible Seats', pending: false },
+      { id: 'freeCopilotMau', label: 'Free Copilot Chat MAU (Unlicensed)', short: 'Free Chat MAU', pending: false },
       { id: 'pru', label: 'Cowork MAU', short: 'Cowork MAU', pending: false },
-      { id: 'revenue', label: 'Cowork Consumption Revenue', short: 'Cowork Revenue', pending: false },
-      { id: 'allAgentsMau', label: 'Agent MAU', short: 'Agent MAU', pending: true },
-      { id: 'freeCopilotMau', label: 'Free Copilot Chat MAU', short: 'Free Chat MAU', pending: true }
+      { id: 'allAgentsMau', label: 'All Agents MAU', short: 'Agents MAU', pending: false },
+      { id: 'paidMau', label: 'Copilot MAU (Licensed)', short: 'Licensed MAU', pending: false },
+      { id: 'npsa', label: 'Copilot NPSA', short: 'NPSA', pending: true },
+      { id: 'revenue', label: 'Copilot Consumption Revenue', short: 'Consumption Revenue', pending: true }
     ];
     const PSM_V3_COPILOT_WORKLOADS = [
       'Microsoft 365 Copilot', 'Copilot Chat', 'Cowork', 'Copilot Studio and agents', 'Copilot extensibility'
@@ -3131,7 +3132,7 @@
       { id:'copilot', label:'Copilot', workloads:PSM_V3_COPILOT_WORKLOADS, metrics:[
         { id:'copilotTenants', label:'Tenants', format:'number', category:'Portfolio' },
         { id:'copilotSeatPenetration', label:'Copilot Seat Penetration', format:'percent', category:'Licensing' },
-        { id:'copilotEligibleSeats', label:'Copilot Eligible Microsoft 365 Seats', format:'number', category:'Licensing' },
+        { id:'copilotEligibleSeats', label:'Copilot Eligible M365 Seats', format:'number', category:'Licensing' },
         { id:'copilotSeatWhitespace', label:'Copilot Seats Whitespace', format:'number', category:'Licensing' },
         { id:'cspTransactedLicenses', label:'CSP Transacted Licenses', format:'number', category:'Licensing' },
         { id:'cspTransactedLicensePercent', label:'CSP Transacted Licenses Percent', format:'percent', category:'Licensing' },
@@ -3139,7 +3140,7 @@
         { id:'paidMau', label:'Copilot MAU (Licensed)', format:'number', category:'Usage' },
         { id:'copilotPau', label:'Copilot PAU', format:'number', category:'Usage' },
         { id:'copilotUtilization', label:'Copilot Utilization', format:'percent', category:'Usage' },
-        { id:'freeCopilotMau', label:'Free Copilot MAU (Unlicensed)', format:'number', category:'Usage' },
+        { id:'freeCopilotMau', label:'Free Copilot Chat MAU (Unlicensed)', format:'number', category:'Usage' },
         { id:'allCopilotMau', label:'All Copilot MAU', format:'number', category:'Usage' },
         { id:'pru', label:'Cowork MAU', format:'number', category:'Usage' },
         { id:'allAgentsMau', label:'All Agents MAU', format:'number', category:'Usage' },
@@ -3168,7 +3169,7 @@
         { id:'growTenants', label:'Grow Tenants', format:'number', category:'Targeting scenarios' },
         { id:'copilotE7UpsellReady', label:'E7 Upsell-ready Tenants', format:'number', category:'Targeting scenarios' },
         { id:'npsa', label:'Copilot NPSA', format:'number', category:'Campaign outcomes' },
-        { id:'revenue', label:'Cowork Consumption Revenue', format:'currency', category:'Campaign outcomes' },
+        { id:'revenue', label:'Copilot Consumption Revenue', format:'currency', category:'Campaign outcomes' },
         { id:'copilotPotentialEarnings', label:'Potential Earnings', format:'currency', category:'Incentives' },
         { id:'copilotCporEarnings', label:'CPOR Potential Earnings', format:'currency', category:'Incentives' },
         { id:'copilotMciEarnings', label:'MCI Potential Earnings', format:'currency', category:'Incentives' },
@@ -3250,7 +3251,6 @@
     let psmV3CreatePartner = null;
     let psmV3CreatePartners = [];
     let psmV3CreateOpportunity = '';
-    let psmV3CreateWorkloads = [];
     let psmV3CreateOutcomes = [];
     let psmV3CurrentCampaign = null;
     let psmV3SearchTimer = null;
@@ -3571,7 +3571,7 @@
         psmV3Kpi(campaigns.length.toLocaleString(), 'Total campaigns', 'All Copilot campaigns in the filtered portfolio'),
         psmV3Kpi(partners.length.toLocaleString(), 'Partners engaged', 'Unique PartnerOne organizations represented'),
         psmV3Kpi(tenants.toLocaleString(), 'Customer tenants engaged', 'Validated customer tenants across these campaigns'),
-        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot Paid MAU growth' }),
+        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot MAU (Licensed) growth' }),
         psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'Copilot NPSA growth' }),
         psmV3OpportunityKpi(campaigns, { metric:'pru', label:'Cowork MAU growth' }),
         psmV3OpportunityKpi(campaigns, { metric:'revenue', label:'Consumption revenue growth' })
@@ -3778,8 +3778,8 @@
     function psmV3OutcomeOptions(containerId, prefix, selected) {
       selected = selected || [];
       var options = PSM_V3_OUTCOMES.map(function(outcome) {
-        var change = prefix === 'v3Migration' ? 'psmV3RenderMigrationMetrics()' : 'psmV3UpdateOutcomeSummary()';
-        return '<label class="v3-outcome-option"><input type="checkbox" name="'+prefix+'Outcome" value="'+outcome.id+'"'+(selected.indexOf(outcome.id) > -1 ? ' checked' : '')+' onchange="'+change+'"><strong>'+outcome.label+'</strong></label>';
+        var change = prefix === 'v3Migration' ? "psmV3HandleMigrationOutcome(this)" : 'psmV3UpdateOutcomeSummary()';
+        return '<label class="v3-outcome-option'+(outcome.pending ? ' pending' : '')+'"><input type="checkbox" name="'+prefix+'Outcome" value="'+outcome.id+'"'+(selected.indexOf(outcome.id) > -1 ? ' checked' : '')+(outcome.pending ? ' disabled' : '')+' onchange="'+change+'"><strong>'+outcome.label+(outcome.pending ? ' (Coming soon)' : '')+'</strong></label>';
       }).join('');
       if (prefix === 'v3') {
         document.getElementById(containerId).innerHTML = '<details class="v3-outcome-select"><summary id="v3OutcomeSummary">Select business outcomes</summary><div class="v3-outcome-menu">'+options+'</div></details>';
@@ -3789,58 +3789,40 @@
       document.getElementById(containerId).innerHTML = '<div class="v3-outcome-menu" style="position:static;box-shadow:none;">'+options+'</div>';
     }
 
+    function psmV3HandleMigrationOutcome(input) {
+      if (psmV3SelectedOutcomes('v3Migration').length > 4) {
+        input.checked = false;
+        showToast('Select a maximum of four business outcomes', true);
+      }
+      psmV3RenderMigrationMetrics();
+    }
+
     function psmV3SelectedOutcomes(prefix) {
       return Array.from(document.querySelectorAll('input[name="'+prefix+'Outcome"]:checked')).map(function(input) { return input.value; });
     }
 
-    function psmV3RenderWorkloadOptions() {
-      var container = document.getElementById('v3WorkloadOptions');
-      if (!container) return;
-      var opportunity = psmV3Opportunity(psmV3CreateOpportunity);
-      if (!opportunity) return;
-      var workloadBoxes = opportunity.workloads.map(function(workload) {
-        return '<label data-search="'+psmEscapeHtml(workload.toLowerCase())+'"><input type="checkbox" value="'+psmEscapeHtml(workload)+'"'+(psmV3CreateWorkloads.indexOf(workload) > -1 ? ' checked' : '')+' onchange="psmV3ToggleWorkload(this.value,this.checked)"> '+psmEscapeHtml(workload)+'</label>';
-      }).join('');
-      container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose workloads</strong><span id="v3WorkloadCount">'+(psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+' · '+opportunity.workloads.length+' available</span></span></summary><input class="v3-picker-search" type="search" placeholder="Search '+opportunity.workloads.length+' workloads" aria-label="Search workloads" oninput="psmV3FilterWorkloads(this.value)"><div class="psm-wl-grid">'+workloadBoxes+'</div></details><div class="psm-wl-selected" id="v3SelectedWorkloads">'+(psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '')+'</div>';
-    }
-
-    function psmV3FilterWorkloads(value) {
-      var term = value.trim().toLowerCase();
-      document.querySelectorAll('#v3WorkloadOptions .psm-wl-grid label').forEach(function(label) {
-        label.style.display = !term || label.getAttribute('data-search').indexOf(term) > -1 ? '' : 'none';
-      });
-    }
-
     function psmV3ToggleBusinessOutcome(metric, checked) {
       var index = psmV3CreateOutcomes.indexOf(metric);
+      if (checked && index === -1 && psmV3CreateOutcomes.length >= 4) {
+        showToast('Select a maximum of four business outcomes', true);
+        psmV3RenderTrackingMetricOptions();
+        return;
+      }
       if (checked && index === -1) psmV3CreateOutcomes.push(metric);
       if (!checked && index > -1) psmV3CreateOutcomes.splice(index, 1);
-      var selected = document.getElementById('v3SelectedBusinessOutcomes');
-      var count = document.getElementById('v3BusinessOutcomeCount');
-      if (count) count.textContent = psmV3CreateOutcomes.length ? psmV3CreateOutcomes.length+' selected' : 'None selected';
-      if (selected) selected.innerHTML = psmV3CreateOutcomes.map(function(id) {
-        return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(id))+'</span>';
-      }).join('');
+      psmV3RenderTrackingMetricOptions();
     }
 
     function psmV3RenderTrackingMetricOptions() {
       var container = document.getElementById('v3TrackingMetricOptions');
       if (!container) return;
+      var limitReached = psmV3CreateOutcomes.length >= 4;
       var outcomeOptions = PSM_V3_OUTCOMES.map(function(outcome) {
-        return '<label class="v3-metric-option'+(outcome.pending ? ' pending' : '')+'"><input type="checkbox" value="'+outcome.id+'"'+(psmV3CreateOutcomes.indexOf(outcome.id) > -1 ? ' checked' : '')+(outcome.pending ? ' disabled' : '')+' onchange="psmV3ToggleBusinessOutcome(this.value,this.checked)"><span>'+psmEscapeHtml(outcome.label)+'<small>'+(outcome.pending ? 'Coming soon' : 'Baseline captured at campaign creation')+'</small></span></label>';
+        var selected = psmV3CreateOutcomes.indexOf(outcome.id) > -1;
+        var unavailable = outcome.pending || (limitReached && !selected);
+        return '<label class="v3-metric-option'+(outcome.pending ? ' pending' : '')+(!outcome.pending && limitReached && !selected ? ' limit-reached' : '')+'"><input type="checkbox" value="'+outcome.id+'"'+(selected ? ' checked' : '')+(unavailable ? ' disabled' : '')+' onchange="psmV3ToggleBusinessOutcome(this.value,this.checked)"><span>'+psmEscapeHtml(outcome.label)+'<small>'+(outcome.pending ? 'Coming soon' : 'Baseline captured at campaign creation')+'</small></span></label>';
       }).join('');
-      container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose business outcomes</strong><span id="v3BusinessOutcomeCount">'+(psmV3CreateOutcomes.length ? psmV3CreateOutcomes.length+' selected' : 'None selected')+'</span></span></summary><div class="v3-metric-options">'+outcomeOptions+'</div></details><div class="psm-wl-selected" id="v3SelectedBusinessOutcomes">'+psmV3CreateOutcomes.map(function(id) { return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(id))+'</span>'; }).join('')+'</div>';
-    }
-
-    function psmV3ToggleWorkload(workload, selected) {
-      var index = psmV3CreateWorkloads.indexOf(workload);
-      if (selected && index === -1) psmV3CreateWorkloads.push(workload);
-      if (!selected && index > -1) psmV3CreateWorkloads.splice(index, 1);
-      var count = document.getElementById('v3WorkloadCount');
-      var chips = document.getElementById('v3SelectedWorkloads');
-      var opportunity = psmV3Opportunity(psmV3CreateOpportunity);
-      if (count) count.textContent = (psmV3CreateWorkloads.length ? psmV3CreateWorkloads.length+' selected' : 'None selected')+(opportunity ? ' · '+opportunity.workloads.length+' available' : '');
-      if (chips) chips.innerHTML = psmV3CreateWorkloads.length ? psmWorkloadChipsHtml(psmV3CreateWorkloads) : '';
+      container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose business outcomes</strong><span id="v3BusinessOutcomeCount">'+psmV3CreateOutcomes.length+' of 4 selected</span></span></summary><div class="v3-metric-options">'+outcomeOptions+'</div></details><div class="psm-wl-selected" id="v3SelectedBusinessOutcomes">'+psmV3CreateOutcomes.map(function(id) { return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(id))+'</span>'; }).join('')+'</div>';
     }
 
     function psmV3OpenCreate() {
@@ -3855,8 +3837,6 @@
       document.getElementById('v3TenantFile').value = '';
       document.getElementById('v3PartnerIdType').value = 'PartnerOneID';
       document.getElementById('v3PartnerIdSearch').value = '';
-      psmV3CreateWorkloads = [];
-      psmV3RenderWorkloadOptions();
       psmV3RenderTrackingMetricOptions();
       document.getElementById('v3CreatePartnerResult').className = 'v3-create-partner-result';
       document.getElementById('v3CreatePartnerResult').textContent = '';
@@ -4185,13 +4165,29 @@
       }, {});
     }
 
+    function psmV3WorkloadsForOutcomes(outcomes) {
+      var workloadByOutcome = {
+        copilotEligibleSeats:'Microsoft 365 Copilot',
+        freeCopilotMau:'Copilot Chat',
+        pru:'Cowork',
+        allAgentsMau:'Copilot Studio and agents',
+        paidMau:'Microsoft 365 Copilot',
+        npsa:'Microsoft 365 Copilot',
+        revenue:'Copilot extensibility'
+      };
+      return outcomes.map(function(outcome) { return workloadByOutcome[outcome]; }).filter(function(workload, index, workloads) {
+        return workload && workloads.indexOf(workload) === index;
+      });
+    }
+
     function psmV3CreateCampaign() {
       var name = document.getElementById('v3CampaignName').value.trim();
       var trackingMetrics = psmV3CreateOutcomes.slice();
+      var mappedWorkloads = psmV3WorkloadsForOutcomes(trackingMetrics);
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmV3CreatePartner) { showToast('Look up a valid PartnerOne ID', true); return; }
       if (!trackingMetrics.length) { showToast('Select at least one business outcome', true); return; }
-      if (!psmV3CreateWorkloads.length) { showToast('Select at least one workload', true); return; }
+      if (trackingMetrics.length > 4) { showToast('Select a maximum of four business outcomes', true); return; }
       if (!psmV3Upload.valid) { showToast('Validate the Tenant IDs before creating the campaign', true); return; }
       if (psmV3Upload.overlaps.length && (!document.getElementById('v3OverlapAck') || !document.getElementById('v3OverlapAck').checked)) {
         showToast('Review and acknowledge existing campaign coverage', true);
@@ -4207,7 +4203,7 @@
       var creationDate = today();
       var c = {
         id: psmNextCampaignId(), name: name, partner: partner, owner: owner, microsoftDri: owner,
-        region: region, workload: psmV3CreateWorkloads[0], workloads: psmV3CreateWorkloads.slice(),
+        region: region, workload: mappedWorkloads[0] || '', workloads: mappedWorkloads,
         tenantCount: tenantCount, status: 'New', goal: 'Business outcomes', goals: [], created: creationDate,
         mauGrowth: 0, npsa: 0, revenueGrowth: '$0', engagement: 0, netPaidSeats: 0, consumption: 0, copilotPru: 0,
         signals: [], activityLog: [], customers: [], progression: null, _enriched: true,
@@ -4222,7 +4218,7 @@
       c.customers = psmV3Upload.rows.map(function(row, index) {
         var customer = psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index);
         customer.stage = 'new';
-        customer.targetedWorkloads = psmV3CreateWorkloads.slice();
+        customer.targetedWorkloads = mappedWorkloads.slice();
         return customer;
       });
       c.v3Countries = c.customers.map(function(customer) { return customer.country; }).filter(function(value, index, values) { return value && values.indexOf(value) === index; });
@@ -5477,14 +5473,14 @@
           '<div class="filter-section"><label>Association</label><select id="psmMvpFilterAssociation">'+options(customers.map(function(customer) { return customer.association; }), filters.association, 'All associations')+'</select></div>' +
           '<div class="filter-section"><label>Tenant Segment</label><select id="psmMvpFilterSegment">'+options(customers.map(function(customer) { return customer.segment; }), filters.segment, 'All segments')+'</select></div>' +
           '<div class="filter-section"><label>Tenant Country/Region</label><select id="psmMvpFilterCountry">'+options(customers.map(function(customer) { return customer.country; }), filters.country, 'All countries/regions')+'</select></div>' +
-          '<div class="filter-section"><label>Copilot Paid MAU - minimum</label><input type="number" min="0" id="psmMvpFilterMau" value="'+value('mauMin')+'" placeholder="Any value"></div>' +
-          '<div class="filter-section"><label>Copilot Paid MAU Growth - minimum</label><input type="number" id="psmMvpFilterMauGrowth" value="'+value('mauGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Copilot MAU (Licensed) - minimum</label><input type="number" min="0" id="psmMvpFilterMau" value="'+value('mauMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot MAU (Licensed) Growth - minimum</label><input type="number" id="psmMvpFilterMauGrowth" value="'+value('mauGrowthMin')+'" placeholder="Any growth"></div>' +
           '<div class="filter-section"><label>Copilot NPSA - minimum</label><input type="number" min="0" id="psmMvpFilterNpsa" value="'+value('npsaMin')+'" placeholder="Any value"></div>' +
           '<div class="filter-section"><label>Copilot NPSA Growth - minimum</label><input type="number" id="psmMvpFilterNpsaGrowth" value="'+value('npsaGrowthMin')+'" placeholder="Any growth"></div>' +
           '<div class="filter-section"><label>Cowork MAU - minimum</label><input type="number" min="0" id="psmMvpFilterCowork" value="'+value('coworkMin')+'" placeholder="Any value"></div>' +
           '<div class="filter-section"><label>Cowork MAU Growth - minimum</label><input type="number" id="psmMvpFilterCoworkGrowth" value="'+value('coworkGrowthMin')+'" placeholder="Any growth"></div>' +
-          '<div class="filter-section"><label>Cowork Consumption Revenue - minimum</label><input type="number" min="0" id="psmMvpFilterRevenue" value="'+value('revenueMin')+'" placeholder="Any value"></div>' +
-          '<div class="filter-section"><label>Cowork Consumption Revenue Growth - minimum</label><input type="number" id="psmMvpFilterRevenueGrowth" value="'+value('revenueGrowthMin')+'" placeholder="Any growth"></div>' +
+          '<div class="filter-section"><label>Copilot Consumption Revenue - minimum</label><input type="number" min="0" id="psmMvpFilterRevenue" value="'+value('revenueMin')+'" placeholder="Any value"></div>' +
+          '<div class="filter-section"><label>Copilot Consumption Revenue Growth - minimum</label><input type="number" id="psmMvpFilterRevenueGrowth" value="'+value('revenueGrowthMin')+'" placeholder="Any growth"></div>' +
           '<div class="filter-section"><label>Partner Name</label><input id="psmMvpFilterPartnerName" value="'+value('partnerName')+'" placeholder="Contains partner name"></div>' +
           '<div class="filter-section"><label>Partner Center ID (MPN)</label><input id="psmMvpFilterPartnerMpn" value="'+value('partnerMpn')+'" placeholder="Contains MPN ID"></div>' +
           '<div class="filter-section"><label>PartnerOneID</label><input id="psmMvpFilterPartnerOneId" value="'+value('partnerOneId')+'" placeholder="Contains PartnerOneID"></div>' +
@@ -5695,10 +5691,10 @@
       var rows = [[
         'Customer / Tenant Name', 'Tenant ID', 'Tenant Segment', 'Tenant Country/Region',
         'Partner Name', 'Partner Center ID (MPN)', 'PartnerOneID', 'CSP Tier', 'T2 Reseller ID', 'T2 Reseller Name',
-        'Copilot Paid MAU Baseline', 'Copilot Paid MAU Current', 'Copilot Paid MAU Growth',
+        'Copilot MAU (Licensed) Baseline', 'Copilot MAU (Licensed) Current', 'Copilot MAU (Licensed) Growth',
         'Copilot NPSA Baseline', 'Copilot NPSA Current', 'Copilot NPSA Growth',
         'Cowork MAU Baseline', 'Cowork MAU Current', 'Cowork MAU Growth',
-        'Cowork Consumption Revenue Baseline', 'Cowork Consumption Revenue Current', 'Cowork Consumption Revenue Growth', 'Progress'
+        'Copilot Consumption Revenue Baseline', 'Copilot Consumption Revenue Current', 'Copilot Consumption Revenue Growth', 'Progress'
       ]];
       c.customers.forEach(function(customer) {
         var stages = psmCampaignStages();
