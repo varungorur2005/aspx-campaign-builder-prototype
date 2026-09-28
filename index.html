@@ -4484,20 +4484,6 @@
       return !!c && PSM_V3_DEMO_EDIT_ALL;
     }
 
-    function psmV3CopyCampaign(id) {
-      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
-      if (!c) return;
-      showDashboard();
-      psmV3OpenCreate();
-      document.getElementById('v3CampaignName').value = 'Copy of '+c.name;
-      psmV3CreateOpportunity = 'copilot';
-      psmV3CreateWorkloads = (c.workloads || []).slice();
-      psmV3CreateOutcomes = (c.v3Outcomes || c.v3TrackingMetrics || []).slice();
-      psmV3RenderWorkloadOptions();
-      psmV3RenderTrackingMetricOptions();
-      showToast('Campaign setup copied. Select a partner and add customer tenants.');
-    }
-
     function psmV3OpenDetail(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
@@ -4577,7 +4563,7 @@
       var initialNotePanel = initialNote
         ? '<div class="psm-v3-initial-note"><h3>Campaign context</h3><p>'+psmEscapeHtml(initialNote.text)+'</p><span class="psm-v3-initial-note-meta">Added by '+psmEscapeHtml(initialNote.author || c.v3CreatedBy)+' · '+psmEscapeHtml(initialNote.date || c.v3OpenDate)+'</span></div>'
         : '';
-      detail.innerHTML = '<div class="flyout-header"><div class="v3-actions"><button class="btn btn-secondary" onclick="psmV3CopyCampaign(\''+c.id+'\')">Copy campaign</button></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
+      detail.innerHTML = '<div class="flyout-header"><div></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-mvp-detail-heading"><div><h1>'+psmEscapeHtml(c.name)+'</h1><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOneID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
