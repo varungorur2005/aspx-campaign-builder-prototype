@@ -832,7 +832,7 @@
     .v3-metric-option { display:flex; align-items:flex-start; gap:9px; min-height:52px; margin:0 !important; padding:9px 10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text) !important; font-size:12px !important; font-weight:600 !important; cursor:pointer; }
     .v3-metric-option input { margin-top:2px; }
     .v3-metric-option.pending, .v3-metric-option.limit-reached { opacity:.62; cursor:not-allowed; }
-    .v3-metric-option small { display:block; margin-top:3px; color:var(--cp-text-muted); font-size:10px; font-weight:400; }
+    .v3-metric-coming-soon { margin-left:6px; color:var(--cp-text-muted); font-size:10px; font-weight:400; white-space:nowrap; }
     .psm-wl-selected { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .psm-wl-chip { display:inline-flex; align-items:center; padding:3px 8px; border-radius:0.625rem; background:var(--cp-accent-soft); color:var(--cp-accent); font-size:11px; font-weight:600; }
     .psm-target-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; margin-top:12px; }
@@ -3820,7 +3820,7 @@
       var outcomeOptions = PSM_V3_OUTCOMES.map(function(outcome) {
         var selected = psmV3CreateOutcomes.indexOf(outcome.id) > -1;
         var unavailable = outcome.pending || (limitReached && !selected);
-        return '<label class="v3-metric-option'+(outcome.pending ? ' pending' : '')+(!outcome.pending && limitReached && !selected ? ' limit-reached' : '')+'"><input type="checkbox" value="'+outcome.id+'"'+(selected ? ' checked' : '')+(unavailable ? ' disabled' : '')+' onchange="psmV3ToggleBusinessOutcome(this.value,this.checked)"><span>'+psmEscapeHtml(outcome.label)+'<small>'+(outcome.pending ? 'Coming soon' : 'Baseline captured at campaign creation')+'</small></span></label>';
+        return '<label class="v3-metric-option'+(outcome.pending ? ' pending' : '')+(!outcome.pending && limitReached && !selected ? ' limit-reached' : '')+'"><input type="checkbox" value="'+outcome.id+'"'+(selected ? ' checked' : '')+(unavailable ? ' disabled' : '')+' onchange="psmV3ToggleBusinessOutcome(this.value,this.checked)"><span>'+psmEscapeHtml(outcome.label)+(outcome.pending ? '<span class="v3-metric-coming-soon">Coming soon</span>' : '')+'</span></label>';
       }).join('');
       container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose business outcomes</strong><span id="v3BusinessOutcomeCount">'+psmV3CreateOutcomes.length+' of 4 selected</span></span></summary><div class="v3-metric-options">'+outcomeOptions+'</div></details><div class="psm-wl-selected" id="v3SelectedBusinessOutcomes">'+psmV3CreateOutcomes.map(function(id) { return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(id))+'</span>'; }).join('')+'</div>';
     }
