@@ -759,6 +759,12 @@
     .psm-v3-initial-note h2 { margin:0 0 8px; font-size:14px; }
     .psm-v3-initial-note p { margin:0; color:var(--cp-text); font-size:13px; line-height:1.5; white-space:pre-wrap; }
     .psm-v3-initial-note-meta { display:block; margin-top:8px; color:var(--cp-text-muted); font-size:11px; }
+    .psm-v3-business-outcome { border-left:4px solid var(--cp-accent); }
+    .psm-v3-business-outcome-value { display:flex; align-items:center; gap:12px; padding:6px 0 2px; }
+    .psm-v3-business-outcome-icon { display:flex; align-items:center; justify-content:center; flex:0 0 34px; width:34px; height:34px; border-radius:50%; background:var(--cp-accent-soft); color:var(--cp-accent); }
+    .psm-v3-business-outcome-icon svg { width:18px; height:18px; }
+    .psm-v3-business-outcome-value span { display:block; margin-bottom:3px; color:var(--cp-text-muted); font-size:11px; }
+    .psm-v3-business-outcome-value strong { display:block; color:var(--cp-text); font-size:18px; font-weight:600; }
     .psm-v3-campaign-status { flex:0 0 160px; min-height:58px; padding:8px 10px; }
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
@@ -5294,6 +5300,7 @@
       var impactPanel = c.v3Status === 'Committed'
         ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
         : '';
+      var businessOutcomePanel = '<div class="panel-card psm-v3-business-outcome"><h2 class="psm-v3-section-heading">Business outcome</h2><div class="psm-v3-business-outcome-value"><div class="psm-v3-business-outcome-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="1" fill="currentColor"/></svg></div><div><span>Selected campaign outcome</span><strong>'+psmEscapeHtml(outcomeConfig.label)+'</strong></div></div></div>';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
       if (!initialNote && c.v3InitialNote) initialNote = { text:c.v3InitialNote, author:c.v3CreatedBy, date:c.v3OpenDate };
       var initialNotePanel = initialNote
@@ -5316,9 +5323,8 @@
           '<div class="detail-meta-item"><strong>Created:</strong> '+psmEscapeHtml(c.v3OpenDate)+'</div>' +
           '<div class="detail-meta-item"><strong>Last updated:</strong> '+psmEscapeHtml(c.v3LastUpdated)+'</div>' +
           '<div class="detail-meta-item"><strong>Customer tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
-          '<div class="detail-meta-item"><strong>Business outcome:</strong> '+psmEscapeHtml(outcomeConfig.label)+'</div>' +
-          '<div class="detail-meta-item"><strong>Metrics measured:</strong> '+psmEscapeHtml(outcomeConfig.metrics.map(function(metric) { return metric.label; }).join(', '))+'</div>' +
         '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</div></div>' +
+        businessOutcomePanel +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
