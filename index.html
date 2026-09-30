@@ -1180,7 +1180,6 @@
     .v3-validation-link { display:block; color:var(--cp-link); font-weight:600; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
     .v3-validation-link strong { display:block; font-size:18px; }
     .v3-validation-link span { display:block; font-size:12px; }
-    .v3-validation-link small { display:block; margin-top:3px; font-size:10px; font-weight:600; }
     .v3-validation-link:hover { text-decoration-thickness:2px; }
     .v3-validation-issues { margin-top:12px; padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-validation-issues > strong { display:block; margin-bottom:8px; color:var(--cp-text); font-size:13px; }
@@ -4408,7 +4407,7 @@
       psmV3Upload.overlaps = psmV3FindOverlaps(psmV3Upload.rows);
       var issueCount = issues.length;
       var issueLink = issueCount
-        ? '<a class="v3-validation-link" href="#v3TenantValidationIssues" aria-expanded="false" aria-controls="v3TenantValidationIssues" aria-label="'+issueCount+(issueCount === 1 ? ' tenant needs' : ' tenants need')+' attention. Show validation details." onclick="psmV3ToggleValidationIssues(event)"><strong>'+issueCount+'</strong><span>Needs attention</span><small>View details &rarr;</small></a>'
+        ? '<a class="v3-validation-link" href="#v3TenantValidationIssues" aria-expanded="false" aria-controls="v3TenantValidationIssues" aria-label="'+issueCount+(issueCount === 1 ? ' tenant needs' : ' tenants need')+' attention. Show validation details." onclick="psmV3ToggleValidationIssues(event)"><strong>'+issueCount+'</strong><span>Needs attention</span></a>'
         : '<strong>0</strong><span style="display:block;">needs attention</span>';
       var issueRows = issues.map(function(issue) {
         return '<tr><td class="psm-tenant-id">'+psmEscapeHtml(issue.tenantId)+'</td><td>'+psmEscapeHtml(issue.tenantName)+'</td><td>'+psmEscapeHtml(issue.reason)+'</td></tr>';
