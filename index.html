@@ -1154,6 +1154,7 @@
     .v3-trend-line { fill:none; stroke:var(--cp-accent); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
     .v3-trend-dot { fill:var(--cp-surface); stroke:var(--cp-accent); stroke-width:2; }
     .v3-trend-label { fill:var(--cp-text-muted); font-size:9px; font-family:"Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
+    .v3-trend-value { fill:var(--cp-text); font-size:9px; font-weight:600; font-family:"Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
     .v3-mapping-pending { display:inline-flex; align-items:center; min-height:24px; padding:3px 8px; border:1px solid var(--cp-warning); border-radius:0.625rem; color:var(--cp-text); font-size:11px; font-weight:600; }
     .v3-detail-overview { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(360px,.85fr); gap:16px; margin-bottom:16px; }
     .v3-detail-overview .panel-card { margin:0; }
@@ -3626,6 +3627,41 @@
       return '<div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="'+psmEscapeHtml(ariaLabel)+'">'+(slices || empty)+'</svg><div class="v3-chart-legend">'+legend+'</div></div>';
     }
 
+    function psmV3TrendCard(title, subtitle, values, valuePrefix) {
+      var width = 300;
+      var height = 150;
+      var left = 48;
+      var right = 12;
+      var top = 20;
+      var bottom = 34;
+      var max = Math.max.apply(null, values);
+      var min = Math.min.apply(null, values);
+      var range = Math.max(1, max - min);
+      var points = values.map(function(value, index) {
+        var x = left + index * ((width - left - right) / (values.length - 1));
+        var y = top + (max - value) / range * (height - top - bottom);
+        return { x:x, y:y, value:value };
+      });
+      var labels = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
+      function formatAxisValue(value) {
+        var absolute = Math.abs(value);
+        var compact = absolute >= 1000000
+          ? (absolute / 1000000).toFixed(1).replace(/\.0$/, '')+'M'
+          : (absolute >= 1000 ? (absolute / 1000).toFixed(1).replace(/\.0$/, '')+'K' : Math.round(absolute).toLocaleString());
+        return (value < 0 ? '-' : '')+valuePrefix+compact;
+      }
+      var yTicks = [max, min + range / 2, min];
+      var grid = yTicks.map(function(value) {
+        var y = top + (max - value) / range * (height - top - bottom);
+        return '<line class="v3-trend-gridline" x1="'+left+'" y1="'+y+'" x2="'+(width-right)+'" y2="'+y+'"></line><text class="v3-trend-label" x="'+(left-6)+'" y="'+(y+3)+'" text-anchor="end">'+formatAxisValue(value)+'</text>';
+      }).join('');
+      var pointMarkup = points.map(function(point, index) {
+        return '<line class="v3-trend-gridline" x1="'+point.x+'" y1="'+(height-bottom)+'" x2="'+point.x+'" y2="'+(height-bottom+4)+'"></line><circle class="v3-trend-dot" cx="'+point.x+'" cy="'+point.y+'" r="3"><title>'+labels[index]+': '+valuePrefix+point.value.toLocaleString()+'</title></circle><text class="v3-trend-value" x="'+point.x+'" y="'+Math.max(10, point.y-7)+'" text-anchor="middle">'+formatAxisValue(point.value)+'</text><text class="v3-trend-label" x="'+point.x+'" y="'+(height-12)+'" text-anchor="middle">'+labels[index]+'</text>';
+      }).join('');
+      var chart = '<svg class="v3-trend-svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+psmEscapeHtml(title)+' month-over-month trend">'+grid+'<line class="v3-trend-gridline" x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(height-bottom)+'"></line><line class="v3-trend-gridline" x1="'+left+'" y1="'+(height-bottom)+'" x2="'+(width-right)+'" y2="'+(height-bottom)+'"></line><polyline class="v3-trend-line" points="'+points.map(function(point) { return point.x+','+point.y; }).join(' ')+'"></polyline>'+pointMarkup+'<text class="v3-trend-label" x="'+((left+width-right)/2)+'" y="'+(height-1)+'" text-anchor="middle">Month</text></svg>';
+      return '<he-card_psmv3 class="v3-card"><h2>'+psmEscapeHtml(title)+'</h2><p style="margin:4px 0;color:var(--cp-text-muted);font-size:11px;">'+psmEscapeHtml(subtitle)+'</p><div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
+    }
+
     function psmV3RenderCharts(campaigns) {
       var lifecycle = PSM_V3_STATUS_FLOW.map(function(status) {
         var value = campaigns.filter(function(c) { return c.v3Status === status; }).length;
@@ -3635,30 +3671,12 @@
         var value = campaigns.filter(function(c) { return c.v3Region === region; }).length;
         return { label:region, value:value, display:value.toLocaleString() };
       });
-      function trendPanel(title, subtitle, values, valuePrefix) {
-        var width = 300;
-        var height = 118;
-        var left = 18;
-        var top = 12;
-        var bottom = 24;
-        var max = Math.max.apply(null, values);
-        var min = Math.min.apply(null, values);
-        var range = Math.max(1, max - min);
-        var points = values.map(function(value, index) {
-          var x = left + index * ((width - left * 2) / (values.length - 1));
-          var y = top + (max - value) / range * (height - top - bottom);
-          return { x:x, y:y, value:value };
-        });
-        var labels = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
-        var chart = '<svg class="v3-trend-svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+psmEscapeHtml(title)+' month-over-month trend"><line class="v3-trend-gridline" x1="'+left+'" y1="'+(height-bottom)+'" x2="'+(width-left)+'" y2="'+(height-bottom)+'"></line><polyline class="v3-trend-line" points="'+points.map(function(point) { return point.x+','+point.y; }).join(' ')+'"></polyline>'+points.map(function(point, index) { return '<circle class="v3-trend-dot" cx="'+point.x+'" cy="'+point.y+'" r="3"><title>'+labels[index]+': '+valuePrefix+point.value.toLocaleString()+'</title></circle><text class="v3-trend-label" x="'+point.x+'" y="'+(height-7)+'" text-anchor="middle">'+labels[index]+'</text>'; }).join('')+'</svg>';
-        return '<he-card_psmv3 class="v3-card"><h2>'+psmEscapeHtml(title)+'</h2><p style="margin:4px 0;color:var(--cp-text-muted);font-size:11px;">'+psmEscapeHtml(subtitle)+'</p><div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
-      }
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts">' +
         '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Campaigns in New, Outreach, Engage, Committed, and Closed.</p>'+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
         '<he-card_psmv3 class="v3-card"><h2>Campaigns by region</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Provisional portfolio view. Final attribution rule for multi-region campaigns is pending.</p>'+psmV3PieChart(regions, 'Campaign regional distribution pie chart')+'</he-card_psmv3>' +
-        trendPanel('Copilot paid MAU growth', 'Monthly aggregate across committed campaigns', [420, 610, 760, 980, 1120, 1360], '')+
-        trendPanel('NPSA growth', 'Synthetic demo net paid seat adds', [185, 260, 348, 455, 590, 742], '')+
-        trendPanel('Cowork credit consumption growth', 'Synthetic demo monetized credits', [18200, 24750, 31600, 42800, 53750, 68900], '$')+
+        psmV3TrendCard('Copilot paid MAU growth', 'Monthly aggregate across committed campaigns', [420, 610, 760, 980, 1120, 1360], '')+
+        psmV3TrendCard('NPSA growth', 'Synthetic demo net paid seat adds', [185, 260, 348, 455, 590, 742], '')+
+        psmV3TrendCard('Cowork credit consumption growth', 'Synthetic demo monetized credits', [18200, 24750, 31600, 42800, 53750, 68900], '$')+
       '</div>';
     }
 
@@ -4529,59 +4547,63 @@
       detail.classList.remove('psm-mvp-half-page');
       document.getElementById('psmMvpFlyoutBackdrop').classList.add('show');
       var canEdit = psmV3CanEdit(c);
-      var metrics = c.v3TrackingMetrics.map(function(id, metricIndex) {
-        var outcome = psmV3MetricDefinition(id);
-        var metric = c.v3Metrics[id];
-        var outcomeConfig = PSM_V3_OUTCOMES.filter(function(item) { return item.id === id; })[0];
-        if (outcomeConfig && outcomeConfig.pending) return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+'</span><span class="current"><span class="v3-mapping-pending">Mapping pending</span></span><div class="comparison"><span>Awaiting confirmed source columns and calculation</span></div></div>';
-        if (['New', 'Outreach', 'Engage'].indexOf(c.v3Status) > -1) return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+'</span><span class="current">Not started</span><div class="comparison"><span>Impact measurement begins at Committed</span></div></div>';
-        if (!metric) return '';
-        if (!c.v3BaselineAvailable) return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+'</span><span class="current">Unavailable</span><div class="comparison"><span>Historical baseline not available</span></div></div>';
+      var detailOutcomeIds = ['paidMau', 'npsa', 'coworkConsumption'];
+      var generatedDetailMetrics = psmV3NewMetrics(detailOutcomeIds, c.tenantCount, true);
+      c.v3Metrics = c.v3Metrics || {};
+      detailOutcomeIds.forEach(function(metricId, index) {
+        if (c.v3Metrics[metricId]) return;
+        var generated = generatedDetailMetrics[metricId];
+        generated.current = generated.baseline + Math.max(1, Math.round(generated.baseline * (.09 + index * .03)));
+        c.v3Metrics[metricId] = generated;
+      });
+      function detailMetricGrowth(metricId) {
+        var metric = c.v3Metrics[metricId];
         var delta = metric.current - metric.baseline;
-        return '<div class="psm-mvp-impact-card"><span class="label">'+outcome.label+'</span><span class="current">'+psmV3FormatMetricValue(metric.current, id)+'</span><div class="comparison"><span>Baseline '+psmV3FormatMetricValue(metric.baseline, id)+'</span><span class="psm-mvp-growth">'+psmV3MetricGrowth(c, id, false)+'</span></div></div>';
-      }).join('');
+        var definition = psmV3MetricDefinition(metricId);
+        var sign = delta > 0 ? '+' : (delta < 0 ? '-' : '');
+        return definition.format === 'currency'
+          ? sign+'$'+Math.abs(delta).toLocaleString()
+          : sign+Math.abs(delta).toLocaleString();
+      }
       psmEnsureMvpTenantRows(c);
       var tenantStageData = psmMvpTenantStageData(c);
-      var detailSegments = (c.customers || []).map(function(customer) { return customer.segment; }).filter(function(segment, index, segments) { return segment && segments.indexOf(segment) === index; });
-      if (!detailSegments.length) detailSegments = c.v3Segments.slice();
-      var segmentCounts = detailSegments.map(function(segment) {
-        return (c.customers || []).filter(function(customer) { return customer.segment === segment; }).length;
-      });
-      var assignedCount = segmentCounts.reduce(function(sum, count) { return sum + count; }, 0);
-      if (!assignedCount && detailSegments.length) {
-        var remaining = c.tenantCount;
-        segmentCounts = detailSegments.map(function(segment, index) {
-          var count = index === detailSegments.length - 1 ? remaining : Math.floor(c.tenantCount / detailSegments.length);
-          remaining -= count;
-          return count;
-        });
-        assignedCount = c.tenantCount;
-      }
       var lifecycleChart = PSM_V3_LIFECYCLE_STAGES.map(function(stage) {
         var count = tenantStageData.counts[stage.key] || 0;
         return {
           label:stage.label,
           value:count,
-          display:count.toLocaleString(),
-          action:"psmV3FilterTenantChart('stage','"+stage.key+"')"
+          display:count.toLocaleString()
         };
       });
-      var outcomeSegmentCharts = c.v3TrackingMetrics.slice(0, 4).map(function(metricId) {
-        var outcome = psmV3MetricDefinition(metricId);
-        var chartData = detailSegments.map(function(segment, index) {
-          var count = (c.customers || []).filter(function(customer) {
-            return customer.segment === segment && customer.v3Metrics && customer.v3Metrics[metricId];
-          }).length;
-          if (!count && !(c.customers || []).some(function(customer) { return customer.v3Metrics && customer.v3Metrics[metricId]; })) count = segmentCounts[index];
-          return {
-            label:segment,
-            value:count,
-            display:count.toLocaleString(),
-            action:"psmV3FilterTenantChart('segment','"+encodeURIComponent(segment)+"')"
-          };
-        });
-        return '<div class="psm-v3-detail-pie-card"><h3>'+psmEscapeHtml(outcome.label)+'</h3>'+psmV3PieChart(chartData, outcome.label+' customer tenants by segment pie chart')+'</div>';
-      }).join('');
+      var regionByCountry = {
+        'United States':'Americas', 'Canada':'Americas',
+        'Germany':'EMEA', 'United Kingdom':'EMEA', 'Netherlands':'EMEA', 'Belgium':'EMEA',
+        'Korea':'APAC', 'India':'APAC', 'Australia':'APAC'
+      };
+      var tenantRegions = ['EMEA', 'Americas', 'APAC'].map(function(region) {
+        var count = (c.customers || []).filter(function(customer) {
+          return (regionByCountry[customer.country] || c.v3Region) === region;
+        }).length;
+        return { label:region, value:count, display:count.toLocaleString() };
+      });
+      var engagedTenants = (tenantStageData.counts.engage || 0) + (tenantStageData.counts.committed || 0) + (tenantStageData.counts.closed || 0);
+      if (!engagedTenants) engagedTenants = Math.round(c.tenantCount * .64);
+      var detailKpis = [
+        psmV3Kpi('1', 'Campaign', 'Current campaign'),
+        psmV3Kpi(engagedTenants.toLocaleString(), 'Customers engaged', 'Synthetic engaged tenant count for this campaign'),
+        psmV3Kpi(c.tenantCount.toLocaleString(), 'Customer tenants', 'Validated tenant records in this campaign'),
+        psmV3Kpi(detailMetricGrowth('paidMau'), 'Copilot paid MAU growth', 'Change from this campaign baseline'),
+        psmV3Kpi(detailMetricGrowth('npsa'), 'NPSA growth', 'Synthetic demo change from baseline'),
+        psmV3Kpi(detailMetricGrowth('coworkConsumption'), 'Cowork consumption growth', 'Synthetic demo credit consumption change')
+      ].join('');
+      var detailCharts =
+        '<div class="v3-charts">' +
+          '<he-card_psmv3 class="v3-card"><h2>Tenant lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Customer tenants by campaign lifecycle stage.</p>'+psmV3PieChart(lifecycleChart, 'Campaign tenant lifecycle pie chart')+'</he-card_psmv3>' +
+          '<he-card_psmv3 class="v3-card"><h2>Tenants by region</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Customer tenant geography in this campaign.</p>'+psmV3PieChart(tenantRegions, 'Campaign tenant regional distribution pie chart')+'</he-card_psmv3>' +
+          psmV3TrendCard('Copilot paid MAU growth', 'Monthly campaign trend', [42, 68, 91, 126, 158, 204], '') +
+          psmV3TrendCard('NPSA growth', 'Synthetic demo net paid seat adds', [18, 31, 47, 66, 89, 118], '') +
+          psmV3TrendCard('Cowork credit consumption growth', 'Synthetic demo monetized credits', [2400, 3900, 6100, 8800, 12400, 16900], '$') +
+        '</div>';
       var outcomeNames = c.v3TrackingMetrics.map(psmV3MetricLabel).join(', ');
       var workloadNames = (c.workloads || []).join(', ');
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
@@ -4600,18 +4622,18 @@
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOne ID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOne name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
-          '<div class="detail-meta-item"><strong>Created by:</strong> '+psmEscapeHtml(c.v3CreatedBy)+'</div>' +
-          '<div class="detail-meta-item"><strong>Campaign owner:</strong> '+psmEscapeHtml(c.v3Owner)+'</div>' +
+          '<div class="detail-meta-item psm-v3-owner-meta"><strong>Created by:</strong> '+psmEscapeHtml(c.v3Owner)+' <button class="psm-v3-owner-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner" title="Edit campaign owner"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10.8 2.2 13.8 5.2 6 13H3v-3l7.8-7.8ZM9.5 3.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>' +
           '<div class="detail-meta-item"><strong>Created:</strong> '+psmEscapeHtml(c.v3OpenDate)+'</div>' +
           '<div class="detail-meta-item"><strong>Last updated:</strong> '+psmEscapeHtml(c.v3LastUpdated)+'</div>' +
           '<div class="detail-meta-item"><strong>Customer tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
           '<div class="detail-meta-item"><strong>Business outcomes:</strong> '+psmEscapeHtml(outcomeNames || 'Not selected')+'</div>' +
           '<div class="detail-meta-item"><strong>Workloads:</strong> '+psmEscapeHtml(workloadNames || 'Not selected')+'</div>' +
-        '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button><button class="btn btn-secondary" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Reassign campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Reassignment remains available.</p>')+'</div></div>' +
+        '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use the pencil next to Created by to change ownership.</p>')+'</div></div>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         '<div class="panel-card"><details class="psm-v3-section-collapse" open><summary><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2></summary><div class="psm-v3-section-collapse-body">' +
-          '<div class="psm-mvp-impact-grid" style="grid-template-columns:repeat('+c.v3TrackingMetrics.length+',minmax(200px,1fr));overflow-x:auto;">'+metrics+'</div>' +
-          '<p style="margin:12px 0 0;color:var(--cp-text-muted);font-size:11px;">Paid MAU, NPSA, and Cowork credit consumption are tracked from Committed through Closed. NPSA and Cowork values remain placeholders until the data mapping is confirmed.</p></div></details></div>' +
+          '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+detailKpis+'</div>' +
+          detailCharts +
+          '<p style="margin:12px 0 0;color:var(--cp-text-muted);font-size:11px;">KPI and trend values are synthetic for prototype review. Cowork represents monetized credit consumption.</p></div></details></div>' +
         psmV3TenantWorkspace(c);
       window.location.hash = 'psm-v3-campaign-'+id;
     }
