@@ -3600,7 +3600,7 @@
     }
 
     function psmV3KpiWithMom(value, label, momValue, momClass, helper) {
-      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><div class="v3-kpi-mom '+momClass+'">'+momValue+' MoM</div><small>'+helper+'</small></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><div class="v3-kpi-mom '+momClass+'">MoM growth: '+momValue+'</div><small>'+helper+'</small></he-card_psmv3>';
     }
 
     const PSM_V3_OPPORTUNITY_KPIS = {
@@ -3671,13 +3671,15 @@
     }
 
     function psmV3RenderKpis(campaigns) {
-      var tenants = campaigns.reduce(function(total, c) { return total + Number(c.tenantCount || 0); }, 0);
-      var engagedCustomers = campaigns.filter(function(c) { return ['Engage', 'Committed', 'Closed'].indexOf(c.v3Status) > -1; })
-        .reduce(function(total, c) { return total + Number(c.tenantCount || 0); }, 0);
+      var engagedCampaigns = campaigns.filter(function(c) { return ['Engage', 'Committed', 'Closed'].indexOf(c.v3Status) > -1; });
+      var partnersEngaged = engagedCampaigns.map(function(c) { return c.partner; }).filter(function(partner, index, partners) {
+        return partner && partners.indexOf(partner) === index;
+      }).length;
+      var engagedCustomers = engagedCampaigns.reduce(function(total, c) { return total + Number(c.tenantCount || 0); }, 0);
       var cards = [
         psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', 'All campaigns in the filtered portfolio'),
-        psmV3Kpi(engagedCustomers.toLocaleString(), 'Customers engaged', 'Customer tenants in Engage, Committed, or Closed campaigns'),
-        psmV3Kpi(tenants.toLocaleString(), 'Customer tenants', 'Validated tenant records across all campaigns'),
+        psmV3Kpi(partnersEngaged.toLocaleString(), 'Partners engaged', 'Unique partners with campaigns in Engage, Committed, or Closed'),
+        psmV3Kpi(engagedCustomers.toLocaleString(), 'Customer engaged', 'Customers in Engage, Committed, or Closed campaigns'),
         psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU' }),
         psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA' }),
         psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork credit consumption' })
