@@ -1340,6 +1340,9 @@
     }
     body.psm-v3-view .v3-kpi span { order:0; margin:0 18px 3px 0; color:var(--cp-text); font-size:13px; font-weight:400; letter-spacing:0; text-transform:none; }
     body.psm-v3-view .v3-kpi strong { order:1; margin:0; color:var(--cp-text); font-size:26px; font-weight:400; }
+    body.psm-v3-view .v3-kpi-mom { order:2; align-self:flex-start; margin-top:8px; padding:3px 7px; border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:11px; font-weight:600; }
+    body.psm-v3-view .v3-kpi-mom.positive { color:var(--cp-success); }
+    body.psm-v3-view .v3-kpi-mom.negative { color:var(--cp-danger); }
     body.psm-v3-view .v3-kpi small { display:none; }
     body.psm-v3-view .v3-kpi-info {
       position:absolute; top:7px; right:7px; display:inline-flex; align-items:center; justify-content:center;
@@ -3583,6 +3586,10 @@
       return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><small>'+helper+'</small></he-card_psmv3>';
     }
 
+    function psmV3KpiWithMom(value, label, momValue, momClass, helper) {
+      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><div class="v3-kpi-mom '+momClass+'">'+momValue+' MoM</div><small>'+helper+'</small></he-card_psmv3>';
+    }
+
     const PSM_V3_OPPORTUNITY_KPIS = {
       copilot: [
         { metric:'copilotEligibleSeats', label:'Eligible M365 seats change' },
@@ -3631,15 +3638,21 @@
           Number.isFinite(c.v3Metrics[config.metric].baseline) && Number.isFinite(c.v3Metrics[config.metric].current);
       });
       if (!tracked.length) return psmV3Kpi('\u2014', config.label, 'No committed campaigns currently measure this metric');
+      var current = tracked.reduce(function(sum, c) {
+        return sum + c.v3Metrics[config.metric].current;
+      }, 0);
       var delta = tracked.reduce(function(sum, c) {
         return sum + c.v3Metrics[config.metric].current - c.v3Metrics[config.metric].baseline;
       }, 0);
       var definition = psmV3MetricDefinition(config.metric);
       var sign = delta > 0 ? '+' : (delta < 0 ? '-' : '');
-      var value = definition.format === 'currency'
+      var currentValue = definition.format === 'currency'
+        ? '$'+current.toLocaleString()
+        : (definition.format === 'percent' ? current.toFixed(1)+'%' : current.toLocaleString());
+      var momValue = definition.format === 'currency'
         ? sign+'$'+Math.abs(delta).toLocaleString()
         : (definition.format === 'percent' ? sign+Math.abs(delta).toFixed(1)+' pp' : sign+Math.abs(delta).toLocaleString());
-      return psmV3Kpi(value, config.label, 'Across '+tracked.length+' committed campaign'+(tracked.length === 1 ? '' : 's'));
+      return psmV3KpiWithMom(currentValue, config.label, momValue, delta > 0 ? 'positive' : (delta < 0 ? 'negative' : ''), 'Across '+tracked.length+' committed campaign'+(tracked.length === 1 ? '' : 's'));
     }
 
     function psmV3RenderKpis(campaigns) {
@@ -3650,9 +3663,9 @@
         psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', 'All campaigns in the filtered portfolio'),
         psmV3Kpi(engagedCustomers.toLocaleString(), 'Customers engaged', 'Customer tenants in Engage, Committed, or Closed campaigns'),
         psmV3Kpi(tenants.toLocaleString(), 'Customer tenants', 'Validated tenant records across all campaigns'),
-        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU MoM growth' }),
-        psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA MoM growth' }),
-        psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork consumption MoM growth' })
+        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU' }),
+        psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA' }),
+        psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork credit consumption' })
       ];
       document.getElementById('psmV3Kpis').innerHTML = '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+cards.join('')+'</div>';
     }
