@@ -1199,6 +1199,8 @@
     .v3-status-step.complete::before, .v3-status-step.current::before { border-color:var(--cp-accent); background:var(--cp-accent); }
     .v3-status-step.complete::after, .v3-status-step.current::after { border-color:var(--cp-accent); }
     .v3-status-step.current { color:var(--cp-text); font-weight:700; }
+    .v3-status-step-date { display:block; min-height:16px; margin-top:3px; color:var(--cp-text-muted); font-size:9px; font-weight:400; white-space:nowrap; }
+    .v3-status-step.current .v3-status-step-date { color:var(--cp-text-muted); }
     .v3-framework-note { display:flex; align-items:flex-start; gap:8px; margin:-8px 0 20px; padding:10px 12px; border-left:3px solid var(--cp-link); background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
     .v3-framework-note strong { color:var(--cp-text); }
     .v3-trend-panel { min-width:0; margin-top:18px; }
@@ -5168,6 +5170,35 @@
       psmRefreshTenantWorkspace();
     }
 
+    function psmV3StatusDates(c) {
+      var currentStatusIndex = PSM_V3_STATUS_FLOW.indexOf(c.v3Status);
+      var dates = { New:c.v3OpenDate || c.created };
+      (c.v3Activity || []).forEach(function(activity) {
+        if (activity.type !== 'Campaign status' || !activity.date) return;
+        var match = String(activity.detail || '').match(/->\s*(New|Outreach|Engage|Committed|Closed)\b/i);
+        if (!match) return;
+        var status = PSM_V3_STATUS_FLOW.filter(function(item) { return item.toLowerCase() === match[1].toLowerCase(); })[0];
+        if (status && !dates[status]) dates[status] = activity.date;
+      });
+      if (currentStatusIndex <= 0) return dates;
+      var start = new Date((dates.New || today())+'T00:00:00');
+      var end = new Date((dates[c.v3Status] || c.v3LastUpdated || today())+'T00:00:00');
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return dates;
+      var span = Math.max(0, end.getTime() - start.getTime());
+      for (var index = 1; index <= currentStatusIndex; index++) {
+        var status = PSM_V3_STATUS_FLOW[index];
+        if (!dates[status]) dates[status] = new Date(start.getTime() + span * index / currentStatusIndex).toISOString().slice(0, 10);
+      }
+      return dates;
+    }
+
+    function psmV3FormatStatusDate(value) {
+      if (!value) return '';
+      var parsed = new Date(value+'T00:00:00');
+      if (Number.isNaN(parsed.getTime())) return value;
+      return parsed.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+
     function psmV3OpenTenantPanel(panel) {
       var title = document.getElementById('psmV3TablePanelTitle');
       var body = document.getElementById('psmV3TablePanelBody');
@@ -5269,9 +5300,11 @@
         ? '<div class="psm-v3-initial-note"><h3>Campaign context</h3><p>'+psmEscapeHtml(initialNote.text)+'</p><span class="psm-v3-initial-note-meta">Added by '+psmEscapeHtml(initialNote.author || c.v3CreatedBy)+' &middot; '+psmEscapeHtml(initialNote.date || c.v3OpenDate)+'</span></div>'
         : '';
       var currentStatusIndex = PSM_V3_STATUS_FLOW.indexOf(c.v3Status);
+      var statusDates = psmV3StatusDates(c);
       var statusFlow = '<div class="v3-status-flow" aria-label="Campaign lifecycle">'+PSM_V3_STATUS_FLOW.map(function(status, index) {
         var stateClass = index < currentStatusIndex ? ' complete' : (index === currentStatusIndex ? ' current' : '');
-        return '<div class="v3-status-step'+stateClass+'">'+status+'</div>';
+        var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
+        return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
       detail.innerHTML = '<div class="flyout-header"><div></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
         '<div class="detail-header"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button></div><p style="margin:5px 0 18px;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
