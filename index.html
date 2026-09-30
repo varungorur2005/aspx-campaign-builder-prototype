@@ -772,10 +772,10 @@
     .psm-v3-detail-title-row h1 { margin:0; }
     .psm-v3-detail-title-actions { display:flex; align-items:flex-end; flex-direction:column; gap:7px; flex:0 0 auto; }
     .psm-v3-business-outcome-header {
-      display:flex; align-items:baseline; gap:7px; width:auto; min-height:0; padding:0;
-      border-left:0; background:transparent; box-sizing:border-box;
+      display:flex; align-items:center; gap:9px; width:auto; min-height:38px; padding:8px 12px;
+      border-left:3px solid var(--cp-accent); background:var(--cp-accent-soft); box-sizing:border-box;
     }
-    .psm-v3-business-outcome-header h3 { margin:0; color:var(--cp-text-muted); font-size:12px; font-weight:400; text-transform:none; letter-spacing:normal; white-space:nowrap; }
+    .psm-v3-business-outcome-header h3 { margin:0; color:var(--cp-text-muted); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.25px; white-space:nowrap; }
     .psm-v3-business-outcome-header .psm-v3-business-outcome-value { display:block; padding:0; }
     .psm-v3-business-outcome-header .psm-v3-business-outcome-icon { display:none; }
     .psm-v3-business-outcome-header .psm-v3-business-outcome-value span { display:none; }
@@ -1209,11 +1209,18 @@
     .v3-tenant-table { min-width:1180px; }
     .v3-tenant-table tbody tr { cursor:default; }
     .v3-tenant-table textarea { min-width:190px; min-height:38px; padding:6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font:inherit; }
-    .v3-status-flow { display:flex; align-items:flex-start; margin:8px 0 0; }
+    .v3-status-flow { position:relative; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); align-items:flex-start; margin:8px 0 0; }
+    .v3-status-flow::before {
+      content:""; position:absolute; top:14px; left:7px; right:7px; height:2px;
+      background:linear-gradient(to right,var(--cp-accent) 0 var(--v3-status-progress),var(--cp-border) var(--v3-status-progress) 100%);
+    }
     .v3-status-step { position:relative; flex:1; padding-top:24px; color:var(--cp-text-muted); font-size:11px; text-align:center; }
     .v3-status-step::before { content:""; position:absolute; top:7px; left:50%; width:14px; height:14px; transform:translateX(-50%); border:2px solid var(--cp-border-strong); border-radius:50%; background:var(--cp-surface); z-index:1; }
-    .v3-status-step::after { content:""; position:absolute; top:14px; left:-50%; width:100%; border-top:2px solid var(--cp-border); }
-    .v3-status-step:first-child::after { display:none; }
+    .v3-status-step::after { display:none; }
+    .v3-status-step:first-child { text-align:left; }
+    .v3-status-step:first-child::before { left:0; transform:none; }
+    .v3-status-step:last-child { text-align:right; }
+    .v3-status-step:last-child::before { right:0; left:auto; transform:none; }
     .v3-status-step.complete::before, .v3-status-step.current::before { border-color:var(--cp-accent); background:var(--cp-accent); }
     .v3-status-step.complete::after, .v3-status-step.current::after { border-color:var(--cp-accent); }
     .v3-status-step.current { color:var(--cp-text); font-weight:700; }
@@ -1240,13 +1247,13 @@
     .v3-status-card .v3-status-flow { margin:16px 0 2px; }
     .v3-status-actions { display:flex; justify-content:flex-end; margin-top:12px; padding-top:12px; border-top:1px solid var(--cp-border); }
     .v3-summary-meta { display:grid; grid-template-columns:repeat(7,minmax(110px,1fr)); margin:16px 0 0; padding:14px 0 0; border-top:1px solid var(--cp-border); }
-    .v3-summary-meta > div { min-width:0; padding:0 14px; border-left:1px solid var(--cp-border); }
+    .v3-summary-meta > div { min-width:0; padding:0 14px; border-left:1px solid var(--cp-border); text-align:center; }
     .v3-summary-meta > div:first-child { padding-left:0; border-left:0; }
     .v3-summary-meta > div:last-child { padding-right:0; }
     .v3-summary-meta dt { margin:0 0 4px; color:var(--cp-text-muted); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.25px; }
     .v3-summary-meta dd { margin:0; overflow:hidden; color:var(--cp-text); font-size:12px; font-weight:600; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
     .v3-detail-overview .v3-summary-meta { margin-top:0; padding-top:0; border-top:0; }
-    .v3-summary-meta-value { display:flex; align-items:center; gap:8px; min-width:0; }
+    .v3-summary-meta-value { display:flex; align-items:center; justify-content:center; gap:8px; min-width:0; }
     .v3-meta-edit {
       padding:0; border:0; background:transparent; color:var(--cp-link);
       font:inherit; font-size:11px; font-weight:600; cursor:pointer;
@@ -5357,7 +5364,8 @@
         : '';
       var currentStatusIndex = PSM_V3_STATUS_FLOW.indexOf(c.v3Status);
       var statusDates = psmV3StatusDates(c);
-      var statusFlow = '<div class="v3-status-flow" aria-label="Campaign lifecycle">'+PSM_V3_STATUS_FLOW.map(function(status, index) {
+      var statusProgress = Math.max(0, currentStatusIndex) / (PSM_V3_STATUS_FLOW.length - 1) * 100;
+      var statusFlow = '<div class="v3-status-flow" style="--v3-status-progress:'+statusProgress+'%;" aria-label="Campaign lifecycle">'+PSM_V3_STATUS_FLOW.map(function(status, index) {
         var stateClass = index < currentStatusIndex ? ' complete' : (index === currentStatusIndex ? ' current' : '');
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
@@ -5372,7 +5380,7 @@
           '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
           '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
         '</dl></div></div>' +
-        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'<div class="v3-status-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div></section>' +
+        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-section-heading-row"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign status</button></div>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'</section>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
