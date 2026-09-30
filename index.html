@@ -1821,11 +1821,11 @@
   <div class="modal-overlay v3-create-overlay" id="psmV3CreateModal">
     <div class="modal v3-modal">
       <h3>Create campaign</h3>
-      <p>Create a Copilot campaign for one partner and a validated list of customer tenants. Selected business outcomes are captured as the campaign baseline.</p>
+      <p>Create a Copilot campaign for one partner and a validated list of customer tenants. The selected business outcome is captured as the campaign baseline.</p>
       <div class="v3-modal-grid">
         <section class="v3-create-section"><h4>Campaign</h4><p>Name the effort so PSMs can identify its partner and intended outcome.</p><div class="form-group full"><label>Campaign name <span class="required">*</span></label><input id="v3CampaignName" placeholder="e.g. Contoso FY27 Copilot consumption"></div></section>
         <section class="v3-create-section"><h4>Partner</h4><p>Look up one PartnerOne ID. The resolved partner provides the context for tenant validation.</p><div class="form-group full"><div class="v3-partner-lookup-label">PartnerOne ID <span class="required">*</span></div><input type="hidden" id="v3PartnerIdType" value="PartnerOneID"><div class="v3-create-partner-row partnerone-only"><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter one PartnerOne ID" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div></section>
-        <section class="v3-create-section"><h4>Business outcomes</h4><p>Select up to four Copilot outcomes this campaign is intended to drive. Workloads will be mapped to the selected outcomes in the backend.</p><div class="form-group full"><div id="v3TrackingMetricOptions"></div></div></section>
+        <section class="v3-create-section"><h4>Business outcome</h4><p>Select the single measurable outcome this campaign is intended to drive.</p><div class="form-group full"><div id="v3TrackingMetricOptions"></div></div></section>
         <section class="v3-create-section"><h4>Customer tenants</h4><p>Paste or upload Tenant IDs, then validate their association with the selected PartnerOne ID.</p><div class="form-group full"><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box" id="v3TenantValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation"></div></div></div></div></section>
         <section class="v3-create-section"><h4>Campaign context</h4><p>Add optional context that should appear near the top of the campaign detail.</p><div class="form-group full"><label for="v3InitialNote">Comment</label><textarea id="v3InitialNote" placeholder="Partner feedback, risks, decisions, or next steps"></textarea></div></section>
       </div>
@@ -3828,28 +3828,18 @@
       return Array.from(document.querySelectorAll('input[name="'+prefix+'Outcome"]:checked')).map(function(input) { return input.value; });
     }
 
-    function psmV3ToggleBusinessOutcome(metric, checked) {
-      var index = psmV3CreateOutcomes.indexOf(metric);
-      if (checked && index === -1 && psmV3CreateOutcomes.length >= 4) {
-        showToast('Select a maximum of four business outcomes', true);
-        psmV3RenderTrackingMetricOptions();
-        return;
-      }
-      if (checked && index === -1) psmV3CreateOutcomes.push(metric);
-      if (!checked && index > -1) psmV3CreateOutcomes.splice(index, 1);
-      psmV3RenderTrackingMetricOptions();
+    function psmV3SelectBusinessOutcome(metric) {
+      psmV3CreateOutcomes = metric ? [metric] : [];
     }
 
     function psmV3RenderTrackingMetricOptions() {
       var container = document.getElementById('v3TrackingMetricOptions');
       if (!container) return;
-      var limitReached = psmV3CreateOutcomes.length >= 4;
       var outcomeOptions = PSM_V3_OUTCOMES.map(function(outcome) {
         var selected = psmV3CreateOutcomes.indexOf(outcome.id) > -1;
-        var unavailable = outcome.pending || (limitReached && !selected);
-        return '<label class="v3-metric-option'+(outcome.pending ? ' pending' : '')+(!outcome.pending && limitReached && !selected ? ' limit-reached' : '')+'"><input type="checkbox" value="'+outcome.id+'"'+(selected ? ' checked' : '')+(unavailable ? ' disabled' : '')+' onchange="psmV3ToggleBusinessOutcome(this.value,this.checked)"><span>'+psmEscapeHtml(outcome.label)+(outcome.pending ? '<span class="v3-metric-coming-soon">Coming soon</span>' : '')+'</span></label>';
+        return '<option value="'+outcome.id+'"'+(selected ? ' selected' : '')+'>'+psmEscapeHtml(outcome.label)+'</option>';
       }).join('');
-      container.innerHTML = '<details class="psm-wl-picker" open><summary><span class="psm-wl-picker-title"><strong>Choose business outcomes</strong><span id="v3BusinessOutcomeCount">'+psmV3CreateOutcomes.length+' of 4 selected</span></span></summary><div class="v3-metric-options">'+outcomeOptions+'</div></details><div class="psm-wl-selected" id="v3SelectedBusinessOutcomes">'+psmV3CreateOutcomes.map(function(id) { return '<span class="psm-wl-chip">'+psmEscapeHtml(psmV3MetricLabel(id))+'</span>'; }).join('')+'</div>';
+      container.innerHTML = '<label for="v3BusinessOutcome">Business outcome <span class="required">*</span></label><select id="v3BusinessOutcome" onchange="psmV3SelectBusinessOutcome(this.value)"><option value="">Select a business outcome</option>'+outcomeOptions+'</select>';
     }
 
     function psmV3OpenCreate() {
@@ -4200,7 +4190,7 @@
         allAgentsMau:'Copilot Studio and agents',
         paidMau:'Microsoft 365 Copilot',
         npsa:'Microsoft 365 Copilot',
-        revenue:'Copilot extensibility'
+        coworkConsumption:'Cowork'
       };
       return outcomes.map(function(outcome) { return workloadByOutcome[outcome]; }).filter(function(workload, index, workloads) {
         return workload && workloads.indexOf(workload) === index;
@@ -4213,8 +4203,7 @@
       var mappedWorkloads = psmV3WorkloadsForOutcomes(trackingMetrics);
       if (!name) { showToast('Campaign name is required', true); return; }
       if (!psmV3CreatePartner) { showToast('Look up a valid PartnerOne ID', true); return; }
-      if (!trackingMetrics.length) { showToast('Select at least one business outcome', true); return; }
-      if (trackingMetrics.length > 4) { showToast('Select a maximum of four business outcomes', true); return; }
+      if (trackingMetrics.length !== 1) { showToast('Select one business outcome', true); return; }
       if (!psmV3Upload.valid) { showToast('Validate the Tenant IDs before creating the campaign', true); return; }
       if (psmV3Upload.overlaps.length && (!document.getElementById('v3OverlapAck') || !document.getElementById('v3OverlapAck').checked)) {
         showToast('Review and acknowledge existing campaign coverage', true);
