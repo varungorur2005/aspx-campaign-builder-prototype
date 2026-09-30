@@ -1428,6 +1428,50 @@
       display:grid; gap:5px; margin-top:9px; color:var(--cp-text-muted); font-size:12px; line-height:1.4;
     }
     body.psm-v3-view .psm-v3-campaign-summary strong { color:var(--cp-text); font-weight:600; }
+    body.psm-v3-view :is(button, input, select, textarea, summary, a, he-button_psmv3):focus-visible {
+      outline:2px solid var(--cp-link);
+      outline-offset:2px;
+    }
+    body.psm-v3-view fieldset.filter-section { min-width:0; padding:0; border:0; }
+    body.psm-v3-view .filter-section label,
+    body.psm-v3-view fieldset.filter-section legend { color:var(--cp-text-muted); }
+    body.psm-v3-view fieldset.filter-section legend {
+      margin-bottom:6px; font-size:11px; font-weight:600; text-transform:uppercase;
+    }
+    body.psm-v3-view .modal-overlay[aria-hidden="true"],
+    body.psm-v3-view .filter-overlay[aria-hidden="true"] { display:none; }
+    @media (max-width:900px) {
+      body.psm-v3-view .top-nav { padding:0 8px; }
+      body.psm-v3-view .top-nav .prototype-switcher-label { display:none; }
+      body.psm-v3-view .dashboard-view { padding:16px; }
+      body.psm-v3-view .v3-title-line { flex-wrap:wrap; font-size:22px; }
+      body.psm-v3-view .v3-page-tabs-row { align-items:stretch; flex-direction:column; gap:12px; margin-bottom:24px; }
+      body.psm-v3-view .v3-page-tabs-row .v3-actions { padding-bottom:12px; }
+      body.psm-v3-view .v3-kpis { grid-template-columns:repeat(2,minmax(0,1fr)) !important; overflow:visible; }
+      body.psm-v3-view .v3-charts,
+      body.psm-v3-view .psm-v3-detail .v3-charts { grid-template-columns:1fr; overflow:visible; }
+      body.psm-v3-view .v3-card { min-height:0; }
+      body.psm-v3-view .v3-table-toolbar,
+      body.psm-v3-view .v3-tenant-toolbar { align-items:stretch; flex-direction:column; }
+      body.psm-v3-view .v3-table-toolbar .v3-actions,
+      body.psm-v3-view .v3-tenant-toolbar .v3-actions { width:100%; margin-left:0 !important; flex-wrap:wrap !important; }
+      body.psm-v3-view .v3-table-search-wrap { width:100%; }
+      body.psm-v3-view .v3-table-search { width:100%; }
+      body.psm-v3-view .v3-modal-grid { grid-template-columns:1fr; }
+      body.psm-v3-view .v3-tenant-methods { grid-template-columns:1fr; }
+      body.psm-v3-view .v3-tenant-or { min-height:24px; }
+      body.psm-v3-view .filter-panel { width:min(400px,100vw); }
+      body.psm-v3-view .detail-view.psm-v3-detail { padding:16px 16px 64px; }
+      body.psm-v3-view .psm-v3-detail .flyout-header { margin:-16px -16px 16px; padding:14px 16px; }
+      body.psm-v3-view .psm-v3-detail-title-row { align-items:flex-start; flex-direction:column; }
+      body.psm-v3-view .v3-detail-overview { grid-template-columns:1fr; }
+    }
+    @media (max-width:560px) {
+      body.psm-v3-view .v3-kpis { grid-template-columns:1fr !important; }
+      body.psm-v3-view .v3-pie-layout { align-items:flex-start; flex-direction:column; min-height:0; }
+      body.psm-v3-view .v3-create-overlay .v3-modal,
+      body.psm-v3-view .modal { width:100% !important; max-width:100%; }
+    }
     @media (max-width:1000px) { .v3-impact-grid { grid-template-columns:1fr; } }
   </style>
   <script type="module">
@@ -1822,31 +1866,31 @@
     </div>
   </div>
 
-  <div class="modal-overlay v3-create-overlay" id="psmV3CreateModal">
-    <div class="modal v3-modal">
-      <h3>Create campaign</h3>
+  <div class="modal-overlay v3-create-overlay" id="psmV3CreateModal" role="dialog" aria-modal="true" aria-labelledby="psmV3CreateTitle" aria-hidden="true">
+    <div class="modal v3-modal" tabindex="-1">
+      <h3 id="psmV3CreateTitle">Create campaign</h3>
       <p>Create a Copilot campaign for one partner and a validated list of customer tenants. The selected business outcome is captured as the campaign baseline.</p>
       <div class="v3-modal-grid">
-        <section class="v3-create-section"><h4>Campaign</h4><p>Name the effort so PSMs can identify its partner and intended outcome.</p><div class="form-group full"><label>Campaign name <span class="required">*</span></label><input id="v3CampaignName" placeholder="e.g. Contoso FY27 Copilot consumption"></div></section>
-        <section class="v3-create-section"><h4>Partner</h4><p>Look up one PartnerOne ID. The resolved partner provides the context for tenant validation.</p><div class="form-group full"><div class="v3-partner-lookup-label">PartnerOne ID <span class="required">*</span></div><input type="hidden" id="v3PartnerIdType" value="PartnerOneID"><div class="v3-create-partner-row partnerone-only"><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" placeholder="Enter one PartnerOne ID" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult"></div></div></section>
+        <section class="v3-create-section"><h4>Campaign</h4><p>Name the effort so PSMs can identify its partner and intended outcome.</p><div class="form-group full"><label for="v3CampaignName">Campaign name <span class="required">*</span></label><input id="v3CampaignName" required aria-required="true" placeholder="e.g. Contoso FY27 Copilot consumption"></div></section>
+        <section class="v3-create-section"><h4>Partner</h4><p>Look up one PartnerOne ID. The resolved partner provides the context for tenant validation.</p><div class="form-group full"><label class="v3-partner-lookup-label" for="v3PartnerIdSearch">PartnerOne ID <span class="required">*</span></label><input type="hidden" id="v3PartnerIdType" value="PartnerOneID"><div class="v3-create-partner-row partnerone-only"><div class="v3-create-partner-search"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input id="v3PartnerIdSearch" required aria-required="true" aria-describedby="v3CreatePartnerResult" placeholder="Enter one PartnerOne ID" oninput="psmV3ClearCreatePartner()" onkeydown="if(event.key==='Enter'){event.preventDefault();psmV3FindCreatePartner();}"></div><button class="btn btn-primary" type="button" onclick="psmV3FindCreatePartner()">Look up</button></div><div class="v3-create-partner-result" id="v3CreatePartnerResult" role="status" aria-live="polite"></div></div></section>
         <section class="v3-create-section"><h4>Business outcome</h4><p>Select the single outcome this campaign is intended to drive. ASPX automatically maps the KPI, trend, and tenant-level metrics measured for that outcome.</p><div class="form-group full"><div id="v3TrackingMetricOptions"></div></div></section>
-        <section class="v3-create-section"><h4>Customer tenants</h4><p>Paste or upload Tenant IDs, then validate their association with the selected PartnerOne ID.</p><div class="form-group full"><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box" id="v3TenantValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation"></div></div></div></div></section>
+        <section class="v3-create-section"><h4>Customer tenants</h4><p>Paste or upload Tenant IDs, then validate their association with the selected PartnerOne ID.</p><div class="form-group full"><div class="v3-upload"><div class="v3-tenant-methods"><div class="v3-tenant-method"><label for="v3TenantIds"><strong>Paste Tenant IDs</strong></label><p id="v3TenantIdsHelp">Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="v3TenantIds" aria-describedby="v3TenantIdsHelp v3TenantValidation" placeholder="Paste Tenant IDs here" oninput="psmV3ResetTenantValidation()"></textarea><button class="btn btn-secondary" type="button" onclick="psmV3ValidateTenantIds()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><label for="v3TenantFile"><strong>Upload a tenant list</strong></label><p id="v3TenantFileHelp">Upload a CSV or TXT file. The Tenant ID can be the only column; no template is required.</p><input type="file" id="v3TenantFile" aria-describedby="v3TenantFileHelp v3TenantValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantFile(this)"></div></div><div class="v3-tenant-validation-box" id="v3TenantValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="v3TenantValidation" role="status" aria-live="polite"></div></div></div></div></section>
         <section class="v3-create-section"><h4>Campaign context</h4><p>Add optional context that should appear near the top of the campaign detail.</p><div class="form-group full"><label for="v3InitialNote">Comment</label><textarea id="v3InitialNote" placeholder="Partner feedback, risks, decisions, or next steps"></textarea></div></section>
       </div>
       <div class="btn-group"><he-button_psmv3 class="v3-btn" onclick="hideModal('psmV3CreateModal')">Cancel</he-button_psmv3><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3CreateCampaign()">Create campaign</he-button_psmv3></div>
     </div>
   </div>
 
-  <div class="filter-overlay" id="psmV3TablePanel" onclick="psmV3CloseTablePanel()">
-    <div class="filter-panel v3-filter-panel" onclick="event.stopPropagation()">
-      <h3><span id="psmV3TablePanelTitle">Filter campaigns</span><button style="background:none;border:none;font-size:20px;color:var(--cp-text-muted);cursor:pointer;" onclick="psmV3CloseTablePanel()">&times;</button></h3>
+  <div class="filter-overlay" id="psmV3TablePanel" role="dialog" aria-modal="true" aria-labelledby="psmV3TablePanelTitle" aria-hidden="true" onclick="psmV3CloseTablePanel()">
+    <div class="filter-panel v3-filter-panel" tabindex="-1" onclick="event.stopPropagation()">
+      <h3><span id="psmV3TablePanelTitle">Filter campaigns</span><button type="button" aria-label="Close panel" style="background:none;border:none;font-size:20px;color:var(--cp-text-muted);cursor:pointer;" onclick="psmV3CloseTablePanel()">&times;</button></h3>
       <div id="psmV3TablePanelBody"></div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="psmV3MigrationModal">
-    <div class="modal v3-modal">
-      <h3>Import existing campaign</h3>
+  <div class="modal-overlay" id="psmV3MigrationModal" role="dialog" aria-modal="true" aria-labelledby="psmV3MigrationTitle" aria-hidden="true">
+    <div class="modal v3-modal" tabindex="-1">
+      <h3 id="psmV3MigrationTitle">Import existing campaign</h3>
       <p>This flow is separate from new campaign creation. Historical impact is available only when a reliable baseline can be supplied.</p>
       <div class="v3-modal-grid">
         <div class="form-group"><label>Legacy campaign name <span class="required">*</span></label><input id="v3MigrationName"></div>
@@ -1890,8 +1934,8 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="psmV3TenantConfirmModal">
-    <div class="modal" style="width:520px;background:var(--cp-surface);color:var(--cp-text);">
+  <div class="modal-overlay" id="psmV3TenantConfirmModal" role="alertdialog" aria-modal="true" aria-labelledby="psmV3TenantConfirmTitle" aria-describedby="psmV3TenantConfirmSummary" aria-hidden="true">
+    <div class="modal" tabindex="-1" style="width:520px;background:var(--cp-surface);color:var(--cp-text);">
       <h3 id="psmV3TenantConfirmTitle">Confirm tenant changes</h3>
       <p id="psmV3TenantConfirmSummary" style="color:var(--cp-text-muted);"></p>
       <div id="psmV3TenantConfirmList" style="max-height:220px;overflow:auto;margin-bottom:16px;"></div>
@@ -3847,7 +3891,7 @@
         '<div class="filter-section"><label>PartnerOne Name</label><select id="v3FilterPartner">'+psmV3Options(partners, psmV3State.partner, 'All PartnerOne names')+'</select></div>' +
         '<div class="filter-section"><label>Campaign status</label><select id="v3FilterStatus">'+psmV3Options(PSM_V3_STATUS_FLOW, psmV3State.status, 'All statuses')+'</select></div>' +
         '<div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyFilters()">Apply</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearFilters();psmV3CloseTablePanel()">Clear all</button></div>';
-      document.getElementById('psmV3TablePanel').classList.add('show');
+      psmV3ShowTablePanel();
     }
 
     function psmV3ApplyFilters() {
@@ -3871,7 +3915,7 @@
       document.getElementById('psmV3TablePanelBody').innerHTML = '<div>'+PSM_V3_COLUMNS.map(function(column) {
         return '<label class="v3-column-option"><input type="checkbox" '+(psmV3VisibleColumns[column.key] ? 'checked ' : '')+(column.fixed ? 'disabled' : 'onchange="psmV3SetColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
       }).join('')+'</div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3CloseTablePanel()">Done</button></div>';
-      document.getElementById('psmV3TablePanel').classList.add('show');
+      psmV3ShowTablePanel();
     }
 
     function psmV3SetColumn(key, visible) {
@@ -3882,6 +3926,17 @@
     function psmV3CloseTablePanel() {
       var panel = document.getElementById('psmV3TablePanel');
       panel.classList.remove('show', 'campaign-update-panel');
+      panel.setAttribute('aria-hidden', 'true');
+      psmRestoreOverlayFocus(panel);
+    }
+
+    function psmV3ShowTablePanel(extraClass) {
+      var panel = document.getElementById('psmV3TablePanel');
+      psmRememberOverlayFocus(panel);
+      if (extraClass) panel.classList.add(extraClass);
+      panel.classList.add('show');
+      panel.setAttribute('aria-hidden', 'false');
+      window.requestAnimationFrame(function() { psmFocusOverlay(panel); });
     }
 
     function psmV3DownloadCampaigns() {
@@ -3951,7 +4006,7 @@
         var selected = psmV3CreateOutcomes.indexOf(outcome.id) > -1;
         return '<option value="'+outcome.id+'"'+(selected ? ' selected' : '')+'>'+psmEscapeHtml(outcome.label)+'</option>';
       }).join('');
-      container.innerHTML = '<label for="v3BusinessOutcome">Business outcome <span class="required">*</span></label><select id="v3BusinessOutcome" onchange="psmV3SelectBusinessOutcome(this.value)"><option value="">Select a business outcome</option>'+outcomeOptions+'</select>';
+      container.innerHTML = '<label for="v3BusinessOutcome">Business outcome <span class="required">*</span></label><select id="v3BusinessOutcome" required aria-required="true" onchange="psmV3SelectBusinessOutcome(this.value)"><option value="">Select a business outcome</option>'+outcomeOptions+'</select>';
     }
 
     function psmV3OpenCreate() {
@@ -4310,6 +4365,11 @@
     }
 
     function psmV3CreateCampaign() {
+      var requiredFields = ['v3CampaignName', 'v3PartnerIdSearch', 'v3BusinessOutcome'];
+      if (requiredFields.some(function(id) {
+        var field = document.getElementById(id);
+        return field && !field.reportValidity();
+      })) return;
       var name = document.getElementById('v3CampaignName').value.trim();
       var trackingMetrics = psmV3CreateOutcomes.slice();
       if (!name) { showToast('Campaign name is required', true); return; }
@@ -4441,16 +4501,15 @@
       if (!c) return;
       if (!psmV3CanEdit(c)) { showToast('Only the assigned PSM Owner can edit this campaign in the Field view', true); return; }
       psmV3CurrentCampaign = c;
-      var panel = document.getElementById('psmV3TablePanel');
       document.getElementById('psmV3TablePanelTitle').textContent = 'Update Campaign';
       document.getElementById('psmV3TablePanelBody').innerHTML =
-        '<div class="filter-section"><label>Campaign status</label><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
+        '<fieldset class="filter-section"><legend>Campaign status</legend><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
           return '<label class="psm-v3-status-option" data-status="'+status.toLowerCase()+'"><input type="radio" name="v3FlyoutStatus" value="'+status+'"'+(status === c.v3Status ? ' checked' : '')+'><span>'+status+'</span></label>';
-        }).join('')+'</div></div>' +
-        '<div class="form-group"><label for="v3FlyoutStatusNote">Update note <span class="required">*</span></label><textarea id="v3FlyoutStatusNote" placeholder="Explain what changed and the next step"></textarea></div>' +
+        }).join('')+'</div></fieldset>' +
+        '<div class="form-group"><label for="v3FlyoutStatusNote">Update note <span class="required">*</span></label><textarea id="v3FlyoutStatusNote" required aria-required="true" placeholder="Explain what changed and the next step"></textarea></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveStatus()">Save update</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>' +
         '<section class="psm-v3-update-history"><h4>Activity History</h4>'+psmV3ActivityHistoryHtml(c)+'</section>';
-      panel.classList.add('campaign-update-panel', 'show');
+      psmV3ShowTablePanel('campaign-update-panel');
     }
 
     function psmV3OpenOwnerEditor(id) {
@@ -4460,15 +4519,16 @@
       document.getElementById('psmV3TablePanelTitle').textContent = 'Change campaign owner';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<p style="margin:0 0 16px;color:var(--cp-text-muted);">Current owner: <strong>'+psmEscapeHtml(c.v3Owner)+'</strong></p>' +
-        '<div class="filter-section"><label for="v3OwnerAlias">New PSM alias <span class="required">*</span></label><input id="v3OwnerAlias" list="v3OwnerAliasOptions" placeholder="Type an alias, such as mayapat" autocomplete="off"><datalist id="v3OwnerAliasOptions">'+PSM_OWNER_DIRECTORY.map(function(owner) { return '<option value="'+psmEscapeHtml(owner.alias)+'">'+psmEscapeHtml(owner.name)+'</option>'; }).join('')+'</datalist><span style="color:var(--cp-text-muted);font-size:11px;">Search by a known PSM alias and save to reassign this campaign.</span></div>' +
+        '<div class="filter-section"><label for="v3OwnerAlias">New PSM alias <span class="required">*</span></label><input id="v3OwnerAlias" required aria-required="true" aria-describedby="v3OwnerAliasHelp" list="v3OwnerAliasOptions" placeholder="Type an alias, such as mayapat" autocomplete="off"><datalist id="v3OwnerAliasOptions">'+PSM_OWNER_DIRECTORY.map(function(owner) { return '<option value="'+psmEscapeHtml(owner.alias)+'">'+psmEscapeHtml(owner.name)+'</option>'; }).join('')+'</datalist><span id="v3OwnerAliasHelp" style="color:var(--cp-text-muted);font-size:11px;">Search by a known PSM alias and save to reassign this campaign.</span></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveOwnerAlias()">Change owner</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>';
-      document.getElementById('psmV3TablePanel').classList.add('campaign-update-panel', 'show');
+      psmV3ShowTablePanel('campaign-update-panel');
       setTimeout(function() { var field = document.getElementById('v3OwnerAlias'); if (field) field.focus(); }, 0);
     }
 
     function psmV3SaveOwnerAlias() {
       var c = psmV3CurrentCampaign;
       var field = document.getElementById('v3OwnerAlias');
+      if (field && !field.reportValidity()) return;
       var query = field ? field.value.trim().toLowerCase() : '';
       var owner = PSM_OWNER_DIRECTORY.filter(function(candidate) {
         return candidate.alias.toLowerCase() === query || candidate.name.toLowerCase() === query;
@@ -4493,7 +4553,9 @@
       if (!psmV3CanEdit(c)) { showToast('You do not have permission to update this campaign', true); return; }
       var selected = document.querySelector('input[name="v3FlyoutStatus"]:checked');
       var status = selected ? selected.value : '';
-      var note = document.getElementById('v3FlyoutStatusNote').value.trim();
+      var noteField = document.getElementById('v3FlyoutStatusNote');
+      if (!noteField.reportValidity()) return;
+      var note = noteField.value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
       var previous = c.v3Status;
       c.v3Status = status;
@@ -4741,9 +4803,9 @@
       document.getElementById('psmV3TablePanelTitle').textContent = verb+' tenants';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<p style="margin:0 0 16px;color:var(--cp-text-muted);font-size:12px;">Paste Tenant IDs or upload a CSV/TXT file. All IDs must pass validation before you can confirm the change.</p>' +
-        '<div class="v3-tenant-methods"><div class="v3-tenant-method"><strong>Paste Tenant IDs</strong><p>Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="psmV3TenantChangeIds" placeholder="Paste Tenant IDs here"></textarea><button class="btn btn-secondary btn-sm" type="button" onclick="psmV3ValidateTenantChange()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><strong>Upload a tenant list</strong><p>Upload a CSV or TXT file with a Tenant ID column or IDs in the first column.</p><input type="file" id="psmV3TenantChangeFile" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"></div></div>' +
-        '<div class="v3-tenant-validation-box" id="psmV3TenantChangeValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="psmV3TenantChangeValidation"></div></div>';
-      document.getElementById('psmV3TablePanel').classList.add('show');
+        '<div class="v3-tenant-methods"><div class="v3-tenant-method"><label for="psmV3TenantChangeIds"><strong>Paste Tenant IDs</strong></label><p id="psmV3TenantChangeIdsHelp">Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="psmV3TenantChangeIds" aria-describedby="psmV3TenantChangeIdsHelp psmV3TenantChangeValidation" placeholder="Paste Tenant IDs here"></textarea><button class="btn btn-secondary btn-sm" type="button" onclick="psmV3ValidateTenantChange()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><label for="psmV3TenantChangeFile"><strong>Upload a tenant list</strong></label><p id="psmV3TenantChangeFileHelp">Upload a CSV or TXT file with a Tenant ID column or IDs in the first column.</p><input type="file" id="psmV3TenantChangeFile" aria-describedby="psmV3TenantChangeFileHelp psmV3TenantChangeValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"></div></div>' +
+        '<div class="v3-tenant-validation-box" id="psmV3TenantChangeValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="psmV3TenantChangeValidation" role="status" aria-live="polite"></div></div>';
+      psmV3ShowTablePanel();
     }
 
     function psmV3ValidateTenantChange() {
@@ -4872,7 +4934,7 @@
         title.textContent = 'Filter campaign tenants';
         body.innerHTML = '<div class="filter-section"><label>Association</label><select id="psmV3TenantAssociationFilter">'+tenantOptions(customers.map(function(customer) { return customer.association || 'None'; }), psmV3TenantTableState.filters.association, 'All associations')+'</select></div><div class="filter-section"><label>Tenant Segment</label><select id="psmV3TenantSegmentFilter">'+tenantOptions(customers.map(function(customer) { return customer.segment; }), psmV3TenantTableState.filters.segment, 'All segments')+'</select></div><div class="filter-section"><label>Tenant Country/Region</label><select id="psmV3TenantCountryFilter">'+tenantOptions(customers.map(function(customer) { return customer.country; }), psmV3TenantTableState.filters.country, 'All countries/regions')+'</select></div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyTenantPanelFilters()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearTenantPanelFilters()">Clear all</button></div>';
       }
-      document.getElementById('psmV3TablePanel').classList.add('show');
+      psmV3ShowTablePanel();
     }
 
     function psmV3ToggleTenantColumn(key, visible) {
@@ -5902,7 +5964,7 @@
           return '<label class="v3-column-option"><input type="checkbox" '+(checked ? 'checked ' : '')+(column.fixed ? 'disabled ' : 'onchange="psmMvpToggleTenantColumn(\''+column.key+'\',this.checked)"')+'>'+column.label+(column.fixed ? ' (required)' : '')+'</label>';
         }).join('')+'</div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3CloseTablePanel()">Done</button></div>';
       }
-      document.getElementById('psmV3TablePanel').classList.add('show');
+      psmV3ShowTablePanel();
     }
 
     function psmMvpApplyTenantFilter() {
@@ -6428,7 +6490,7 @@
         '<div class="filter-section"><label for="psmBulkStage">Lifecycle status <span class="required">*</span></label><select id="psmBulkStage">'+psmCampaignStages().map(function(stage) { return '<option value="'+stage.key+'">'+stage.label+'</option>'; }).join('')+'</select></div>' +
         '<div class="filter-section"><label for="psmBulkComment">Comment (optional)</label><textarea id="psmBulkComment" placeholder="Add context for this status update"></textarea></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmReviewBulkStatus(\''+id+'\')">Review update</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>';
-      document.getElementById('psmV3TablePanel').classList.add('campaign-update-panel', 'show');
+      psmV3ShowTablePanel('campaign-update-panel');
     }
 
     function psmReviewBulkStatus(id) {
@@ -8685,8 +8747,70 @@
       setTimeout(function() { t.classList.remove('show'); }, 3000);
     }
 
-    function showModal(id) { document.getElementById(id).classList.add('show'); }
-    function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+    const PSM_OVERLAY_FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], summary, he-button_psmv3:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    function psmRememberOverlayFocus(overlay) {
+      if (overlay && document.activeElement && document.activeElement !== document.body) overlay._returnFocus = document.activeElement;
+    }
+
+    function psmFocusOverlay(overlay) {
+      if (!overlay) return;
+      var target = overlay.querySelector('[autofocus], '+PSM_OVERLAY_FOCUSABLE) || overlay.querySelector('[tabindex="-1"]');
+      if (target && typeof target.focus === 'function') target.focus();
+    }
+
+    function psmRestoreOverlayFocus(overlay) {
+      var target = overlay && overlay._returnFocus;
+      overlay._returnFocus = null;
+      if (target && document.contains(target) && typeof target.focus === 'function') target.focus();
+    }
+
+    function showModal(id) {
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      psmRememberOverlayFocus(modal);
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      window.requestAnimationFrame(function() { psmFocusOverlay(modal); });
+    }
+
+    function hideModal(id) {
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      psmRestoreOverlayFocus(modal);
+    }
+
+    document.addEventListener('keydown', function(event) {
+      var overlays = Array.from(document.querySelectorAll('.modal-overlay.show, .filter-overlay.show'));
+      var overlay = overlays[overlays.length - 1];
+      if (!overlay) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (overlay.id === 'psmV3TablePanel') psmV3CloseTablePanel();
+        else hideModal(overlay.id);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      var focusable = Array.from(overlay.querySelectorAll(PSM_OVERLAY_FOCUSABLE)).filter(function(element) {
+        return element.getClientRects().length > 0;
+      });
+      if (!focusable.length) {
+        event.preventDefault();
+        psmFocusOverlay(overlay);
+        return;
+      }
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
 
     function moveToNextState() {
       var c = currentCampaign;
