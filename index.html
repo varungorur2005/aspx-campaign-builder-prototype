@@ -1160,6 +1160,7 @@
     .v3-detail-actions .btn:disabled { cursor:not-allowed; opacity:.55; }
     .v3-readonly-table { min-width:820px; }
     .v3-readonly-table tbody tr { cursor:default; }
+    .v3-readonly-table .v3-tenant-domain { min-width:180px; max-width:220px; overflow:hidden; text-overflow:ellipsis; }
     .v3-analysis-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .v3-analysis-filters select { min-width:210px; padding:8px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
     @media (max-width:1100px) { .v3-detail-overview { grid-template-columns:1fr; } }
@@ -3624,11 +3625,12 @@
 
     function psmV3OpportunityKpi(campaigns, config) {
       var tracked = campaigns.filter(function(c) {
-        return (c.v3TrackingMetrics || []).indexOf(config.metric) > -1 &&
+        return c.v3Status === 'Committed' &&
+          (c.v3TrackingMetrics || []).indexOf(config.metric) > -1 &&
           c.v3BaselineAvailable && c.v3Metrics && c.v3Metrics[config.metric] &&
           Number.isFinite(c.v3Metrics[config.metric].baseline) && Number.isFinite(c.v3Metrics[config.metric].current);
       });
-      if (!tracked.length) return psmV3Kpi('\u2014', config.label, 'No valid baseline snapshots track this metric');
+      if (!tracked.length) return psmV3Kpi('\u2014', config.label, 'No committed campaigns currently measure this metric');
       var delta = tracked.reduce(function(sum, c) {
         return sum + c.v3Metrics[config.metric].current - c.v3Metrics[config.metric].baseline;
       }, 0);
@@ -3637,7 +3639,7 @@
       var value = definition.format === 'currency'
         ? sign+'$'+Math.abs(delta).toLocaleString()
         : (definition.format === 'percent' ? sign+Math.abs(delta).toFixed(1)+' pp' : sign+Math.abs(delta).toLocaleString());
-      return psmV3Kpi(value, config.label, 'Across '+tracked.length+' campaign snapshot'+(tracked.length === 1 ? '' : 's')+' tracking this metric');
+      return psmV3Kpi(value, config.label, 'Across '+tracked.length+' committed campaign'+(tracked.length === 1 ? '' : 's'));
     }
 
     function psmV3RenderKpis(campaigns) {
@@ -3648,9 +3650,9 @@
         psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', 'All campaigns in the filtered portfolio'),
         psmV3Kpi(engagedCustomers.toLocaleString(), 'Customers engaged', 'Customer tenants in Engage, Committed, or Closed campaigns'),
         psmV3Kpi(tenants.toLocaleString(), 'Customer tenants', 'Validated tenant records across all campaigns'),
-        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU growth' }),
-        psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA growth' }),
-        psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork consumption growth' })
+        psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU MoM growth' }),
+        psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA MoM growth' }),
+        psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork consumption MoM growth' })
       ];
       document.getElementById('psmV3Kpis').innerHTML = '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+cards.join('')+'</div>';
     }
@@ -4622,7 +4624,7 @@
           headers.push(column.label);
           return;
         }
-        headers.push(column.label+' Baseline', column.label+' Current', column.label+' Growth');
+        headers.push(column.label+' Current', column.label+' MoM Growth');
       });
       var csv = headers.join(',')+'\r\n'+(c.customers || []).map(function(customer, index) {
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
@@ -4634,11 +4636,7 @@
             row.push(snapshot.current);
             return;
           }
-          row.push(
-            psmV3FormatOutcomeValue(snapshot.baseline, column.format),
-            psmV3FormatOutcomeValue(snapshot.current, column.format),
-            psmV3FormatTenantGrowth(snapshot, column.format)
-          );
+          row.push(psmV3FormatOutcomeValue(snapshot.current, column.format), psmV3FormatTenantGrowth(snapshot, column.format));
         });
         return row.map(function(value) { return '"'+String(value).replace(/"/g, '""')+'"'; }).join(',');
       }).join('\r\n');
@@ -4677,18 +4675,18 @@
         var metricCells = visibleMetricColumns.map(function(column) {
           var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
-          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.baseline, column.format))+'</td><td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
+          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
         }).join('');
-        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td>'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
+        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
-      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="3"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
-      var metricSubHeaders = visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Baseline</th><th>Current</th><th>Growth</th>'; }).join('');
+      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="2"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
+      var metricSubHeaders = visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('');
       var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th>' +
-        (psmV3TenantTableState.visibleColumns.domain ? '<th rowspan="2">Tenant Domain</th>' : '') +
+        (psmV3TenantTableState.visibleColumns.domain ? '<th class="v3-tenant-domain" rowspan="2">Tenant Domain</th>' : '') +
         (psmV3TenantTableState.visibleColumns.country ? '<th rowspan="2">Tenant Country/Region</th>' : '') +
         (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
       var activeFilterCount = (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant.</div></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div></he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -4797,7 +4795,9 @@
       var detailKpis = [
         psmV3Kpi(c.tenantCount.toLocaleString(), 'Customer tenants', 'Validated tenant records in this campaign')
       ].concat(outcomeConfig.metrics.map(function(metric) {
-        return psmV3Kpi(psmV3AggregateOutcomeMetric(c, metric), metric.label, 'Synthetic campaign aggregate mapped to '+outcomeConfig.label);
+        return c.v3Status === 'Committed'
+          ? psmV3Kpi(psmV3AggregateOutcomeMetric(c, metric), metric.label, 'Measured across committed campaign tenants')
+          : psmV3Kpi('-', metric.label, 'Measurement begins when the campaign is Committed');
       })).join('');
       var detailCharts =
         '<div class="v3-charts">' +
