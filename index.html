@@ -3093,14 +3093,14 @@
     }
 
     const PSM_V3_OUTCOMES = [
-      { id: 'paidMau', label: 'Copilot paid MAU', short: 'Paid MAU', pending: false },
-      { id: 'npsa', label: 'NPSA', short: 'NPSA', pending: true },
-      { id: 'coworkConsumption', label: 'Cowork credit consumption', short: 'Cowork consumption', pending: true }
+      { id: 'paidMau', label: 'Drive Copilot Paid MAU', short: 'Drive Copilot Paid MAU', pending: false },
+      { id: 'npsa', label: 'Drive NPSA', short: 'Drive NPSA', pending: true },
+      { id: 'coworkConsumption', label: 'Drive Cowork Consumption', short: 'Drive Cowork Consumption', pending: true }
     ];
     const PSM_V3_ACTIVE_OUTCOME_IDS = PSM_V3_OUTCOMES.map(function(outcome) { return outcome.id; });
     const PSM_V3_OUTCOME_DETAILS = {
       paidMau: {
-        label:'Copilot paid MAU',
+        label:'Drive Copilot Paid MAU',
         metrics:[
           { key:'copilotEligibleSeats', label:'Copilot eligible M365 seats', format:'number', aggregate:'sum' },
           { key:'copilotSeatsWhitespace', label:'Copilot seats whitespace', format:'number', aggregate:'sum' },
@@ -3123,7 +3123,7 @@
         ]
       },
       npsa: {
-        label:'NPSA',
+        label:'Drive NPSA',
         metrics:[
           { key:'npsa', label:'Copilot NPSA', format:'number', aggregate:'sum' },
           { key:'cspTransactedLicenses', label:'CSP transacted licenses', format:'number', aggregate:'sum' },
@@ -3146,7 +3146,7 @@
         ]
       },
       coworkConsumption: {
-        label:'Cowork credit consumption',
+        label:'Drive Cowork Consumption',
         metrics:[
           { key:'consumptionRevenue', label:'Copilot consumption revenue', format:'currency', aggregate:'sum' },
           { key:'mtdCredits', label:'MTD credits consumed', format:'number', aggregate:'sum' },
