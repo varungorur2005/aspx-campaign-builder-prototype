@@ -770,14 +770,17 @@
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .psm-v3-detail-title-row h1 { margin:0; }
-    .psm-v3-detail-title-actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
-    .psm-v3-business-outcome-header { display:flex; align-items:center; gap:10px; width:auto; min-height:40px; padding:8px 12px; box-sizing:border-box; }
-    .psm-v3-business-outcome-header h3 { margin:0; white-space:nowrap; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-value { gap:8px; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon { flex-basis:24px; width:24px; height:24px; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon svg { width:14px; height:14px; }
+    .psm-v3-detail-title-actions { display:flex; align-items:flex-end; flex-direction:column; gap:7px; flex:0 0 auto; }
+    .psm-v3-business-outcome-header {
+      display:flex; align-items:baseline; gap:7px; width:auto; min-height:0; padding:0;
+      border-left:0; background:transparent; box-sizing:border-box;
+    }
+    .psm-v3-business-outcome-header h3 { margin:0; color:var(--cp-text-muted); font-size:12px; font-weight:400; text-transform:none; letter-spacing:normal; white-space:nowrap; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-value { display:block; padding:0; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon { display:none; }
     .psm-v3-business-outcome-header .psm-v3-business-outcome-value span { display:none; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-value strong { font-size:14px; white-space:nowrap; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-value strong { font-size:14px; font-weight:600; white-space:nowrap; }
+    .psm-v3-back-button { min-height:30px; padding:5px 10px; }
     .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
     .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:6px; min-width:0; }
     .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
@@ -1235,6 +1238,7 @@
     .psm-v3-detail .v3-section-heading-row .psm-v3-section-heading { margin:0; padding:0; border:0; }
     .v3-status-card { margin-bottom:16px; }
     .v3-status-card .v3-status-flow { margin:16px 0 2px; }
+    .v3-status-actions { display:flex; justify-content:flex-end; margin-top:12px; padding-top:12px; border-top:1px solid var(--cp-border); }
     .v3-summary-meta { display:grid; grid-template-columns:repeat(7,minmax(110px,1fr)); margin:16px 0 0; padding:14px 0 0; border-top:1px solid var(--cp-border); }
     .v3-summary-meta > div { min-width:0; padding:0 14px; border-left:1px solid var(--cp-border); }
     .v3-summary-meta > div:first-child { padding-left:0; border-left:0; }
@@ -1576,9 +1580,11 @@
       body.psm-v3-view .v3-create-overlay .v3-modal,
       body.psm-v3-view .modal { width:100% !important; max-width:100%; }
       body.psm-v3-view .psm-v3-detail-title-actions { width:100%; }
-      body.psm-v3-view .psm-v3-business-outcome-header { flex:1 1 auto; width:auto; }
+      body.psm-v3-view .psm-v3-detail-title-actions { align-items:flex-start; }
+      body.psm-v3-view .psm-v3-business-outcome-header { width:auto; }
       body.psm-v3-view .v3-section-heading-row { align-items:stretch; flex-direction:column; }
       body.psm-v3-view .v3-section-heading-row .btn { width:100%; }
+      body.psm-v3-view .v3-status-actions .btn { width:100%; }
       body.psm-v3-view .v3-summary-meta { grid-template-columns:1fr; gap:10px; }
       body.psm-v3-view .v3-summary-meta > div,
       body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0; border-left:0; }
@@ -5343,7 +5349,7 @@
       var impactPanel = c.v3Status === 'Committed'
         ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
         : '';
-      var businessOutcomePanel = '<section class="psm-v3-business-outcome psm-v3-business-outcome-header" aria-labelledby="psmV3BusinessOutcomeHeading"><h3 id="psmV3BusinessOutcomeHeading">Business outcome</h3><div class="psm-v3-business-outcome-value"><div class="psm-v3-business-outcome-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="1" fill="currentColor"/></svg></div><div><span>Selected campaign outcome</span><strong>'+psmEscapeHtml(outcomeConfig.label)+'</strong></div></div></section>';
+      var businessOutcomePanel = '<section class="psm-v3-business-outcome psm-v3-business-outcome-header" aria-labelledby="psmV3BusinessOutcomeHeading"><h3 id="psmV3BusinessOutcomeHeading">Business outcome:</h3><div class="psm-v3-business-outcome-value"><strong>'+psmEscapeHtml(outcomeConfig.label)+'</strong></div></section>';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
       if (!initialNote && c.v3InitialNote) initialNote = { text:c.v3InitialNote, author:c.v3CreatedBy, date:c.v3OpenDate };
       var initialNotePanel = initialNote
@@ -5356,7 +5362,7 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
-      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions">'+businessOutcomePanel+'<button class="flyout-close" type="button" onclick="showDashboard()" aria-label="Close campaign details">&times;</button></div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-secondary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
@@ -5366,7 +5372,7 @@
           '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
           '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
         '</dl></div></div>' +
-        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-section-heading-row"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'</section>' +
+        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'<div class="v3-status-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div></section>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
