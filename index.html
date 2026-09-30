@@ -4580,6 +4580,16 @@
       return values[key];
     }
 
+    function psmV3TenantMetricSnapshot(key, index, format) {
+      var current = psmV3TenantMetricValue(key, index);
+      if (format === 'text') return { current:current };
+      var growthRate = .06 + (index % 9) * .012;
+      var baseline = format === 'percent'
+        ? Math.max(0, Number(current) - (2.5 + index % 6))
+        : Math.max(0, Math.round(Number(current) / (1 + growthRate)));
+      return { baseline:baseline, current:Number(current) };
+    }
+
     function psmV3FormatOutcomeValue(value, format) {
       if (format === 'currency') return '$'+Number(value).toLocaleString();
       if (format === 'percent') return Number(value).toFixed(1)+'%';
@@ -4587,10 +4597,19 @@
       return String(value);
     }
 
+    function psmV3FormatTenantGrowth(snapshot, format) {
+      var delta = snapshot.current - snapshot.baseline;
+      var sign = delta > 0 ? '+' : (delta < 0 ? '-' : '');
+      if (format === 'percent') return sign+Math.abs(delta).toFixed(1)+' pp';
+      var formattedDelta = psmV3FormatOutcomeValue(Math.abs(delta), format);
+      var percent = snapshot.baseline ? Math.abs(delta / snapshot.baseline * 100).toFixed(1) : '0.0';
+      return sign+formattedDelta+' ('+sign+percent+'%)';
+    }
+
     function psmV3AggregateOutcomeMetric(c, metric) {
       var customerCount = Math.max(1, (c.customers || []).length || c.tenantCount);
       var total = 0;
-      for (var index = 0; index < customerCount; index++) total += Number(psmV3TenantMetricValue(metric.key, index)) || 0;
+      for (var index = 0; index < customerCount; index++) total += Number(psmV3TenantMetricSnapshot(metric.key, index, metric.format).current) || 0;
       var value = metric.aggregate === 'average' ? total / customerCount : total;
       return psmV3FormatOutcomeValue(value, metric.format);
     }
@@ -4599,12 +4618,31 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       var config = psmV3OutcomeConfig(c);
-      var headers = ['Tenant Name','Tenant ID','Tenant Domain','Tenant Country/Region','Tenant Segment'].concat(config.columns.map(function(column) { return column.label; }));
+      var headers = ['Tenant Name','Tenant ID','Tenant Domain','Tenant Country/Region','Tenant Segment'];
+      config.columns.forEach(function(column) {
+        if (column.format === 'text') {
+          headers.push(column.label);
+          return;
+        }
+        headers.push(column.label+' Baseline', column.label+' Current', column.label+' Growth');
+      });
       var csv = headers.join(',')+'\r\n'+(c.customers || []).map(function(customer, index) {
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var row = [name, customer.tenantId, domain, customer.country || '', customer.segment || ''];
-        return row.concat(config.columns.map(function(column) { return psmV3TenantMetricValue(column.key, index); })).map(function(value) { return '"'+String(value).replace(/"/g, '""')+'"'; }).join(',');
+        config.columns.forEach(function(column) {
+          var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
+          if (column.format === 'text') {
+            row.push(snapshot.current);
+            return;
+          }
+          row.push(
+            psmV3FormatOutcomeValue(snapshot.baseline, column.format),
+            psmV3FormatOutcomeValue(snapshot.current, column.format),
+            psmV3FormatTenantGrowth(snapshot, column.format)
+          );
+        });
+        return row.map(function(value) { return '"'+String(value).replace(/"/g, '""')+'"'; }).join(',');
       }).join('\r\n');
       var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
       var link = document.createElement('a');
@@ -4628,12 +4666,15 @@
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var opportunity = index % 5 === 0 ? 'no-license' : (index % 5 === 1 ? 'growth' : (index % 5 === 2 ? 'usage-limit' : (index % 5 === 3 ? 'license-request' : 'growth')));
         var metricCells = config.columns.map(function(column) {
-          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(psmV3TenantMetricValue(column.key, index), column.format))+'</td>';
+          var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
+          if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
+          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.baseline, column.format))+'</td><td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
         }).join('');
         return '<tr class="v3-tenant-row" data-opportunity="'+opportunity+'" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td>'+psmEscapeHtml(domain)+'</td><td>'+psmEscapeHtml(customer.country || 'Not available')+'</td><td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>'+metricCells+'</tr>';
       }).join('');
-      var metricHeaders = config.columns.map(function(column) { return '<th>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions"><div class="v3-analysis-filters"><select aria-label="Filter tenant opportunities" onchange="psmV3FilterTenantOpportunity(this.value)"><option value="">All opportunity signals</option><option value="no-license">Without Copilot licenses</option><option value="growth">Growth phase</option><option value="usage-limit">Users at usage limits</option><option value="license-request">License requests</option></select><input aria-label="Search tenants" placeholder="Search tenant name or ID" oninput="psmV3FilterTenantRows(this.value)" style="padding:8px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></div><he-button_psmv3 class="v3-btn" onclick="psmV3DownloadTenants(\''+c.id+'\')">Download</he-button_psmv3></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr><th>Tenant Name</th><th>Tenant ID</th><th>Tenant Domain</th><th>Tenant Country/Region</th><th>Tenant Segment</th>'+metricHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Metric mapping is proposed for prototype review and will be finalized with the PSM.</div></he-card_psmv3>';
+      var metricGroupHeaders = config.columns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="3"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
+      var metricSubHeaders = config.columns.map(function(column) { return column.format === 'text' ? '' : '<th>Baseline</th><th>Current</th><th>Growth</th>'; }).join('');
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions"><div class="v3-analysis-filters"><select aria-label="Filter tenant opportunities" onchange="psmV3FilterTenantOpportunity(this.value)"><option value="">All opportunity signals</option><option value="no-license">Without Copilot licenses</option><option value="growth">Growth phase</option><option value="usage-limit">Users at usage limits</option><option value="license-request">License requests</option></select><input aria-label="Search tenants" placeholder="Search tenant name or ID" oninput="psmV3FilterTenantRows(this.value)" style="padding:8px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></div><he-button_psmv3 class="v3-btn" onclick="psmV3DownloadTenants(\''+c.id+'\')">Download</he-button_psmv3></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr><th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Tenant Domain</th><th rowspan="2">Tenant Country/Region</th><th rowspan="2">Tenant Segment</th>'+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant. Metric mapping is proposed for prototype review and will be finalized with the PSM.</div></he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
