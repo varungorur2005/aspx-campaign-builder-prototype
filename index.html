@@ -4850,12 +4850,33 @@
       return sign+formattedDelta+' ('+sign+percent+'%)';
     }
 
-    function psmV3AggregateOutcomeMetric(c, metric) {
+    function psmV3AggregateOutcomeMetricSnapshot(c, metric) {
       var customerCount = Math.max(1, (c.customers || []).length || c.tenantCount);
-      var total = 0;
-      for (var index = 0; index < customerCount; index++) total += Number(psmV3TenantMetricSnapshot(metric.key, index, metric.format).current) || 0;
-      var value = metric.aggregate === 'average' ? total / customerCount : total;
-      return psmV3FormatOutcomeValue(value, metric.format);
+      var totals = { baseline:0, current:0 };
+      for (var index = 0; index < customerCount; index++) {
+        var snapshot = psmV3TenantMetricSnapshot(metric.key, index, metric.format);
+        totals.baseline += Number(snapshot.baseline) || 0;
+        totals.current += Number(snapshot.current) || 0;
+      }
+      if (metric.aggregate === 'average') {
+        totals.baseline /= customerCount;
+        totals.current /= customerCount;
+      }
+      return totals;
+    }
+
+    function psmV3ImpactKpi(c, metric) {
+      var snapshot = psmV3AggregateOutcomeMetricSnapshot(c, metric);
+      var delta = snapshot.current - snapshot.baseline;
+      var momPercent = snapshot.baseline ? delta / snapshot.baseline * 100 : 0;
+      var sign = momPercent > 0 ? '+' : '';
+      return psmV3KpiWithMom(
+        psmV3FormatOutcomeValue(snapshot.current, metric.format),
+        metric.label,
+        sign+momPercent.toFixed(1)+'%',
+        momPercent > 0 ? 'positive' : (momPercent < 0 ? 'negative' : ''),
+        'Measured across committed campaign tenants'
+      );
     }
 
     function psmV3DownloadTenants(id) {
@@ -5233,7 +5254,7 @@
       c.v3MeasuredMetrics = outcomeConfig.metrics.map(function(metric) { return metric.key; });
       psmEnsureMvpTenantRows(c);
       var detailKpis = outcomeConfig.metrics.map(function(metric) {
-        return psmV3Kpi(psmV3AggregateOutcomeMetric(c, metric), metric.label, 'Measured across committed campaign tenants');
+        return psmV3ImpactKpi(c, metric);
       }).join('');
       var detailCharts =
         '<div class="v3-charts">' +
