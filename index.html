@@ -1350,6 +1350,7 @@
       color:var(--cp-link); font-size:8px; font-style:normal;
     }
     body.psm-v3-view .v3-charts { grid-template-columns:repeat(5,minmax(260px,1fr)); gap:16px; margin-bottom:32px; }
+    body.psm-v3-view .psm-v3-detail .v3-charts { grid-template-columns:repeat(3,minmax(260px,1fr)); }
     body.psm-v3-view .v3-card { min-height:325px; padding:12px 16px; border-radius:2px; box-shadow:0 1px 2px var(--cp-border); }
     body.psm-v3-view .v3-card h2 { margin-bottom:4px; font-size:14px; font-weight:600; }
     body.psm-v3-view .v3-pie-layout { justify-content:center; gap:24px; min-height:245px; }
@@ -4633,13 +4634,15 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       var config = psmV3OutcomeConfig(c);
+      var showMomGrowth = c.v3Status === 'Committed';
       var headers = ['Tenant Name','Tenant ID','Association','Tenant Domain','Tenant Country/Region','Tenant Segment'];
       config.columns.forEach(function(column) {
         if (column.format === 'text') {
           headers.push(column.label);
           return;
         }
-        headers.push(column.label+' Current', column.label+' MoM Growth');
+        headers.push(column.label+' Current');
+        if (showMomGrowth) headers.push(column.label+' MoM Growth');
       });
       var csv = headers.join(',')+'\r\n'+(c.customers || []).map(function(customer, index) {
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
@@ -4651,7 +4654,8 @@
             row.push(snapshot.current);
             return;
           }
-          row.push(psmV3FormatOutcomeValue(snapshot.current, column.format), psmV3FormatTenantGrowth(snapshot, column.format));
+          row.push(psmV3FormatOutcomeValue(snapshot.current, column.format));
+          if (showMomGrowth) row.push(psmV3FormatTenantGrowth(snapshot, column.format));
         });
         return row.map(function(value) { return '"'+String(value).replace(/"/g, '""')+'"'; }).join(',');
       }).join('\r\n');
@@ -4672,6 +4676,7 @@
 
     function psmV3TenantWorkspace(c) {
       var config = psmV3OutcomeConfig(c);
+      var showMomGrowth = c.v3Status === 'Committed';
       var visibleMetricColumns = config.columns.filter(function(column) {
         return psmV3TenantTableState.visibleColumns['metric:'+column.key] !== false;
       });
@@ -4691,18 +4696,18 @@
         var metricCells = visibleMetricColumns.map(function(column) {
           var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
-          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
+          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td>'+(showMomGrowth ? '<td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>' : '');
         }).join('');
         return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+(customer.association || 'None')+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td><span class="v3-chip">'+psmEscapeHtml(customer.association || 'None')+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
-      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="2"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
-      var metricSubHeaders = visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('');
+      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : (showMomGrowth ? ' colspan="2"' : ' rowspan="2"'))+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
+      var metricSubHeaders = showMomGrowth ? visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('') : '';
       var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Association</th>' +
         (psmV3TenantTableState.visibleColumns.domain ? '<th class="v3-tenant-domain" rowspan="2">Tenant Domain</th>' : '') +
         (psmV3TenantTableState.visibleColumns.country ? '<th rowspan="2">Tenant Country/Region</th>' : '') +
         (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
       var activeFilterCount = (psmV3TenantTableState.filters.association ? 1 : 0) + (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -4789,39 +4794,16 @@
       var outcomeConfig = psmV3OutcomeConfig(c);
       c.v3MeasuredMetrics = outcomeConfig.metrics.map(function(metric) { return metric.key; });
       psmEnsureMvpTenantRows(c);
-      var tenantStageData = psmMvpTenantStageData(c);
-      var lifecycleChart = PSM_V3_LIFECYCLE_STAGES.map(function(stage) {
-        var count = tenantStageData.counts[stage.key] || 0;
-        return {
-          label:stage.label,
-          value:count,
-          display:count.toLocaleString()
-        };
-      });
-      var regionByCountry = {
-        'United States':'Americas', 'Canada':'Americas',
-        'Germany':'EMEA', 'United Kingdom':'EMEA', 'Netherlands':'EMEA', 'Belgium':'EMEA',
-        'Korea':'APAC', 'India':'APAC', 'Australia':'APAC'
-      };
-      var tenantRegions = ['EMEA', 'Americas', 'APAC'].map(function(region) {
-        var count = (c.customers || []).filter(function(customer) {
-          return (regionByCountry[customer.country] || c.v3Region) === region;
-        }).length;
-        return { label:region, value:count, display:count.toLocaleString() };
-      });
-      var detailKpis = [
-        psmV3Kpi(c.tenantCount.toLocaleString(), 'Customer tenants', 'Validated tenant records in this campaign')
-      ].concat(outcomeConfig.metrics.map(function(metric) {
-        return c.v3Status === 'Committed'
-          ? psmV3Kpi(psmV3AggregateOutcomeMetric(c, metric), metric.label, 'Measured across committed campaign tenants')
-          : psmV3Kpi('-', metric.label, 'Measurement begins when the campaign is Committed');
-      })).join('');
+      var detailKpis = outcomeConfig.metrics.map(function(metric) {
+        return psmV3Kpi(psmV3AggregateOutcomeMetric(c, metric), metric.label, 'Measured across committed campaign tenants');
+      }).join('');
       var detailCharts =
         '<div class="v3-charts">' +
-          '<he-card_psmv3 class="v3-card"><h2>Tenant lifecycle</h2>'+psmV3PieChart(lifecycleChart, 'Campaign tenant lifecycle pie chart')+'</he-card_psmv3>' +
-          '<he-card_psmv3 class="v3-card"><h2>Tenants by region</h2>'+psmV3PieChart(tenantRegions, 'Campaign tenant regional distribution pie chart')+'</he-card_psmv3>' +
           outcomeConfig.trends.map(function(trend) { return psmV3TrendCard(trend.title, trend.subtitle, trend.values, trend.prefix, trend.suffix || ''); }).join('') +
         '</div>';
+      var impactPanel = c.v3Status === 'Committed'
+        ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
+        : '';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
       if (!initialNote && c.v3InitialNote) initialNote = { text:c.v3InitialNote, author:c.v3CreatedBy, date:c.v3OpenDate };
       var initialNotePanel = initialNote
@@ -4846,10 +4828,7 @@
           '<div class="detail-meta-item"><strong>Metrics measured:</strong> '+psmEscapeHtml(outcomeConfig.metrics.map(function(metric) { return metric.label; }).join(', '))+'</div>' +
         '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</div></div>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
-        '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
-          '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+detailKpis+'</div>' +
-          detailCharts +
-          '</div>' +
+        impactPanel +
         psmV3TenantWorkspace(c);
       window.location.hash = 'psm-v3-campaign-'+id;
     }
