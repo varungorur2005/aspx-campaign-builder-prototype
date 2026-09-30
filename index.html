@@ -761,10 +761,8 @@
     .psm-v3-initial-note-meta { display:block; margin-top:8px; color:var(--cp-text-muted); font-size:11px; }
     .psm-v3-campaign-status { flex:0 0 160px; min-height:58px; padding:8px 10px; }
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
-    .psm-v3-owner-meta { display:block; }
-    .psm-v3-owner-edit { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-left:3px; padding:0; border:1px solid var(--cp-border-strong); border-radius:4px; background:var(--cp-surface); color:var(--cp-link); vertical-align:text-bottom; cursor:pointer; }
-    .psm-v3-owner-edit:hover, .psm-v3-owner-edit:focus-visible { border-color:var(--cp-link); background:var(--cp-link-soft); outline:0; }
-    .psm-v3-owner-edit svg { width:12px; height:12px; }
+    .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .psm-v3-detail-title-row h1 { margin:0; }
     .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
     .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:6px; min-width:0; }
     .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
@@ -4818,18 +4816,18 @@
         return '<div class="v3-status-step'+stateClass+'">'+status+'</div>';
       }).join('')+'</div>';
       detail.innerHTML = '<div class="flyout-header"><div></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
-        '<div class="detail-header"><h1>'+psmEscapeHtml(c.name)+'</h1><p style="margin:5px 0 18px;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+        '<div class="detail-header"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button></div><p style="margin:5px 0 18px;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><div class="detail-meta">' +
           '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOne ID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
           '<div class="detail-meta-item"><strong>PartnerOne name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
-          '<div class="detail-meta-item psm-v3-owner-meta"><strong>Created by:</strong> '+psmEscapeHtml(c.v3Owner)+' <button class="psm-v3-owner-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner" title="Edit campaign owner"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10.8 2.2 13.8 5.2 6 13H3v-3l7.8-7.8ZM9.5 3.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>' +
+          '<div class="detail-meta-item"><strong>Created by:</strong> '+psmEscapeHtml(c.v3Owner)+'</div>' +
           '<div class="detail-meta-item"><strong>Created:</strong> '+psmEscapeHtml(c.v3OpenDate)+'</div>' +
           '<div class="detail-meta-item"><strong>Last updated:</strong> '+psmEscapeHtml(c.v3LastUpdated)+'</div>' +
           '<div class="detail-meta-item"><strong>Customer tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
           '<div class="detail-meta-item"><strong>Business outcome:</strong> '+psmEscapeHtml(outcomeConfig.label)+'</div>' +
           '<div class="detail-meta-item"><strong>Metrics measured:</strong> '+psmEscapeHtml(outcomeConfig.metrics.map(function(metric) { return metric.label; }).join(', '))+'</div>' +
-        '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use the pencil next to Created by to change ownership.</p>')+'</div></div>' +
+        '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</div></div>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
           '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+detailKpis+'</div>' +
