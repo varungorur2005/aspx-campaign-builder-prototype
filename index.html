@@ -4512,7 +4512,7 @@
     var psmV3TenantTableState = {
       campaignId: '',
       search: '',
-      filters: { segment:'', country:'' },
+      filters: { association:'', segment:'', country:'' },
       visibleColumns: { domain:true, country:true, segment:true }
     };
 
@@ -4631,7 +4631,7 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       var config = psmV3OutcomeConfig(c);
-      var headers = ['Tenant Name','Tenant ID','Tenant Domain','Tenant Country/Region','Tenant Segment'];
+      var headers = ['Tenant Name','Tenant ID','Association','Tenant Domain','Tenant Country/Region','Tenant Segment'];
       config.columns.forEach(function(column) {
         if (column.format === 'text') {
           headers.push(column.label);
@@ -4642,7 +4642,7 @@
       var csv = headers.join(',')+'\r\n'+(c.customers || []).map(function(customer, index) {
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
-        var row = [name, customer.tenantId, domain, customer.country || '', customer.segment || ''];
+        var row = [name, customer.tenantId, customer.association || 'None', domain, customer.country || '', customer.segment || ''];
         config.columns.forEach(function(column) {
           var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
           if (column.format === 'text') {
@@ -4677,7 +4677,8 @@
         return { customer:customer, index:index };
       }).filter(function(item) {
         var filters = psmV3TenantTableState.filters;
-        return (!filters.segment || item.customer.segment === filters.segment) &&
+        return (!filters.association || (item.customer.association || 'None') === filters.association) &&
+          (!filters.segment || item.customer.segment === filters.segment) &&
           (!filters.country || item.customer.country === filters.country);
       });
       var rows = filteredCustomers.map(function(item) {
@@ -4690,15 +4691,15 @@
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
           return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
         }).join('');
-        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
+        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+(customer.association || 'None')+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td><span class="v3-chip">'+psmEscapeHtml(customer.association || 'None')+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
       var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="2"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
       var metricSubHeaders = visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('');
-      var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th>' +
+      var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Association</th>' +
         (psmV3TenantTableState.visibleColumns.domain ? '<th class="v3-tenant-domain" rowspan="2">Tenant Domain</th>' : '') +
         (psmV3TenantTableState.visibleColumns.country ? '<th rowspan="2">Tenant Country/Region</th>' : '') +
         (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
-      var activeFilterCount = (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
+      var activeFilterCount = (psmV3TenantTableState.filters.association ? 1 : 0) + (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
       return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div></he-card_psmv3>';
     }
 
@@ -4731,7 +4732,7 @@
           return '<option value="">'+allLabel+'</option>'+unique.map(function(value) { return '<option value="'+psmEscapeHtml(value)+'"'+(value === selected ? ' selected' : '')+'>'+psmEscapeHtml(value)+'</option>'; }).join('');
         }
         title.textContent = 'Filter campaign tenants';
-        body.innerHTML = '<div class="filter-section"><label>Tenant Segment</label><select id="psmV3TenantSegmentFilter">'+tenantOptions(customers.map(function(customer) { return customer.segment; }), psmV3TenantTableState.filters.segment, 'All segments')+'</select></div><div class="filter-section"><label>Tenant Country/Region</label><select id="psmV3TenantCountryFilter">'+tenantOptions(customers.map(function(customer) { return customer.country; }), psmV3TenantTableState.filters.country, 'All countries/regions')+'</select></div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyTenantPanelFilters()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearTenantPanelFilters()">Clear all</button></div>';
+        body.innerHTML = '<div class="filter-section"><label>Association</label><select id="psmV3TenantAssociationFilter">'+tenantOptions(customers.map(function(customer) { return customer.association || 'None'; }), psmV3TenantTableState.filters.association, 'All associations')+'</select></div><div class="filter-section"><label>Tenant Segment</label><select id="psmV3TenantSegmentFilter">'+tenantOptions(customers.map(function(customer) { return customer.segment; }), psmV3TenantTableState.filters.segment, 'All segments')+'</select></div><div class="filter-section"><label>Tenant Country/Region</label><select id="psmV3TenantCountryFilter">'+tenantOptions(customers.map(function(customer) { return customer.country; }), psmV3TenantTableState.filters.country, 'All countries/regions')+'</select></div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyTenantPanelFilters()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearTenantPanelFilters()">Clear all</button></div>';
       }
       document.getElementById('psmV3TablePanel').classList.add('show');
     }
@@ -4742,6 +4743,7 @@
     }
 
     function psmV3ApplyTenantPanelFilters() {
+      psmV3TenantTableState.filters.association = document.getElementById('psmV3TenantAssociationFilter').value;
       psmV3TenantTableState.filters.segment = document.getElementById('psmV3TenantSegmentFilter').value;
       psmV3TenantTableState.filters.country = document.getElementById('psmV3TenantCountryFilter').value;
       psmV3CloseTablePanel();
@@ -4749,7 +4751,7 @@
     }
 
     function psmV3ClearTenantPanelFilters() {
-      psmV3TenantTableState.filters = { segment:'', country:'' };
+      psmV3TenantTableState.filters = { association:'', segment:'', country:'' };
       psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
     }
@@ -4773,7 +4775,7 @@
       if (psmV3TenantTableState.campaignId !== id) {
         psmV3TenantTableState.campaignId = id;
         psmV3TenantTableState.search = '';
-        psmV3TenantTableState.filters = { segment:'', country:'' };
+        psmV3TenantTableState.filters = { association:'', segment:'', country:'' };
         psmV3TenantTableState.visibleColumns = { domain:true, country:true, segment:true };
       }
       var detail = document.getElementById('detailView');
