@@ -400,11 +400,11 @@
     }
     .flyout-close {
       width: 32px; height: 32px; border-radius: 4px; border: none;
-      background: transparent; font-size: 18px; color: #616161;
+      background: transparent; font-size: 18px; color: var(--cp-text-muted);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.12s;
     }
-    .flyout-close:hover { background: #f0f0f0; color: #242424; }
+    .flyout-close:hover { background: var(--cp-surface-soft); color: var(--cp-text); }
 
     /* Detail Header */
     .detail-header { margin-bottom: 20px; }
@@ -770,6 +770,7 @@
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .psm-v3-detail-title-row h1 { margin:0; }
+    .psm-v3-detail-title-actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
     .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
     .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:6px; min-width:0; }
     .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
@@ -1548,7 +1549,9 @@
       body.psm-v3-view .filter-panel { width:min(400px,100vw); }
       body.psm-v3-view .detail-view.psm-v3-detail { padding:16px 16px 64px; }
       body.psm-v3-view .psm-v3-detail .flyout-header { margin:-16px -16px 16px; padding:14px 16px; }
-      body.psm-v3-view .psm-v3-detail-title-row { align-items:flex-start; flex-direction:column; }
+      body.psm-v3-view .psm-v3-detail-title-row { align-items:center; flex-wrap:wrap; }
+      body.psm-v3-view .psm-v3-detail-title-row h1 { flex:1 1 320px; }
+      body.psm-v3-view .psm-v3-detail-title-actions { margin-left:auto; }
       body.psm-v3-view .v3-summary-meta { grid-template-columns:repeat(2,minmax(0,1fr)); }
       body.psm-v3-view .v3-summary-meta > div,
       body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0 12px; border-left:1px solid var(--cp-border); }
@@ -5339,8 +5342,7 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
-      detail.innerHTML = '<div class="flyout-header"><div></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
-        '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button><button class="flyout-close" type="button" onclick="showDashboard()" aria-label="Close campaign details">&times;</button></div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><div class="v3-summary-primary">'+businessOutcomePanel+'<section class="v3-status-summary" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-status-summary-head"><h3 id="psmV3CampaignStatusHeading">Campaign status</h3><span class="v3-current-status">'+psmEscapeHtml(c.v3Status)+'</span><div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div></div>'+statusFlow+(canEdit ? '' : '<p style="margin:6px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</section></div><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
