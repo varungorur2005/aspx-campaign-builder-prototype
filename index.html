@@ -3641,6 +3641,9 @@
       var current = tracked.reduce(function(sum, c) {
         return sum + c.v3Metrics[config.metric].current;
       }, 0);
+      var baseline = tracked.reduce(function(sum, c) {
+        return sum + c.v3Metrics[config.metric].baseline;
+      }, 0);
       var delta = tracked.reduce(function(sum, c) {
         return sum + c.v3Metrics[config.metric].current - c.v3Metrics[config.metric].baseline;
       }, 0);
@@ -3649,9 +3652,8 @@
       var currentValue = definition.format === 'currency'
         ? '$'+current.toLocaleString()
         : (definition.format === 'percent' ? current.toFixed(1)+'%' : current.toLocaleString());
-      var momValue = definition.format === 'currency'
-        ? sign+'$'+Math.abs(delta).toLocaleString()
-        : (definition.format === 'percent' ? sign+Math.abs(delta).toFixed(1)+' pp' : sign+Math.abs(delta).toLocaleString());
+      var momPercent = baseline ? Math.abs(delta / baseline * 100) : 0;
+      var momValue = sign+momPercent.toFixed(1)+'%';
       return psmV3KpiWithMom(currentValue, config.label, momValue, delta > 0 ? 'positive' : (delta < 0 ? 'negative' : ''), 'Across '+tracked.length+' committed campaign'+(tracked.length === 1 ? '' : 's'));
     }
 
