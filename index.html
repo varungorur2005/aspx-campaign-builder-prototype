@@ -3352,7 +3352,6 @@
       { key: 'owner', label: 'Created By (PSM Owner)' },
       { key: 'status', label: 'Status' },
       { key: 'tenants', label: 'Tenants' },
-      { key: 'outcomeGrowth', label: 'Outcome Growth vs Baseline' },
       { key: 'updated', label: 'Last Updated' }
     ];
     let psmV3VisibleColumns = PSM_V3_COLUMNS.reduce(function(columns, column) { columns[column.key] = true; return columns; }, {});
@@ -3779,7 +3778,6 @@
           area: psmEscapeHtml(c.v3Area),
           status: psmRenderStatusBadge(c.v3Status),
           tenants: c.tenantCount.toLocaleString(),
-          outcomeGrowth: (c.v3Outcomes || []).map(function(metric) { return psmV3MetricLabel(metric)+': '+psmV3MetricGrowth(c, metric, false); }).join('<br>'),
           updated: psmEscapeHtml(c.v3LastUpdated)
         };
         return values[key];
@@ -3865,7 +3863,6 @@
           workloads:(c.workloads || []).join('; '), businessOutcomes:(c.v3Outcomes || []).map(psmV3MetricLabel).join('; '),
           owner:c.v3Owner, region:c.v3Region, area:c.v3Area,
           status:c.v3Status, tenants:c.tenantCount,
-          outcomeGrowth:(c.v3Outcomes || []).map(function(metric) { return psmV3MetricLabel(metric)+': '+psmV3MetricGrowth(c, metric, false); }).join('; '),
           updated:c.v3LastUpdated
         };
         return columns.map(function(column) { return '"'+String(values[column.key] == null ? '' : values[column.key]).replace(/"/g, '""')+'"'; }).join(',');
