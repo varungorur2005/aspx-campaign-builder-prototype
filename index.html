@@ -4499,18 +4499,22 @@
       psmV3UpdateSelection();
     }
 
-    var psmV3TenantFilter = { search:'', opportunity:'' };
+    var psmV3TenantTableState = {
+      campaignId: '',
+      search: '',
+      filters: { segment:'', country:'' },
+      visibleColumns: { domain:true, country:true, segment:true }
+    };
 
     function psmV3ApplyTenantFilters() {
       document.querySelectorAll('.v3-tenant-row').forEach(function(row) {
-        var matchesSearch = !psmV3TenantFilter.search || row.getAttribute('data-search').indexOf(psmV3TenantFilter.search) > -1;
-        var matchesOpportunity = !psmV3TenantFilter.opportunity || row.getAttribute('data-opportunity') === psmV3TenantFilter.opportunity;
-        row.style.display = matchesSearch && matchesOpportunity ? '' : 'none';
+        var matchesSearch = !psmV3TenantTableState.search || row.getAttribute('data-search').indexOf(psmV3TenantTableState.search) > -1;
+        row.style.display = matchesSearch ? '' : 'none';
       });
     }
 
     function psmV3FilterTenantRows(value) {
-      psmV3TenantFilter.search = value.trim().toLowerCase();
+      psmV3TenantTableState.search = value.trim().toLowerCase();
       psmV3ApplyTenantFilters();
     }
 
@@ -4660,29 +4664,88 @@
 
     function psmV3TenantWorkspace(c) {
       var config = psmV3OutcomeConfig(c);
-      var rows = (c.customers || []).map(function(customer, index) {
+      var visibleMetricColumns = config.columns.filter(function(column) {
+        return psmV3TenantTableState.visibleColumns['metric:'+column.key] !== false;
+      });
+      var filteredCustomers = (c.customers || []).map(function(customer, index) {
+        return { customer:customer, index:index };
+      }).filter(function(item) {
+        var filters = psmV3TenantTableState.filters;
+        return (!filters.segment || item.customer.segment === filters.segment) &&
+          (!filters.country || item.customer.country === filters.country);
+      });
+      var rows = filteredCustomers.map(function(item) {
+        var customer = item.customer;
+        var index = item.index;
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
-        var opportunity = index % 5 === 0 ? 'no-license' : (index % 5 === 1 ? 'growth' : (index % 5 === 2 ? 'usage-limit' : (index % 5 === 3 ? 'license-request' : 'growth')));
-        var metricCells = config.columns.map(function(column) {
+        var metricCells = visibleMetricColumns.map(function(column) {
           var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
           return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.baseline, column.format))+'</td><td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>';
         }).join('');
-        return '<tr class="v3-tenant-row" data-opportunity="'+opportunity+'" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td>'+psmEscapeHtml(domain)+'</td><td>'+psmEscapeHtml(customer.country || 'Not available')+'</td><td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>'+metricCells+'</tr>';
+        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td>'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
-      var metricGroupHeaders = config.columns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="3"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
-      var metricSubHeaders = config.columns.map(function(column) { return column.format === 'text' ? '' : '<th>Baseline</th><th>Current</th><th>Growth</th>'; }).join('');
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions"><div class="v3-analysis-filters"><select aria-label="Filter tenant opportunities" onchange="psmV3FilterTenantOpportunity(this.value)"><option value="">All opportunity signals</option><option value="no-license">Without Copilot licenses</option><option value="growth">Growth phase</option><option value="usage-limit">Users at usage limits</option><option value="license-request">License requests</option></select><input aria-label="Search tenants" placeholder="Search tenant name or ID" oninput="psmV3FilterTenantRows(this.value)" style="padding:8px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></div><he-button_psmv3 class="v3-btn" onclick="psmV3DownloadTenants(\''+c.id+'\')">Download</he-button_psmv3></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr><th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Tenant Domain</th><th rowspan="2">Tenant Country/Region</th><th rowspan="2">Tenant Segment</th>'+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant.</div></he-card_psmv3>';
+      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="3"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
+      var metricSubHeaders = visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Baseline</th><th>Current</th><th>Growth</th>'; }).join('');
+      var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th>' +
+        (psmV3TenantTableState.visibleColumns.domain ? '<th rowspan="2">Tenant Domain</th>' : '') +
+        (psmV3TenantTableState.visibleColumns.country ? '<th rowspan="2">Tenant Country/Region</th>' : '') +
+        (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
+      var activeFilterCount = (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+filteredCustomers.length+' of '+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant.</div></he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
       return !!c && (PSM_V3_DEMO_EDIT_ALL || c.v3Owner === PSM_CURRENT_USER);
     }
 
-    function psmV3FilterTenantOpportunity(value) {
-      psmV3TenantFilter.opportunity = value;
-      psmV3ApplyTenantFilters();
+    function psmV3OpenTenantPanel(panel) {
+      var title = document.getElementById('psmV3TablePanelTitle');
+      var body = document.getElementById('psmV3TablePanelBody');
+      var c = psmV3CurrentCampaign;
+      if (!c) return;
+      if (panel === 'columns') {
+        var config = psmV3OutcomeConfig(c);
+        var columns = [
+          { key:'domain', label:'Tenant Domain' },
+          { key:'country', label:'Tenant Country/Region' },
+          { key:'segment', label:'Tenant Segment' }
+        ].concat(config.columns.map(function(column) {
+          return { key:'metric:'+column.key, label:column.label };
+        }));
+        title.textContent = 'Change tenant columns';
+        body.innerHTML = '<div><label class="v3-column-option"><input type="checkbox" checked disabled>Tenant Name (required)</label><label class="v3-column-option"><input type="checkbox" checked disabled>Tenant ID (required)</label>'+columns.map(function(column) {
+          return '<label class="v3-column-option"><input type="checkbox" '+(psmV3TenantTableState.visibleColumns[column.key] !== false ? 'checked ' : '')+'onchange="psmV3ToggleTenantColumn(\''+column.key+'\',this.checked)">'+psmEscapeHtml(column.label)+'</label>';
+        }).join('')+'</div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3CloseTablePanel()">Done</button></div>';
+      } else {
+        var customers = c.customers || [];
+        function tenantOptions(values, selected, allLabel) {
+          var unique = values.filter(Boolean).filter(function(value, index, items) { return items.indexOf(value) === index; }).sort();
+          return '<option value="">'+allLabel+'</option>'+unique.map(function(value) { return '<option value="'+psmEscapeHtml(value)+'"'+(value === selected ? ' selected' : '')+'>'+psmEscapeHtml(value)+'</option>'; }).join('');
+        }
+        title.textContent = 'Filter campaign tenants';
+        body.innerHTML = '<div class="filter-section"><label>Tenant Segment</label><select id="psmV3TenantSegmentFilter">'+tenantOptions(customers.map(function(customer) { return customer.segment; }), psmV3TenantTableState.filters.segment, 'All segments')+'</select></div><div class="filter-section"><label>Tenant Country/Region</label><select id="psmV3TenantCountryFilter">'+tenantOptions(customers.map(function(customer) { return customer.country; }), psmV3TenantTableState.filters.country, 'All countries/regions')+'</select></div><div class="filter-actions"><button class="btn btn-primary btn-sm" onclick="psmV3ApplyTenantPanelFilters()">Apply filters</button><button class="btn btn-secondary btn-sm" onclick="psmV3ClearTenantPanelFilters()">Clear all</button></div>';
+      }
+      document.getElementById('psmV3TablePanel').classList.add('show');
+    }
+
+    function psmV3ToggleTenantColumn(key, visible) {
+      psmV3TenantTableState.visibleColumns[key] = visible;
+      psmRefreshTenantWorkspace();
+    }
+
+    function psmV3ApplyTenantPanelFilters() {
+      psmV3TenantTableState.filters.segment = document.getElementById('psmV3TenantSegmentFilter').value;
+      psmV3TenantTableState.filters.country = document.getElementById('psmV3TenantCountryFilter').value;
+      psmV3CloseTablePanel();
+      psmRefreshTenantWorkspace();
+    }
+
+    function psmV3ClearTenantPanelFilters() {
+      psmV3TenantTableState.filters = { segment:'', country:'' };
+      psmV3CloseTablePanel();
+      psmRefreshTenantWorkspace();
     }
 
     function psmV3OpenDetail(id) {
@@ -4700,6 +4763,12 @@
         psmMvpTenantTableState.stage = '';
         psmMvpTenantTableState.filters = {};
         psmMvpTenantTableState.openPanel = '';
+      }
+      if (psmV3TenantTableState.campaignId !== id) {
+        psmV3TenantTableState.campaignId = id;
+        psmV3TenantTableState.search = '';
+        psmV3TenantTableState.filters = { segment:'', country:'' };
+        psmV3TenantTableState.visibleColumns = { domain:true, country:true, segment:true };
       }
       var detail = document.getElementById('detailView');
       detail.setAttribute('data-psm-rendered', 'true');
