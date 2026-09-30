@@ -1175,7 +1175,8 @@
     .v3-validation-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0; }
     .v3-validation-stat { padding:8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-validation-stat strong { display:block; font-size:18px; }
-    .v3-validation-stat.has-issues { border-color:var(--cp-link); background:var(--cp-link-soft); }
+    .v3-validation-stat.has-issues { border-color:var(--cp-danger); background:var(--cp-surface-soft); }
+    .v3-validation-stat.has-issues .v3-validation-link { color:var(--cp-danger); }
     .v3-validation-link { display:block; color:var(--cp-link); font-weight:600; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
     .v3-validation-link strong { display:block; font-size:18px; }
     .v3-validation-link span { display:block; font-size:12px; }
@@ -4413,7 +4414,7 @@
         return '<tr><td class="psm-tenant-id">'+psmEscapeHtml(issue.tenantId)+'</td><td>'+psmEscapeHtml(issue.tenantName)+'</td><td>'+psmEscapeHtml(issue.reason)+'</td></tr>';
       }).join('');
       status.className = 'v3-validation'+(psmV3Upload.valid && !psmV3Upload.overlaps.length ? '' : ' warning');
-      status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>checked</div><div class="v3-validation-stat"><strong>'+validIds.length+'</strong>associated with '+psmEscapeHtml(partner)+'</div><div class="v3-validation-stat'+(issueCount ? ' has-issues' : '')+'">'+issueLink+'</div></div>' +
+      status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>tenants validated</div><div class="v3-validation-stat"><strong>'+seen.size+'</strong>associated with '+psmEscapeHtml(partner)+'</div><div class="v3-validation-stat'+(issueCount ? ' has-issues' : '')+'">'+issueLink+'</div></div>' +
         (issueCount ? '<div class="v3-validation-issues" id="v3TenantValidationIssues" hidden><strong>Tenants needing attention</strong><div style="overflow-x:auto;"><table class="v3-validation-issues-table"><thead><tr><th>Tenant ID</th><th>Tenant Name</th><th>Reason for invalidation</th></tr></thead><tbody>'+issueRows+'</tbody></table></div></div>' : '') +
         (psmV3Upload.valid ? '<div><strong>Validation passed.</strong> Every Tenant ID is valid and associated with the selected partner.</div>' : '<div>Resolve every listed ID before creating the campaign.</div>') +
         (psmV3Upload.overlaps.length ? '<div style="margin-top:8px;"><strong>'+psmV3Upload.overlaps.length+' already in another campaign:</strong> '+psmV3Upload.overlaps.map(function(overlap) { return psmEscapeHtml(overlap.tenantId); }).join(', ')+'<label style="display:flex;gap:6px;margin-top:6px;"><input type="checkbox" id="v3OverlapAck"> I reviewed the existing campaign coverage and want to continue.</label></div>' : '');
