@@ -5370,7 +5370,7 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
-      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-secondary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
