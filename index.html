@@ -1174,6 +1174,16 @@
     .v3-validation-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0; }
     .v3-validation-stat { padding:8px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
     .v3-validation-stat strong { display:block; font-size:18px; }
+    .v3-validation-link { display:block; color:var(--cp-link); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+    .v3-validation-link strong { display:block; font-size:18px; }
+    .v3-validation-link span { display:block; font-size:12px; }
+    .v3-validation-link:hover { text-decoration-thickness:2px; }
+    .v3-validation-issues { margin-top:12px; padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); }
+    .v3-validation-issues > strong { display:block; margin-bottom:8px; color:var(--cp-text); font-size:13px; }
+    .v3-validation-issues-table { width:100%; border-collapse:collapse; color:var(--cp-text); font-size:12px; }
+    .v3-validation-issues-table th, .v3-validation-issues-table td { padding:8px 10px; border-bottom:1px solid var(--cp-border); text-align:left; vertical-align:top; }
+    .v3-validation-issues-table th { background:var(--cp-surface-soft); color:var(--cp-text-muted); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.25px; }
+    .v3-validation-issues-table tr:last-child td { border-bottom:0; }
     .v3-detail-head { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; padding-bottom:14px; border-bottom:1px solid var(--cp-border); }
     .v3-detail-head h1 { margin:0 0 6px; font-size:22px; }
     .v3-owner-top { min-width:240px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
@@ -4263,6 +4273,31 @@
       }
     }
 
+    function psmV3ValidationTenantName(id, index) {
+      var normalizedId = String(id || '').toLowerCase();
+      var matchedName = '';
+      psmCampaigns.some(function(campaign) {
+        psmEnsureMvpTenantRows(campaign);
+        return (campaign.customers || []).some(function(customer) {
+          if (String(customer.tenantId || '').toLowerCase() !== normalizedId) return false;
+          matchedName = customer.tenantName || customer.tenantCustomerName || customer.customerName || customer.name || '';
+          return true;
+        });
+      });
+      return matchedName || 'Fabrikam Tenant '+String(index + 1).padStart(3, '0');
+    }
+
+    function psmV3ToggleValidationIssues(event) {
+      event.preventDefault();
+      var link = event.currentTarget;
+      var details = document.getElementById('v3TenantValidationIssues');
+      if (!details) return;
+      var expanded = link.getAttribute('aria-expanded') === 'true';
+      link.setAttribute('aria-expanded', String(!expanded));
+      details.hidden = expanded;
+      if (!expanded) details.scrollIntoView({ block: 'nearest' });
+    }
+
     function psmV3OpenMigration() {
       psmV3MigrationUpload = { file: null, rows: [], valid: false, overlaps: [] };
       document.getElementById('v3MigrationName').value = '';
@@ -4322,7 +4357,7 @@
       return Object.keys(found).map(function(key) { return found[key]; });
     }
 
-    function psmV3ValidateRows(ids) {
+    function psmV3ValidateRows(entries) {
       var box = document.getElementById('v3TenantValidationBox');
       var status = document.getElementById('v3TenantValidation');
       if (box) box.hidden = false;
@@ -4337,26 +4372,46 @@
       var invalidIds = [];
       var wrongPartnerIds = [];
       var validIds = [];
-      ids.forEach(function(raw) {
-        var id = String(raw || '').trim();
+      var issues = [];
+      var tenantNames = {};
+      entries.forEach(function(raw, index) {
+        var entry = raw && typeof raw === 'object' ? raw : { tenantId: raw };
+        var id = String(entry.tenantId || '').trim();
         if (!id || /^tenant[\s_-]?id$/i.test(id)) return;
         var key = id.toLowerCase();
-        if (seen.has(key)) { duplicateIds.push(id); return; }
+        var tenantName = String(entry.tenantCustomerName || tenantNames[key] || psmV3ValidationTenantName(id, index)).trim();
+        if (seen.has(key)) {
+          duplicateIds.push(id);
+          issues.push({ tenantId: id, tenantName: tenantName, reason: 'Duplicate Tenant ID in the submitted list.' });
+          return;
+        }
         seen.add(key);
-        if (id.length < 5 || /invalid/i.test(id)) { invalidIds.push(id); return; }
-        if (/other|unmatched|wrong/i.test(id)) { wrongPartnerIds.push(id); return; }
-        validIds.push(id);
+        tenantNames[key] = tenantName;
+        if (id.length < 5 || /invalid/i.test(id)) {
+          invalidIds.push(id);
+          issues.push({ tenantId: id, tenantName: tenantName, reason: 'Tenant ID format is invalid.' });
+          return;
+        }
+        if (/other|unmatched|wrong/i.test(id)) {
+          wrongPartnerIds.push(id);
+          issues.push({ tenantId: id, tenantName: tenantName, reason: 'Tenant is not associated with '+partner+'.' });
+          return;
+        }
+        validIds.push({ tenantId: id, tenantCustomerName: tenantName });
       });
-      psmV3Upload.rows = validIds.map(function(id, index) {
-        return { tenantCustomerName: 'Fabrikam Tenant '+String(index + 1).padStart(3, '0'), tenantId: id };
-      });
+      psmV3Upload.rows = validIds;
       psmV3Upload.valid = validIds.length > 0 && !duplicateIds.length && !invalidIds.length && !wrongPartnerIds.length;
       psmV3Upload.overlaps = psmV3FindOverlaps(psmV3Upload.rows);
+      var issueCount = issues.length;
+      var issueLink = issueCount
+        ? '<a class="v3-validation-link" href="#v3TenantValidationIssues" aria-expanded="false" aria-controls="v3TenantValidationIssues" aria-label="'+issueCount+(issueCount === 1 ? ' tenant needs' : ' tenants need')+' attention. Show validation details." onclick="psmV3ToggleValidationIssues(event)"><strong>'+issueCount+'</strong><span>needs attention</span></a>'
+        : '<strong>0</strong><span style="display:block;">needs attention</span>';
+      var issueRows = issues.map(function(issue) {
+        return '<tr><td class="psm-tenant-id">'+psmEscapeHtml(issue.tenantId)+'</td><td>'+psmEscapeHtml(issue.tenantName)+'</td><td>'+psmEscapeHtml(issue.reason)+'</td></tr>';
+      }).join('');
       status.className = 'v3-validation'+(psmV3Upload.valid && !psmV3Upload.overlaps.length ? '' : ' warning');
-      status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>checked</div><div class="v3-validation-stat"><strong>'+validIds.length+'</strong>associated with '+psmEscapeHtml(partner)+'</div><div class="v3-validation-stat"><strong>'+(duplicateIds.length+invalidIds.length+wrongPartnerIds.length)+'</strong>need attention</div></div>' +
-        (invalidIds.length ? '<div><strong>Invalid Tenant IDs:</strong> '+invalidIds.map(psmEscapeHtml).join(', ')+'</div>' : '') +
-        (wrongPartnerIds.length ? '<div><strong>Not associated with '+psmEscapeHtml(partner)+':</strong> '+wrongPartnerIds.map(psmEscapeHtml).join(', ')+'</div>' : '') +
-        (duplicateIds.length ? '<div><strong>Duplicates:</strong> '+duplicateIds.map(psmEscapeHtml).join(', ')+'</div>' : '') +
+      status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>checked</div><div class="v3-validation-stat"><strong>'+validIds.length+'</strong>associated with '+psmEscapeHtml(partner)+'</div><div class="v3-validation-stat">'+issueLink+'</div></div>' +
+        (issueCount ? '<div class="v3-validation-issues" id="v3TenantValidationIssues" hidden><strong>Tenants needing attention</strong><div style="overflow-x:auto;"><table class="v3-validation-issues-table"><thead><tr><th>Tenant ID</th><th>Tenant Name</th><th>Reason for invalidation</th></tr></thead><tbody>'+issueRows+'</tbody></table></div></div>' : '') +
         (psmV3Upload.valid ? '<div><strong>Validation passed.</strong> Every Tenant ID is valid and associated with the selected partner.</div>' : '<div>Resolve every listed ID before creating the campaign.</div>') +
         (psmV3Upload.overlaps.length ? '<div style="margin-top:8px;"><strong>'+psmV3Upload.overlaps.length+' already in another campaign:</strong> '+psmV3Upload.overlaps.map(function(overlap) { return psmEscapeHtml(overlap.tenantId); }).join(', ')+'<label style="display:flex;gap:6px;margin-top:6px;"><input type="checkbox" id="v3OverlapAck"> I reviewed the existing campaign coverage and want to continue.</label></div>' : '');
     }
@@ -4380,15 +4435,19 @@
       file.text().then(function(text) {
         if (psmV3Upload.file !== selectedFile) return;
         var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
-        var ids = lines.map(function(line, index) {
+        var headers = psmParseCsvLine(lines[0] || '').map(function(value) { return value.trim().toLowerCase().replace(/[^a-z0-9]/g, ''); });
+        var tenantIndex = headers.indexOf('tenantid');
+        var nameIndex = headers.indexOf('customertenantname');
+        if (nameIndex === -1) nameIndex = headers.indexOf('tenantname');
+        var rows = (tenantIndex > -1 ? lines.slice(1) : lines).map(function(line) {
           var values = psmParseCsvLine(line);
-          if (values.length === 1) return values[0];
-          var headers = psmParseCsvLine(lines[0]).map(function(value) { return value.trim().toLowerCase().replace(/[^a-z0-9]/g, ''); });
-          var tenantIndex = headers.indexOf('tenantid');
-          return index === 0 ? '' : values[tenantIndex > -1 ? tenantIndex : 0];
+          return {
+            tenantId: (values[tenantIndex > -1 ? tenantIndex : 0] || '').trim(),
+            tenantCustomerName: nameIndex > -1 ? (values[nameIndex] || '').trim() : ''
+          };
         });
-        document.getElementById('v3TenantIds').value = ids.filter(Boolean).join('\n');
-        psmV3ValidateRows(ids);
+        document.getElementById('v3TenantIds').value = rows.map(function(row) { return row.tenantId; }).filter(Boolean).join('\n');
+        psmV3ValidateRows(rows);
       });
     }
 
@@ -5370,7 +5429,7 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
-      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
