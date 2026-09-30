@@ -770,7 +770,8 @@
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .psm-v3-detail-title-row h1 { margin:0; }
-    .psm-v3-detail-title-actions { display:flex; align-items:flex-end; flex-direction:column; gap:7px; flex:0 0 auto; }
+    .psm-v3-detail-title-actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
+    .psm-v3-detail-back-row { display:flex; justify-content:flex-start; margin-bottom:10px; }
     .psm-v3-business-outcome-header {
       display:flex; align-items:center; gap:9px; width:auto; min-height:38px; padding:8px 12px;
       border-left:3px solid var(--cp-accent); background:var(--cp-accent-soft); box-sizing:border-box;
@@ -5429,7 +5430,7 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
-      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button>'+businessOutcomePanel+'</div></div></div>' +
+      detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-back-row"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button></div><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions">'+businessOutcomePanel+'</div></div></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
