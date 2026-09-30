@@ -1017,6 +1017,13 @@
     .v3-charts { display:grid; grid-template-columns:repeat(2,minmax(340px,1fr)); gap:12px; margin-bottom:16px; overflow-x:auto; }
     .v3-card { padding:16px; border:1px solid var(--cp-border); border-radius:16px; background:var(--cp-surface); box-shadow:0 0 2px var(--cp-border); }
     .v3-card h2 { margin:0 0 12px; font-size:15px; }
+    .v3-chart-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:4px; }
+    .v3-chart-header h2 { margin:0; }
+    .v3-chart-actions { display:flex; align-items:center; gap:4px; }
+    .v3-chart-action { display:inline-flex; align-items:center; gap:4px; min-height:28px; padding:4px 6px; border:0; background:transparent; color:var(--cp-text-muted); font:inherit; font-size:10px; cursor:pointer; }
+    .v3-chart-action:hover { background:var(--cp-surface-soft); color:var(--cp-text); }
+    .v3-chart-action svg { width:12px; height:12px; }
+    .v3-chart-more { width:28px; justify-content:center; font-size:16px; letter-spacing:1px; }
     .v3-pie-layout { display:flex; align-items:center; justify-content:center; gap:28px; min-height:190px; }
     .v3-pie-chart { flex:0 0 150px; width:150px; height:150px; }
     .v3-chart-legend { display:flex; flex-direction:column; gap:10px; min-width:150px; }
@@ -1044,6 +1051,8 @@
     .v3-chip { display:inline-flex; align-items:center; margin:2px 4px 2px 0; padding:3px 7px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); color:var(--cp-text); font-size:10px; font-weight:600; }
     .v3-chip.pending { border-color:var(--cp-warning); }
     .v3-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:10px; color:var(--cp-text-muted); font-size:12px; }
+    .v3-pagination label { display:flex; align-items:center; gap:6px; }
+    .v3-pagination select { min-height:30px; padding:4px 24px 4px 8px; border:1px solid var(--cp-border-strong); border-radius:2px; background:var(--cp-surface); color:var(--cp-text); }
     .v3-empty { padding:48px 24px; text-align:center; border:1px dashed var(--cp-border-strong); border-radius:16px; background:var(--cp-surface); }
     .v3-empty h2 { margin:0 0 8px; }
     .v3-create-overlay { justify-content:flex-end; align-items:stretch; padding:48px 0 0; }
@@ -1099,6 +1108,46 @@
     .v3-tenant-method textarea { flex:1; min-height:100px; margin:0 0 10px; }
     .v3-tenant-method input[type="file"] { margin-top:auto; }
     .v3-tenant-validation-box { margin-top:12px; padding-top:12px; border-top:1px solid var(--cp-border); }
+    .v3-tenant-change-intro { margin:0 0 18px; color:var(--cp-text-muted); font-size:12px; line-height:1.5; }
+    .v3-tenant-change-context { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .v3-tenant-change-context span { display:block; color:var(--cp-text-muted); font-size:11px; }
+    .v3-tenant-change-context strong { display:block; margin-top:2px; color:var(--cp-text); font-size:13px; }
+    .v3-tenant-change-count { flex:0 0 auto; color:var(--cp-text); font-size:12px; font-weight:600; }
+    .v3-tenant-change-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:20px; }
+    .v3-tenant-change-step { position:relative; padding-top:24px; color:var(--cp-text-muted); font-size:10px; text-align:center; }
+    .v3-tenant-change-step::before { content:attr(data-step); position:absolute; top:0; left:50%; display:flex; align-items:center; justify-content:center; width:20px; height:20px; border:1px solid var(--cp-border-strong); border-radius:50%; background:var(--cp-surface); color:var(--cp-text-muted); transform:translateX(-50%); }
+    .v3-tenant-change-step::after { content:""; position:absolute; top:10px; right:50%; width:100%; border-top:1px solid var(--cp-border); z-index:-1; }
+    .v3-tenant-change-step:first-child::after { display:none; }
+    .v3-tenant-change-step.active { color:var(--cp-text); font-weight:600; }
+    .v3-tenant-change-step.active::before { border-color:var(--cp-link); background:var(--cp-link); color:var(--cp-accent-fg); }
+    .v3-tenant-change-methods { display:grid; grid-template-columns:1fr 1fr; margin-bottom:16px; border-bottom:1px solid var(--cp-border); }
+    .v3-tenant-change-method { padding:9px 8px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--cp-text-muted); font:inherit; font-size:12px; font-weight:600; cursor:pointer; }
+    .v3-tenant-change-method[aria-selected="true"] { border-bottom-color:var(--cp-link); color:var(--cp-text); }
+    .v3-tenant-change-pane label { display:block; margin-bottom:6px; color:var(--cp-text); font-size:12px; font-weight:600; }
+    .v3-tenant-change-pane p { margin:0 0 10px; color:var(--cp-text-muted); font-size:11px; line-height:1.45; }
+    .v3-tenant-change-pane textarea { width:100%; min-height:170px; resize:vertical; }
+    .v3-tenant-change-input-meta { display:flex; justify-content:space-between; gap:8px; margin-top:6px; color:var(--cp-text-muted); font-size:10px; }
+    .v3-tenant-file-zone { padding:24px 16px; border:1px dashed var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
+    .v3-tenant-file-zone svg { width:28px; height:28px; margin-bottom:8px; color:var(--cp-link); }
+    .v3-tenant-file-zone input { width:100%; margin-top:12px; }
+    .v3-tenant-file-name { margin-top:8px; color:var(--cp-text); font-size:11px; font-weight:600; }
+    .v3-tenant-change-actions { position:sticky; bottom:0; display:flex; justify-content:flex-end; gap:8px; margin:20px -20px -20px; padding:14px 20px; border-top:1px solid var(--cp-border); background:var(--cp-surface); }
+    body.psm-v3-view .v3-tenant-change-panel .filter-panel { width:min(520px,100vw); }
+    .v3-tenant-change-panel .v3-filter-panel > h3 { margin-bottom:4px; }
+    .v3-tenant-change-panel .v3-validation-summary { grid-template-columns:repeat(3,1fr); }
+    .v3-tenant-change-panel .v3-validation-stat { background:var(--cp-surface-soft); text-align:center; }
+    .v3-tenant-change-panel .v3-validation-stat strong { font-size:20px; }
+    .v3-tenant-change-issue { margin-top:8px; padding:9px 10px; border-left:3px solid var(--cp-warning); background:var(--cp-surface-soft); color:var(--cp-text); font-size:11px; line-height:1.4; }
+    .v3-tenant-confirm-modal { width:560px; background:var(--cp-surface); color:var(--cp-text); }
+    .v3-tenant-confirm-callout { display:flex; gap:10px; margin:14px 0; padding:12px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .v3-tenant-confirm-callout strong { display:block; margin-bottom:2px; font-size:12px; }
+    .v3-tenant-confirm-callout span { color:var(--cp-text-muted); font-size:11px; line-height:1.4; }
+    .v3-tenant-confirm-list { max-height:240px; margin:0 0 16px; overflow:auto; border:1px solid var(--cp-border); border-radius:0.625rem; }
+    .v3-tenant-confirm-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; padding:10px 12px; border-bottom:1px solid var(--cp-border); }
+    .v3-tenant-confirm-row:last-child { border-bottom:0; }
+    .v3-tenant-confirm-row strong { display:block; font-size:12px; }
+    .v3-tenant-confirm-row span { color:var(--cp-text-muted); font-size:10px; }
+    .v3-tenant-confirm-change { color:var(--cp-text); font-size:11px; font-weight:600; }
     .v3-upload-or { display:flex; align-items:center; gap:8px; margin:10px 0; color:var(--cp-text-muted); font-size:11px; font-weight:700; text-transform:uppercase; }
     .v3-upload-or::before, .v3-upload-or::after { content:""; flex:1; border-top:1px solid var(--cp-border); }
     .v3-validation { margin-top:8px; color:var(--cp-text-muted); font-size:12px; line-height:1.45; }
@@ -1457,9 +1506,12 @@
       body.psm-v3-view .v3-tenant-toolbar .v3-actions { width:100%; margin-left:0 !important; flex-wrap:wrap !important; }
       body.psm-v3-view .v3-table-search-wrap { width:100%; }
       body.psm-v3-view .v3-table-search { width:100%; }
+      body.psm-v3-view .v3-pagination { align-items:flex-start; flex-direction:column; }
+      body.psm-v3-view .v3-pagination .v3-actions { width:100%; flex-wrap:wrap; }
       body.psm-v3-view .v3-modal-grid { grid-template-columns:1fr; }
       body.psm-v3-view .v3-tenant-methods { grid-template-columns:1fr; }
       body.psm-v3-view .v3-tenant-or { min-height:24px; }
+      body.psm-v3-view .v3-tenant-change-panel .filter-panel { width:100vw; }
       body.psm-v3-view .filter-panel { width:min(400px,100vw); }
       body.psm-v3-view .detail-view.psm-v3-detail { padding:16px 16px 64px; }
       body.psm-v3-view .psm-v3-detail .flyout-header { margin:-16px -16px 16px; padding:14px 16px; }
@@ -1935,13 +1987,14 @@
   </div>
 
   <div class="modal-overlay" id="psmV3TenantConfirmModal" role="alertdialog" aria-modal="true" aria-labelledby="psmV3TenantConfirmTitle" aria-describedby="psmV3TenantConfirmSummary" aria-hidden="true">
-    <div class="modal" tabindex="-1" style="width:520px;background:var(--cp-surface);color:var(--cp-text);">
+    <div class="modal v3-tenant-confirm-modal" tabindex="-1">
       <h3 id="psmV3TenantConfirmTitle">Confirm tenant changes</h3>
       <p id="psmV3TenantConfirmSummary" style="color:var(--cp-text-muted);"></p>
-      <div id="psmV3TenantConfirmList" style="max-height:220px;overflow:auto;margin-bottom:16px;"></div>
+      <div class="v3-tenant-confirm-callout" id="psmV3TenantConfirmCallout"></div>
+      <div class="v3-tenant-confirm-list" id="psmV3TenantConfirmList"></div>
       <div class="btn-group">
         <button class="btn btn-primary" id="psmV3TenantConfirmButton" type="button" onclick="psmV3ConfirmTenantChange()">Confirm</button>
-        <button class="btn btn-secondary" type="button" onclick="hideModal('psmV3TenantConfirmModal')">Cancel</button>
+        <button class="btn btn-secondary" type="button" onclick="psmV3BackToTenantChange()">Back</button>
       </div>
     </div>
   </div>
@@ -3767,6 +3820,15 @@
       return '<div class="v3-pie-layout"><svg class="v3-pie-chart" viewBox="0 0 150 150" role="img" aria-label="'+psmEscapeHtml(ariaLabel)+'">'+(slices || empty)+'</svg><div class="v3-chart-legend">'+legend+'</div></div>';
     }
 
+    function psmV3ChartHeader(title) {
+      return '<div class="v3-chart-header"><h2>'+psmEscapeHtml(title)+'</h2><div class="v3-chart-actions"><button class="v3-chart-action" type="button" aria-label="Filter '+psmEscapeHtml(title)+'" onclick="psmV3OpenChartFilter()"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filter</button><button class="v3-chart-action v3-chart-more" type="button" aria-label="More options for '+psmEscapeHtml(title)+'" onclick="showToast(\'More chart options selected\')">&hellip;</button></div></div>';
+    }
+
+    function psmV3OpenChartFilter() {
+      if (document.getElementById('detailView').classList.contains('show') && psmV3CurrentCampaign) psmV3OpenTenantPanel('filters');
+      else psmV3OpenFilters();
+    }
+
     function psmV3TrendCard(title, subtitle, values, valuePrefix, valueSuffix) {
       valueSuffix = valueSuffix || '';
       var width = 300;
@@ -3800,7 +3862,7 @@
         return '<line class="v3-trend-gridline" x1="'+point.x+'" y1="'+(height-bottom)+'" x2="'+point.x+'" y2="'+(height-bottom+4)+'"></line><circle class="v3-trend-dot" cx="'+point.x+'" cy="'+point.y+'" r="3"><title>'+labels[index]+': '+valuePrefix+point.value.toLocaleString()+valueSuffix+'</title></circle><text class="v3-trend-value" x="'+point.x+'" y="'+Math.max(10, point.y-7)+'" text-anchor="middle">'+formatAxisValue(point.value)+'</text><text class="v3-trend-label" x="'+point.x+'" y="'+(height-12)+'" text-anchor="middle">'+labels[index]+'</text>';
       }).join('');
       var chart = '<svg class="v3-trend-svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+psmEscapeHtml(title)+' month-over-month trend">'+grid+'<line class="v3-trend-gridline" x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(height-bottom)+'"></line><line class="v3-trend-gridline" x1="'+left+'" y1="'+(height-bottom)+'" x2="'+(width-right)+'" y2="'+(height-bottom)+'"></line><polyline class="v3-trend-line" points="'+points.map(function(point) { return point.x+','+point.y; }).join(' ')+'"></polyline>'+pointMarkup+'<text class="v3-trend-label" x="'+((left+width-right)/2)+'" y="'+(height-1)+'" text-anchor="middle">Month</text></svg>';
-      return '<he-card_psmv3 class="v3-card"><h2>'+psmEscapeHtml(title)+'</h2><div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card">'+psmV3ChartHeader(title)+'<div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
     }
 
     function psmV3RenderCharts(campaigns) {
@@ -3813,8 +3875,8 @@
         return { label:region, value:value, display:value.toLocaleString() };
       });
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts">' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2>'+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaigns by region</h2>'+psmV3PieChart(regions, 'Campaign regional distribution pie chart')+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card">'+psmV3ChartHeader('Campaign lifecycle')+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card">'+psmV3ChartHeader('Campaigns by region')+psmV3PieChart(regions, 'Campaign regional distribution pie chart')+'</he-card_psmv3>' +
         psmV3TrendCard('Copilot paid MAU growth', 'Monthly aggregate across committed campaigns', [420, 610, 760, 980, 1120, 1360], '')+
         psmV3TrendCard('NPSA growth', 'Synthetic demo net paid seat adds', [185, 260, 348, 455, 590, 742], '')+
         psmV3TrendCard('Cowork credit consumption growth', 'Synthetic demo monetized credits', [18200, 24750, 31600, 42800, 53750, 68900], '$')+
@@ -3925,7 +3987,7 @@
 
     function psmV3CloseTablePanel() {
       var panel = document.getElementById('psmV3TablePanel');
-      panel.classList.remove('show', 'campaign-update-panel');
+      panel.classList.remove('show', 'campaign-update-panel', 'v3-tenant-change-panel');
       panel.setAttribute('aria-hidden', 'true');
       psmRestoreOverlayFocus(panel);
     }
@@ -4591,21 +4653,41 @@
     var psmV3TenantTableState = {
       campaignId: '',
       search: '',
+      page: 1,
+      pageSize: 25,
       filters: { association:'', segment:'', country:'' },
       visibleColumns: { domain:true, country:true, segment:true }
     };
+    var psmV3TenantSearchTimer;
     var psmV3TenantChange = { action:'', ids:[], valid:false };
-
-    function psmV3ApplyTenantFilters() {
-      document.querySelectorAll('.v3-tenant-row').forEach(function(row) {
-        var matchesSearch = !psmV3TenantTableState.search || row.getAttribute('data-search').indexOf(psmV3TenantTableState.search) > -1;
-        row.style.display = matchesSearch ? '' : 'none';
-      });
-    }
 
     function psmV3FilterTenantRows(value) {
       psmV3TenantTableState.search = value.trim().toLowerCase();
-      psmV3ApplyTenantFilters();
+      psmV3TenantTableState.page = 1;
+      psmRefreshTenantWorkspace();
+      window.requestAnimationFrame(function() {
+        var field = document.querySelector('.v3-tenant-toolbar .v3-table-search');
+        if (field) {
+          field.focus();
+          field.setSelectionRange(field.value.length, field.value.length);
+        }
+      });
+    }
+
+    function psmV3QueueTenantSearch(value) {
+      window.clearTimeout(psmV3TenantSearchTimer);
+      psmV3TenantSearchTimer = window.setTimeout(function() { psmV3FilterTenantRows(value); }, 300);
+    }
+
+    function psmV3SetTenantPageSize(value) {
+      psmV3TenantTableState.pageSize = parseInt(value, 10) || 25;
+      psmV3TenantTableState.page = 1;
+      psmRefreshTenantWorkspace();
+    }
+
+    function psmV3TenantPage(delta) {
+      psmV3TenantTableState.page = Math.max(1, psmV3TenantTableState.page + delta);
+      psmRefreshTenantWorkspace();
     }
 
     function psmV3UpdateTenant(id, index, field, value) {
@@ -4761,11 +4843,20 @@
         return { customer:customer, index:index };
       }).filter(function(item) {
         var filters = psmV3TenantTableState.filters;
-        return (!filters.association || (item.customer.association || 'None') === filters.association) &&
+        var name = item.customer.tenantName || item.customer.tenantCustomerName || item.customer.name;
+        var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
+        var searchText = [name, item.customer.tenantId, item.customer.association || 'None', domain, item.customer.country || '', item.customer.segment || ''].join(' ').toLowerCase();
+        return (!psmV3TenantTableState.search || searchText.indexOf(psmV3TenantTableState.search) > -1) &&
+          (!filters.association || (item.customer.association || 'None') === filters.association) &&
           (!filters.segment || item.customer.segment === filters.segment) &&
           (!filters.country || item.customer.country === filters.country);
       });
-      var rows = filteredCustomers.map(function(item) {
+      var tenantTotal = filteredCustomers.length;
+      var totalPages = Math.max(1, Math.ceil(tenantTotal / psmV3TenantTableState.pageSize));
+      psmV3TenantTableState.page = Math.min(Math.max(1, psmV3TenantTableState.page), totalPages);
+      var pageStart = (psmV3TenantTableState.page - 1) * psmV3TenantTableState.pageSize;
+      var pageCustomers = filteredCustomers.slice(pageStart, pageStart + psmV3TenantTableState.pageSize);
+      var rows = pageCustomers.map(function(item) {
         var customer = item.customer;
         var index = item.index;
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
@@ -4785,7 +4876,7 @@
         (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
       var activeFilterCount = (psmV3TenantTableState.filters.association ? 1 : 0) + (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
       var tenantEditDisabled = psmV3CanEdit(c) ? '' : ' disabled title="Only the assigned PSM can change campaign tenants"';
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'remove\')"'+tenantEditDisabled+'>Remove Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3FilterTenantRows(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'remove\')"'+tenantEditDisabled+'>Remove Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3QueueTenantSearch(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div><div class="v3-pagination"><span>Showing '+(tenantTotal ? pageStart + 1 : 0)+'-'+Math.min(pageStart + pageCustomers.length, tenantTotal)+' of '+tenantTotal+' tenants</span><div class="v3-actions"><label>Rows per page <select aria-label="Tenant rows per page" onchange="psmV3SetTenantPageSize(this.value)">'+[25,50,100].map(function(size) { return '<option value="'+size+'"'+(psmV3TenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(-1)"'+(psmV3TenantTableState.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3TenantTableState.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(1)"'+(psmV3TenantTableState.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -4800,12 +4891,49 @@
       }
       psmV3TenantChange = { action:action, ids:[], valid:false };
       var verb = action === 'add' ? 'Add' : 'Remove';
+      var description = action === 'add'
+        ? 'Add customer tenants to this campaign using Tenant IDs. Existing campaign tenants will not be duplicated.'
+        : 'Remove customer tenants from this campaign using Tenant IDs. Campaign-level history and measurements are not deleted.';
       document.getElementById('psmV3TablePanelTitle').textContent = verb+' tenants';
       document.getElementById('psmV3TablePanelBody').innerHTML =
-        '<p style="margin:0 0 16px;color:var(--cp-text-muted);font-size:12px;">Paste Tenant IDs or upload a CSV/TXT file. All IDs must pass validation before you can confirm the change.</p>' +
-        '<div class="v3-tenant-methods"><div class="v3-tenant-method"><label for="psmV3TenantChangeIds"><strong>Paste Tenant IDs</strong></label><p id="psmV3TenantChangeIdsHelp">Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="psmV3TenantChangeIds" aria-describedby="psmV3TenantChangeIdsHelp psmV3TenantChangeValidation" placeholder="Paste Tenant IDs here"></textarea><button class="btn btn-secondary btn-sm" type="button" onclick="psmV3ValidateTenantChange()">Validate pasted IDs</button></div><div class="v3-tenant-or" aria-hidden="true">OR</div><div class="v3-tenant-method"><label for="psmV3TenantChangeFile"><strong>Upload a tenant list</strong></label><p id="psmV3TenantChangeFileHelp">Upload a CSV or TXT file with a Tenant ID column or IDs in the first column.</p><input type="file" id="psmV3TenantChangeFile" aria-describedby="psmV3TenantChangeFileHelp psmV3TenantChangeValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"></div></div>' +
-        '<div class="v3-tenant-validation-box" id="psmV3TenantChangeValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="psmV3TenantChangeValidation" role="status" aria-live="polite"></div></div>';
-      psmV3ShowTablePanel();
+        '<p class="v3-tenant-change-intro">'+description+'</p>' +
+        '<div class="v3-tenant-change-context"><div><span>Campaign</span><strong>'+psmEscapeHtml(c.name)+'</strong></div><div class="v3-tenant-change-count">'+(c.customers || []).length+' current tenants</div></div>' +
+        '<div class="v3-tenant-change-steps" aria-label="Tenant change progress"><div class="v3-tenant-change-step active" data-step="1">Provide IDs</div><div class="v3-tenant-change-step" data-step="2">Validate</div><div class="v3-tenant-change-step" data-step="3">Confirm</div></div>' +
+        '<div class="v3-tenant-change-methods" role="tablist" aria-label="Tenant ID input method"><button class="v3-tenant-change-method" id="psmV3TenantPasteTab" type="button" role="tab" aria-selected="true" aria-controls="psmV3TenantPastePane" onclick="psmV3SetTenantChangeMethod(\'paste\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Paste Tenant IDs</button><button class="v3-tenant-change-method" id="psmV3TenantUploadTab" type="button" role="tab" aria-selected="false" aria-controls="psmV3TenantUploadPane" onclick="psmV3SetTenantChangeMethod(\'upload\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Upload a file</button></div>' +
+        '<div class="v3-tenant-change-pane" id="psmV3TenantPastePane" role="tabpanel" aria-labelledby="psmV3TenantPasteTab"><label for="psmV3TenantChangeIds">Tenant IDs</label><p id="psmV3TenantChangeIdsHelp">Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="psmV3TenantChangeIds" aria-describedby="psmV3TenantChangeIdsHelp psmV3TenantChangeValidation" placeholder="00000000-0000-0000-0000-000000000000" oninput="psmV3TenantChangeInputChanged()"></textarea><div class="v3-tenant-change-input-meta"><span>CSV-style values are also supported</span><span id="psmV3TenantChangeInputCount">0 IDs entered</span></div></div>' +
+        '<div class="v3-tenant-change-pane" id="psmV3TenantUploadPane" role="tabpanel" aria-labelledby="psmV3TenantUploadTab" hidden><div class="v3-tenant-file-zone"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 14v5h14v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><label for="psmV3TenantChangeFile">Choose a CSV or TXT file</label><p id="psmV3TenantChangeFileHelp">Use a Tenant ID column, or place Tenant IDs in the first column. Maximum file size: 5 MB.</p><input type="file" id="psmV3TenantChangeFile" aria-describedby="psmV3TenantChangeFileHelp psmV3TenantChangeValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"><div class="v3-tenant-file-name" id="psmV3TenantChangeFileName"></div></div></div>' +
+        '<div class="v3-tenant-validation-box" id="psmV3TenantChangeValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="psmV3TenantChangeValidation" role="status" aria-live="polite"></div></div>' +
+        '<div class="v3-tenant-change-actions"><button class="btn btn-secondary" type="button" onclick="psmV3CloseTablePanel()">Cancel</button><button class="btn btn-primary" id="psmV3TenantValidateButton" type="button" onclick="psmV3ValidateTenantChange()">Validate Tenant IDs</button></div>';
+      psmV3ShowTablePanel('v3-tenant-change-panel');
+    }
+
+    function psmV3SetTenantChangeMethod(method) {
+      var paste = method === 'paste';
+      document.getElementById('psmV3TenantPasteTab').setAttribute('aria-selected', String(paste));
+      document.getElementById('psmV3TenantUploadTab').setAttribute('aria-selected', String(!paste));
+      document.getElementById('psmV3TenantPastePane').hidden = !paste;
+      document.getElementById('psmV3TenantUploadPane').hidden = paste;
+      window.requestAnimationFrame(function() {
+        var target = document.getElementById(paste ? 'psmV3TenantChangeIds' : 'psmV3TenantChangeFile');
+        if (target) target.focus();
+      });
+    }
+
+    function psmV3TenantChangeMethodKeydown(event) {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      psmV3SetTenantChangeMethod(document.getElementById('psmV3TenantPasteTab').getAttribute('aria-selected') === 'true' ? 'upload' : 'paste');
+    }
+
+    function psmV3TenantChangeInputChanged() {
+      var field = document.getElementById('psmV3TenantChangeIds');
+      var ids = String(field ? field.value : '').split(/[\s,;]+/).map(function(value) { return value.trim(); }).filter(Boolean);
+      var count = document.getElementById('psmV3TenantChangeInputCount');
+      if (count) count.textContent = ids.length+' ID'+(ids.length === 1 ? '' : 's')+' entered';
+      psmV3TenantChange.ids = [];
+      psmV3TenantChange.valid = false;
+      var box = document.getElementById('psmV3TenantChangeValidationBox');
+      if (box) box.hidden = true;
     }
 
     function psmV3ValidateTenantChange() {
@@ -4837,21 +4965,26 @@
       psmV3TenantChange.valid = valid.length > 0 && !duplicates.length && !invalid.length && !unavailable.length;
       status.className = 'v3-validation'+(psmV3TenantChange.valid ? '' : ' warning');
       status.innerHTML = '<div class="v3-validation-summary"><div class="v3-validation-stat"><strong>'+seen.size+'</strong>checked</div><div class="v3-validation-stat"><strong>'+valid.length+'</strong>ready to '+psmV3TenantChange.action+'</div><div class="v3-validation-stat"><strong>'+(duplicates.length+invalid.length+unavailable.length)+'</strong>need attention</div></div>' +
-        (duplicates.length ? '<div><strong>Duplicates:</strong> '+duplicates.map(psmEscapeHtml).join(', ')+'</div>' : '') +
-        (invalid.length ? '<div><strong>Invalid Tenant IDs:</strong> '+invalid.map(psmEscapeHtml).join(', ')+'</div>' : '') +
-        (unavailable.length ? '<div><strong>'+(psmV3TenantChange.action === 'add' ? 'Already in this campaign' : 'Not found in this campaign')+':</strong> '+unavailable.map(psmEscapeHtml).join(', ')+'</div>' : '') +
-        (psmV3TenantChange.valid ? '<div><strong>Validation passed.</strong> Review and confirm the tenant change.</div>' : '<div>Resolve every listed ID before continuing.</div>');
-      if (psmV3TenantChange.valid) psmV3ShowTenantChangeConfirmation();
+        (duplicates.length ? '<div class="v3-tenant-change-issue"><strong>Duplicate IDs</strong><br>'+duplicates.map(psmEscapeHtml).join(', ')+'</div>' : '') +
+        (invalid.length ? '<div class="v3-tenant-change-issue"><strong>Invalid Tenant IDs</strong><br>'+invalid.map(psmEscapeHtml).join(', ')+'</div>' : '') +
+        (unavailable.length ? '<div class="v3-tenant-change-issue"><strong>'+(psmV3TenantChange.action === 'add' ? 'Already in this campaign' : 'Not found in this campaign')+'</strong><br>'+unavailable.map(psmEscapeHtml).join(', ')+'</div>' : '') +
+        (psmV3TenantChange.valid ? '<div style="margin-top:10px;"><strong>Validation passed.</strong> Opening the confirmation step.</div>' : '<div style="margin-top:10px;">Resolve every item that needs attention, then validate again.</div>');
+      var steps = document.querySelectorAll('.v3-tenant-change-step');
+      if (steps[1]) steps[1].classList.add('active');
+      if (psmV3TenantChange.valid) window.setTimeout(function() {
+        if (psmV3TenantChange.valid) psmV3ShowTenantChangeConfirmation();
+      }, 350);
     }
 
     function psmV3ValidateTenantChangeFile(input) {
       var file = input.files && input.files[0];
-      if (!file || !file.text || ['csv', 'txt'].indexOf(file.name.split('.').pop().toLowerCase()) === -1) {
+      if (!file || !file.text || file.size > 5 * 1024 * 1024 || ['csv', 'txt'].indexOf(file.name.split('.').pop().toLowerCase()) === -1) {
         document.getElementById('psmV3TenantChangeValidationBox').hidden = false;
         document.getElementById('psmV3TenantChangeValidation').className = 'v3-validation warning';
-        document.getElementById('psmV3TenantChangeValidation').textContent = 'Upload a CSV or TXT file containing Tenant IDs.';
+        document.getElementById('psmV3TenantChangeValidation').textContent = 'Upload a CSV or TXT file containing Tenant IDs. The file must be 5 MB or smaller.';
         return;
       }
+      document.getElementById('psmV3TenantChangeFileName').textContent = file.name;
       file.text().then(function(text) {
         var lines = text.split(/\r?\n/).filter(function(line) { return line.trim(); });
         var firstRow = psmParseCsvLine(lines[0] || '');
@@ -4870,15 +5003,26 @@
     function psmV3ShowTenantChangeConfirmation() {
       var c = psmV3CurrentCampaign;
       var adding = psmV3TenantChange.action === 'add';
+      var steps = document.querySelectorAll('.v3-tenant-change-step');
+      if (steps[2]) steps[2].classList.add('active');
       psmV3CloseTablePanel();
-      document.getElementById('psmV3TenantConfirmTitle').textContent = adding ? 'Confirm tenants to add' : 'Confirm tenants to remove';
-      document.getElementById('psmV3TenantConfirmSummary').textContent = psmV3TenantChange.ids.length+' validated tenant'+(psmV3TenantChange.ids.length === 1 ? '' : 's')+' will be '+(adding ? 'added to' : 'removed from')+' '+c.name+'.';
-      document.getElementById('psmV3TenantConfirmList').innerHTML = psmV3TenantChange.ids.map(function(id) {
+      document.getElementById('psmV3TenantConfirmTitle').textContent = adding ? 'Confirm tenants to add' : 'Confirm tenant removal';
+      document.getElementById('psmV3TenantConfirmSummary').textContent = 'Review the validated tenants before changing '+c.name+'.';
+      document.getElementById('psmV3TenantConfirmCallout').innerHTML = '<div aria-hidden="true">'+(adding ? '+' : '-')+'</div><div><strong>'+psmV3TenantChange.ids.length+' tenant'+(psmV3TenantChange.ids.length === 1 ? '' : 's')+' will be '+(adding ? 'added' : 'removed')+'</strong><span>'+(adding ? 'The tenants will appear in the campaign table after confirmation.' : 'The tenants will no longer contribute to this campaign. Campaign activity history will remain available.')+'</span></div>';
+      document.getElementById('psmV3TenantConfirmList').innerHTML = psmV3TenantChange.ids.map(function(id, index) {
         var customer = (c.customers || []).filter(function(item) { return item.tenantId.toLowerCase() === id.toLowerCase(); })[0];
-        return '<div style="padding:8px 0;border-bottom:1px solid var(--cp-border);"><strong>'+psmEscapeHtml(customer ? (customer.tenantName || customer.tenantCustomerName || customer.name) : 'New Fabrikam tenant')+'</strong><br><span class="psm-tenant-id">'+psmEscapeHtml(id)+'</span></div>';
+        var name = customer ? (customer.tenantName || customer.tenantCustomerName || customer.name) : 'Fabrikam Tenant '+String((c.customers || []).length + index + 1).padStart(3, '0');
+        return '<div class="v3-tenant-confirm-row"><div><strong>'+psmEscapeHtml(name)+'</strong><span class="psm-tenant-id">'+psmEscapeHtml(id)+'</span></div><div class="v3-tenant-confirm-change">'+(adding ? 'Add' : 'Remove')+'</div></div>';
       }).join('');
-      document.getElementById('psmV3TenantConfirmButton').textContent = adding ? 'Add tenants' : 'Remove tenants';
+      var confirmButton = document.getElementById('psmV3TenantConfirmButton');
+      confirmButton.className = adding ? 'btn btn-primary' : 'btn btn-danger';
+      confirmButton.textContent = adding ? 'Add '+psmV3TenantChange.ids.length+' tenant'+(psmV3TenantChange.ids.length === 1 ? '' : 's') : 'Remove '+psmV3TenantChange.ids.length+' tenant'+(psmV3TenantChange.ids.length === 1 ? '' : 's');
       showModal('psmV3TenantConfirmModal');
+    }
+
+    function psmV3BackToTenantChange() {
+      hideModal('psmV3TenantConfirmModal');
+      psmV3ShowTablePanel('v3-tenant-change-panel');
     }
 
     function psmV3ConfirmTenantChange() {
@@ -4886,8 +5030,9 @@
       if (!c || !psmV3TenantChange.valid || !psmV3CanEdit(c)) return;
       var ids = psmV3TenantChange.ids.slice();
       if (psmV3TenantChange.action === 'add') {
+        var startingTenantCount = c.customers.length;
         ids.forEach(function(id, index) {
-          var customer = psmMvpCreateTenantRecord('Fabrikam Tenant '+String(c.customers.length + index + 1).padStart(3, '0'), id, c, c.customers.length + index);
+          var customer = psmMvpCreateTenantRecord('Fabrikam Tenant '+String(startingTenantCount + index + 1).padStart(3, '0'), id, c, startingTenantCount + index);
           customer.association = 'None';
           customer.manuallyAdded = true;
           c.customers.push(customer);
@@ -4946,12 +5091,14 @@
       psmV3TenantTableState.filters.association = document.getElementById('psmV3TenantAssociationFilter').value;
       psmV3TenantTableState.filters.segment = document.getElementById('psmV3TenantSegmentFilter').value;
       psmV3TenantTableState.filters.country = document.getElementById('psmV3TenantCountryFilter').value;
+      psmV3TenantTableState.page = 1;
       psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
     }
 
     function psmV3ClearTenantPanelFilters() {
       psmV3TenantTableState.filters = { association:'', segment:'', country:'' };
+      psmV3TenantTableState.page = 1;
       psmV3CloseTablePanel();
       psmRefreshTenantWorkspace();
     }
@@ -4975,6 +5122,7 @@
       if (psmV3TenantTableState.campaignId !== id) {
         psmV3TenantTableState.campaignId = id;
         psmV3TenantTableState.search = '';
+        psmV3TenantTableState.page = 1;
         psmV3TenantTableState.filters = { association:'', segment:'', country:'' };
         psmV3TenantTableState.visibleColumns = { domain:true, country:true, segment:true };
       }
