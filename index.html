@@ -771,13 +771,13 @@
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .psm-v3-detail-title-row h1 { margin:0; }
     .psm-v3-detail-title-actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
-    .psm-v3-business-outcome-header { width:300px; padding:9px 12px; }
-    .psm-v3-business-outcome-header h3 { margin-bottom:5px; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-value { gap:9px; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon { flex-basis:28px; width:28px; height:28px; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon svg { width:15px; height:15px; }
+    .psm-v3-business-outcome-header { display:flex; align-items:center; gap:10px; width:auto; min-height:40px; padding:8px 12px; box-sizing:border-box; }
+    .psm-v3-business-outcome-header h3 { margin:0; white-space:nowrap; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-value { gap:8px; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon { flex-basis:24px; width:24px; height:24px; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-icon svg { width:14px; height:14px; }
     .psm-v3-business-outcome-header .psm-v3-business-outcome-value span { display:none; }
-    .psm-v3-business-outcome-header .psm-v3-business-outcome-value strong { font-size:16px; }
+    .psm-v3-business-outcome-header .psm-v3-business-outcome-value strong { font-size:14px; white-space:nowrap; }
     .psm-v3-tenant-highlight { flex:1 1 320px; min-width:300px; }
     .psm-v3-tenant-status-inline { display:grid; grid-template-columns:repeat(5,minmax(48px,1fr)); gap:6px; min-width:0; }
     .psm-v3-tenant-status-item { min-width:0; padding:7px 6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); text-align:center; }
@@ -1231,16 +1231,17 @@
     .v3-detail-overview { margin-bottom:16px; }
     .v3-detail-overview .panel-card { margin:0; }
     .v3-status-summary { min-width:0; padding:2px 0 0; }
-    .v3-status-summary-head { display:flex; align-items:center; gap:12px; min-height:36px; }
-    .v3-status-summary-head h3 { margin:0; color:var(--cp-text-muted); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
-    .v3-current-status { padding-left:10px; border-left:3px solid var(--cp-accent); color:var(--cp-text); font-size:18px; font-weight:600; line-height:1.2; }
-    .v3-status-summary-head .v3-detail-actions { margin-left:auto; }
+    .v3-section-heading-row { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid var(--cp-border); }
+    .psm-v3-detail .v3-section-heading-row .psm-v3-section-heading { margin:0; padding:0; border:0; }
+    .v3-status-card { margin-bottom:16px; }
+    .v3-status-card .v3-status-flow { margin:16px 0 2px; }
     .v3-summary-meta { display:grid; grid-template-columns:repeat(7,minmax(110px,1fr)); margin:16px 0 0; padding:14px 0 0; border-top:1px solid var(--cp-border); }
     .v3-summary-meta > div { min-width:0; padding:0 14px; border-left:1px solid var(--cp-border); }
     .v3-summary-meta > div:first-child { padding-left:0; border-left:0; }
     .v3-summary-meta > div:last-child { padding-right:0; }
     .v3-summary-meta dt { margin:0 0 4px; color:var(--cp-text-muted); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.25px; }
     .v3-summary-meta dd { margin:0; overflow:hidden; color:var(--cp-text); font-size:12px; font-weight:600; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
+    .v3-detail-overview .v3-summary-meta { margin-top:0; padding-top:0; border-top:0; }
     .v3-summary-meta-value { display:flex; align-items:center; gap:8px; min-width:0; }
     .v3-meta-edit {
       padding:0; border:0; background:transparent; color:var(--cp-link);
@@ -1563,7 +1564,7 @@
       body.psm-v3-view .psm-v3-detail-title-row { align-items:center; flex-wrap:wrap; }
       body.psm-v3-view .psm-v3-detail-title-row h1 { flex:1 1 320px; }
       body.psm-v3-view .psm-v3-detail-title-actions { margin-left:auto; }
-      body.psm-v3-view .psm-v3-business-outcome-header { width:min(300px,calc(100vw - 88px)); }
+      body.psm-v3-view .psm-v3-business-outcome-header { width:auto; }
       body.psm-v3-view .v3-summary-meta { grid-template-columns:repeat(2,minmax(0,1fr)); }
       body.psm-v3-view .v3-summary-meta > div,
       body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0 12px; border-left:1px solid var(--cp-border); }
@@ -1574,11 +1575,10 @@
       body.psm-v3-view .v3-pie-layout { align-items:flex-start; flex-direction:column; min-height:0; }
       body.psm-v3-view .v3-create-overlay .v3-modal,
       body.psm-v3-view .modal { width:100% !important; max-width:100%; }
-      body.psm-v3-view .v3-status-summary-head { align-items:flex-start; flex-wrap:wrap; }
-      body.psm-v3-view .v3-status-summary-head .v3-detail-actions { width:100%; margin-left:0; }
-      body.psm-v3-view .v3-status-summary-head .btn { width:100%; }
       body.psm-v3-view .psm-v3-detail-title-actions { width:100%; }
       body.psm-v3-view .psm-v3-business-outcome-header { flex:1 1 auto; width:auto; }
+      body.psm-v3-view .v3-section-heading-row { align-items:stretch; flex-direction:column; }
+      body.psm-v3-view .v3-section-heading-row .btn { width:100%; }
       body.psm-v3-view .v3-summary-meta { grid-template-columns:1fr; gap:10px; }
       body.psm-v3-view .v3-summary-meta > div,
       body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0; border-left:0; }
@@ -5357,7 +5357,7 @@
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
       detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions">'+businessOutcomePanel+'<button class="flyout-close" type="button" onclick="showDashboard()" aria-label="Close campaign details">&times;</button></div></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
-        '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><section class="v3-status-summary" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-status-summary-head"><h3 id="psmV3CampaignStatusHeading">Campaign status</h3><span class="v3-current-status">'+psmEscapeHtml(c.v3Status)+'</span><div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div></div>'+statusFlow+(canEdit ? '' : '<p style="margin:6px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'</section><dl class="v3-summary-meta">' +
+        '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
           '<div><dt>PartnerOne name</dt><dd>'+psmEscapeHtml(c.partner)+'</dd></div>' +
@@ -5366,6 +5366,7 @@
           '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
           '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
         '</dl></div></div>' +
+        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-section-heading-row"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'</section>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
