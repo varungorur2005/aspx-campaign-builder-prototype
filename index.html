@@ -3526,7 +3526,6 @@
       dashboard.innerHTML = '<div class="v3-shell">' +
         '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>Referrals and Deal Clinics</span><small class="v3-title-suite">AI Business Solutions &amp; Security</small><i class="v3-title-info" title="AI Business Solutions &amp; Security Partner eXperience">i</i></h1></div></div>' +
         '<div class="v3-page-tabs-row"><nav class="v3-page-tabs" aria-label="Referrals and Deal Clinics views"><button class="v3-page-tab" type="button" onclick="showToast(\'FastTrack Referrals selected\')">FastTrack Referrals</button><button class="v3-page-tab" type="button" onclick="showToast(\'Security Deal Clinic selected\')">Security Deal Clinic</button><button class="v3-page-tab active" type="button" aria-current="page">PSM Campaigns</button></nav><div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
-        '<div class="v3-framework-note"><strong>Demo data:</strong><span>KPI and trend values are synthetic for prototype review. Cowork is represented as monetized credit consumption, not seats, licenses, MAU, or generic usage.</span></div>' +
         '<div id="psmV3Kpis"></div><div id="psmV3Charts"></div><div id="psmV3Table"></div></div>';
       psmV3RenderDashboard();
     }
@@ -3728,7 +3727,7 @@
         return '<line class="v3-trend-gridline" x1="'+point.x+'" y1="'+(height-bottom)+'" x2="'+point.x+'" y2="'+(height-bottom+4)+'"></line><circle class="v3-trend-dot" cx="'+point.x+'" cy="'+point.y+'" r="3"><title>'+labels[index]+': '+valuePrefix+point.value.toLocaleString()+valueSuffix+'</title></circle><text class="v3-trend-value" x="'+point.x+'" y="'+Math.max(10, point.y-7)+'" text-anchor="middle">'+formatAxisValue(point.value)+'</text><text class="v3-trend-label" x="'+point.x+'" y="'+(height-12)+'" text-anchor="middle">'+labels[index]+'</text>';
       }).join('');
       var chart = '<svg class="v3-trend-svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+psmEscapeHtml(title)+' month-over-month trend">'+grid+'<line class="v3-trend-gridline" x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(height-bottom)+'"></line><line class="v3-trend-gridline" x1="'+left+'" y1="'+(height-bottom)+'" x2="'+(width-right)+'" y2="'+(height-bottom)+'"></line><polyline class="v3-trend-line" points="'+points.map(function(point) { return point.x+','+point.y; }).join(' ')+'"></polyline>'+pointMarkup+'<text class="v3-trend-label" x="'+((left+width-right)/2)+'" y="'+(height-1)+'" text-anchor="middle">Month</text></svg>';
-      return '<he-card_psmv3 class="v3-card"><h2>'+psmEscapeHtml(title)+'</h2><p style="margin:4px 0;color:var(--cp-text-muted);font-size:11px;">'+psmEscapeHtml(subtitle)+'</p><div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card"><h2>'+psmEscapeHtml(title)+'</h2><div class="v3-trend-panel">'+chart+'</div></he-card_psmv3>';
     }
 
     function psmV3RenderCharts(campaigns) {
@@ -3741,8 +3740,8 @@
         return { label:region, value:value, display:value.toLocaleString() };
       });
       document.getElementById('psmV3Charts').innerHTML = '<div class="v3-charts">' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Campaigns in New, Outreach, Engage, Committed, and Closed.</p>'+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
-        '<he-card_psmv3 class="v3-card"><h2>Campaigns by region</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Provisional portfolio view. Final attribution rule for multi-region campaigns is pending.</p>'+psmV3PieChart(regions, 'Campaign regional distribution pie chart')+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Campaign lifecycle</h2>'+psmV3PieChart(lifecycle, 'Campaign lifecycle pie chart')+'</he-card_psmv3>' +
+        '<he-card_psmv3 class="v3-card"><h2>Campaigns by region</h2>'+psmV3PieChart(regions, 'Campaign regional distribution pie chart')+'</he-card_psmv3>' +
         psmV3TrendCard('Copilot paid MAU growth', 'Monthly aggregate across committed campaigns', [420, 610, 760, 980, 1120, 1360], '')+
         psmV3TrendCard('NPSA growth', 'Synthetic demo net paid seat adds', [185, 260, 348, 455, 590, 742], '')+
         psmV3TrendCard('Cowork credit consumption growth', 'Synthetic demo monetized credits', [18200, 24750, 31600, 42800, 53750, 68900], '$')+
@@ -4674,7 +4673,7 @@
       }).join('');
       var metricGroupHeaders = config.columns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : ' colspan="3"')+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
       var metricSubHeaders = config.columns.map(function(column) { return column.format === 'text' ? '' : '<th>Baseline</th><th>Current</th><th>Growth</th>'; }).join('');
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions"><div class="v3-analysis-filters"><select aria-label="Filter tenant opportunities" onchange="psmV3FilterTenantOpportunity(this.value)"><option value="">All opportunity signals</option><option value="no-license">Without Copilot licenses</option><option value="growth">Growth phase</option><option value="usage-limit">Users at usage limits</option><option value="license-request">License requests</option></select><input aria-label="Search tenants" placeholder="Search tenant name or ID" oninput="psmV3FilterTenantRows(this.value)" style="padding:8px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></div><he-button_psmv3 class="v3-btn" onclick="psmV3DownloadTenants(\''+c.id+'\')">Download</he-button_psmv3></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr><th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Tenant Domain</th><th rowspan="2">Tenant Country/Region</th><th rowspan="2">Tenant Segment</th>'+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant. Metric mapping is proposed for prototype review and will be finalized with the PSM.</div></he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2 style="margin-bottom:4px;">Campaign tenants</h2><span style="color:var(--cp-text-muted);font-size:12px;">'+c.customers.length+' tenant records with columns mapped to <strong>'+psmEscapeHtml(config.label)+'</strong>.</span></div><div class="v3-actions"><div class="v3-analysis-filters"><select aria-label="Filter tenant opportunities" onchange="psmV3FilterTenantOpportunity(this.value)"><option value="">All opportunity signals</option><option value="no-license">Without Copilot licenses</option><option value="growth">Growth phase</option><option value="usage-limit">Users at usage limits</option><option value="license-request">License requests</option></select><input aria-label="Search tenants" placeholder="Search tenant name or ID" oninput="psmV3FilterTenantRows(this.value)" style="padding:8px;border:1px solid var(--cp-border-strong);border-radius:0.625rem;background:var(--cp-surface);color:var(--cp-text);"></div><he-button_psmv3 class="v3-btn" onclick="psmV3DownloadTenants(\''+c.id+'\')">Download</he-button_psmv3></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr><th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Tenant Domain</th><th rowspan="2">Tenant Country/Region</th><th rowspan="2">Tenant Segment</th>'+metricGroupHeaders+'</tr><tr>'+metricSubHeaders+'</tr></thead><tbody>'+rows+'</tbody></table></div><div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">Growth compares the current value with the campaign baseline for each tenant.</div></he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -4738,8 +4737,8 @@
       })).join('');
       var detailCharts =
         '<div class="v3-charts">' +
-          '<he-card_psmv3 class="v3-card"><h2>Tenant lifecycle</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Customer tenants by campaign lifecycle stage.</p>'+psmV3PieChart(lifecycleChart, 'Campaign tenant lifecycle pie chart')+'</he-card_psmv3>' +
-          '<he-card_psmv3 class="v3-card"><h2>Tenants by region</h2><p style="margin:4px 0 16px;color:var(--cp-text-muted);font-size:11px;">Customer tenant geography in this campaign.</p>'+psmV3PieChart(tenantRegions, 'Campaign tenant regional distribution pie chart')+'</he-card_psmv3>' +
+          '<he-card_psmv3 class="v3-card"><h2>Tenant lifecycle</h2>'+psmV3PieChart(lifecycleChart, 'Campaign tenant lifecycle pie chart')+'</he-card_psmv3>' +
+          '<he-card_psmv3 class="v3-card"><h2>Tenants by region</h2>'+psmV3PieChart(tenantRegions, 'Campaign tenant regional distribution pie chart')+'</he-card_psmv3>' +
           outcomeConfig.trends.map(function(trend) { return psmV3TrendCard(trend.title, trend.subtitle, trend.values, trend.prefix, trend.suffix || ''); }).join('') +
         '</div>';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
@@ -4769,7 +4768,7 @@
         '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2>' +
           '<div class="v3-kpis" style="grid-template-columns:repeat(6,minmax(150px,1fr));">'+detailKpis+'</div>' +
           detailCharts +
-          '<p style="margin:12px 0 0;color:var(--cp-text-muted);font-size:11px;">Metric mapping and values are proposed for prototype review and will be finalized with the PSM.</p></div>' +
+          '</div>' +
         psmV3TenantWorkspace(c);
       window.location.hash = 'psm-v3-campaign-'+id;
     }
