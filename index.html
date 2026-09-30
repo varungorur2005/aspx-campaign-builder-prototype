@@ -759,13 +759,13 @@
     .psm-v3-initial-note h2 { margin:0 0 8px; font-size:14px; }
     .psm-v3-initial-note p { margin:0; color:var(--cp-text); font-size:13px; line-height:1.5; white-space:pre-wrap; }
     .psm-v3-initial-note-meta { display:block; margin-top:8px; color:var(--cp-text-muted); font-size:11px; }
-    .psm-v3-business-outcome { margin:0 0 16px; padding:10px 12px; border-left:4px solid var(--cp-accent); background:var(--cp-surface-soft); }
-    .psm-v3-business-outcome h3 { margin:0 0 7px; color:var(--cp-text); font-size:12px; font-weight:600; }
-    .psm-v3-business-outcome-value { display:flex; align-items:center; gap:12px; padding:6px 0 2px; }
+    .psm-v3-business-outcome { min-width:0; padding:14px 16px; border-left:4px solid var(--cp-accent); background:var(--cp-accent-soft); }
+    .psm-v3-business-outcome h3 { margin:0 0 10px; color:var(--cp-text-muted); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+    .psm-v3-business-outcome-value { display:flex; align-items:center; gap:12px; }
     .psm-v3-business-outcome-icon { display:flex; align-items:center; justify-content:center; flex:0 0 34px; width:34px; height:34px; border-radius:50%; background:var(--cp-accent-soft); color:var(--cp-accent); }
     .psm-v3-business-outcome-icon svg { width:18px; height:18px; }
     .psm-v3-business-outcome-value span { display:block; margin-bottom:3px; color:var(--cp-text-muted); font-size:11px; }
-    .psm-v3-business-outcome-value strong { display:block; color:var(--cp-text); font-size:18px; font-weight:600; }
+    .psm-v3-business-outcome-value strong { display:block; color:var(--cp-text); font-size:20px; font-weight:600; line-height:1.2; }
     .psm-v3-campaign-status { flex:0 0 160px; min-height:58px; padding:8px 10px; }
     .psm-v3-campaign-status strong { display:block; color:var(--cp-text); font-size:16px; line-height:1.2; }
     .psm-v3-detail-title-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
@@ -1198,7 +1198,7 @@
     .v3-tenant-table { min-width:1180px; }
     .v3-tenant-table tbody tr { cursor:default; }
     .v3-tenant-table textarea { min-width:190px; min-height:38px; padding:6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font:inherit; }
-    .v3-status-flow { display:flex; align-items:flex-start; margin:14px 0; }
+    .v3-status-flow { display:flex; align-items:flex-start; margin:8px 0 0; }
     .v3-status-step { position:relative; flex:1; padding-top:24px; color:var(--cp-text-muted); font-size:11px; text-align:center; }
     .v3-status-step::before { content:""; position:absolute; top:7px; left:50%; width:14px; height:14px; transform:translateX(-50%); border:2px solid var(--cp-border-strong); border-radius:50%; background:var(--cp-surface); z-index:1; }
     .v3-status-step::after { content:""; position:absolute; top:14px; left:-50%; width:100%; border-top:2px solid var(--cp-border); }
@@ -1220,16 +1220,32 @@
     .v3-trend-label { fill:var(--cp-text-muted); font-size:9px; font-family:"Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
     .v3-trend-value { fill:var(--cp-text); font-size:9px; font-weight:600; font-family:"Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
     .v3-mapping-pending { display:inline-flex; align-items:center; min-height:24px; padding:3px 8px; border:1px solid var(--cp-warning); border-radius:0.625rem; color:var(--cp-text); font-size:11px; font-weight:600; }
-    .v3-detail-overview { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(360px,.85fr); gap:16px; margin-bottom:16px; }
+    .v3-detail-overview { margin-bottom:16px; }
     .v3-detail-overview .panel-card { margin:0; }
-    .v3-detail-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .v3-summary-primary { display:grid; grid-template-columns:minmax(260px,.8fr) minmax(520px,1.7fr); gap:20px; align-items:stretch; }
+    .v3-status-summary { min-width:0; padding:2px 0 0; }
+    .v3-status-summary-head { display:flex; align-items:center; gap:12px; min-height:36px; }
+    .v3-status-summary-head h3 { margin:0; color:var(--cp-text-muted); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+    .v3-current-status { padding-left:10px; border-left:3px solid var(--cp-accent); color:var(--cp-text); font-size:18px; font-weight:600; line-height:1.2; }
+    .v3-status-summary-head .v3-detail-actions { margin-left:auto; }
+    .v3-summary-meta { display:grid; grid-template-columns:repeat(7,minmax(110px,1fr)); margin:16px 0 0; padding:14px 0 0; border-top:1px solid var(--cp-border); }
+    .v3-summary-meta > div { min-width:0; padding:0 14px; border-left:1px solid var(--cp-border); }
+    .v3-summary-meta > div:first-child { padding-left:0; border-left:0; }
+    .v3-summary-meta > div:last-child { padding-right:0; }
+    .v3-summary-meta dt { margin:0 0 4px; color:var(--cp-text-muted); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.25px; }
+    .v3-summary-meta dd { margin:0; overflow:hidden; color:var(--cp-text); font-size:12px; font-weight:600; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
+    .v3-detail-actions { display:flex; gap:8px; flex-wrap:wrap; }
     .v3-detail-actions .btn:disabled { cursor:not-allowed; opacity:.55; }
     .v3-readonly-table { min-width:820px; }
     .v3-readonly-table tbody tr { cursor:default; }
     .v3-readonly-table .v3-tenant-domain { min-width:180px; max-width:220px; overflow:hidden; text-overflow:ellipsis; }
     .v3-analysis-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .v3-analysis-filters select { min-width:210px; padding:8px 10px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
-    @media (max-width:1100px) { .v3-detail-overview { grid-template-columns:1fr; } }
+    @media (max-width:1100px) {
+      .v3-summary-primary { grid-template-columns:1fr; gap:14px; }
+      .v3-summary-meta { grid-template-columns:repeat(4,minmax(120px,1fr)); row-gap:14px; }
+      .v3-summary-meta > div:nth-child(5) { padding-left:0; border-left:0; }
+    }
     .v3-activity { display:grid; grid-template-columns:110px 1fr; gap:6px 12px; padding:9px 0; border-bottom:1px solid var(--cp-border); font-size:12px; }
     .v3-activity time { color:var(--cp-text-muted); }
     .v3-table-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:16px 0 10px; padding:10px 0; border-top:1px solid var(--cp-border); }
@@ -1533,13 +1549,22 @@
       body.psm-v3-view .detail-view.psm-v3-detail { padding:16px 16px 64px; }
       body.psm-v3-view .psm-v3-detail .flyout-header { margin:-16px -16px 16px; padding:14px 16px; }
       body.psm-v3-view .psm-v3-detail-title-row { align-items:flex-start; flex-direction:column; }
-      body.psm-v3-view .v3-detail-overview { grid-template-columns:1fr; }
+      body.psm-v3-view .v3-summary-meta { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      body.psm-v3-view .v3-summary-meta > div,
+      body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0 12px; border-left:1px solid var(--cp-border); }
+      body.psm-v3-view .v3-summary-meta > div:nth-child(odd) { padding-left:0; border-left:0; }
     }
     @media (max-width:560px) {
       body.psm-v3-view .v3-kpis { grid-template-columns:1fr !important; }
       body.psm-v3-view .v3-pie-layout { align-items:flex-start; flex-direction:column; min-height:0; }
       body.psm-v3-view .v3-create-overlay .v3-modal,
       body.psm-v3-view .modal { width:100% !important; max-width:100%; }
+      body.psm-v3-view .v3-status-summary-head { align-items:flex-start; flex-wrap:wrap; }
+      body.psm-v3-view .v3-status-summary-head .v3-detail-actions { width:100%; margin-left:0; }
+      body.psm-v3-view .v3-status-summary-head .btn { width:100%; }
+      body.psm-v3-view .v3-summary-meta { grid-template-columns:1fr; gap:10px; }
+      body.psm-v3-view .v3-summary-meta > div,
+      body.psm-v3-view .v3-summary-meta > div:nth-child(5) { padding:0; border-left:0; }
     }
     @media (max-width:1000px) { .v3-impact-grid { grid-template-columns:1fr; } }
   </style>
@@ -5315,16 +5340,16 @@
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
       detail.innerHTML = '<div class="flyout-header"><div></div><button class="flyout-close" onclick="showDashboard()" title="Close">&times;</button></div>' +
-        '<div class="detail-header"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button></div><p style="margin:5px 0 18px;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
-        '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2>'+businessOutcomePanel+'<div class="detail-meta">' +
-          '<div class="detail-meta-item"><strong>Campaign ID:</strong> '+c.id+'</div>' +
-          '<div class="detail-meta-item"><strong>PartnerOne ID:</strong> '+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</div>' +
-          '<div class="detail-meta-item"><strong>PartnerOne name:</strong> '+psmEscapeHtml(c.partner)+'</div>' +
-          '<div class="detail-meta-item"><strong>Created by:</strong> '+psmEscapeHtml(c.v3Owner)+'</div>' +
-          '<div class="detail-meta-item"><strong>Created:</strong> '+psmEscapeHtml(c.v3OpenDate)+'</div>' +
-          '<div class="detail-meta-item"><strong>Last updated:</strong> '+psmEscapeHtml(c.v3LastUpdated)+'</div>' +
-          '<div class="detail-meta-item"><strong>Customer tenants:</strong> '+c.tenantCount.toLocaleString()+'</div>' +
-        '</div></div><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign status</h2><strong style="font-size:18px;">'+psmEscapeHtml(c.v3Status)+'</strong>'+statusFlow+'<div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div>'+(canEdit ? '' : '<p style="margin:10px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</div></div>' +
+        '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><button class="btn btn-secondary" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')">Change Campaign Ownership</button></div><p style="margin:5px 0 0;color:var(--cp-text-muted);">Campaign-level operations and read-only tenant analysis</p></div>' +
+        '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><div class="v3-summary-primary">'+businessOutcomePanel+'<section class="v3-status-summary" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-status-summary-head"><h3 id="psmV3CampaignStatusHeading">Campaign status</h3><span class="v3-current-status">'+psmEscapeHtml(c.v3Status)+'</span><div class="v3-detail-actions"><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign</button></div></div>'+statusFlow+(canEdit ? '' : '<p style="margin:6px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Use Change Campaign Ownership to assign the campaign.</p>')+'</section></div><dl class="v3-summary-meta">' +
+          '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
+          '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
+          '<div><dt>PartnerOne name</dt><dd>'+psmEscapeHtml(c.partner)+'</dd></div>' +
+          '<div><dt>Created by</dt><dd>'+psmEscapeHtml(c.v3Owner)+'</dd></div>' +
+          '<div><dt>Created</dt><dd>'+psmEscapeHtml(c.v3OpenDate)+'</dd></div>' +
+          '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
+          '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
+        '</dl></div></div>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
