@@ -1179,7 +1179,15 @@
     .v3-selection-bar { display:none; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0; padding:10px 12px; border:1px solid var(--cp-accent); border-radius:0.625rem; background:var(--cp-accent-soft); }
     .v3-selection-bar.show { display:flex; }
     .v3-selection-bar strong { margin-right:auto; }
+    .v3-selection-guidance { flex-basis:100%; color:var(--cp-text-muted); font-size:11px; }
     .v3-selection-bar select, .v3-selection-bar input { padding:7px 9px; border:1px solid var(--cp-border-strong); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); }
+    .v3-tenant-select-cell { width:42px; min-width:42px !important; text-align:center !important; }
+    .v3-tenant-select-cell input { width:16px; height:16px; cursor:pointer; }
+    .v3-tenant-selection-mode-label { color:var(--cp-text-muted); font-size:12px; font-weight:600; }
+    .v3-tenant-change-methods.three { grid-template-columns:repeat(3,1fr); }
+    .v3-tenant-table-choice { padding:16px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface-soft); }
+    .v3-tenant-table-choice strong { display:block; margin-bottom:5px; color:var(--cp-text); font-size:12px; }
+    .v3-tenant-table-choice p { margin-bottom:14px; }
     .v3-tenant-table { min-width:1180px; }
     .v3-tenant-table tbody tr { cursor:default; }
     .v3-tenant-table textarea { min-width:190px; min-height:38px; padding:6px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); font:inherit; }
@@ -4655,11 +4663,13 @@
       search: '',
       page: 1,
       pageSize: 25,
+      selectionMode: false,
+      selectedIds: [],
       filters: { association:'', segment:'', country:'' },
       visibleColumns: { domain:true, country:true, segment:true }
     };
     var psmV3TenantSearchTimer;
-    var psmV3TenantChange = { action:'', ids:[], valid:false };
+    var psmV3TenantChange = { action:'', ids:[], valid:false, source:'input' };
 
     function psmV3FilterTenantRows(value) {
       psmV3TenantTableState.search = value.trim().toLowerCase();
@@ -4688,6 +4698,65 @@
     function psmV3TenantPage(delta) {
       psmV3TenantTableState.page = Math.max(1, psmV3TenantTableState.page + delta);
       psmRefreshTenantWorkspace();
+    }
+
+    function psmV3StartTenantTableSelection() {
+      psmV3CloseTablePanel();
+      psmV3TenantTableState.selectionMode = true;
+      psmV3TenantTableState.selectedIds = [];
+      psmV3TenantTableState.page = 1;
+      psmRefreshTenantWorkspace();
+      window.requestAnimationFrame(function() {
+        var checkbox = document.querySelector('.v3-tenant-check');
+        if (checkbox) checkbox.focus();
+      });
+    }
+
+    function psmV3CancelTenantTableSelection() {
+      psmV3TenantTableState.selectionMode = false;
+      psmV3TenantTableState.selectedIds = [];
+      psmRefreshTenantWorkspace();
+    }
+
+    function psmV3ToggleTenantSelection(id, checked) {
+      var selected = new Set(psmV3TenantTableState.selectedIds);
+      if (checked) selected.add(id);
+      else selected.delete(id);
+      psmV3TenantTableState.selectedIds = Array.from(selected);
+      psmV3UpdateTenantSelectionBar();
+    }
+
+    function psmV3ToggleTenantPageSelection(checked) {
+      document.querySelectorAll('.v3-tenant-check').forEach(function(box) {
+        box.checked = checked;
+        psmV3ToggleTenantSelection(box.getAttribute('data-tenant-id'), checked);
+      });
+      psmV3UpdateTenantSelectionBar();
+    }
+
+    function psmV3UpdateTenantSelectionBar() {
+      var count = psmV3TenantTableState.selectedIds.length;
+      var countLabel = document.getElementById('v3TenantSelectionCount');
+      var reviewButton = document.getElementById('v3TenantReviewRemoval');
+      if (countLabel) countLabel.textContent = count+' tenant'+(count === 1 ? '' : 's')+' selected';
+      if (reviewButton) reviewButton.disabled = count === 0;
+      var pageBoxes = Array.from(document.querySelectorAll('.v3-tenant-check'));
+      var checkedCount = pageBoxes.filter(function(box) { return box.checked; }).length;
+      var allBox = document.getElementById('v3TenantSelectPage');
+      if (allBox) {
+        allBox.checked = pageBoxes.length > 0 && checkedCount === pageBoxes.length;
+        allBox.indeterminate = checkedCount > 0 && checkedCount < pageBoxes.length;
+      }
+    }
+
+    function psmV3ReviewSelectedTenantRemoval() {
+      var ids = psmV3TenantTableState.selectedIds.slice();
+      if (!ids.length) {
+        showToast('Select at least one tenant to remove', true);
+        return;
+      }
+      psmV3TenantChange = { action:'remove', ids:ids, valid:true, source:'table' };
+      psmV3ShowTenantChangeConfirmation();
     }
 
     function psmV3UpdateTenant(id, index, field, value) {
@@ -4856,6 +4925,7 @@
       psmV3TenantTableState.page = Math.min(Math.max(1, psmV3TenantTableState.page), totalPages);
       var pageStart = (psmV3TenantTableState.page - 1) * psmV3TenantTableState.pageSize;
       var pageCustomers = filteredCustomers.slice(pageStart, pageStart + psmV3TenantTableState.pageSize);
+      var selectedTenantIds = new Set(psmV3TenantTableState.selectedIds);
       var rows = pageCustomers.map(function(item) {
         var customer = item.customer;
         var index = item.index;
@@ -4866,17 +4936,28 @@
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
           return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td>'+(showMomGrowth ? '<td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>' : '');
         }).join('');
-        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+(customer.association || 'None')+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'"><td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td><span class="v3-chip">'+psmEscapeHtml(customer.association || 'None')+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
+        var selectionCell = psmV3TenantTableState.selectionMode ? '<td class="v3-tenant-select-cell"><input class="v3-tenant-check" type="checkbox" data-tenant-id="'+psmEscapeHtml(customer.tenantId)+'" aria-label="Select '+psmEscapeHtml(name)+'" '+(selectedTenantIds.has(customer.tenantId) ? 'checked ' : '')+'onchange="psmV3ToggleTenantSelection(\''+psmEscapeHtml(customer.tenantId)+'\',this.checked)"></td>' : '';
+        return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+(customer.association || 'None')+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'">'+selectionCell+'<td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td><span class="v3-chip">'+psmEscapeHtml(customer.association || 'None')+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
       var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : (showMomGrowth ? ' colspan="2"' : ' rowspan="2"'))+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
       var metricSubHeaders = showMomGrowth ? visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('') : '';
-      var tenantHeaders = '<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Association</th>' +
+      var pageSelectionCount = pageCustomers.filter(function(item) { return selectedTenantIds.has(item.customer.tenantId); }).length;
+      var selectionHeader = psmV3TenantTableState.selectionMode ? '<th class="v3-tenant-select-cell" rowspan="2"><input id="v3TenantSelectPage" type="checkbox" aria-label="Select all tenants on this page" '+(pageCustomers.length && pageSelectionCount === pageCustomers.length ? 'checked ' : '')+'onchange="psmV3ToggleTenantPageSelection(this.checked)"></th>' : '';
+      var tenantHeaders = selectionHeader+'<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Association</th>' +
         (psmV3TenantTableState.visibleColumns.domain ? '<th class="v3-tenant-domain" rowspan="2">Tenant Domain</th>' : '') +
         (psmV3TenantTableState.visibleColumns.country ? '<th rowspan="2">Tenant Country/Region</th>' : '') +
         (psmV3TenantTableState.visibleColumns.segment ? '<th rowspan="2">Tenant Segment</th>' : '');
       var activeFilterCount = (psmV3TenantTableState.filters.association ? 1 : 0) + (psmV3TenantTableState.filters.segment ? 1 : 0) + (psmV3TenantTableState.filters.country ? 1 : 0);
       var tenantEditDisabled = psmV3CanEdit(c) ? '' : ' disabled title="Only the assigned PSM can change campaign tenants"';
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;"><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'remove\')"'+tenantEditDisabled+'>Remove Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button><button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3QueueTenantSearch(this.value)"></div></div></div><div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div><div class="v3-pagination"><span>Showing '+(tenantTotal ? pageStart + 1 : 0)+'-'+Math.min(pageStart + pageCustomers.length, tenantTotal)+' of '+tenantTotal+' tenants</span><div class="v3-actions"><label>Rows per page <select aria-label="Tenant rows per page" onchange="psmV3SetTenantPageSize(this.value)">'+[25,50,100].map(function(size) { return '<option value="'+size+'"'+(psmV3TenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(-1)"'+(psmV3TenantTableState.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3TenantTableState.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(1)"'+(psmV3TenantTableState.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
+      var tenantSearch = '<div class="v3-table-search-wrap"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8.5 3a5.5 5.5 0 0 1 4.23 9.02l4.12 4.13a.75.75 0 0 1-1.06 1.06l-4.13-4.12A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg><input class="v3-table-search" aria-label="Search tenants" placeholder="Search tenants" value="'+psmEscapeHtml(psmV3TenantTableState.search)+'" oninput="psmV3QueueTenantSearch(this.value)"></div>';
+      var filterButton = '<button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button>';
+      var toolbarActions = psmV3TenantTableState.selectionMode
+        ? '<span class="v3-tenant-selection-mode-label">Select tenants to remove</span>'+filterButton+tenantSearch
+        : '<button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'remove\')"'+tenantEditDisabled+'>Remove Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>'+filterButton+'<button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button>'+tenantSearch;
+      var selectionBar = psmV3TenantTableState.selectionMode
+        ? '<div class="v3-selection-bar show" id="v3TenantSelectionBar"><strong id="v3TenantSelectionCount">'+psmV3TenantTableState.selectedIds.length+' tenant'+(psmV3TenantTableState.selectedIds.length === 1 ? '' : 's')+' selected</strong><button class="btn btn-secondary btn-sm" type="button" onclick="psmV3CancelTenantTableSelection()">Cancel</button><button class="btn btn-danger btn-sm" id="v3TenantReviewRemoval" type="button" onclick="psmV3ReviewSelectedTenantRemoval()"'+(psmV3TenantTableState.selectedIds.length ? '' : ' disabled')+'>Review removal</button><span class="v3-selection-guidance">Selections are preserved while you search, filter, or move between pages.</span></div>'
+        : '';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;">'+toolbarActions+'</div></div>'+selectionBar+'<div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div><div class="v3-pagination"><span>Showing '+(tenantTotal ? pageStart + 1 : 0)+'-'+Math.min(pageStart + pageCustomers.length, tenantTotal)+' of '+tenantTotal+' tenants</span><div class="v3-actions"><label>Rows per page <select aria-label="Tenant rows per page" onchange="psmV3SetTenantPageSize(this.value)">'+[25,50,100].map(function(size) { return '<option value="'+size+'"'+(psmV3TenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(-1)"'+(psmV3TenantTableState.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3TenantTableState.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(1)"'+(psmV3TenantTableState.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -4889,32 +4970,40 @@
         showToast('Only the assigned PSM can change campaign tenants', true);
         return;
       }
-      psmV3TenantChange = { action:action, ids:[], valid:false };
+      psmV3TenantChange = { action:action, ids:[], valid:false, source:'input' };
       var verb = action === 'add' ? 'Add' : 'Remove';
       var description = action === 'add'
         ? 'Add customer tenants to this campaign using Tenant IDs. Existing campaign tenants will not be duplicated.'
         : 'Remove customer tenants from this campaign using Tenant IDs. Campaign-level history and measurements are not deleted.';
+      var tableMethodTab = action === 'remove' ? '<button class="v3-tenant-change-method" id="psmV3TenantTableTab" type="button" role="tab" data-method="table" aria-selected="false" aria-controls="psmV3TenantTablePane" onclick="psmV3SetTenantChangeMethod(\'table\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Select from table</button>' : '';
+      var tableMethodPane = action === 'remove' ? '<div class="v3-tenant-change-pane" id="psmV3TenantTablePane" role="tabpanel" aria-labelledby="psmV3TenantTableTab" hidden><div class="v3-tenant-table-choice"><strong>Select tenants directly from the campaign table</strong><p>Checkboxes will appear beside each tenant. You can select one or multiple tenants and keep selections while searching, filtering, or changing pages.</p><button class="btn btn-primary" type="button" onclick="psmV3StartTenantTableSelection()">Start selecting tenants</button></div></div>' : '';
       document.getElementById('psmV3TablePanelTitle').textContent = verb+' tenants';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<p class="v3-tenant-change-intro">'+description+'</p>' +
         '<div class="v3-tenant-change-context"><div><span>Campaign</span><strong>'+psmEscapeHtml(c.name)+'</strong></div><div class="v3-tenant-change-count">'+(c.customers || []).length+' current tenants</div></div>' +
         '<div class="v3-tenant-change-steps" aria-label="Tenant change progress"><div class="v3-tenant-change-step active" data-step="1">Provide IDs</div><div class="v3-tenant-change-step" data-step="2">Validate</div><div class="v3-tenant-change-step" data-step="3">Confirm</div></div>' +
-        '<div class="v3-tenant-change-methods" role="tablist" aria-label="Tenant ID input method"><button class="v3-tenant-change-method" id="psmV3TenantPasteTab" type="button" role="tab" aria-selected="true" aria-controls="psmV3TenantPastePane" onclick="psmV3SetTenantChangeMethod(\'paste\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Paste Tenant IDs</button><button class="v3-tenant-change-method" id="psmV3TenantUploadTab" type="button" role="tab" aria-selected="false" aria-controls="psmV3TenantUploadPane" onclick="psmV3SetTenantChangeMethod(\'upload\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Upload a file</button></div>' +
+        '<div class="v3-tenant-change-methods'+(action === 'remove' ? ' three' : '')+'" role="tablist" aria-label="Tenant selection method"><button class="v3-tenant-change-method" id="psmV3TenantPasteTab" type="button" role="tab" data-method="paste" aria-selected="true" aria-controls="psmV3TenantPastePane" onclick="psmV3SetTenantChangeMethod(\'paste\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Paste Tenant IDs</button><button class="v3-tenant-change-method" id="psmV3TenantUploadTab" type="button" role="tab" data-method="upload" aria-selected="false" aria-controls="psmV3TenantUploadPane" onclick="psmV3SetTenantChangeMethod(\'upload\')" onkeydown="psmV3TenantChangeMethodKeydown(event)">Upload a file</button>'+tableMethodTab+'</div>' +
         '<div class="v3-tenant-change-pane" id="psmV3TenantPastePane" role="tabpanel" aria-labelledby="psmV3TenantPasteTab"><label for="psmV3TenantChangeIds">Tenant IDs</label><p id="psmV3TenantChangeIdsHelp">Enter one Tenant ID per line, or separate IDs with commas.</p><textarea id="psmV3TenantChangeIds" aria-describedby="psmV3TenantChangeIdsHelp psmV3TenantChangeValidation" placeholder="00000000-0000-0000-0000-000000000000" oninput="psmV3TenantChangeInputChanged()"></textarea><div class="v3-tenant-change-input-meta"><span>CSV-style values are also supported</span><span id="psmV3TenantChangeInputCount">0 IDs entered</span></div></div>' +
-        '<div class="v3-tenant-change-pane" id="psmV3TenantUploadPane" role="tabpanel" aria-labelledby="psmV3TenantUploadTab" hidden><div class="v3-tenant-file-zone"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 14v5h14v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><label for="psmV3TenantChangeFile">Choose a CSV or TXT file</label><p id="psmV3TenantChangeFileHelp">Use a Tenant ID column, or place Tenant IDs in the first column. Maximum file size: 5 MB.</p><input type="file" id="psmV3TenantChangeFile" aria-describedby="psmV3TenantChangeFileHelp psmV3TenantChangeValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"><div class="v3-tenant-file-name" id="psmV3TenantChangeFileName"></div></div></div>' +
+        '<div class="v3-tenant-change-pane" id="psmV3TenantUploadPane" role="tabpanel" aria-labelledby="psmV3TenantUploadTab" hidden><div class="v3-tenant-file-zone"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 14v5h14v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><label for="psmV3TenantChangeFile">Choose a CSV or TXT file</label><p id="psmV3TenantChangeFileHelp">Use a Tenant ID column, or place Tenant IDs in the first column. Maximum file size: 5 MB.</p><input type="file" id="psmV3TenantChangeFile" aria-describedby="psmV3TenantChangeFileHelp psmV3TenantChangeValidation" accept=".csv,.txt" onchange="psmV3ValidateTenantChangeFile(this)"><div class="v3-tenant-file-name" id="psmV3TenantChangeFileName"></div></div></div>'+tableMethodPane +
         '<div class="v3-tenant-validation-box" id="psmV3TenantChangeValidationBox" hidden><strong>Validation results</strong><div class="v3-validation" id="psmV3TenantChangeValidation" role="status" aria-live="polite"></div></div>' +
         '<div class="v3-tenant-change-actions"><button class="btn btn-secondary" type="button" onclick="psmV3CloseTablePanel()">Cancel</button><button class="btn btn-primary" id="psmV3TenantValidateButton" type="button" onclick="psmV3ValidateTenantChange()">Validate Tenant IDs</button></div>';
       psmV3ShowTablePanel('v3-tenant-change-panel');
     }
 
     function psmV3SetTenantChangeMethod(method) {
-      var paste = method === 'paste';
-      document.getElementById('psmV3TenantPasteTab').setAttribute('aria-selected', String(paste));
-      document.getElementById('psmV3TenantUploadTab').setAttribute('aria-selected', String(!paste));
-      document.getElementById('psmV3TenantPastePane').hidden = !paste;
-      document.getElementById('psmV3TenantUploadPane').hidden = paste;
+      document.querySelectorAll('.v3-tenant-change-method').forEach(function(tab) {
+        tab.setAttribute('aria-selected', String(tab.getAttribute('data-method') === method));
+      });
+      ['paste', 'upload', 'table'].forEach(function(name) {
+        var pane = document.getElementById('psmV3Tenant'+name.charAt(0).toUpperCase()+name.slice(1)+'Pane');
+        if (pane) pane.hidden = name !== method;
+      });
+      var validateButton = document.getElementById('psmV3TenantValidateButton');
+      if (validateButton) validateButton.hidden = method === 'table';
       window.requestAnimationFrame(function() {
-        var target = document.getElementById(paste ? 'psmV3TenantChangeIds' : 'psmV3TenantChangeFile');
+        var target = method === 'paste'
+          ? document.getElementById('psmV3TenantChangeIds')
+          : (method === 'upload' ? document.getElementById('psmV3TenantChangeFile') : document.querySelector('#psmV3TenantTablePane button'));
         if (target) target.focus();
       });
     }
@@ -4922,7 +5011,10 @@
     function psmV3TenantChangeMethodKeydown(event) {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
-      psmV3SetTenantChangeMethod(document.getElementById('psmV3TenantPasteTab').getAttribute('aria-selected') === 'true' ? 'upload' : 'paste');
+      var tabs = Array.from(document.querySelectorAll('.v3-tenant-change-method'));
+      var current = tabs.indexOf(event.currentTarget);
+      var next = event.key === 'ArrowRight' ? (current + 1) % tabs.length : (current - 1 + tabs.length) % tabs.length;
+      psmV3SetTenantChangeMethod(tabs[next].getAttribute('data-method'));
     }
 
     function psmV3TenantChangeInputChanged() {
@@ -5022,6 +5114,7 @@
 
     function psmV3BackToTenantChange() {
       hideModal('psmV3TenantConfirmModal');
+      if (psmV3TenantChange.source === 'table') return;
       psmV3ShowTablePanel('v3-tenant-change-panel');
     }
 
@@ -5046,7 +5139,9 @@
       c.v3Activity = c.v3Activity || [];
       c.v3Activity.push({ date:today(), type:psmV3TenantChange.action === 'add' ? 'Customer tenants added' : 'Customer tenants removed', detail:ids.length+' tenant(s) '+(psmV3TenantChange.action === 'add' ? 'added to' : 'removed from')+' the campaign.' });
       var action = psmV3TenantChange.action;
-      psmV3TenantChange = { action:'', ids:[], valid:false };
+      psmV3TenantChange = { action:'', ids:[], valid:false, source:'input' };
+      psmV3TenantTableState.selectionMode = false;
+      psmV3TenantTableState.selectedIds = [];
       hideModal('psmV3TenantConfirmModal');
       showToast(ids.length+' tenant'+(ids.length === 1 ? '' : 's')+' '+(action === 'add' ? 'added' : 'removed'));
       psmRefreshTenantWorkspace();
@@ -5123,6 +5218,8 @@
         psmV3TenantTableState.campaignId = id;
         psmV3TenantTableState.search = '';
         psmV3TenantTableState.page = 1;
+        psmV3TenantTableState.selectionMode = false;
+        psmV3TenantTableState.selectedIds = [];
         psmV3TenantTableState.filters = { association:'', segment:'', country:'' };
         psmV3TenantTableState.visibleColumns = { domain:true, country:true, segment:true };
       }
@@ -6194,6 +6291,7 @@
     function psmRefreshTenantWorkspace() {
       if (isPsmV3View() && psmV3CurrentCampaign) {
         psmV3OpenDetail(psmV3CurrentCampaign.id);
+        if (psmV3TenantTableState.selectionMode) window.requestAnimationFrame(psmV3UpdateTenantSelectionBar);
         return;
       }
       psmRenderMvpDetail();
