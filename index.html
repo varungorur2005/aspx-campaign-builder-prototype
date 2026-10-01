@@ -793,6 +793,7 @@
     .psm-v3-status-options { display:flex; flex-direction:column; gap:6px; }
     .psm-v3-status-option { display:flex; align-items:center; gap:9px; padding:10px; border:1px solid var(--cp-border); border-radius:0.625rem; background:var(--cp-surface); color:var(--cp-text); cursor:pointer; }
     .psm-v3-status-option:has(input:checked) { border-color:var(--cp-link); background:var(--cp-surface-soft); font-weight:700; }
+    .psm-v3-status-option:has(input:disabled) { color:var(--cp-text-muted); cursor:not-allowed; opacity:.65; }
     .psm-v3-update-history { margin-top:22px; padding-top:18px; border-top:1px solid var(--cp-border); }
     .psm-v3-update-history h4 { margin:0 0 8px; color:var(--cp-text); font-size:15px; }
     .psm-mvp-section-title { display:flex; align-items:center; gap:7px; }
@@ -1295,6 +1296,7 @@
       font:inherit; font-size:11px; font-weight:600; cursor:pointer;
     }
     .v3-meta-edit:hover { text-decoration:underline; }
+    .v3-inline-owner-select { min-width:130px; max-width:180px; padding:4px 6px; border:1px solid var(--cp-border-strong); border-radius:2px; background:var(--cp-surface); color:var(--cp-text); font:inherit; font-size:11px; }
     .v3-detail-actions { display:flex; gap:8px; flex-wrap:wrap; }
     .v3-detail-actions .btn:disabled { cursor:not-allowed; opacity:.55; }
     .v3-readonly-table { min-width:820px; }
@@ -2842,7 +2844,7 @@
       document.getElementById('dashboardTitle').style.display = '';
       document.getElementById('dashboardTitle').innerHTML =
         view === 'partner'
-          ? 'Partner Engagements'
+          ? 'Insights <span style="font-weight:400;">|</span> Partner Engagements'
           : 'Security Deal Clinic <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security</span>';
       document.getElementById('breadcrumb').style.display = view === 'partner' ? '' : 'none';
       // Partner Engagements tabs are shown only in the Partner (ASPX) experience
@@ -3580,6 +3582,7 @@
     let psmV3CreateStep = 0;
     const PSM_V3_CREATE_STEPS = ['Campaign', 'Partner', 'Business outcome', 'Customer tenants', 'Review'];
     let psmV3CurrentCampaign = null;
+    let psmV3InlineOwnerCampaignId = '';
     let psmV3SearchTimer = null;
     const PSM_V3_COLUMNS = [
       { key: 'id', label: 'Campaign ID', fixed: true },
@@ -3774,7 +3777,7 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML = '<div class="v3-shell">' +
-        '<div class="v3-head"><div><h1 class="v3-title-line">Partner Engagements</h1></div></div>' +
+        '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>Partner Engagements</span></h1></div></div>' +
         '<div class="v3-page-tabs-row"><nav class="v3-page-tabs" aria-label="Partner Engagements views"><button class="v3-page-tab" type="button" onclick="showToast(\'FastTrack Referrals selected\')">FastTrack Referrals</button><button class="v3-page-tab" type="button" onclick="showToast(\'Security Deal Clinic selected\')">Security Deal Clinic</button><button class="v3-page-tab active" type="button" aria-current="page">PSM Campaigns</button></nav><div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
         '<div id="psmV3Kpis"></div><div id="psmV3Charts"></div><div id="psmV3Table"></div></div>';
       psmV3RenderDashboard();
@@ -4850,16 +4853,32 @@
       return history.join('') || '<div style="padding:12px 0;color:var(--cp-text-muted);font-size:12px;">No campaign activity yet.</div>';
     }
 
+    function psmV3AllowedStatuses(c) {
+      var currentIndex = PSM_V3_STATUS_FLOW.indexOf(c.v3Status);
+      if (currentIndex < 0) return [c.v3Status];
+      return PSM_V3_STATUS_FLOW.slice(currentIndex, Math.min(currentIndex + 2, PSM_V3_STATUS_FLOW.length));
+    }
+
     function psmV3OpenCampaignUpdate(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       if (!psmV3CanEdit(c)) { showToast('Only the assigned PSM Owner can edit this campaign in the Field view', true); return; }
       psmV3CurrentCampaign = c;
+      var allowedStatuses = psmV3AllowedStatuses(c);
+      var lifecycleGuidance = c.v3Status === 'Engaged'
+        ? '<div class="v3-callout"><div><strong>Commitment starts impact tracking</strong><p style="margin:4px 0 0;">A baseline snapshot will be captured when this campaign moves to Committed. It cannot be moved back to an earlier status without support.</p><label style="display:flex;gap:8px;margin-top:10px;"><input id="v3CommitmentAck" type="checkbox"> I understand that moving to Committed starts measurement.</label></div></div>'
+        : (c.v3Status === 'Committed'
+          ? '<div class="v3-callout"><div><strong>Impact tracking is active</strong><p style="margin:4px 0 0;">The campaign can remain Committed or move to Closed. Returning to an earlier status requires support.</p></div></div>'
+          : (c.v3Status === 'Closed'
+            ? '<div class="v3-callout"><div><strong>This campaign is closed</strong><p style="margin:4px 0 0;">Reopening or changing its lifecycle requires a support request so the measurement history remains accurate.</p></div></div>'
+            : ''));
       document.getElementById('psmV3TablePanelTitle').textContent = 'Update Campaign';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<fieldset class="filter-section"><legend>Campaign status</legend><div class="psm-v3-status-options">'+PSM_V3_STATUS_FLOW.map(function(status) {
-          return '<label class="psm-v3-status-option" data-status="'+status.toLowerCase()+'"><input type="radio" name="v3FlyoutStatus" value="'+status+'"'+(status === c.v3Status ? ' checked' : '')+'><span>'+status+'</span></label>';
+          var disabled = allowedStatuses.indexOf(status) === -1;
+          return '<label class="psm-v3-status-option" data-status="'+status.toLowerCase()+'"><input type="radio" name="v3FlyoutStatus" value="'+status+'"'+(status === c.v3Status ? ' checked' : '')+(disabled ? ' disabled' : '')+'><span>'+status+'</span></label>';
         }).join('')+'</div></fieldset>' +
+        lifecycleGuidance +
         '<div class="form-group"><label for="v3FlyoutStatusNote">Update note <span class="required">*</span></label><textarea id="v3FlyoutStatusNote" required aria-required="true" placeholder="Explain what changed and the next step"></textarea></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveStatus()">Save update</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>' +
         '<section class="psm-v3-update-history"><h4>Activity History</h4>'+psmV3ActivityHistoryHtml(c)+'</section>';
@@ -4869,6 +4888,7 @@
     function psmV3OpenOwnerEditor(id) {
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
+      if (!psmV3CanEdit(c)) { showToast('Only the assigned PSM can transfer this campaign', true); return; }
       psmV3CurrentCampaign = c;
       document.getElementById('psmV3TablePanelTitle').textContent = 'Change campaign owner';
       document.getElementById('psmV3TablePanelBody').innerHTML =
@@ -4877,6 +4897,46 @@
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveOwnerAlias()">Change owner</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>';
       psmV3ShowTablePanel('campaign-update-panel');
       setTimeout(function() { var field = document.getElementById('v3OwnerAlias'); if (field) field.focus(); }, 0);
+    }
+
+    function psmV3StartInlineOwnerEdit(id) {
+      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
+      if (!c || !psmV3CanEdit(c)) { showToast('Only the assigned PSM can transfer this campaign', true); return; }
+      psmV3InlineOwnerCampaignId = id;
+      psmV3OpenDetail(id);
+      window.requestAnimationFrame(function() {
+        var field = document.getElementById('v3InlineOwnerSelect');
+        if (field) field.focus();
+      });
+    }
+
+    function psmV3CancelInlineOwnerEdit(id) {
+      psmV3InlineOwnerCampaignId = '';
+      psmV3OpenDetail(id);
+    }
+
+    function psmV3ApplyOwnerChange(c, owner) {
+      var previousOwner = c.v3Owner;
+      c.v3Owner = owner.name;
+      c.owner = owner.name;
+      c.microsoftDri = owner.name;
+      c.v3LastUpdated = today();
+      c.v3Activity = c.v3Activity || [];
+      c.v3Activity.push({ date:today(), type:'Campaign owner changed', detail:previousOwner+' \u2192 '+owner.name+' ('+owner.alias+').', actor:PSM_CURRENT_USER });
+      try { localStorage.setItem(psmMvpOwnerStorageKey(c.id), owner.name); } catch (e) {}
+    }
+
+    function psmV3SaveInlineOwner(id) {
+      var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
+      var field = document.getElementById('v3InlineOwnerSelect');
+      if (!c || !field || !psmV3CanEdit(c)) { showToast('Only the assigned PSM can transfer this campaign', true); return; }
+      var owner = PSM_OWNER_DIRECTORY.filter(function(candidate) { return candidate.alias === field.value; })[0];
+      if (!owner) { showToast('Select a PSM', true); return; }
+      if (owner.name === c.v3Owner) { psmV3CancelInlineOwnerEdit(id); return; }
+      psmV3ApplyOwnerChange(c, owner);
+      psmV3InlineOwnerCampaignId = '';
+      showToast('Campaign owner changed to '+owner.name);
+      psmV3OpenDetail(id);
     }
 
     function psmV3SaveOwnerAlias() {
@@ -4889,14 +4949,7 @@
       })[0];
       if (!owner) { showToast('Select a PSM', true); return; }
       if (owner.name === c.v3Owner) { showToast(owner.name+' is already the campaign owner', true); return; }
-      var previousOwner = c.v3Owner;
-      c.v3Owner = owner.name;
-      c.owner = owner.name;
-      c.microsoftDri = owner.name;
-      c.v3LastUpdated = today();
-      c.v3Activity = c.v3Activity || [];
-      c.v3Activity.push({ date:today(), type:'Campaign owner changed', detail:previousOwner+' \u2192 '+owner.name+' ('+owner.alias+').', actor:PSM_CURRENT_USER });
-      try { localStorage.setItem(psmMvpOwnerStorageKey(c.id), owner.name); } catch (e) {}
+      psmV3ApplyOwnerChange(c, owner);
       psmV3CloseTablePanel();
       showToast('Campaign owner changed to '+owner.name);
       psmV3OpenDetail(c.id);
@@ -4942,6 +4995,17 @@
       var note = noteField.value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
       var previous = c.v3Status;
+      if (psmV3AllowedStatuses(c).indexOf(status) === -1) {
+        showToast('This lifecycle transition is not available. Contact support for an exception.', true);
+        return;
+      }
+      if (previous === 'Engaged' && status === 'Committed') {
+        var commitmentAck = document.getElementById('v3CommitmentAck');
+        if (!commitmentAck || !commitmentAck.checked) {
+          showToast('Confirm that impact tracking should begin before committing the campaign', true);
+          return;
+        }
+      }
       if (status === 'Closed' && !c.v3BaselineAvailable) {
         showToast('Move the campaign to Committed before closing it so an impact baseline can be captured', true);
         return;
@@ -5236,6 +5300,10 @@
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var row = [name, customer.tenantId, customer.association || 'None', domain, customer.country || '', customer.segment || ''];
         config.columns.forEach(function(column) {
+          if (!showMomGrowth) {
+            row.push('Not tracked yet');
+            return;
+          }
           var snapshot = psmV3TrackedTenantMetricSnapshot(customer, column.key, index, column.format);
           if (column.format === 'text') {
             row.push(snapshot.current);
@@ -5291,6 +5359,7 @@
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var metricCells = visibleMetricColumns.map(function(column) {
+          if (!showMomGrowth) return '<td><span style="color:var(--cp-text-muted);">Not tracked yet</span></td>';
           var snapshot = psmV3TrackedTenantMetricSnapshot(customer, column.key, index, column.format);
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
           return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td>'+(showMomGrowth ? '<td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format, 'previousMonth'))+'</span></td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>' : '');
@@ -5645,9 +5714,18 @@
         '<div class="v3-charts">' +
           outcomeConfig.trends.map(function(trend) { return psmV3TrendCard(trend.title, trend.subtitle, trend.values, trend.prefix, trend.suffix || ''); }).join('') +
         '</div>';
+      var impactPlaceholderKpis = outcomeConfig.metrics.map(function(metric) {
+        return psmV3Kpi('\u2014', metric.label, 'Not tracked yet. Impact tracking starts when the campaign moves to Committed.');
+      }).join('');
+      var impactPlaceholderCharts =
+        '<div class="v3-charts">' +
+          outcomeConfig.trends.map(function(trend) {
+            return '<he-card_psmv3 class="v3-card"><h3 style="margin:0 0 4px;font-size:14px;">'+psmEscapeHtml(trend.title)+'</h3><p style="margin:0 0 14px;color:var(--cp-text-muted);font-size:12px;">'+psmEscapeHtml(trend.subtitle)+'</p><div class="v3-empty" style="padding:26px 12px;"><strong>Not tracked yet</strong><p>Monthly snapshots will appear after the campaign is committed.</p></div></he-card_psmv3>';
+          }).join('') +
+        '</div>';
       var impactPanel = psmV3IsTrackingStatus(c)
         ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+psmEscapeHtml(c.v3BaselineDate)+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
-        : '';
+        : '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta" title="Impact tracking begins when the campaign moves to Committed.">i &middot; Tracking starts at Committed</span></h2><div class="v3-callout"><div><strong>No impact data available yet</strong><p style="margin:4px 0 0;">This campaign has not reached Committed. KPI values and monthly charts will begin from the baseline captured at commitment.</p></div></div><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+impactPlaceholderKpis+'</div>'+impactPlaceholderCharts+'</div>';
       var businessOutcomePanel = '<section class="psm-v3-business-outcome psm-v3-business-outcome-header" aria-labelledby="psmV3BusinessOutcomeHeading"><h3 id="psmV3BusinessOutcomeHeading">Business outcome:</h3><div class="psm-v3-business-outcome-value"><strong>'+psmEscapeHtml(outcomeConfig.label)+'</strong></div></section>';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
       if (!initialNote && c.v3InitialNote) initialNote = { text:c.v3InitialNote, author:c.v3CreatedBy, date:c.v3OpenDate };
@@ -5662,13 +5740,16 @@
         var statusDate = index <= currentStatusIndex ? statusDates[status] : '';
         return '<div class="v3-status-step'+stateClass+'"><span>'+status+'</span><time class="v3-status-step-date"'+(statusDate ? ' datetime="'+psmEscapeHtml(statusDate)+'"' : '')+'>'+(statusDate ? psmEscapeHtml(psmV3FormatStatusDate(statusDate)) : '')+'</time></div>';
       }).join('')+'</div>';
+      var ownerMeta = psmV3InlineOwnerCampaignId === c.id
+        ? '<select class="v3-inline-owner-select" id="v3InlineOwnerSelect" aria-label="Campaign owner">'+PSM_OWNER_DIRECTORY.map(function(owner) { return '<option value="'+psmEscapeHtml(owner.alias)+'"'+(owner.name === c.v3Owner ? ' selected' : '')+'>'+psmEscapeHtml(owner.name)+'</option>'; }).join('')+'</select><button class="v3-meta-edit" type="button" onclick="psmV3SaveInlineOwner(\''+c.id+'\')">Save</button><button class="v3-meta-edit" type="button" onclick="psmV3CancelInlineOwnerEdit(\''+c.id+'\')">Cancel</button>'
+        : '<span>'+psmEscapeHtml(c.v3Owner)+'</span>'+(canEdit ? '<button class="v3-meta-edit" type="button" onclick="psmV3StartInlineOwnerEdit(\''+c.id+'\')" aria-label="Edit campaign owner">Edit</button>' : '');
       detail.innerHTML = '<div class="detail-header" style="margin-bottom:16px;"><div class="psm-v3-detail-back-row"><button class="btn btn-primary psm-v3-back-button" type="button" onclick="showDashboard()" aria-label="Back to campaigns">&larr; Back to campaigns</button></div><div class="psm-v3-detail-title-row"><h1>'+psmEscapeHtml(c.name)+'</h1><div class="psm-v3-detail-title-actions">'+businessOutcomePanel+'</div></div></div>' +
         '<div class="v3-detail-overview"><div class="panel-card"><h2 class="psm-v3-section-heading">Campaign information</h2><dl class="v3-summary-meta">' +
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
           '<div><dt>PartnerOne name</dt><dd>'+psmEscapeHtml(c.partner)+'</dd></div>' +
           '<div><dt>Created by</dt><dd>'+psmEscapeHtml(c.v3CreatedBy)+'</dd></div>' +
-          '<div><dt>Campaign owner</dt><dd class="v3-summary-meta-value"><span>'+psmEscapeHtml(c.v3Owner)+'</span><button class="v3-meta-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner">Edit</button></dd></div>' +
+          '<div><dt>Campaign owner</dt><dd class="v3-summary-meta-value">'+ownerMeta+'</dd></div>' +
           '<div><dt>Created</dt><dd>'+psmEscapeHtml(c.v3OpenDate)+'</dd></div>' +
           '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
           '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
