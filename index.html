@@ -178,7 +178,7 @@
     .dashboard-view { padding: 20px 24px 40px; }
     .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
-    /* Referrals and Deal Clinics tabs */
+    /* Partner Engagements tabs */
     .sdc-tabs { display: flex; gap: 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
     .sdc-tab {
       background: none; border: none; padding: 10px 16px 12px; font-size: 14px; color: #424242;
@@ -1540,7 +1540,7 @@
     body.psm-v3-view #psmV3CreateModal .form-group { gap:8px; margin-bottom:0; }
     body.psm-v3-view .v3-create-overlay .btn-group { min-height:72px; padding:20px 24px; }
     body.psm-v3-view .psm-v3-detail .panel-card, body.psm-v3-view .psm-v3-header-card { border-radius:2px; box-shadow:none; }
-    /* ASPXi Referrals and Deal Clinics shell */
+    /* ASPXi Partner Engagements shell */
     body.psm-v3-view .top-nav { display:flex; height:48px; background:var(--cp-aspx-header); }
     body.psm-v3-view .top-nav .microsoft-logo,
     body.psm-v3-view .top-nav .nav-separator,
@@ -1742,7 +1742,7 @@
       <div class="dashboard-view content-view active" id="dashboardView">
         <h1 class="page-title" id="dashboardTitle" style="display:none;"></h1>
 
-        <!-- Referrals and Deal Clinics tabs (Partner/ASPX only) -->
+        <!-- Partner Engagements tabs (Partner/ASPX only) -->
         <div class="sdc-tabs" id="sdcTabs" style="display:none;">
           <button class="sdc-tab" id="sdcTabFastTrack" onclick="switchSdcTab('fasttrack')">FastTrack Referrals</button>
           <button class="sdc-tab active" id="sdcTabClinic" onclick="switchSdcTab('clinic')">Security Deal Clinic</button>
@@ -2822,7 +2822,7 @@
       document.querySelector('.nav-platform-name').textContent =
         isPsmV3View(view) ? 'ASPXi' : (view === 'partner' ? 'Microsoft Partner Center' : 'ASPXi');
       document.getElementById('navPageName').textContent =
-        isPsmView(view) ? 'Campaigns' : (view === 'partner' ? 'Referrals and Deal Clinics' : 'Security Deal Clinic');
+        isPsmView(view) ? 'Campaigns' : (view === 'partner' ? 'Partner Engagements' : 'Security Deal Clinic');
       document.getElementById('psmPartnerPicker').style.display = isPsmView(view) && !isPsmV3View(view) ? 'flex' : 'none';
       document.getElementById('psmPartnerBanner').style.display = isPsmView(view) && !isPsmV3View(view) ? 'block' : 'none';
       activeKpiFilter = null;
@@ -2842,10 +2842,10 @@
       document.getElementById('dashboardTitle').style.display = '';
       document.getElementById('dashboardTitle').innerHTML =
         view === 'partner'
-          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Referrals and Deal Clinics <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
+          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Partner Engagements <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
           : 'Security Deal Clinic <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security</span>';
       document.getElementById('breadcrumb').style.display = view === 'partner' ? '' : 'none';
-      // Referrals and Deal Clinics tabs are shown only in the Partner (ASPX) experience
+      // Partner Engagements tabs are shown only in the Partner (ASPX) experience
       renderNavPanels();
       document.getElementById('sdcTabs').style.display = view === 'partner' ? 'flex' : 'none';
       sdcActiveTab = 'clinic';
@@ -2859,7 +2859,7 @@
       renderDashboard();
     }
 
-    // Referrals and Deal Clinics tab state (Partner/ASPX experience)
+    // Partner Engagements tab state (Partner/ASPX experience)
     var sdcActiveTab = 'clinic';
     function renderNavPanels() {
       // NAV-04: FastTrack Referrals tab, partner not onboarded to FastTrack Partner program
@@ -3774,8 +3774,8 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML = '<div class="v3-shell">' +
-        '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>Referrals and Deal Clinics</span><small class="v3-title-suite">AI Business Solutions &amp; Security</small><i class="v3-title-info" title="AI Business Solutions &amp; Security Partner eXperience">i</i></h1></div></div>' +
-        '<div class="v3-page-tabs-row"><nav class="v3-page-tabs" aria-label="Referrals and Deal Clinics views"><button class="v3-page-tab" type="button" onclick="showToast(\'FastTrack Referrals selected\')">FastTrack Referrals</button><button class="v3-page-tab" type="button" onclick="showToast(\'Security Deal Clinic selected\')">Security Deal Clinic</button><button class="v3-page-tab active" type="button" aria-current="page">PSM Campaigns</button></nav><div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
+        '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>Partner Engagements</span><small class="v3-title-suite">AI Business Solutions &amp; Security</small><i class="v3-title-info" title="AI Business Solutions &amp; Security Partner eXperience">i</i></h1></div></div>' +
+        '<div class="v3-page-tabs-row"><nav class="v3-page-tabs" aria-label="Partner Engagements views"><button class="v3-page-tab" type="button" onclick="showToast(\'FastTrack Referrals selected\')">FastTrack Referrals</button><button class="v3-page-tab" type="button" onclick="showToast(\'Security Deal Clinic selected\')">Security Deal Clinic</button><button class="v3-page-tab active" type="button" aria-current="page">PSM Campaigns</button></nav><div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
         '<div id="psmV3Kpis"></div><div id="psmV3Charts"></div><div id="psmV3Table"></div></div>';
       psmV3RenderDashboard();
     }
