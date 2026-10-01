@@ -2494,13 +2494,16 @@
     const PSM_MVP_STATUS_ORDER = ['Defining', 'Executing', 'Closed'];
     const PSM_CURRENT_USER = 'Varun Gorur';
     const PSM_OWNER_DIRECTORY = [
-      { name:'Varun Gorur', alias:'varung' },
-      { name:'Alex Chen', alias:'alexch' },
-      { name:'Maya Patel', alias:'mayapat' },
-      { name:'Jordan Lee', alias:'jordanl' },
-      { name:'Sam Rivera', alias:'samriv' }
+      { name:'Varun Gorur', alias:'varung', region:'Americas' },
+      { name:'Alex Chen', alias:'alexch', region:'APAC' },
+      { name:'Maya Patel', alias:'mayapat', region:'APAC' },
+      { name:'Jordan Lee', alias:'jordanl', region:'EMEA' },
+      { name:'Sam Rivera', alias:'samriv', region:'Americas' }
     ];
     const PSM_OWNERS = PSM_OWNER_DIRECTORY.map(function(owner) { return owner.name; });
+    function psmV3OwnerProfile(name) {
+      return PSM_OWNER_DIRECTORY.filter(function(owner) { return owner.name === name; })[0] || PSM_OWNER_DIRECTORY[0];
+    }
     const PSM_STATUS_COLORS = { Draft: '#616161', Submitted: '#0078d4', Accepted: '#038387', Active: '#107c10', Measuring: '#c19c00', Completed: '#7719aa' };
     const PSM_PROGRESSION_STAGES = [
       { key: 'targetList', label: 'Target List', sub: 'Tenants selected to pursue', color: '#0078d4', source: 'Auto', sourceNote: 'System-curated or uploaded list' },
@@ -2512,7 +2515,7 @@
     const PSM_V3_LIFECYCLE_STAGES = [
       { key:'new', label:'New', sub:'Tenants added to the campaign', color:'var(--cp-link)' },
       { key:'outreach', label:'Outreach', sub:'PSM or partner outreach is underway', color:'var(--cp-accent)' },
-      { key:'engage', label:'Engage', sub:'Partner and customer are actively engaged', color:'var(--cp-accent-hover)' },
+      { key:'engaged', label:'Engaged', sub:'Partner and customer are actively engaged', color:'var(--cp-accent-hover)' },
       { key:'committed', label:'Committed', sub:'Impact measurement begins when the campaign is committed', color:'var(--cp-success)' },
       { key:'closed', label:'Closed', sub:'Campaign work and impact measurement are complete', color:'var(--cp-text-muted)' }
     ];
@@ -3534,18 +3537,18 @@
       { id:'PSM-601', partner:'Contoso', region:'Americas', area:'US West', tenants:38, status:'New', created:'2026-08-26' },
       { id:'PSM-602', partner:'Contoso Digital', region:'Americas', area:'Canada', tenants:27, status:'Outreach', created:'2026-07-18' },
       { id:'PSM-603', partner:'Contoso Consulting', region:'EMEA', area:'Germany', tenants:34, status:'Closed', created:'2026-04-09' },
-      { id:'PSM-604', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Engage', created:'2026-06-14' },
-      { id:'PSM-605', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Engage', created:'2026-09-02' },
+      { id:'PSM-604', partner:'Contoso Retail', region:'EMEA', area:'UK', tenants:22, status:'Engaged', created:'2026-06-14' },
+      { id:'PSM-605', partner:'Contoso Systems', region:'APAC', area:'India', tenants:46, status:'Engaged', created:'2026-09-02' },
       { id:'PSM-606', partner:'Contoso Cloud', region:'APAC', area:'ANZ', tenants:31, status:'Committed', created:'2026-07-03' },
       { id:'PSM-607', partner:'Contoso', region:'Americas', area:'US East', tenants:29, status:'Closed', created:'2026-03-21' },
       { id:'PSM-608', partner:'Contoso Digital', region:'APAC', area:'Southeast Asia', tenants:41, status:'Outreach', created:'2026-08-30' },
-      { id:'PSM-609', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Engage', created:'2026-05-28' },
-      { id:'PSM-610', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Engage', created:'2026-02-17' },
+      { id:'PSM-609', partner:'Contoso Consulting', region:'Americas', area:'US West', tenants:36, status:'Engaged', created:'2026-05-28' },
+      { id:'PSM-610', partner:'Contoso Retail', region:'Americas', area:'Canada', tenants:24, status:'Engaged', created:'2026-02-17' },
       { id:'PSM-611', partner:'Contoso Systems', region:'EMEA', area:'UK', tenants:33, status:'Outreach', created:'2026-09-08' },
       { id:'PSM-612', partner:'Contoso Cloud', region:'APAC', area:'India', tenants:44, status:'Committed', created:'2026-06-25' }
     ];
     (function seedRepresentativePsmCampaigns() {
-      var targetCounts = { New:24, Outreach:31, Engage:50, Committed:27, Closed:19 };
+      var targetCounts = { New:24, Outreach:31, Engaged:50, Committed:27, Closed:19 };
       var partners = ['Contoso', 'Contoso Digital', 'Contoso Consulting', 'Contoso Retail', 'Contoso Systems', 'Contoso Cloud'];
       var sequence = 700;
       Object.keys(targetCounts).forEach(function(status, statusIndex) {
@@ -3584,9 +3587,11 @@
       { key: 'partnerOneId', label: 'PartnerOneID' },
       { key: 'partnerOneName', label: 'PartnerOne Name' },
       { key: 'businessOutcomes', label: 'Business Outcome' },
-      { key: 'owner', label: 'Created By (PSM Owner)' },
+      { key: 'owner', label: 'PSM Owner' },
+      { key: 'createdBy', label: 'Created By' },
       { key: 'status', label: 'Status' },
       { key: 'tenants', label: 'Tenants' },
+      { key: 'created', label: 'Created' },
       { key: 'updated', label: 'Last Updated' }
     ];
     let psmV3VisibleColumns = PSM_V3_COLUMNS.reduce(function(columns, column) { columns[column.key] = true; return columns; }, {});
@@ -3596,7 +3601,7 @@
       var map = {
         Draft:'New', Prepare:'New', New:'New', Defining:'New',
         Submitted:'Outreach', Accepted:'Outreach', Active:'Outreach', Execute:'Outreach', Executing:'Outreach',
-        Outreach:'Outreach', Engaged:'Engage', Engage:'Engage', Funding:'Engage', Prerequisites:'Engage', Readiness:'Engage',
+        Outreach:'Outreach', Engaged:'Engaged', Engage:'Engaged', Funding:'Engaged', Prerequisites:'Engaged', Readiness:'Engaged',
         Committed:'Committed', Measuring:'Committed', Review:'Committed', Completed:'Closed', Close:'Closed', Closed:'Closed'
       };
       return map[source] || (PSM_V3_STATUS_FLOW.indexOf(source) > -1 ? source : 'New');
@@ -3647,7 +3652,7 @@
       c.v3CreatedBy = c.v3CreatedBy || c.owner || c.v3Owner;
       c.owner = c.v3Owner;
       c.microsoftDri = c.v3Owner;
-      c.v3Region = c.v3Region || c.region || ['Americas', 'EMEA', 'APAC'][seed % 3];
+      c.v3Region = c.v3Region || psmV3OwnerProfile(c.v3CreatedBy).region || c.region || 'Americas';
       c.v3Area = c.v3Area || PSM_V3_AREAS[seed % PSM_V3_AREAS.length];
       c.v3Segments = c.v3Segments || [PSM_V3_SEGMENTS[seed % PSM_V3_SEGMENTS.length], PSM_V3_SEGMENTS[(seed + 1) % PSM_V3_SEGMENTS.length]].filter(function(value, index, values) { return values.indexOf(value) === index; });
       c.v3Countries = c.v3Countries || (c.customers || []).map(function(customer) { return customer.country; }).filter(function(value, index, values) { return value && values.indexOf(value) === index; });
@@ -3657,11 +3662,21 @@
       c.v3PartnerIds = c.v3PartnerIds || c.v3Partners.reduce(function(ids, partner) {
         return ids.concat([PSM_PARTNER_ONE[partner] || '']).concat(PSM_PARTNER_ASSOCIATED_MPN[partner] || []);
       }, []).filter(Boolean);
-      c.v3BaselineDate = c.v3BaselineDate || c.created;
       c.v3OpenDate = c.v3OpenDate || c.created;
       c.v3LastUpdated = c.v3LastUpdated || c.mvpUpdated || today();
       c.v3Status = psmV3Status(c);
-      var ageFactor = c.v3Status === 'New' ? 0 : (c.v3Status === 'Outreach' ? 0.35 : (c.v3Status === 'Engage' ? 0.65 : 1));
+      var trackingStarted = ['Committed', 'Closed'].indexOf(c.v3Status) > -1;
+      if (trackingStarted && !c.v3BaselineDate) {
+        var openedAt = new Date((c.v3OpenDate || c.created)+'T00:00:00');
+        var updatedAt = new Date(c.v3LastUpdated);
+        if (Number.isNaN(updatedAt.getTime())) updatedAt = new Date(today()+'T00:00:00');
+        var committedAt = c.v3Status === 'Closed'
+          ? new Date(openedAt.getTime() + Math.max(0, updatedAt.getTime() - openedAt.getTime()) * .75)
+          : updatedAt;
+        c.v3BaselineDate = committedAt.toISOString().slice(0, 10);
+      }
+      if (!trackingStarted) c.v3BaselineDate = '';
+      var ageFactor = c.v3Status === 'New' ? 0 : (c.v3Status === 'Outreach' ? 0.35 : (c.v3Status === 'Engaged' ? 0.65 : 1));
       var paidBase = 1200 + (seed % 30) * 85;
       var pruBase = 1700 + (seed % 32) * 92;
       if (!c.v3Metrics) {
@@ -3685,15 +3700,15 @@
         });
       }
       var primaryMetric = c.v3Metrics[c.v3PrimaryMetric];
-      if (primaryMetric && ['Outreach', 'Engage'].indexOf(c.v3Status) > -1 && seed % 5 === 0) {
+      if (primaryMetric && ['Outreach', 'Engaged'].indexOf(c.v3Status) > -1 && seed % 5 === 0) {
         var attentionDelta = psmV3MetricDefinition(c.v3PrimaryMetric).format === 'percent'
           ? 1
           : Math.max(1, Math.round(Math.abs(primaryMetric.baseline) * .03));
         primaryMetric.current = primaryMetric.baseline - attentionDelta;
       }
-      c.v3Activity = c.v3Activity || [{ date: c.v3OpenDate, type: 'Campaign created', detail: 'Baseline telemetry snapshot captured.' }];
+      c.v3Activity = c.v3Activity || [{ date: c.v3OpenDate, type: 'Campaign created', detail: 'Campaign created. Impact tracking begins when the campaign is committed.' }];
       c.v3Source = c.v3Source || 'New campaign';
-      c.v3BaselineAvailable = c.v3BaselineAvailable !== false;
+      c.v3BaselineAvailable = trackingStarted && c.v3BaselineAvailable !== false;
       c._v3Enriched = true;
       return c;
     }
@@ -3702,14 +3717,15 @@
       var existingIds = new Set(psmCampaigns.map(function(c) { return c.id; }));
       PSM_V3_ADDITIONAL_CAMPAIGNS.forEach(function(item) {
         if (existingIds.has(item.id)) return;
+        var ownerProfile = PSM_OWNER_DIRECTORY[parseInt(item.id.replace('PSM-', ''), 10) % PSM_OWNER_DIRECTORY.length];
         psmCampaigns.push({
           id: item.id, name:item.partner+' Copilot outcomes - '+item.area+' '+item.id.replace('PSM-', ''), partner:item.partner, mpn:PSM_PARTNER_MPN[item.partner],
-          region: item.region, workload: 'Microsoft 365 Copilot', workloads: ['Microsoft 365 Copilot'],
+          region: ownerProfile.region, workload: 'Microsoft 365 Copilot', workloads: ['Microsoft 365 Copilot'],
           tenantCount: item.tenants, status: item.status, goal: 'MAU Growth', created: item.created,
-          owner: PSM_CURRENT_USER, microsoftDri: PSM_CURRENT_USER, mauGrowth: 0, revenueGrowth: '$0',
-          engagement: 0, executionType: 'Bulk', v3Owner: PSM_CURRENT_USER, v3Status: item.status,
+          owner: ownerProfile.name, microsoftDri: ownerProfile.name, mauGrowth: 0, revenueGrowth: '$0',
+          engagement: 0, executionType: 'Bulk', v3Owner: ownerProfile.name, v3CreatedBy:ownerProfile.name, v3Status: item.status,
           v3Opportunity: 'copilot', v3PrimaryMetric: PSM_V3_ACTIVE_OUTCOME_IDS[parseInt(item.id.replace('PSM-', ''), 10) % PSM_V3_ACTIVE_OUTCOME_IDS.length],
-          v3Region: item.region, v3Area: item.area
+          v3Region: ownerProfile.region, v3Area: item.area
         });
       });
       var campaigns = psmCampaigns.filter(function(c) { return !!c.v3Opportunity || !!c.mvpReady; }).map(psmV3Enrich);
@@ -3819,8 +3835,8 @@
       return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><small>'+helper+'</small></he-card_psmv3>';
     }
 
-    function psmV3KpiWithMom(value, label, momValue, momClass, helper) {
-      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><div class="v3-kpi-mom '+momClass+'">MoM growth: '+momValue+'</div><small>'+helper+'</small></he-card_psmv3>';
+    function psmV3KpiWithMom(value, label, momValue, momClass, helper, sinceCommitted) {
+      return '<he-card_psmv3 class="v3-kpi"><span>'+label+'</span><i class="v3-kpi-info" title="'+psmEscapeHtml(helper)+'" aria-label="'+psmEscapeHtml(helper)+'">i</i><strong>'+value+'</strong><div class="v3-kpi-mom '+momClass+'">MoM growth: '+momValue+'</div>'+(sinceCommitted ? '<div class="v3-kpi-mom">Since committed: '+sinceCommitted+'</div>' : '')+'<small>'+helper+'</small></he-card_psmv3>';
     }
 
     const PSM_V3_OPPORTUNITY_KPIS = {
@@ -3865,12 +3881,12 @@
 
     function psmV3OpportunityKpi(campaigns, config) {
       var tracked = campaigns.filter(function(c) {
-        return c.v3Status === 'Committed' &&
+        return ['Committed', 'Closed'].indexOf(c.v3Status) > -1 &&
           (c.v3TrackingMetrics || []).indexOf(config.metric) > -1 &&
           c.v3BaselineAvailable && c.v3Metrics && c.v3Metrics[config.metric] &&
           Number.isFinite(c.v3Metrics[config.metric].baseline) && Number.isFinite(c.v3Metrics[config.metric].current);
       });
-      if (!tracked.length) return psmV3Kpi('\u2014', config.label, 'No committed campaigns currently measure this metric');
+      if (!tracked.length) return psmV3Kpi('\u2014', config.label, 'No committed or closed campaigns currently measure this metric');
       var current = tracked.reduce(function(sum, c) {
         return sum + c.v3Metrics[config.metric].current;
       }, 0);
@@ -3891,15 +3907,15 @@
     }
 
     function psmV3RenderKpis(campaigns) {
-      var engagedCampaigns = campaigns.filter(function(c) { return ['Engage', 'Committed', 'Closed'].indexOf(c.v3Status) > -1; });
+      var engagedCampaigns = campaigns.filter(function(c) { return ['Engaged', 'Committed', 'Closed'].indexOf(c.v3Status) > -1; });
       var partnersEngaged = engagedCampaigns.map(function(c) { return c.partner; }).filter(function(partner, index, partners) {
         return partner && partners.indexOf(partner) === index;
       }).length;
       var engagedCustomers = engagedCampaigns.reduce(function(total, c) { return total + Number(c.tenantCount || 0); }, 0);
       var cards = [
         psmV3Kpi(campaigns.length.toLocaleString(), 'Campaigns', 'All campaigns in the filtered portfolio'),
-        psmV3Kpi(partnersEngaged.toLocaleString(), 'Partners engaged', 'Unique partners with campaigns in Engage, Committed, or Closed'),
-        psmV3Kpi(engagedCustomers.toLocaleString(), 'Customer engaged', 'Customers in Engage, Committed, or Closed campaigns'),
+        psmV3Kpi(partnersEngaged.toLocaleString(), 'Partners engaged', 'Unique partners with campaigns in Engaged, Committed, or Closed'),
+        psmV3Kpi(engagedCustomers.toLocaleString(), 'Customer engaged', 'Customers in Engaged, Committed, or Closed campaigns'),
         psmV3OpportunityKpi(campaigns, { metric:'paidMau', label:'Copilot paid MAU' }),
         psmV3OpportunityKpi(campaigns, { metric:'npsa', label:'NPSA' }),
         psmV3OpportunityKpi(campaigns, { metric:'coworkConsumption', label:'Cowork credit consumption' })
@@ -4021,7 +4037,7 @@
       var start = (psmV3State.page - 1) * psmV3State.pageSize;
       var page = campaigns.slice(start, start + psmV3State.pageSize);
       if (!campaigns.length) {
-        document.getElementById('psmV3Table').innerHTML = '<div class="v3-empty"><h2>No campaigns found</h2><p>'+(psmV3Campaigns().length ? 'No campaigns match the current portfolio filters.' : 'Create a new campaign or import an existing campaign to begin tracking impact.')+'</p><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div>';
+        document.getElementById('psmV3Table').innerHTML = '<div class="v3-empty"><h2>No campaigns found</h2><p>'+(psmV3Campaigns().length ? 'No campaigns match the current portfolio filters.' : 'Create a new campaign to begin tracking impact after it is committed.')+'</p><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div>';
         return;
       }
       var visibleColumns = PSM_V3_COLUMNS.filter(function(column) { return column.fixed || psmV3VisibleColumns[column.key]; });
@@ -4033,10 +4049,12 @@
           partnerOneId: psmEscapeHtml(c.partnerOneId || '\u2014'),
           businessOutcomes: (c.v3Outcomes || []).map(function(metric) { return '<span class="v3-chip">'+psmEscapeHtml(psmV3MetricLabel(metric))+'</span>'; }).join('') || '\u2014',
           owner: psmEscapeHtml(c.v3Owner),
+          createdBy: psmEscapeHtml(c.v3CreatedBy),
           region: psmEscapeHtml(c.v3Region),
           area: psmEscapeHtml(c.v3Area),
           status: psmRenderStatusBadge(c.v3Status),
           tenants: c.tenantCount.toLocaleString(),
+          created: psmEscapeHtml(c.v3OpenDate),
           updated: psmEscapeHtml(c.v3LastUpdated)
         };
         return values[key];
@@ -4061,14 +4079,12 @@
     function psmV3OpenFilters() {
       var partners = Object.keys(PSM_PARTNER_ONE);
       var campaigns = psmV3Campaigns();
-      var creators = campaigns.map(function(c) { return c.v3CreatedBy; }).filter(function(value, index, values) { return value && values.indexOf(value) === index; }).sort();
       var campaignOwners = campaigns.map(function(c) { return c.v3Owner; }).filter(function(value, index, values) { return value && values.indexOf(value) === index; }).sort();
       var countries = campaigns.reduce(function(values, c) { return values.concat(c.v3Countries || []); }, []).filter(function(value, index, values) { return value && values.indexOf(value) === index; }).sort();
       document.getElementById('psmV3TablePanelTitle').textContent = 'Filter campaigns';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<div class="filter-section"><label>View</label><select id="v3FilterPersona"><option value="psm"'+(psmV3State.persona === 'psm' ? ' selected' : '')+'>My campaigns</option><option value="all"'+(psmV3State.persona === 'all' ? ' selected' : '')+'>All campaigns</option></select></div>' +
-        '<div class="filter-section"><label>PSM Owner</label><select id="v3FilterCampaignOwner">'+psmV3Options(campaignOwners, psmV3State.campaignOwner, 'All PSM owners')+'</select></div>' +
-        '<div class="filter-section"><label>Created By</label><select id="v3FilterOwner">'+psmV3Options(creators, psmV3State.owner, 'All creators')+'</select></div>' +
+        '<div class="filter-section"><label>PSM</label><select id="v3FilterCampaignOwner">'+psmV3Options(campaignOwners, psmV3State.campaignOwner, 'All PSMs')+'</select></div>' +
         '<div class="filter-section"><label>Region</label><select id="v3FilterRegion">'+psmV3Options(['Americas', 'EMEA', 'APAC'], psmV3State.region, 'All regions')+'</select></div>' +
         '<div class="filter-section"><label>Area</label><select id="v3FilterArea">'+psmV3Options(PSM_V3_AREAS, psmV3State.area, 'All areas')+'</select></div>' +
         '<div class="filter-section"><label>Country/Location</label><select id="v3FilterCountry">'+psmV3Options(countries, psmV3State.country, 'All countries/locations')+'</select></div>' +
@@ -4081,7 +4097,7 @@
 
     function psmV3ApplyFilters() {
       psmV3State.persona = document.getElementById('v3FilterPersona').value;
-      psmV3State.owner = psmV3State.persona === 'psm' ? '' : document.getElementById('v3FilterOwner').value;
+      psmV3State.owner = '';
       psmV3State.campaignOwner = psmV3State.persona === 'psm' ? '' : document.getElementById('v3FilterCampaignOwner').value;
       psmV3State.region = document.getElementById('v3FilterRegion').value;
       psmV3State.area = document.getElementById('v3FilterArea').value;
@@ -4131,8 +4147,9 @@
         var values = {
           id:c.id, name:c.name, partnerOneName:c.partner, partnerOneId:c.partnerOneId,
           workloads:(c.workloads || []).join('; '), businessOutcomes:(c.v3Outcomes || []).map(psmV3MetricLabel).join('; '),
-          owner:c.v3Owner, region:c.v3Region, area:c.v3Area,
+          owner:c.v3Owner, createdBy:c.v3CreatedBy, region:c.v3Region, area:c.v3Area,
           status:c.v3Status, tenants:c.tenantCount,
+          created:c.v3OpenDate,
           updated:c.v3LastUpdated
         };
         return columns.map(function(column) { return '"'+String(values[column.key] == null ? '' : values[column.key]).replace(/"/g, '""')+'"'; }).join(',');
@@ -4721,7 +4738,7 @@
       var tenantCount = psmV3Upload.rows.length;
       var ids = psmV3ParseIds(document.getElementById('v3PartnerIdSearch').value);
       var owner = PSM_CURRENT_USER;
-      var region = psmGetRegionForPartner(partner);
+      var region = psmV3OwnerProfile(owner).region;
       var partnerIndex = Math.max(0, Object.keys(PSM_PARTNER_ONE).indexOf(partner));
       var area = PSM_V3_AREAS[partnerIndex % PSM_V3_AREAS.length];
       var creationDate = today();
@@ -4735,9 +4752,9 @@
         v3PrimaryMetric: trackingMetrics[0], v3SecondaryMetrics: trackingMetrics.slice(1),
         v3TrackingMetrics: trackingMetrics, v3Outcomes: trackingMetrics.slice(), v3Region: region,
         v3Area: area, v3Segments: PSM_V3_SEGMENTS.slice(0, 2), v3Partners: psmV3CreatePartners.slice(),
-        v3PartnerIds: ids, v3OpenDate: creationDate, v3BaselineDate: creationDate,
+        v3PartnerIds: ids, v3OpenDate: creationDate, v3BaselineDate: '',
         v3LastUpdated: today(), v3Status: 'New', v3Metrics: psmV3NewMetrics(trackingMetrics, tenantCount, true),
-        v3Source: 'New campaign', v3BaselineAvailable: true, v3Activity: [{ date: today(), type: 'Campaign created', detail: 'Tenant validation passed and baseline telemetry snapshot captured.' }], _v3Enriched: true
+        v3Source: 'New campaign', v3BaselineAvailable: false, v3Activity: [{ date: today(), type: 'Campaign created', detail: 'Tenant validation passed. Impact tracking begins when the campaign is committed.' }], _v3Enriched: true
       };
       c.customers = psmV3Upload.rows.map(function(row, index) {
         var customer = psmMvpCreateTenantRecord(row.tenantCustomerName, row.tenantId, c, index);
@@ -4754,7 +4771,7 @@
       psmV3State.persona = 'all';
       psmV3State.page = 1;
       psmV3RenderDashboard();
-      showToast('Campaign created with baseline captured on '+c.v3BaselineDate);
+      showToast('Campaign created. Impact tracking will begin when it is committed.');
     }
 
     function psmV3ImportCampaign() {
@@ -4856,7 +4873,7 @@
       document.getElementById('psmV3TablePanelTitle').textContent = 'Change campaign owner';
       document.getElementById('psmV3TablePanelBody').innerHTML =
         '<p style="margin:0 0 16px;color:var(--cp-text-muted);">Current owner: <strong>'+psmEscapeHtml(c.v3Owner)+'</strong></p>' +
-        '<div class="filter-section"><label for="v3OwnerAlias">New PSM alias <span class="required">*</span></label><input id="v3OwnerAlias" required aria-required="true" aria-describedby="v3OwnerAliasHelp" list="v3OwnerAliasOptions" placeholder="Type an alias, such as mayapat" autocomplete="off"><datalist id="v3OwnerAliasOptions">'+PSM_OWNER_DIRECTORY.map(function(owner) { return '<option value="'+psmEscapeHtml(owner.alias)+'">'+psmEscapeHtml(owner.name)+'</option>'; }).join('')+'</datalist><span id="v3OwnerAliasHelp" style="color:var(--cp-text-muted);font-size:11px;">Search by a known PSM alias and save to reassign this campaign.</span></div>' +
+        '<div class="filter-section"><label for="v3OwnerAlias">New PSM <span class="required">*</span></label><select id="v3OwnerAlias" required aria-required="true"><option value="">Select a PSM</option>'+PSM_OWNER_DIRECTORY.map(function(owner) { return '<option value="'+psmEscapeHtml(owner.alias)+'"'+(owner.name === c.v3Owner ? ' disabled' : '')+'>'+psmEscapeHtml(owner.name)+' ('+psmEscapeHtml(owner.alias)+') - '+psmEscapeHtml(owner.region)+'</option>'; }).join('')+'</select></div>' +
         '<div class="filter-actions"><button class="btn btn-primary" onclick="psmV3SaveOwnerAlias()">Change owner</button><button class="btn btn-secondary" onclick="psmV3CloseTablePanel()">Cancel</button></div>';
       psmV3ShowTablePanel('campaign-update-panel');
       setTimeout(function() { var field = document.getElementById('v3OwnerAlias'); if (field) field.focus(); }, 0);
@@ -4870,7 +4887,7 @@
       var owner = PSM_OWNER_DIRECTORY.filter(function(candidate) {
         return candidate.alias.toLowerCase() === query || candidate.name.toLowerCase() === query;
       })[0];
-      if (!owner) { showToast('Select a valid PSM alias from the suggestions', true); return; }
+      if (!owner) { showToast('Select a PSM', true); return; }
       if (owner.name === c.v3Owner) { showToast(owner.name+' is already the campaign owner', true); return; }
       var previousOwner = c.v3Owner;
       c.v3Owner = owner.name;
@@ -4885,6 +4902,36 @@
       psmV3OpenDetail(c.id);
     }
 
+    function psmV3IsTrackingStatus(c) {
+      return !!c && ['Committed', 'Closed'].indexOf(c.v3Status) > -1 && c.v3BaselineAvailable;
+    }
+
+    function psmV3CaptureCommittedBaseline(c) {
+      var baselineDate = today();
+      c.v3BaselineDate = baselineDate;
+      c.v3BaselineAvailable = true;
+      Object.keys(c.v3Metrics || {}).forEach(function(metricId) {
+        c.v3Metrics[metricId].baseline = c.v3Metrics[metricId].current;
+      });
+      c.v3CommittedOutcomeBaselines = {};
+      var config = psmV3OutcomeConfig(c);
+      (config ? config.metrics : []).forEach(function(metric) {
+        var snapshot = psmV3AggregateOutcomeMetricSnapshot(c, metric);
+        c.v3CommittedOutcomeBaselines[metric.key] = snapshot.current;
+      });
+      psmEnsureMvpTenantRows(c);
+      (c.customers || []).forEach(function(customer, index) {
+        customer.v3TrackingStartDate = baselineDate;
+        customer.v3CommittedMetricBaselines = {};
+        (config ? config.columns : []).forEach(function(column) {
+          if (column.format === 'text') return;
+          customer.v3CommittedMetricBaselines[column.key] = psmV3TenantMetricSnapshot(column.key, index, column.format).current;
+        });
+      });
+      c.v3Activity = c.v3Activity || [];
+      c.v3Activity.push({ date:baselineDate, type:'Impact baseline captured', detail:'Campaign and tenant outcome tracking started when the campaign moved to Committed.', actor:PSM_CURRENT_USER });
+    }
+
     function psmV3SaveStatus() {
       var c = psmV3CurrentCampaign;
       if (!psmV3CanEdit(c)) { showToast('You do not have permission to update this campaign', true); return; }
@@ -4895,8 +4942,13 @@
       var note = noteField.value.trim();
       if (!c || !note) { showToast('Add an update note before saving', true); return; }
       var previous = c.v3Status;
+      if (status === 'Closed' && !c.v3BaselineAvailable) {
+        showToast('Move the campaign to Committed before closing it so an impact baseline can be captured', true);
+        return;
+      }
       c.v3Status = status;
       c.status = status;
+      if (status === 'Committed' && !c.v3BaselineAvailable) psmV3CaptureCommittedBaseline(c);
       c.v3LastUpdated = today();
       c.v3Activity = c.v3Activity || [];
       c.v3Activity.push({ date: today(), type: 'Campaign status', detail: previous+' -> '+status+'. '+note });
@@ -5095,10 +5147,22 @@
       var current = psmV3TenantMetricValue(key, index);
       if (format === 'text') return { current:current };
       var growthRate = .06 + (index % 9) * .012;
+      var monthlyGrowthRate = .015 + (index % 5) * .006;
       var baseline = format === 'percent'
         ? Math.max(0, Number(current) - (2.5 + index % 6))
         : Math.max(0, Math.round(Number(current) / (1 + growthRate)));
-      return { baseline:baseline, current:Number(current) };
+      var previousMonth = format === 'percent'
+        ? Math.max(0, Number(current) - (0.6 + index % 3))
+        : Math.max(0, Math.round(Number(current) / (1 + monthlyGrowthRate)));
+      return { baseline:baseline, previousMonth:previousMonth, current:Number(current) };
+    }
+
+    function psmV3TrackedTenantMetricSnapshot(customer, key, index, format) {
+      var snapshot = psmV3TenantMetricSnapshot(key, index, format);
+      if (customer && customer.v3CommittedMetricBaselines && customer.v3CommittedMetricBaselines[key] != null) {
+        snapshot.baseline = customer.v3CommittedMetricBaselines[key];
+      }
+      return snapshot;
     }
 
     function psmV3FormatOutcomeValue(value, format) {
@@ -5108,41 +5172,48 @@
       return String(value);
     }
 
-    function psmV3FormatTenantGrowth(snapshot, format) {
-      var delta = snapshot.current - snapshot.baseline;
+    function psmV3FormatTenantGrowth(snapshot, format, comparisonKey) {
+      var comparison = snapshot[comparisonKey || 'baseline'];
+      var delta = snapshot.current - comparison;
       var sign = delta > 0 ? '+' : (delta < 0 ? '-' : '');
       if (format === 'percent') return sign+Math.abs(delta).toFixed(1)+' pp';
       var formattedDelta = psmV3FormatOutcomeValue(Math.abs(delta), format);
-      var percent = snapshot.baseline ? Math.abs(delta / snapshot.baseline * 100).toFixed(1) : '0.0';
+      var percent = comparison ? Math.abs(delta / comparison * 100).toFixed(1) : '0.0';
       return sign+formattedDelta+' ('+sign+percent+'%)';
     }
 
     function psmV3AggregateOutcomeMetricSnapshot(c, metric) {
       var customerCount = Math.max(1, (c.customers || []).length || c.tenantCount);
-      var totals = { baseline:0, current:0 };
+      var totals = { baseline:0, previousMonth:0, current:0 };
       for (var index = 0; index < customerCount; index++) {
         var snapshot = psmV3TenantMetricSnapshot(metric.key, index, metric.format);
         totals.baseline += Number(snapshot.baseline) || 0;
+        totals.previousMonth += Number(snapshot.previousMonth) || 0;
         totals.current += Number(snapshot.current) || 0;
       }
       if (metric.aggregate === 'average') {
         totals.baseline /= customerCount;
+        totals.previousMonth /= customerCount;
         totals.current /= customerCount;
+      }
+      if (c.v3CommittedOutcomeBaselines && c.v3CommittedOutcomeBaselines[metric.key] != null) {
+        totals.baseline = c.v3CommittedOutcomeBaselines[metric.key];
       }
       return totals;
     }
 
     function psmV3ImpactKpi(c, metric) {
       var snapshot = psmV3AggregateOutcomeMetricSnapshot(c, metric);
-      var delta = snapshot.current - snapshot.baseline;
-      var momPercent = snapshot.baseline ? delta / snapshot.baseline * 100 : 0;
+      var monthlyDelta = snapshot.current - snapshot.previousMonth;
+      var momPercent = snapshot.previousMonth ? monthlyDelta / snapshot.previousMonth * 100 : 0;
       var sign = momPercent > 0 ? '+' : '';
       return psmV3KpiWithMom(
         psmV3FormatOutcomeValue(snapshot.current, metric.format),
         metric.label,
         sign+momPercent.toFixed(1)+'%',
         momPercent > 0 ? 'positive' : (momPercent < 0 ? 'negative' : ''),
-        'Measured across committed campaign tenants'
+        'Measured from the committed baseline through the current or closing date',
+        psmV3FormatTenantGrowth(snapshot, metric.format)
       );
     }
 
@@ -5150,7 +5221,7 @@
       var c = psmCampaigns.find(function(campaign) { return campaign.id === id; });
       if (!c) return;
       var config = psmV3OutcomeConfig(c);
-      var showMomGrowth = c.v3Status === 'Committed';
+      var showMomGrowth = psmV3IsTrackingStatus(c);
       var headers = ['Tenant Name','Tenant ID','Association','Tenant Domain','Tenant Country/Region','Tenant Segment'];
       config.columns.forEach(function(column) {
         if (column.format === 'text') {
@@ -5158,20 +5229,20 @@
           return;
         }
         headers.push(column.label+' Current');
-        if (showMomGrowth) headers.push(column.label+' MoM Growth');
+        if (showMomGrowth) headers.push(column.label+' MoM Growth', column.label+' Since Committed');
       });
       var csv = headers.join(',')+'\r\n'+(c.customers || []).map(function(customer, index) {
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var row = [name, customer.tenantId, customer.association || 'None', domain, customer.country || '', customer.segment || ''];
         config.columns.forEach(function(column) {
-          var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
+          var snapshot = psmV3TrackedTenantMetricSnapshot(customer, column.key, index, column.format);
           if (column.format === 'text') {
             row.push(snapshot.current);
             return;
           }
           row.push(psmV3FormatOutcomeValue(snapshot.current, column.format));
-          if (showMomGrowth) row.push(psmV3FormatTenantGrowth(snapshot, column.format));
+          if (showMomGrowth) row.push(psmV3FormatTenantGrowth(snapshot, column.format, 'previousMonth'), psmV3FormatTenantGrowth(snapshot, column.format));
         });
         return row.map(function(value) { return '"'+String(value).replace(/"/g, '""')+'"'; }).join(',');
       }).join('\r\n');
@@ -5192,7 +5263,7 @@
 
     function psmV3TenantWorkspace(c) {
       var config = psmV3OutcomeConfig(c);
-      var showMomGrowth = c.v3Status === 'Committed';
+      var showMomGrowth = psmV3IsTrackingStatus(c);
       var visibleMetricColumns = config.columns.filter(function(column) {
         return psmV3TenantTableState.visibleColumns['metric:'+column.key] !== false;
       });
@@ -5220,15 +5291,15 @@
         var name = customer.tenantName || customer.tenantCustomerName || customer.name;
         var domain = name.toLowerCase().replace(/[^a-z0-9]/g, '')+'.com';
         var metricCells = visibleMetricColumns.map(function(column) {
-          var snapshot = psmV3TenantMetricSnapshot(column.key, index, column.format);
+          var snapshot = psmV3TrackedTenantMetricSnapshot(customer, column.key, index, column.format);
           if (column.format === 'text') return '<td>'+psmEscapeHtml(snapshot.current)+'</td>';
-          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td>'+(showMomGrowth ? '<td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>' : '');
+          return '<td>'+psmEscapeHtml(psmV3FormatOutcomeValue(snapshot.current, column.format))+'</td>'+(showMomGrowth ? '<td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format, 'previousMonth'))+'</span></td><td><span class="psm-mvp-growth">'+psmEscapeHtml(psmV3FormatTenantGrowth(snapshot, column.format))+'</span></td>' : '');
         }).join('');
         var selectionCell = psmV3TenantTableState.selectionMode ? '<td class="v3-tenant-select-cell"><input class="v3-tenant-check" type="checkbox" data-tenant-id="'+psmEscapeHtml(customer.tenantId)+'" aria-label="Select '+psmEscapeHtml(name)+'" '+(selectedTenantIds.has(customer.tenantId) ? 'checked ' : '')+'onchange="psmV3ToggleTenantSelection(\''+psmEscapeHtml(customer.tenantId)+'\',this.checked)"></td>' : '';
         return '<tr class="v3-tenant-row" data-search="'+psmEscapeHtml((name+' '+customer.tenantId+' '+(customer.association || 'None')+' '+domain+' '+customer.segment+' '+customer.country).toLowerCase())+'">'+selectionCell+'<td><strong>'+psmEscapeHtml(name)+'</strong></td><td><span class="psm-tenant-id">'+psmEscapeHtml(customer.tenantId)+'</span></td><td><span class="v3-chip">'+psmEscapeHtml(customer.association || 'None')+'</span></td>'+(psmV3TenantTableState.visibleColumns.domain ? '<td class="v3-tenant-domain" title="'+psmEscapeHtml(domain)+'">'+psmEscapeHtml(domain)+'</td>' : '')+(psmV3TenantTableState.visibleColumns.country ? '<td>'+psmEscapeHtml(customer.country || 'Not available')+'</td>' : '')+(psmV3TenantTableState.visibleColumns.segment ? '<td>'+psmEscapeHtml(customer.segment || 'Not available')+'</td>' : '')+metricCells+'</tr>';
       }).join('');
-      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : (showMomGrowth ? ' colspan="2"' : ' rowspan="2"'))+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
-      var metricSubHeaders = showMomGrowth ? visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th>'; }).join('') : '';
+      var metricGroupHeaders = visibleMetricColumns.map(function(column) { return '<th'+(column.format === 'text' ? ' rowspan="2"' : (showMomGrowth ? ' colspan="3"' : ' rowspan="2"'))+'>'+psmEscapeHtml(column.label)+'</th>'; }).join('');
+      var metricSubHeaders = showMomGrowth ? visibleMetricColumns.map(function(column) { return column.format === 'text' ? '' : '<th>Current</th><th>MoM Growth</th><th>Since Committed</th>'; }).join('') : '';
       var pageSelectionCount = pageCustomers.filter(function(item) { return selectedTenantIds.has(item.customer.tenantId); }).length;
       var selectionHeader = psmV3TenantTableState.selectionMode ? '<th class="v3-tenant-select-cell" rowspan="2"><input id="v3TenantSelectPage" type="checkbox" aria-label="Select all tenants on this page" '+(pageCustomers.length && pageSelectionCount === pageCustomers.length ? 'checked ' : '')+'onchange="psmV3ToggleTenantPageSelection(this.checked)"></th>' : '';
       var tenantHeaders = selectionHeader+'<th rowspan="2">Tenant Name</th><th rowspan="2">Tenant ID</th><th rowspan="2">Association</th>' +
@@ -5241,11 +5312,11 @@
       var filterButton = '<button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'filters\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12L9.5 8v4l-3 1V8L2 3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>Filters'+(activeFilterCount ? ' ('+activeFilterCount+')' : '')+'</button>';
       var toolbarActions = psmV3TenantTableState.selectionMode
         ? '<span class="v3-tenant-selection-mode-label">Select tenants to remove</span>'+filterButton+tenantSearch
-        : '<button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'remove\')"'+tenantEditDisabled+'>Remove Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>'+filterButton+'<button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button>'+tenantSearch;
+        : '<button class="toolbar-btn" type="button" onclick="psmV3OpenTenantChange(\'add\')"'+tenantEditDisabled+'>Add Tenants</button><button class="toolbar-btn" type="button" onclick="psmV3OpenTenantPanel(\'columns\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 2.5h11v11h-11v-11Zm3.67 0v11m3.66-11v11" stroke="currentColor" stroke-width="1.25"/></svg>Change Columns</button>'+filterButton+'<button class="toolbar-btn" type="button" onclick="psmV3DownloadTenants(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button>'+tenantSearch;
       var selectionBar = psmV3TenantTableState.selectionMode
         ? '<div class="v3-selection-bar show" id="v3TenantSelectionBar"><strong id="v3TenantSelectionCount">'+psmV3TenantTableState.selectedIds.length+' tenant'+(psmV3TenantTableState.selectedIds.length === 1 ? '' : 's')+' selected</strong><button class="btn btn-secondary btn-sm" type="button" onclick="psmV3CancelTenantTableSelection()">Cancel</button><button class="btn btn-danger btn-sm" id="v3TenantReviewRemoval" type="button" onclick="psmV3ReviewSelectedTenantRemoval()"'+(psmV3TenantTableState.selectedIds.length ? '' : ' disabled')+'>Review removal</button><span class="v3-selection-guidance">Selections are preserved while you search, filter, or move between pages.</span></div>'
         : '';
-      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;">'+toolbarActions+'</div></div>'+selectionBar+'<div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div><div class="v3-pagination"><span>Showing '+(tenantTotal ? pageStart + 1 : 0)+'-'+Math.min(pageStart + pageCustomers.length, tenantTotal)+' of '+tenantTotal+' tenants</span><div class="v3-actions"><label>Rows per page <select aria-label="Tenant rows per page" onchange="psmV3SetTenantPageSize(this.value)">'+[25,50,100].map(function(size) { return '<option value="'+size+'"'+(psmV3TenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(-1)"'+(psmV3TenantTableState.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3TenantTableState.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(1)"'+(psmV3TenantTableState.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month for each tenant.</div>' : '')+'</he-card_psmv3>';
+      return '<he-card_psmv3 class="v3-card" style="margin-top:12px;"><div class="v3-tenant-toolbar"><div><h2>Campaign tenants</h2></div><div class="v3-actions" style="margin-left:auto;flex-wrap:nowrap;">'+toolbarActions+'</div></div>'+selectionBar+'<div class="v3-table-wrap"><table class="v3-table v3-readonly-table"><thead><tr>'+tenantHeaders+metricGroupHeaders+'</tr>'+(showMomGrowth ? '<tr>'+metricSubHeaders+'</tr>' : '')+'</thead><tbody>'+rows+'</tbody></table></div><div class="v3-pagination"><span>Showing '+(tenantTotal ? pageStart + 1 : 0)+'-'+Math.min(pageStart + pageCustomers.length, tenantTotal)+' of '+tenantTotal+' tenants</span><div class="v3-actions"><label>Rows per page <select aria-label="Tenant rows per page" onchange="psmV3SetTenantPageSize(this.value)">'+[25,50,100].map(function(size) { return '<option value="'+size+'"'+(psmV3TenantTableState.pageSize === size ? ' selected' : '')+'>'+size+'</option>'; }).join('')+'</select></label><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(-1)"'+(psmV3TenantTableState.page === 1 ? ' disabled' : '')+'>Previous</he-button_psmv3><span>Page '+psmV3TenantTableState.page+' of '+totalPages+'</span><he-button_psmv3 class="v3-btn" onclick="psmV3TenantPage(1)"'+(psmV3TenantTableState.page === totalPages ? ' disabled' : '')+'>Next</he-button_psmv3></div></div>'+(showMomGrowth ? '<div style="margin-top:8px;color:var(--cp-text-muted);font-size:11px;">MoM Growth compares the current value with the previous month. Since Committed compares the current value with the campaign baseline.</div>' : '')+'</he-card_psmv3>';
     }
 
     function psmV3CanEdit(c) {
@@ -5254,8 +5325,16 @@
 
     function psmV3OpenTenantChange(action) {
       var c = psmV3CurrentCampaign;
+      if (action !== 'add') {
+        showToast('Tenant removal requires a support request in the MVP', true);
+        return;
+      }
       if (!c || !psmV3CanEdit(c)) {
         showToast('Only the assigned PSM can change campaign tenants', true);
+        return;
+      }
+      if (c.v3Status === 'Closed') {
+        showToast('Closed campaigns cannot accept new tenants', true);
         return;
       }
       psmV3TenantChange = { action:action, ids:[], valid:false, source:'input' };
@@ -5416,6 +5495,15 @@
           var customer = psmMvpCreateTenantRecord('Fabrikam Tenant '+String(startingTenantCount + index + 1).padStart(3, '0'), id, c, startingTenantCount + index);
           customer.association = 'None';
           customer.manuallyAdded = true;
+          if (psmV3IsTrackingStatus(c)) {
+            customer.v3TrackingStartDate = today();
+            customer.v3CommittedMetricBaselines = {};
+            var config = psmV3OutcomeConfig(c);
+            config.columns.forEach(function(column) {
+              if (column.format === 'text') return;
+              customer.v3CommittedMetricBaselines[column.key] = psmV3TenantMetricSnapshot(column.key, startingTenantCount + index, column.format).current;
+            });
+          }
           c.customers.push(customer);
         });
       } else {
@@ -5425,7 +5513,7 @@
       c.tenantCount = c.customers.length;
       c.v3LastUpdated = today();
       c.v3Activity = c.v3Activity || [];
-      c.v3Activity.push({ date:today(), type:psmV3TenantChange.action === 'add' ? 'Customer tenants added' : 'Customer tenants removed', detail:ids.length+' tenant(s) '+(psmV3TenantChange.action === 'add' ? 'added to' : 'removed from')+' the campaign.' });
+      c.v3Activity.push({ date:today(), type:psmV3TenantChange.action === 'add' ? 'Customer tenants added' : 'Customer tenants removed', detail:ids.length+' tenant(s) '+(psmV3TenantChange.action === 'add' ? 'added to' : 'removed from')+' the campaign.'+(psmV3TenantChange.action === 'add' && psmV3IsTrackingStatus(c) ? ' Impact tracking started for the new tenants on '+today()+'.' : '') });
       var action = psmV3TenantChange.action;
       psmV3TenantChange = { action:'', ids:[], valid:false, source:'input' };
       psmV3TenantTableState.selectionMode = false;
@@ -5440,11 +5528,12 @@
       var dates = { New:c.v3OpenDate || c.created };
       (c.v3Activity || []).forEach(function(activity) {
         if (activity.type !== 'Campaign status' || !activity.date) return;
-        var match = String(activity.detail || '').match(/->\s*(New|Outreach|Engage|Committed|Closed)\b/i);
+        var match = String(activity.detail || '').match(/->\s*(New|Outreach|Engaged|Committed|Closed)\b/i);
         if (!match) return;
         var status = PSM_V3_STATUS_FLOW.filter(function(item) { return item.toLowerCase() === match[1].toLowerCase(); })[0];
         if (status && !dates[status]) dates[status] = activity.date;
       });
+      if (c.v3BaselineAvailable && c.v3BaselineDate) dates.Committed = c.v3BaselineDate;
       if (currentStatusIndex <= 0) return dates;
       var start = new Date((dates.New || today())+'T00:00:00');
       var end = new Date((dates[c.v3Status] || c.v3LastUpdated || today())+'T00:00:00');
@@ -5556,8 +5645,8 @@
         '<div class="v3-charts">' +
           outcomeConfig.trends.map(function(trend) { return psmV3TrendCard(trend.title, trend.subtitle, trend.values, trend.prefix, trend.suffix || ''); }).join('') +
         '</div>';
-      var impactPanel = c.v3Status === 'Committed'
-        ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+(c.v3BaselineAvailable ? c.v3BaselineDate : 'when tracking began')+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
+      var impactPanel = psmV3IsTrackingStatus(c)
+        ? '<div class="panel-card"><h2 class="psm-v3-section-heading">Campaign Impact <span class="psm-v3-heading-meta">Baseline captured '+psmEscapeHtml(c.v3BaselineDate)+'</span></h2><div class="v3-kpis" style="grid-template-columns:repeat(5,minmax(150px,1fr));">'+detailKpis+'</div>'+detailCharts+'</div>'
         : '';
       var businessOutcomePanel = '<section class="psm-v3-business-outcome psm-v3-business-outcome-header" aria-labelledby="psmV3BusinessOutcomeHeading"><h3 id="psmV3BusinessOutcomeHeading">Business outcome:</h3><div class="psm-v3-business-outcome-value"><strong>'+psmEscapeHtml(outcomeConfig.label)+'</strong></div></section>';
       var initialNote = (c.v3Notes || []).filter(function(note) { return note.type === 'Campaign comment' || note.type === 'Initial campaign note'; })[0];
@@ -5578,12 +5667,13 @@
           '<div><dt>Campaign ID</dt><dd>'+c.id+'</dd></div>' +
           '<div><dt>PartnerOne ID</dt><dd>'+psmEscapeHtml(c.partnerOneId || PSM_PARTNER_ONE[c.partner] || '\u2014')+'</dd></div>' +
           '<div><dt>PartnerOne name</dt><dd>'+psmEscapeHtml(c.partner)+'</dd></div>' +
-          '<div><dt>Created by</dt><dd class="v3-summary-meta-value"><span>'+psmEscapeHtml(c.v3Owner)+'</span><button class="v3-meta-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner">Edit</button></dd></div>' +
+          '<div><dt>Created by</dt><dd>'+psmEscapeHtml(c.v3CreatedBy)+'</dd></div>' +
+          '<div><dt>Campaign owner</dt><dd class="v3-summary-meta-value"><span>'+psmEscapeHtml(c.v3Owner)+'</span><button class="v3-meta-edit" type="button" onclick="psmV3OpenOwnerEditor(\''+c.id+'\')" aria-label="Edit campaign owner">Edit</button></dd></div>' +
           '<div><dt>Created</dt><dd>'+psmEscapeHtml(c.v3OpenDate)+'</dd></div>' +
           '<div><dt>Last updated</dt><dd>'+psmEscapeHtml(c.v3LastUpdated)+'</dd></div>' +
           '<div><dt>Customer tenants</dt><dd>'+c.tenantCount.toLocaleString()+'</dd></div>' +
         '</dl></div></div>' +
-        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-section-heading-row"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign status</button></div>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. Edit Created by to assign the campaign.</p>')+'</section>' +
+        '<section class="panel-card v3-status-card" aria-labelledby="psmV3CampaignStatusHeading"><div class="v3-section-heading-row"><h2 class="psm-v3-section-heading" id="psmV3CampaignStatusHeading">Campaign status</h2><button class="btn btn-primary" onclick="psmV3OpenCampaignUpdate(\''+c.id+'\')"'+(canEdit ? '' : ' disabled title="Only the assigned PSM can update this campaign"')+'>Update campaign status</button></div>'+statusFlow+(canEdit ? '' : '<p style="margin:8px 0 0;color:var(--cp-text-muted);font-size:11px;">Update is disabled because you are not the assigned PSM. The current owner can transfer the campaign to another PSM.</p>')+'</section>' +
         (initialNotePanel ? '<div class="panel-card">'+initialNotePanel+'</div>' : '') +
         impactPanel +
         psmV3TenantWorkspace(c);
