@@ -2842,7 +2842,7 @@
       document.getElementById('dashboardTitle').style.display = '';
       document.getElementById('dashboardTitle').innerHTML =
         view === 'partner'
-          ? 'Insights <span style="color:#616161;font-weight:400;">|</span> Partner Engagements <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security &#9432;</span>'
+          ? 'Partner Engagements'
           : 'Security Deal Clinic <span style="font-size:13px;color:#999;font-weight:400;">AI Business Solutions &amp; Security</span>';
       document.getElementById('breadcrumb').style.display = view === 'partner' ? '' : 'none';
       // Partner Engagements tabs are shown only in the Partner (ASPX) experience
@@ -3774,7 +3774,7 @@
       var dashboard = document.getElementById('dashboardView');
       dashboard.setAttribute('data-psm-rendered', 'true');
       dashboard.innerHTML = '<div class="v3-shell">' +
-        '<div class="v3-head"><div><h1 class="v3-title-line"><strong>Insights</strong><span class="v3-title-divider">|</span><span>Partner Engagements</span><small class="v3-title-suite">AI Business Solutions &amp; Security</small><i class="v3-title-info" title="AI Business Solutions &amp; Security Partner eXperience">i</i></h1></div></div>' +
+        '<div class="v3-head"><div><h1 class="v3-title-line">Partner Engagements</h1></div></div>' +
         '<div class="v3-page-tabs-row"><nav class="v3-page-tabs" aria-label="Partner Engagements views"><button class="v3-page-tab" type="button" onclick="showToast(\'FastTrack Referrals selected\')">FastTrack Referrals</button><button class="v3-page-tab" type="button" onclick="showToast(\'Security Deal Clinic selected\')">Security Deal Clinic</button><button class="v3-page-tab active" type="button" aria-current="page">PSM Campaigns</button></nav><div class="v3-actions"><he-button_psmv3 class="v3-btn" appearance="primary" onclick="psmV3OpenCreate()">Create campaign</he-button_psmv3></div></div>' +
         '<div id="psmV3Kpis"></div><div id="psmV3Charts"></div><div id="psmV3Table"></div></div>';
       psmV3RenderDashboard();
